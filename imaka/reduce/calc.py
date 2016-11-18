@@ -84,12 +84,13 @@ def xy_to_en(x, y, camera_pa='N'):
     Calculate the East North offsets for a desired X Y offset.
     """
     scale = 0.040 # arcsec / pixel
-    angle = 90.0 - camera_angle[camera_pa] # degrees
+    angle = camera_angle[camera_pa] # degrees
 
+    import pdb
     cosa = np.cos(np.radians(angle))
     sina = np.sin(np.radians(angle))
 
-    east = scale * (x * cosa - y * sina)
+    east = -1.0 * scale * (x * cosa - y * sina)
     north = scale * (x * sina + y * cosa)
 
     return east, north
