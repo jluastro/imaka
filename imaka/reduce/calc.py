@@ -76,13 +76,15 @@ def two_point_solve(e1, n1, x1, y1, e2, n2, x2, y2):
 
     return scale, angle
 
-    
-def xy_to_en(x, y):
+# These are numbers reported from scale_from_fiber_positions()
+camera_angle = {'N':76.33, 'E':-15.68}
+
+def xy_to_en(x, y, camera_pa='N'):
     """
     Calculate the East North offsets for a desired X Y offset.
     """
     scale = 0.040 # arcsec / pixel
-    angle = 12.0 # degrees
+    angle = 90.0 - camera_angle[camera_pa] # degrees
 
     cosa = np.cos(np.radians(angle))
     sina = np.sin(np.radians(angle))
@@ -93,12 +95,12 @@ def xy_to_en(x, y):
     return east, north
     
 
-def en_to_xy(e, n):
+def en_to_xy(e, n, camera_pa='N'):
     """
     Calculate the East North offsets for a desired X Y offset.
     """
     scale = 0.040 # arcsec / pixel
-    angle = 12.0 # degrees
+    angle = 90.0 - camera_angle[camera_pa] # degrees
 
     cosa = np.cos(np.radians(angle))
     sina = np.sin(np.radians(angle))
@@ -117,14 +119,27 @@ def scale_from_fiber_positions():
     Analysis of the fiber positions
     """
     
+
+    # Camera Position N - 2016-11-15
+    # fiber_en_1 = np.array([0.0, 0.0])
+    # fiber_en_2 = np.array([0.0, 12.1858])  # (supposedly N offset)
+    # fiber_en_3 = np.array([-15.53, 0.0])  # (supposedly E offset... note the sign flip)
+    # The sign flip is necessary to make the two coordinate have the same "handed-ness".
+    
+    # fiber_xy_1 = np.array([1788.502, 1930.594])
+    # fiber_xy_2 = np.array([4211.805, 2553.25])
+    # fiber_xy_3 = np.array([917.762, 5300.377])
+
+    # Position E - 2016-11-17
     fiber_en_1 = np.array([0.0, 0.0])
     fiber_en_2 = np.array([0.0, 12.1858])  # (supposedly N offset)
-    fiber_en_3 = np.array([-15.53, 0.0])  # (supposedly E offset... note the sign flip)
+    fiber_en_3 = np.array([15.53, 0.0])  # (supposedly E offset... note the sign flip)
     # The sign flip is necessary to make the two coordinate have the same "handed-ness".
-
-    fiber_xy_1 = np.array([1788.502, 1930.594])
-    fiber_xy_2 = np.array([4211.805, 2553.25])
-    fiber_xy_3 = np.array([917.762, 5300.377])
+    
+    fiber_xy_1 = np.array([1915.28, 2197.8])
+    fiber_xy_2 = np.array([1290.2, 4569.8])
+    fiber_xy_3 = np.array([5285.4, 3077.8])
+    
 
     pixel_size = 0.006 # 6 micron pixels.
 
