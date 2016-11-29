@@ -90,7 +90,7 @@ def xy_to_en(x, y, camera_pa='N'):
     cosa = np.cos(np.radians(angle))
     sina = np.sin(np.radians(angle))
 
-    east = -1.0 * scale * (x * cosa - y * sina)
+    east = -scale * (x * cosa - y * sina)
     north = scale * (x * sina + y * cosa)
 
     return east, north

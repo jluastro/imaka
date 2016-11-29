@@ -3,6 +3,7 @@ from . import util
 from astropy.io import fits
 from astropy.stats import sigma_clip
 import numpy as np
+import pdb
 
 module_dir = os.path.dirname(__file__)
 
@@ -56,6 +57,72 @@ def makedark(dark_files, output):
     outlis_file.close()
     
     return
+
+def makeflat(flat_files, dark_files, output):
+    """
+    Make flats image for data. 
+
+    flat_files: array fits file names
+    dark_files: array fits file names matched, 1:1, to the flats
+    """
+    # Catch if there are no files sent in.
+    if (len(flat_files) == 0) or (len(dark_files) == 0):
+        raise RuntimeError('No files passed into makeflat')
+        
+    # Output directory is the same as the input directory.
+    dark_dir = os.path.dirname(dark_files[0]) + '/'
+    flat_dir = os.path.dirname(flat_files[0]) + '/'
+    
+    _out = flat_dir + output
+    _outlis = flat_dir + 'flat.lis'
+    util.rmall([_out, _outlis])
+
+    # Print out useful info.
+    print('Making flat frame: ' + output)
+    for ff in range(len(dark_files)):
+        filedir1, filename1 = os.path.split(dark_files[ff])
+        filedir2, filename2 = os.path.split(flat_files[ff])
+        print('\t Flat: ' + filename2 + '  Dark: ' + filename1)
+
+    # Read in the dark images
+    print('\nReading in dark files')
+    darks = np.array([fits.getdata(dark_file) for dark_file in dark_files])
+    
+    # Read in the flat images
+    print('\nReading in flat files')
+    flats = np.array([fits.getdata(flat_file) for flat_file in flat_files])
+
+    flats_ds = flats - darks
+
+    # Normalize each of the flats:
+    norms = flats_ds.sum(axis=(1,2))
+
+    pdb.set_trace()
+    
+    for ff in range(len(flat_files)):
+        flats_ds[ff]
+    # Sigma clip  (about the median)
+    print('Sigma clipping (3 sigma, 2 iterations) about the median.')
+    darks_masked = sigma_clip(darks, sigma=3, iters=2, axis=0)
+    print('\t Masked {0:d} total pixels'.format(darks_masked.mask.sum()))
+
+    # Median combine the masked images.
+    print('Median combining')
+    dark = np.ma.median(darks_masked, axis=0)
+    
+    # Save the output files.
+    # Get the header from the first image.
+    hdr = fits.getheader(dark_files[0])
+    fits.writeto(_out, dark.data, header=hdr)
+
+    outlis_file = open(_outlis, 'w')
+    for ff in range(len(dark_files)):
+        outlis_file.write(dark_files[ff] + '\n')
+    outlis_file.close()
+    
+    return
+
+
 
 # def makeflat(onFiles, offFiles, output, normalizeFirst=False):
 #     """

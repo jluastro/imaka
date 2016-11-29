@@ -62,16 +62,17 @@ def fix_bad_pixels(img):
     return cleanarr
 
 
-def clean_images(img_files, rebin=10):
+def clean_images(img_files, rebin=10, sky_frame=None):
     from scipy.ndimage import median_filter
 
     for ii in range(len(img_files)):
         print('Working on image: ', img_files[ii])
         img, hdr = fits.getdata(img_files[ii], header=True)
 
-        # Fix hot and dead pixels
-        print('\t Fix bad pixels')
-        bad_pixels, img_cr = find_outlier_pixels(img, tolerance=5, worry_about_edges=False)
+        # # Fix hot and dead pixels
+        # print('\t Fix bad pixels')
+        # bad_pixels, img_cr = find_outlier_pixels(img, tolerance=5, worry_about_edges=False)
+        img_cr = img
  
         # Bin by a factor of 10 (or as specified).
         print('\t Bin by a factor of ', rebin)
@@ -80,10 +81,15 @@ def clean_images(img_files, rebin=10):
         fits.writeto(img_files[ii].replace('.fits', '_bin.fits'), img_bin, hdr, clobber=True)
 
         # Subtract background.
-        bkg_box_size = int(round(img_bin.shape[0] / 10.))
-        print('\t Subtract background with smoothing box size of ', bkg_box_size)
-        blurred = median_filter(img_bin, size=bkg_box_size)
-        img_final = img_bin - blurred.astype(float)
+        if sky_frame == None:
+            bkg_box_size = int(round(img_bin.shape[0] / 10.))
+            print('\t Subtract background with smoothing box size of ', bkg_box_size)
+            blurred = median_filter(img_bin, size=bkg_box_size)
+            img_final = img_bin - blurred.astype(float)
+        else:
+            sky = fits.getdata(sky_frame)
+            sky_bin = block_reduce(sky, (rebin, rebin), func=np.sum)
+            img_final = img_bin - sky_bin
 
         # Save the final image.
         fits.writeto(img_files[ii].replace('.fits', '_bin_nobkg.fits'), img_final, hdr, clobber=True)
@@ -113,9 +119,9 @@ def find_stars_bin(img_files, fwhm=5, threshold=4, N_passes=2):
         
         bkg_mean = img[good_pix].mean()
         bkg_std = img[good_pix].std()
-        threshold *= threshold * bkg_std
+        img_threshold = threshold * bkg_std
         print('\t Bkg = {0:.2f} +/- {1:.2f}'.format(bkg_mean, bkg_std))
-        print('\t Bkg Threshold = {0:.2f}'.format(threshold))
+        print('\t Bkg Threshold = {0:.2f}'.format(img_threshold))
 
         # Detect stars
         print('\t Detecting Stars')
@@ -123,7 +129,7 @@ def find_stars_bin(img_files, fwhm=5, threshold=4, N_passes=2):
         # Each pass will have an updated fwhm for the PSF.
         for nn in range(N_passes):
             print('\t Pass {0:d} assuming FWHM = {1:.1f}'.format(nn, fwhm))
-            daofind = DAOStarFinder(fwhm=fwhm, threshold = threshold, exclude_border=True)
+            daofind = DAOStarFinder(fwhm=fwhm, threshold = img_threshold, exclude_border=True)
             sources = daofind(img - bkg_mean)
 
             # Calculate FWHM for each detected star.
@@ -216,6 +222,7 @@ def find_outlier_pixels(data, tolerance=3, worry_about_edges=True, median_filter
     blurred = median_filter(data, size=median_filter_size)
     difference = data - blurred.astype(float)
     threshold = tolerance * np.std(difference)
+    pdb.set_trace()
 
     # Find the hot pixels, but ignore the edges
     hot_pixels = np.nonzero((np.abs(difference[1:-1,1:-1]) > threshold) )

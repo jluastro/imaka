@@ -58,7 +58,9 @@ def reduce_pleiades_binned_open():
     os.chdir(data_dir)
     
     # img_files = ['obj_{0:03d}.fits'.format(ii) for ii in range(82, 91)]
-    img_files = ['obj_{0:03d}.fits'.format(ii) for ii in range(163, 173)]
+    # img_files = ['obj_{0:03d}.fits'.format(ii) for ii in range(163, 173)]
+    img_files = ['obj_{0:03d}.fits'.format(ii) for ii in range(247, 251)]
+    img_files += ['obj_{0:03d}.fits'.format(ii) for ii in range(255, 258)]
 
     reduce_fli.clean_images(img_files, rebin=2)
 
@@ -70,7 +72,9 @@ def reduce_pleiades_binned_closed():
     os.chdir(data_dir)
     
     # img_files = ['obj_{0:03d}.fits'.format(ii) for ii in range(92, 101)]
-    img_files = ['obj_{0:03d}.fits'.format(ii) for ii in range(153, 163)]
+    # img_files = ['obj_{0:03d}.fits'.format(ii) for ii in range(153, 163)]
+    img_files = ['obj_{0:03d}.fits'.format(ii) for ii in range(243, 247)]
+    img_files += ['obj_{0:03d}.fits'.format(ii) for ii in range(251, 254)]
 
     reduce_fli.clean_images(img_files, rebin=2)
 
@@ -82,7 +86,9 @@ def find_stars_pleiades_binned_open():
     
     # img_files = ['obj_{0:03d}_bin_nobkg.fits'.format(ii) for ii in range(82, 92)]
     # img_files = ['obj_{0:03d}_bin_nobkg.fits'.format(ii) for ii in range(163, 173)]
-    img_files = ['obj_{0:03d}_bin_nobkg.fits'.format(ii) for ii in range(167, 173)]
+    # img_files = ['obj_{0:03d}_bin_nobkg.fits'.format(ii) for ii in range(167, 173)]
+    img_files = ['obj_{0:03d}_bin_nobkg.fits'.format(ii) for ii in range(247, 251)]
+    img_files += ['obj_{0:03d}_bin_nobkg.fits'.format(ii) for ii in range(255, 258)]
 
     reduce_fli.find_stars_bin(img_files, fwhm=4, threshold=6)
 
@@ -93,7 +99,9 @@ def find_stars_pleiades_binned_closed():
     os.chdir(data_dir)
     
     # img_files = ['obj_{0:03d}_bin_nobkg.fits'.format(ii) for ii in range(92, 102)]
-    img_files = ['obj_{0:03d}_bin_nobkg.fits'.format(ii) for ii in range(153, 163)]
+    # img_files = ['obj_{0:03d}_bin_nobkg.fits'.format(ii) for ii in range(153, 163)]
+    img_files = ['obj_{0:03d}_bin_nobkg.fits'.format(ii) for ii in range(243, 247)]
+    img_files += ['obj_{0:03d}_bin_nobkg.fits'.format(ii) for ii in range(251, 254)]
 
     reduce_fli.find_stars_bin(img_files, fwhm=4, threshold=6)
 
@@ -105,9 +113,11 @@ def compare_fwhm_list():
     
     # o_list = np.arange(163, 173) # Open loop star lists
     # c_list = np.arange(153, 163) # Closed loop star lists
-    o_list = np.arange(163, 173) # Open loop star lists
-    c_list = np.arange(153, 163) # Closed loop star lists
-
+    # o_list = np.arange(163, 173) # Open loop star lists
+    # c_list = np.arange(153, 163) # Closed loop star lists
+    o_list = np.concatenate([np.arange(247, 251), np.arange(255, 258)])
+    c_list = np.concatenate([np.arange(243, 247), np.arange(251, 254)])
+    
     plt.ion()
 
     for ii in range(len(o_list)):
