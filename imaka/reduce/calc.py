@@ -39,15 +39,42 @@ def get_pa_scale():
     # x_pos = np.array([381.4, 172.5])
     # y_pos = np.array([329.0, 374.6])
 
-    e_pos = np.array([6.0, -3.0])
-    n_pos = np.array([0.0, 0.0])
-    x_pos = np.array([381.4, 172.5])
-    y_pos = np.array([329.0, 374.6])
+    # e_pos = np.array([6.0, -3.0])
+    # n_pos = np.array([0.0, 0.0])
+    # x_pos = np.array([381.4, 172.5])
+    # y_pos = np.array([329.0, 374.6])
 
+    # E-position of the science camera (2017-01-09 HST)
+    # e_pos = np.array([15.0, -30.0])  # OR 0 60, OR 15 0
+    # n_pos = np.array([0.0, 0.0])
+    # x_pos = np.array([1770.0, 1650.0])
+    # y_pos = np.array([2023.0, 1815.0])
+
+    # E-position of the science camera (2017-01-09 HST)
+    e_pos = np.array([0.0, -28.0])  # OR 0 60, OR 15 0
+    n_pos = np.array([0.0, 0.0])
+    x_pos = np.array([1495.0, 1382.0])
+    y_pos = np.array([1985.0, 1796.0])
+    
     scale, angle = two_point_solve(e_pos[0], n_pos[0], x_pos[0], y_pos[0],
                                    e_pos[1], n_pos[1], x_pos[1], y_pos[1])
 
     return
+
+
+# Want center at (fiber center):
+# x = 1660
+# y = 1745
+# Star coming into:
+# x = 1522 (1525)
+# y = 2027 
+# Star coming into:
+# x = 1482
+# y = 1965
+# After AO -28 25
+# x = 1520
+# y = 1688
+# 
 
 def two_point_solve(e1, n1, x1, y1, e2, n2, x2, y2):
     """
@@ -77,37 +104,42 @@ def two_point_solve(e1, n1, x1, y1, e2, n2, x2, y2):
     return scale, angle
 
 # These are numbers reported from scale_from_fiber_positions()
-camera_angle = {'N':76.33, 'E':-15.68}
+# camera_angle = {'N':76.33, 'E':-15.68}
 
-def xy_to_en(x, y, camera_pa='N'):
+# These are numbers reported from get_pa_scale() on 2017-01-17
+camera_angle = {'N':76.33, 'E': -60.0}
+# camera_angle = {'N':76.33, 'E': -140.0}
+
+def xy_to_en(x, y, camera_pa='E'):
     """
     Calculate the East North offsets for a desired X Y offset.
+
+    Note: x and y should be CURRENT - DESIRED
     """
-    scale = 0.040 # arcsec / pixel
+    scale = 0.127 # arcsec / pixel
     angle = camera_angle[camera_pa] # degrees
 
-    import pdb
     cosa = np.cos(np.radians(angle))
     sina = np.sin(np.radians(angle))
 
-    east = -scale * (x * cosa - y * sina)
-    north = scale * (x * sina + y * cosa)
+    east = scale * (x * cosa - y * sina)
+    north = -scale * (x * sina + y * cosa)
 
     return east, north
     
 
-def en_to_xy(e, n, camera_pa='N'):
+def en_to_xy(e, n, camera_pa='E'):
     """
     Calculate the East North offsets for a desired X Y offset.
     """
-    scale = 0.040 # arcsec / pixel
-    angle = 90.0 - camera_angle[camera_pa] # degrees
+    scale = 0.127 # arcsec / pixel
+    angle = camera_angle[camera_pa] # degrees
 
     cosa = np.cos(np.radians(angle))
     sina = np.sin(np.radians(angle))
 
-    x = (1.0 / scale) * (e * cosa + n * sina)
-    y = (1.0 / scale) * (e * sina - n * cosa) * -1.0
+    x = (1.0 / scale) * (e * cosa - n * sina)
+    y = (1.0 / -scale) * (e * sina + n * cosa)
 
     return x, y
     
