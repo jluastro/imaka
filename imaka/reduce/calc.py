@@ -108,7 +108,6 @@ def two_point_solve(e1, n1, x1, y1, e2, n2, x2, y2):
 
 # These are numbers reported from get_pa_scale() on 2017-01-17
 camera_angle = {'N':76.33, 'E': -60.0}
-# camera_angle = {'N':76.33, 'E': -140.0}
 
 def xy_to_en(x, y, camera_pa='E'):
     """

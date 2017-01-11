@@ -5,7 +5,6 @@ import numpy as np
 import glob 
 from skimage.measure import block_reduce
 from astropy.stats import sigma_clipped_stats
-from reduce_2016_10_24 import calc_fwhm
 
 
 
