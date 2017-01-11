@@ -120,15 +120,15 @@ def find_stars_bin(img_files, fwhm=5, threshold=4, N_passes=2):
         bkg_mean = img[good_pix].mean()
         bkg_std = img[good_pix].std()
         img_threshold = threshold * bkg_std
-        print('\t Bkg = {0:.2f} +/- {1:.2f}'.format(bkg_mean, bkg_std))
-        print('\t Bkg Threshold = {0:.2f}'.format(img_threshold))
+        print('     Bkg = {0:.2f} +/- {1:.2f}'.format(bkg_mean, bkg_std))
+        print('     Bkg Threshold = {0:.2f}'.format(img_threshold))
 
         # Detect stars
-        print('\t Detecting Stars')
+        print('     Detecting Stars')
 
         # Each pass will have an updated fwhm for the PSF.
         for nn in range(N_passes):
-            print('\t Pass {0:d} assuming FWHM = {1:.1f}'.format(nn, fwhm))
+            print('     Pass {0:d} assuming FWHM = {1:.1f}'.format(nn, fwhm))
             daofind = DAOStarFinder(fwhm=fwhm, threshold = img_threshold, exclude_border=True)
             sources = daofind(img - bkg_mean)
 
@@ -181,10 +181,10 @@ def find_stars_bin(img_files, fwhm=5, threshold=4, N_passes=2):
             x_fwhm_med = np.median(sources['x_fwhm'])
             y_fwhm_med = np.median(sources['y_fwhm'])
             
-            print('\t    Number of sources = ', len(sources))
-            print('\t    Median x_fwhm = {0:.1f} +/- {1:.1f}'.format(x_fwhm_med,
+            print('        Number of sources = ', len(sources))
+            print('        Median x_fwhm = {0:.1f} +/- {1:.1f}'.format(x_fwhm_med,
                                                                      sources['x_fwhm'].std()))
-            print('\t    Median y_fwhm = {0:.1f} +/- {1:.1f}'.format(y_fwhm_med,
+            print('        Median y_fwhm = {0:.1f} +/- {1:.1f}'.format(y_fwhm_med,
                                                                      sources['y_fwhm'].std()))
 
             fwhm = np.mean([x_fwhm_med, y_fwhm_med])
