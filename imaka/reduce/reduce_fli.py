@@ -137,7 +137,7 @@ def find_stars_bin(img_files, fwhm=5, threshold=4, N_passes=2):
             y_fwhm = np.zeros(len(sources), dtype=float)
             theta = np.zeros(len(sources), dtype=float)
         
-            cutout_half_size = int(round(fwhm * 2))
+            cutout_half_size = int(round(fwhm * 3))
             cutout_size = 2 * cutout_half_size
         
             cutouts = np.zeros((len(sources), cutout_size, cutout_size), dtype=float)
@@ -161,9 +161,26 @@ def find_stars_bin(img_files, fwhm=5, threshold=4, N_passes=2):
                 cutouts[ss] = cutout_tmp
                 cutouts[ss] /= cutouts[ss].sum()
 
-
                 # Fit an elliptical gaussian to the cutout image.
                 g2d_params = g2d_fitter(g2d_model, cut_x, cut_y, cutouts[ss])
+
+                g2d_image = g2d_params(cut_x, cut_y)
+                plt.figure(4)
+                plt.clf()
+                plt.imshow(cutouts[ss])
+                plt.pause(0.05)
+                
+                plt.figure(5)
+                plt.clf()
+                plt.imshow(g2d_image)
+                plt.pause(0.05)
+                
+                plt.figure(6)
+                plt.clf()
+                plt.imshow(cutouts[ss] - g2d_image)
+                plt.pause(0.05)
+                
+                pdb.set_trace()
 
                 x_fwhm[ss] = g2d_params.x_stddev.value / gaussian_fwhm_to_sigma
                 y_fwhm[ss] = g2d_params.y_stddev.value / gaussian_fwhm_to_sigma
@@ -302,6 +319,4 @@ def find_outlier_pixels(data, tolerance=3, worry_about_edges=True, median_filter
     return hot_pixels, fixed_image
 
     
-        
-
         
