@@ -1,7 +1,7 @@
 import os, sys
 from . import util
 from astropy.io import fits
-from astropy.stats import sigma_clip
+from astropy.stats import sigma_clip, sigma_clipped_stats
 import numpy as np
 import pdb
 
@@ -38,13 +38,9 @@ def makedark(dark_files, output):
     darks = np.array([fits.getdata(dark_file) for dark_file in dark_files])
 
     # Sigma clip  (about the median)
-    print('Sigma clipping (3 sigma, 2 iterations) about the median.')
-    darks_masked = sigma_clip(darks, sigma=3, iters=2, axis=0)
-    print('\t Masked {0:d} total pixels'.format(darks_masked.mask.sum()))
-
-    # Median combine the masked images.
-    print('Median combining')
-    dark = np.ma.median(darks_masked, axis=0)
+    print('Sigma clipping and median combining (3 sigma lower, 2 sigma upper, 5 iterations) about the median.')
+    dark_mean, dark_median, dark_std = sigma_clipped_stats(darks, sigma_lower=3, sigma_upper=2, iters=5, axis=0)
+    dark = dark_median
     
     # Save the output files.
     # Get the header from the first image.

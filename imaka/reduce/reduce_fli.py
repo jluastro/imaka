@@ -65,6 +65,8 @@ def fix_bad_pixels(img):
 def clean_images(img_files, rebin=10, sky_frame=None):
     from scipy.ndimage import median_filter
 
+    sky_bin == None   # Indiciates we haven't loaded the sky frame yet.
+
     for ii in range(len(img_files)):
         print('Working on image: ', img_files[ii])
         img, hdr = fits.getdata(img_files[ii], header=True)
@@ -87,8 +89,10 @@ def clean_images(img_files, rebin=10, sky_frame=None):
             blurred = median_filter(img_bin, size=bkg_box_size)
             img_final = img_bin - blurred.astype(float)
         else:
-            sky = fits.getdata(sky_frame)
-            sky_bin = block_reduce(sky, (rebin, rebin), func=np.sum)
+            if sky_bin == None:
+                sky = fits.getdata(sky_frame)
+                sky_bin = block_reduce(sky, (rebin, rebin), func=np.sum)
+                
             img_final = img_bin - sky_bin
 
         # Save the final image.

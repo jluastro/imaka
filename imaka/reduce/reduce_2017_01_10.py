@@ -12,12 +12,45 @@ from flystar import match
 
 def make_sky():
     sky_dir = '/Users/jlu/data/imaka/2017_01_10/fli/Pleiades/'
-    sky_frames = [20, 21, 30, 31, 46, 47, 56, 57]
 
-    for ss in range(len(sky_frames)):
-        sky_frames[ss] = '{0:s}sky{1:03d}.fits'.format(sky_dir, sky_frames[ss])
-
+    sky_num = [20, 21, 30, 31, 46, 47, 56, 57, 70, 71, 84, 85, 98, 99, 112, 113,
+                   126, 127, 140, 141, 140, 141, 154, 155, 168, 169, 186, 187]
+    sky_frames = ['{0:s}sky{1:03d}.fits'.format(sky_dir, ss) for ss in sky_num]
     calib.makedark(sky_frames, 'pleiades_sky.fits')
+    
+    sky_num = [20, 21, 30, 31]
+    sky_frames = ['{0:s}sky{1:03d}.fits'.format(sky_dir, ss) for ss in sky_num]
+    calib.makedark(sky_frames, 'pleiades_sky_020.fits')
+
+    sky_num = [46, 47, 56, 57]
+    sky_frames = ['{0:s}sky{1:03d}.fits'.format(sky_dir, ss) for ss in sky_num]
+    calib.makedark(sky_frames, 'pleiades_sky_046.fits')
+
+    sky_num = [70, 71, 84, 85]
+    sky_frames = ['{0:s}sky{1:03d}.fits'.format(sky_dir, ss) for ss in sky_num]
+    calib.makedark(sky_frames, 'pleiades_sky_070.fits')
+
+    sky_num = [98, 99, 112, 113]
+    sky_frames = ['{0:s}sky{1:03d}.fits'.format(sky_dir, ss) for ss in sky_num]
+    calib.makedark(sky_frames, 'pleiades_sky_098.fits')
+
+    sky_num = [126, 127, 140, 141]
+    sky_frames = ['{0:s}sky{1:03d}.fits'.format(sky_dir, ss) for ss in sky_num]
+    calib.makedark(sky_frames, 'pleiades_sky_126.fits')
+
+    sky_num = [140, 141, 154, 155]
+    sky_frames = ['{0:s}sky{1:03d}.fits'.format(sky_dir, ss) for ss in sky_num]
+    calib.makedark(sky_frames, 'pleiades_sky_140.fits')
+
+    sky_num = [168, 169, 186, 187]
+    sky_frames = ['{0:s}sky{1:03d}.fits'.format(sky_dir, ss) for ss in sky_num]
+    calib.makedark(sky_frames, 'pleiades_sky_168.fits')
+
+    sky_num = [204, 205, 222, 240, 241]
+    sky_frames = ['{0:s}sky{1:03d}.fits'.format(sky_dir, ss) for ss in sky_num]
+    calib.makedark(sky_frames, 'pleiades_sky_204.fits')
+
+    return
     
         
 def reduce_pleiades_binned_open():
@@ -27,9 +60,16 @@ def reduce_pleiades_binned_open():
 
     fnum = [10, 11, 14, 15]
     img_files = ['obj{0:03d}.fits'.format(ii) for ii in fnum]
-
     reduce_fli.clean_images(img_files, rebin=1, sky_frame=sky_dir + 'pleiades_sky.fits')
 
+    fnum = [10, 11, 14, 15]
+    img_files = ['obj{0:03d}.fits'.format(ii) for ii in fnum]
+    reduce_fli.clean_images(img_files, rebin=1, sky_frame=sky_dir + 'pleiades_sky.fits')
+
+    fnum = [10, 11, 14, 15]
+    img_files = ['obj{0:03d}.fits'.format(ii) for ii in fnum]
+    reduce_fli.clean_images(img_files, rebin=1, sky_frame=sky_dir + 'pleiades_sky.fits')
+    
     return
     
 
