@@ -100,10 +100,16 @@ def clean_images(img_files, rebin=10, sky_frame=None):
 
     return
     
-def find_stars_bin(img_files, fwhm=5, threshold=4, N_passes=2):
+def find_stars_bin(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=False):
+    """
+    img_files - a list of image files.
+    fwhm - First guess at the FWHM of the PSF for the first pass on the first image.
+    threshold - the SNR threshold (mean + threshold*std) above which to search for sources.
+    N_passes - how many times to find sources, recalc the PSF FWHM, and find sources again. 
+    """
     for ii in range(len(img_files)):
         print("Working on image: ", img_files[ii])
-        img = fits.getdata(img_files[ii])
+        img, hdr = fits.getdata(img_files[ii], header=True)
 
         # Calculate the bacgkround and noise (iteratively)
         print("\t Calculating background")
@@ -143,6 +149,10 @@ def find_stars_bin(img_files, fwhm=5, threshold=4, N_passes=2):
         
             cutout_half_size = int(round(fwhm * 3))
             cutout_size = 2 * cutout_half_size
+
+            final_psf_obs = np.zeros((cutout_size, cutout_size), dtype=float)
+            final_psf_mod = np.zeros((cutout_size, cutout_size), dtype=float)
+            final_psf_count = 0
         
             cutouts = np.zeros((len(sources), cutout_size, cutout_size), dtype=float)
             sigma_init_guess = fwhm * gaussian_fwhm_to_sigma
@@ -167,24 +177,29 @@ def find_stars_bin(img_files, fwhm=5, threshold=4, N_passes=2):
 
                 # Fit an elliptical gaussian to the cutout image.
                 g2d_params = g2d_fitter(g2d_model, cut_x, cut_y, cutouts[ss])
-
                 g2d_image = g2d_params(cut_x, cut_y)
-                plt.figure(4)
-                plt.clf()
-                plt.imshow(cutouts[ss])
-                plt.pause(0.05)
                 
-                plt.figure(5)
-                plt.clf()
-                plt.imshow(g2d_image)
-                plt.pause(0.05)
+                final_psf_count += 1
+                final_psf_obs += cutout_tmp
+                final_psf_mod += g2d_image
+
+                if plot_psf_compare == True:
+                    plt.figure(4)
+                    plt.clf()
+                    plt.imshow(cutouts[ss])
+                    plt.pause(0.05)
                 
-                plt.figure(6)
-                plt.clf()
-                plt.imshow(cutouts[ss] - g2d_image)
-                plt.pause(0.05)
+                    plt.figure(5)
+                    plt.clf()
+                    plt.imshow(g2d_image)
+                    plt.pause(0.05)
                 
-                pdb.set_trace()
+                    plt.figure(6)
+                    plt.clf()
+                    plt.imshow(cutouts[ss] - g2d_image)
+                    plt.pause(0.05)
+                
+                    pdb.set_trace()
 
                 x_fwhm[ss] = g2d_params.x_stddev.value / gaussian_fwhm_to_sigma
                 y_fwhm[ss] = g2d_params.y_stddev.value / gaussian_fwhm_to_sigma
@@ -193,6 +208,16 @@ def find_stars_bin(img_files, fwhm=5, threshold=4, N_passes=2):
             sources['x_fwhm'] = x_fwhm
             sources['y_fwhm'] = y_fwhm
             sources['theta'] = theta
+
+            # Save the average PSF (flux-weighted). Note we are making a slight mistake
+            # here since each PSF has a different sub-pixel position... still same for both
+            # obs and model.
+            final_psf_obs /= final_psf_count
+            final_psf_mod /= final_psf_count
+            final_psf_obs /= final_psf_obs.sum()
+            final_psf_mod /= final_psf_mod.sum()
+            fits.writeto(img_files[ii].replace('.fits', '_psf_obs.fits'), final_psf_obs, hdr, clobber=True)
+            fits.writeto(img_files[ii].replace('.fits', '_psf_mod.fits'), final_psf_mod, hdr, clobber=True)
 
             # Drop sources with flux (signifiance) that isn't good enough.
             # Empirically this is <1.2

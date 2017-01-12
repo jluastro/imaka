@@ -158,7 +158,7 @@ def find_stars_pleiades_binned_open():
 
     img_files = img_files_1 + img_files_2
     
-    reduce_fli.find_stars_bin(img_files, fwhm=2, threshold=6)
+    reduce_fli.find_stars_bin(img_files, fwhm=10, threshold=6)
 
     return
     
@@ -181,7 +181,7 @@ def find_stars_pleiades_binned_closed():
     img_files_2 = ['obj_c{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum_2]
 
     img_files = img_files_1 + img_files_2
-    reduce_fli.find_stars_bin(img_files, fwhm=2, threshold=6)
+    reduce_fli.find_stars_bin(img_files, fwhm=3, threshold=6)
 
     return
 
