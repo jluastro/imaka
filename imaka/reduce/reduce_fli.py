@@ -65,7 +65,7 @@ def fix_bad_pixels(img):
 def clean_images(img_files, rebin=10, sky_frame=None):
     from scipy.ndimage import median_filter
 
-    sky_bin == None   # Indiciates we haven't loaded the sky frame yet.
+    sky_bin = None   # Indiciates we haven't loaded the sky frame yet.
 
     for ii in range(len(img_files)):
         print('Working on image: ', img_files[ii])
