@@ -59,41 +59,41 @@ def reduce_pleiades_binned_open():
     data_dir = '/Users/jlu/data/imaka/2017_01_10/fli/Pleiades/'
     os.chdir(data_dir)
 
-    fnum = [10, 11, 14, 15, 18, 19, 24, 25, 28, 29, 34, 35]
-    img_files = ['obj{0:03d}.fits'.format(ii) for ii in fnum]
-    reduce_fli.clean_images(img_files, rebin=1, sky_frame=sky_dir + 'pleiades_sky_020.fits')
+    # fnum = [10, 11, 14, 15, 18, 19, 24, 25, 28, 29, 34, 35]
+    # img_files = ['obj{0:03d}.fits'.format(ii) for ii in fnum]
+    # reduce_fli.clean_images(img_files, rebin=1, sky_frame=sky_dir + 'pleiades_sky_020.fits')
 
-    fnum = [38, 39, 40, 41, 44, 45, 50, 51, 60, 61]
-    img_files = ['obj{0:03d}.fits'.format(ii) for ii in fnum]
-    reduce_fli.clean_images(img_files, rebin=1, sky_frame=sky_dir + 'pleiades_sky_046.fits')
+    # fnum = [38, 39, 40, 41, 44, 45, 50, 51, 60, 61]
+    # img_files = ['obj{0:03d}.fits'.format(ii) for ii in fnum]
+    # reduce_fli.clean_images(img_files, rebin=1, sky_frame=sky_dir + 'pleiades_sky_046.fits')
 
-    fnum = [64, 65, 68, 69, 74, 75, 78, 79, 82, 83, 88, 89]
-    img_files = ['obj{0:03d}.fits'.format(ii) for ii in fnum]
-    reduce_fli.clean_images(img_files, rebin=1, sky_frame=sky_dir + 'pleiades_sky_070.fits')
+    # fnum = [64, 65, 68, 69, 74, 75, 78, 79, 82, 83, 88, 89]
+    # img_files = ['obj{0:03d}.fits'.format(ii) for ii in fnum]
+    # reduce_fli.clean_images(img_files, rebin=1, sky_frame=sky_dir + 'pleiades_sky_070.fits')
 
-    fnum_1 = [92, 93, 96, 97, 102, 103]
-    fnum_2 = [106, 107, 110, 111, 116, 117]
-    img_files_1 = ['obj{0:03d}.fits'.format(ii) for ii in fnum_1]
-    img_files_2 = ['obj_o{0:03d}.fits'.format(ii) for ii in fnum_2]
-    img_files = img_files_1 + img_files_2
-    reduce_fli.clean_images(img_files, rebin=1, sky_frame=sky_dir + 'pleiades_sky_098.fits')
+    # fnum_1 = [92, 93, 96, 97, 102, 103]
+    # fnum_2 = [106, 107, 110, 111, 116, 117]
+    # img_files_1 = ['obj{0:03d}.fits'.format(ii) for ii in fnum_1]
+    # img_files_2 = ['obj_o{0:03d}.fits'.format(ii) for ii in fnum_2]
+    # img_files = img_files_1 + img_files_2
+    # reduce_fli.clean_images(img_files, rebin=1, sky_frame=sky_dir + 'pleiades_sky_098.fits')
 
-    fnum = [120, 121, 124, 125, 130, 131]
-    img_files = ['obj_o{0:03d}.fits'.format(ii) for ii in fnum]
-    reduce_fli.clean_images(img_files, rebin=1, sky_frame=sky_dir + 'pleiades_sky_126.fits')
+    # fnum = [120, 121, 124, 125, 130, 131]
+    # img_files = ['obj_o{0:03d}.fits'.format(ii) for ii in fnum]
+    # reduce_fli.clean_images(img_files, rebin=1, sky_frame=sky_dir + 'pleiades_sky_126.fits')
 
-    fnum = [134, 135, 138, 139, 144, 145, 148, 149, 152, 153, 158, 159]
-    img_files = ['obj_o{0:03d}.fits'.format(ii) for ii in fnum]
-    reduce_fli.clean_images(img_files, rebin=1, sky_frame=sky_dir + 'pleiades_sky_140.fits')
+    # fnum = [134, 135, 138, 139, 144, 145, 148, 149, 152, 153, 158, 159]
+    # img_files = ['obj_o{0:03d}.fits'.format(ii) for ii in fnum]
+    # reduce_fli.clean_images(img_files, rebin=1, sky_frame=sky_dir + 'pleiades_sky.fits')
 
     fnum = [162, 163, 166, 167, 172, 173, 176, 177, 180, 181, 184, 185, 190, 191, 194, 195]
     img_files = ['obj_o{0:03d}.fits'.format(ii) for ii in fnum]
-    reduce_fli.clean_images(img_files, rebin=1, sky_frame=sky_dir + 'pleiades_sky_168.fits')
+    reduce_fli.clean_images(img_files, rebin=1, sky_frame=sky_dir + 'pleiades_sky.fits')
 
-    fnum = [198, 199, 202, 203, 208, 209, 212, 213, 216, 217, 220,
-                221, 226, 227, 230, 231, 234, 235, 238, 239, 244, 245, 248, 249, 252, 253]
-    img_files = ['obj_o{0:03d}.fits'.format(ii) for ii in fnum]
-    reduce_fli.clean_images(img_files, rebin=1, sky_frame=sky_dir + 'pleiades_sky_204.fits')
+    # fnum = [198, 199, 202, 203, 208, 209, 212, 213, 216, 217, 220,
+    #             221, 226, 227, 230, 231, 234, 235, 238, 239, 244, 245, 248, 249, 252, 253]
+    # img_files = ['obj_o{0:03d}.fits'.format(ii) for ii in fnum]
+    # reduce_fli.clean_images(img_files, rebin=1, sky_frame=sky_dir + 'pleiades_sky_204.fits')
     
     return
     
@@ -149,16 +149,19 @@ def find_stars_pleiades_binned_open():
     img_files_1 = ['obj{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum_1]
     
     fnum_2 = [106, 107, 110, 111, 116, 117]
-    fnum_2 = [120, 121, 124, 125, 130, 131]
-    fnum_2 = [134, 135, 138, 139, 144, 145, 148, 149, 152, 153, 158, 159]
-    fnum_2 = [162, 163, 166, 167, 172, 173, 176, 177, 180, 181, 184, 185, 190, 191, 194, 195]
-    fnum_2 = [198, 199, 202, 203, 208, 209, 212, 213, 216, 217, 220,
+    fnum_2 += [120, 121, 124, 125, 130, 131]
+    fnum_2 += [134, 135, 138, 139, 144, 145]
+    fnum_2 += [148, 149, 152, 153, 158, 159]
+    fnum_2 += [134, 135, 138, 139, 144, 145, 148, 149, 152, 153, 158, 159]
+    fnum_2 += [162, 163, 166, 167, 172, 173, 176, 177, 180, 181, 184, 185, 190, 191, 194, 195]
+    fnum_2 += [198, 202, 203, 208, 209, 212, 213, 216, 217, 220,
                 221, 226, 227, 230, 231, 234, 235, 238, 239, 244, 245, 248, 249, 252, 253]
     img_files_2 = ['obj_o{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum_2]
 
     img_files = img_files_1 + img_files_2
     
-    reduce_fli.find_stars_bin(img_files, fwhm=8, threshold=6)
+    # reduce_fli.find_stars_bin(img_files, fwhm=5, threshold=6)
+    reduce_fli.calc_star_stats(img_files, output_stats='stats_open.fits')
 
     return
     
@@ -166,46 +169,24 @@ def find_stars_pleiades_binned_closed():
     data_dir = '/Users/jlu/data/imaka/2017_01_10/fli/Pleiades/'
     os.chdir(data_dir)
     
-    fnum = [8, 9, 12, 13, 16, 17, 22, 23, 26, 27, 32, 33, 36, 37]
-    fnum = [42, 43, 48, 49, 52, 53, 58, 59, 62, 63]
-    fnum = [66, 67, 72, 73, 76, 77, 80, 81, 86, 87, 90, 91]
-    fnum_1 = [94, 95, 100, 101, 104, 105]
+    fnum_1 = [8, 9, 12, 13, 16, 17, 22, 23, 26, 27, 32, 33, 36, 37]
+    fnum_1 += [42, 43, 48, 49, 52, 53, 58, 59, 62, 63]
+    fnum_1 += [66, 67, 72, 73, 76, 77, 80, 81, 86, 87, 90, 91]
+    fnum_1 += [94, 95, 100, 101, 104, 105]
     img_files_1 = ['obj{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum_1]
 
     fnum_2 = [108, 109, 114, 115, 118, 119]
-    fnum = [122, 123, 128, 129, 132, 133, 136, 137]
-    fnum = [142, 143, 146, 147, 150, 151, 156, 157, 160, 161]
-    fnum = [164, 165, 170, 171, 174, 175, 178, 179, 182, 183, 188, 189, 192, 193,
+    fnum_2 += [122, 123, 128, 129, 132, 133, 136, 137]
+    fnum_2 += [142, 143, 146, 147, 150, 151, 156, 157, 160, 161]
+    fnum_2 += [164, 165, 170, 171, 174, 175, 178, 179, 182, 183, 188, 189, 192, 193,
                 196, 197, 200, 201, 206, 207, 210, 211, 214, 215, 218, 219, 224, 225,
                 228, 229, 232, 233, 236, 237, 242, 243, 246, 247, 250, 251]
     img_files_2 = ['obj_c{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum_2]
 
     img_files = img_files_1 + img_files_2
+    
     reduce_fli.find_stars_bin(img_files, fwhm=3, threshold=6)
-
-    return
-
-def calc_star_stats_open():
-    data_dir = '/Users/jlu/data/imaka/2017_01_10/fli/Pleiades/'
-    os.chdir(data_dir)
-    
-    fnum_1 = [10, 11, 14, 15, 18, 19, 24, 25, 28, 29, 34, 35]
-    fnum_1 += [38, 39, 40, 41, 44, 45, 50, 51, 60, 61]
-    fnum_1 += [64, 65, 68, 69, 74, 75, 78, 79, 82, 83, 88, 89]
-    fnum_1 += [92, 93, 96, 97, 102, 103]
-    img_files_1 = ['obj{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum_1]
-    
-    fnum_2 = [106, 107, 110, 111, 116, 117]
-    fnum_2 = [120, 121, 124, 125, 130, 131]
-    fnum_2 = [134, 135, 138, 139, 144, 145, 148, 149, 152, 153, 158, 159]
-    fnum_2 = [162, 163, 166, 167, 172, 173, 176, 177, 180, 181, 184, 185, 190, 191, 194, 195]
-    fnum_2 = [198, 199, 202, 203, 208, 209, 212, 213, 216, 217, 220,
-                221, 226, 227, 230, 231, 234, 235, 238, 239, 244, 245, 248, 249, 252, 253]
-    img_files_2 = ['obj_o{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum_2]
-
-    img_files = img_files_1 + img_files_2
-
-    reduce_fli.calc_star_stats(img_files, output_stats='stats_open.fits')
+    reduce_fli.calc_star_stats(img_files, output_stats='stats_closed.fits')
 
     return
 

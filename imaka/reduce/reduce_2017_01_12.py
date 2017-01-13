@@ -13,7 +13,7 @@ from flystar import match
 def make_sky():
     sky_dir = '/Users/jlu/data/imaka/2017_01_12/fli/Pleiades/'
 
-    sky_num = [41, 42, 43, 71, 72, 73]
+    sky_num = [41, 42, 43, 71, 72, 73, 116, 117, 118, 119]
     sky_frames = ['{0:s}sky{1:03d}.fits'.format(sky_dir, ss) for ss in sky_num]
     calib.makedark(sky_frames, 'pleiades_sky.fits')
 
@@ -25,18 +25,23 @@ def reduce_pleiades_binned():
     data_dir = '/Users/jlu/data/imaka/2017_01_12/fli/Pleiades/'
     os.chdir(data_dir)
 
-    # # Open Loop
+    # Open Loop
     # fnum = [56, 57, 58, 65, 66, 67]
-    # img_files = ['obj_o{0:03d}.fits'.format(ii) for ii in fnum]
-    # reduce_fli.clean_images(img_files, rebin=1, sky_frame=sky_dir + 'pleiades_sky.fits')
+    # fnum = [77, 78, 79, 92, 93, 94, 98, 99, 100, 104, 105, 106, 113, 114]
+    fnum = [115, 126, 127, 128, 135]
+    img_files = ['obj_o{0:03d}.fits'.format(ii) for ii in fnum]
+    reduce_fli.clean_images(img_files, rebin=1, sky_frame=sky_dir + 'pleiades_sky.fits')
 
-    # # TTF Closed Loop
+    # TTF Closed Loop
     # fnum = [32, 33, 34, 38, 39, 40, 50, 51, 52, 59, 60, 61]
-    # img_files = ['obj_ttf{0:03d}.fits'.format(ii) for ii in fnum]
-    # reduce_fli.clean_images(img_files, rebin=1, sky_frame=sky_dir + 'pleiades_sky.fits')
+    # fnum = [32, 33, 34, 38, 39, 40, 50, 51, 52, 59, 60, 61]
+    fnum = [68, 69, 70, 80, 81, 82, 86, 87, 88, 95, 96, 97, 107, 108, 109, 120, 121, 122, 129, 130, 131]
+    img_files = ['obj_ttf{0:03d}.fits'.format(ii) for ii in fnum]
+    reduce_fli.clean_images(img_files, rebin=1, sky_frame=sky_dir + 'pleiades_sky.fits')
 
     # Closed Loop
-    fnum = [27, 28, 29, 30, 31, 35, 36, 37, 44, 45, 46, 47, 48, 49, 53, 54, 55, 62, 63, 64]
+    # fnum = [27, 28, 29, 30, 31, 35, 36, 37, 44, 45, 46, 47, 48, 49, 53, 54, 55, 62, 63, 64]
+    fnum = [74, 75, 76, 89, 90, 91, 101, 102, 103, 110, 111, 112, 123, 124, 125, 132, 133, 134]
     img_files = ['obj_c{0:03d}.fits'.format(ii) for ii in fnum]
     reduce_fli.clean_images(img_files, rebin=1, sky_frame=sky_dir + 'pleiades_sky.fits')
     
@@ -48,8 +53,12 @@ def find_stars_pleiades_binned_open():
     os.chdir(data_dir)
     
     fnum = [56, 57, 58, 65, 66, 67]
+    fnum += [77, 78, 79, 92, 93, 94, 98, 99, 100, 104, 105, 106, 113, 114]
+    fnum += [115, 126, 127, 128, 135]
     img_files = ['obj_o{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum]
-    reduce_fli.find_stars_bin(img_files, fwhm=5, threshold=6)
+    
+    # reduce_fli.find_stars_bin(img_files, fwhm=5, threshold=6)
+    reduce_fli.calc_star_stats(img_files, output_stats='stats_open.fits')
 
     return
 
@@ -58,8 +67,11 @@ def find_stars_pleiades_binned_ttf():
     os.chdir(data_dir)
     
     fnum = [32, 33, 34, 38, 39, 40, 50, 51, 52, 59, 60, 61]
+    fnum += [68, 69, 70, 80, 81, 82, 86, 87, 88, 95, 96, 97, 107, 108, 109, 120, 121, 122, 129, 130, 131]
     img_files = ['obj_ttf{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum]
-    reduce_fli.find_stars_bin(img_files, fwhm=5, threshold=6)
+    
+    # reduce_fli.find_stars_bin(img_files, fwhm=5, threshold=6)
+    reduce_fli.calc_star_stats(img_files, output_stats='stats_ttf.fits')
 
     return
 
@@ -68,8 +80,11 @@ def find_stars_pleiades_binned_closed():
     os.chdir(data_dir)
     
     fnum = [27, 28, 29, 30, 31, 35, 36, 37, 44, 45, 46, 47, 48, 49, 53, 54, 55, 62, 63, 64]
+    fnum += [74, 75, 76, 89, 90, 91, 101, 102, 103, 110, 111, 112, 123, 124, 125, 132, 133, 134]
     img_files = ['obj_c{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum]
+    
     reduce_fli.find_stars_bin(img_files, fwhm=3, threshold=6)
+    reduce_fli.calc_star_stats(img_files, output_stats='stats_closed.fits')
 
     return
 
@@ -194,3 +209,89 @@ def compare_fwhm(open_list, closed_list, scale=0.04, flux_min=2.0):
     print('\t x_fwhm closed / open = {0:.2f}'.format(x_fwhm_c_med / x_fwhm_o_med))
     print('\t y_fwhm closed / open = {0:.2f}'.format(y_fwhm_c_med / y_fwhm_o_med))
     
+
+def plot_stats():
+    so = table.Table.read('stats_open.fits')
+    st = table.Table.read('stats_ttf.fits')
+    sc = table.Table.read('stats_closed.fits')
+
+    add_frame_number_column(so)
+    add_frame_number_column(st)
+    add_frame_number_column(sc)
+
+    scale = 0.12
+
+    # FWHM
+    plt.clf()
+    plt.plot(so['Index'], so['FWHM']*scale, 'bo', label='Open')
+    plt.plot(st['Index'], st['FWHM']*scale, 'go', label='TTF')
+    plt.plot(sc['Index'], sc['FWHM']*scale, 'ro', label='Closed')
+    plt.xlabel('Frame Number')
+    plt.ylabel('FWHM (")')
+    plt.legend(numpoints=1)
+    plt.ylim(0, 1)
+    plt.savefig('plots/fwhm_vs_frame.png')
+
+    # EE 50
+    plt.clf()
+    plt.plot(so['Index'], so['EE50'], 'bo', label='Open')
+    plt.plot(st['Index'], st['EE50'], 'go', label='TTF')
+    plt.plot(sc['Index'], sc['EE50'], 'ro', label='Closed')
+    plt.xlabel('Frame Number')
+    plt.ylabel('Radius of 50% Encircled Energy (")')
+    plt.legend(numpoints=1)
+    plt.ylim(0, 2)
+    plt.savefig('plots/ee50_vs_frame.png')
+
+    # EE 80
+    plt.clf()
+    plt.plot(so['Index'], so['EE80'], 'bo', label='Open')
+    plt.plot(st['Index'], st['EE80'], 'go', label='TTF')
+    plt.plot(sc['Index'], sc['EE80'], 'ro', label='Closed')
+    plt.xlabel('Frame Number')
+    plt.ylabel('Radius of 80% Encircled Energy (")')
+    plt.legend(numpoints=1)
+    plt.ylim(0, 2)
+    plt.savefig('plots/ee80_vs_frame.png')
+
+    # NEA
+    plt.clf()
+    plt.plot(so['Index'], so['NEA'], 'bo', label='Open')
+    plt.plot(st['Index'], st['NEA'], 'go', label='TTF')
+    plt.plot(sc['Index'], sc['NEA'], 'ro', label='Closed')
+    plt.xlabel('Frame Number')
+    plt.ylabel('Noise Equivalent Area (Sq. Arcsec)')
+    plt.legend(numpoints=1)
+    # plt.ylim(0, 2)
+    plt.savefig('plots/nea_vs_frame.png')
+
+    # FWHM for each direction
+    plt.clf()
+    plt.plot(so['Index'], so['xFWHM']*scale, 'bo', label='Open X')
+    plt.plot(st['Index'], st['xFWHM']*scale, 'go', label='TTF X')
+    plt.plot(sc['Index'], sc['xFWHM']*scale, 'ro', label='Closed X')
+    plt.plot(so['Index'], so['yFWHM']*scale, 'b^', label='Open Y')
+    plt.plot(st['Index'], st['yFWHM']*scale, 'g^', label='TTF Y')
+    plt.plot(sc['Index'], sc['yFWHM']*scale, 'r^', label='Closed Y')
+    plt.xlabel('Frame Number')
+    plt.ylabel('FWHM (")')
+    plt.legend(numpoints=1, fontsize=10)
+    plt.ylim(0, 1.5)
+    plt.savefig('plots/xyfwhm_vs_frame.png')
+    
+    return
+
+def add_frame_number_column(stats_table):
+    # Get the frame numbers for plotting.
+    frame_num = np.zeros(len(stats_table), dtype=int)
+    for ii in range(len(stats_table)):
+        foo = stats_table['Image'][ii].index('bin')
+
+        frame_num[ii] = int(stats_table['Image'][ii][foo - 4:foo - 1])
+        frame_num_col = table.Column(frame_num, name='Index')
+
+    stats_table.add_column(frame_num_col)
+
+    return
+
+        

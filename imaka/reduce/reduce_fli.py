@@ -227,8 +227,10 @@ def find_stars_bin(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=
             good = np.where(sources['flux'] > 1.2)[0]
             sources = sources[good]
 
-            x_fwhm_med = np.median(sources['x_fwhm'])
-            y_fwhm_med = np.median(sources['y_fwhm'])
+            # Only use the brightest sources for calculating the mean. This is just for printing.
+            idx = np.where(sources['flux'] > 5)[0]
+            x_fwhm_med = np.median(sources['x_fwhm'][idx])
+            y_fwhm_med = np.median(sources['y_fwhm'][idx])
             
             print('        Number of sources = ', len(sources))
             print('        Median x_fwhm = {0:.1f} +/- {1:.1f}'.format(x_fwhm_med,
@@ -429,6 +431,9 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
 
         # Find the median EE curve. But first, trim to just the brightest stars.
         idx = np.where(stars['flux'] > 5)[0]
+        if len(idx) == 0:
+            # Didn't find any bright stars... use all of them.
+            idx = np.arange(N_stars)
         enc_energy_final = np.median(enc_energy[idx], axis=0)
 
         # Plot and save the EE curve and data.
