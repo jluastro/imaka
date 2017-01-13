@@ -6,8 +6,6 @@ from astropy import table
 from astropy import units
 import glob
 import photutils
-from photutils import psf
-from photutils import morphology as morph
 from astropy.convolution import Gaussian2DKernel
 from astropy.stats import gaussian_fwhm_to_sigma
 import poppy
@@ -24,6 +22,9 @@ import photutils
 from photutils import psf
 from photutils import morphology as morph
 from photutils import DAOStarFinder
+from photutils import CircularAperture
+from photutils import CircularAnnulus
+from photutils import aperture_photometry
 from astropy.convolution import Gaussian2DKernel
 from astropy.stats import gaussian_fwhm_to_sigma
 from astropy.stats import sigma_clipped_stats
@@ -111,6 +112,8 @@ def find_stars_bin(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=
         print("Working on image: ", img_files[ii])
         img, hdr = fits.getdata(img_files[ii], header=True)
 
+        fwhm_curr = fwhm
+
         # Calculate the bacgkround and noise (iteratively)
         print("\t Calculating background")
         bkg_threshold = 3
@@ -138,8 +141,8 @@ def find_stars_bin(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=
 
         # Each pass will have an updated fwhm for the PSF.
         for nn in range(N_passes):
-            print('     Pass {0:d} assuming FWHM = {1:.1f}'.format(nn, fwhm))
-            daofind = DAOStarFinder(fwhm=fwhm, threshold = img_threshold, exclude_border=True)
+            print('     Pass {0:d} assuming FWHM = {1:.1f}'.format(nn, fwhm_curr))
+            daofind = DAOStarFinder(fwhm=fwhm_curr, threshold = img_threshold, exclude_border=True)
             sources = daofind(img - bkg_mean)
 
             # Calculate FWHM for each detected star.
@@ -147,7 +150,7 @@ def find_stars_bin(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=
             y_fwhm = np.zeros(len(sources), dtype=float)
             theta = np.zeros(len(sources), dtype=float)
         
-            cutout_half_size = int(round(fwhm * 3))
+            cutout_half_size = int(round(fwhm_curr * 3))
             cutout_size = 2 * cutout_half_size
 
             final_psf_obs = np.zeros((cutout_size, cutout_size), dtype=float)
@@ -155,7 +158,7 @@ def find_stars_bin(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=
             final_psf_count = 0
         
             cutouts = np.zeros((len(sources), cutout_size, cutout_size), dtype=float)
-            sigma_init_guess = fwhm * gaussian_fwhm_to_sigma
+            sigma_init_guess = fwhm_curr * gaussian_fwhm_to_sigma
             g2d_model = models.Gaussian2D(1.0, cutout_half_size, cutout_half_size,
                                               sigma_init_guess, sigma_init_guess, theta=0)
             g2d_fitter = fitting.LevMarLSQFitter()
@@ -233,7 +236,7 @@ def find_stars_bin(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=
             print('        Median y_fwhm = {0:.1f} +/- {1:.1f}'.format(y_fwhm_med,
                                                                      sources['y_fwhm'].std()))
 
-            fwhm = np.mean([x_fwhm_med, y_fwhm_med])
+            fwhm_curr = np.mean([x_fwhm_med, y_fwhm_med])
 
 
             formats = {'xcentroid': '%8.3f', 'ycentroid': '%8.3f', 'sharpness': '%.2f',
@@ -243,6 +246,7 @@ def find_stars_bin(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=
         
             sources.write(img_files[ii].replace('.fits', '_stars.txt'), format='ascii.fixed_width',
                           delimiter=None, bookend=False, formats=formats)
+
         
     return
     
@@ -349,3 +353,130 @@ def find_outlier_pixels(data, tolerance=3, worry_about_edges=True, median_filter
 
     
         
+def calc_star_stats(img_files, output_stats='image_stats.fits'):
+    """
+    Calculate statistics for the Data Metrics table.
+    """
+    plate_scale_orig = 0.04 # " / pixel
+
+    # radial bins for the EE curves
+    max_radius = 3.0
+    radii = np.arange(0.05, max_radius, 0.05)
+
+    # Create arrays for all the final statistics.
+    s_ee50 = np.zeros(len(img_files), dtype=float)
+    s_ee80 = np.zeros(len(img_files), dtype=float)
+    s_xfwhm = np.zeros(len(img_files), dtype=float)
+    s_yfwhm = np.zeros(len(img_files), dtype=float)
+    s_theta = np.zeros(len(img_files), dtype=float)
+    s_fwhm = np.zeros(len(img_files), dtype=float)
+    s_fwhm_std = np.zeros(len(img_files), dtype=float)
+    s_NEA = np.zeros(len(img_files), dtype=float)
+    
+    for ii in range(len(img_files)):
+        # Load up the image to work on.
+        print("Working on image: ", img_files[ii])
+        img, hdr = fits.getdata(img_files[ii], header=True)
+
+        # Get the bin fraction from the header
+        bin_factor = hdr['BINFAC']
+        plate_scale = plate_scale_orig * bin_factor
+
+        # Load up the corresponding starlist.
+        starlist = img_files[ii].replace('.fits', '_stars.txt')
+        stars = table.Table.read(starlist, format='ascii')
+        N_stars = len(stars)
+
+        # Put the positions into an array for photutils work.
+        coords = np.array([stars['xcentroid'], stars['ycentroid']])
+
+        # Define the background annuli (typically from 2"-3"). Calculate mean background for each star.
+        bkg_annuli = CircularAnnulus(coords, max_radius / plate_scale, (max_radius + 1) / plate_scale)
+        bkg = aperture_photometry(img, bkg_annuli)
+        bkg_mean = bkg['aperture_sum'] / bkg_annuli.area()
+
+        enc_energy = np.zeros((N_stars, len(radii)), dtype=float)
+        int_psf2_all = np.zeros(N_stars, dtype=float)
+
+        # Loop through radial bins and calculate EE
+        for rr in range(len(radii)):
+            radius_pixel = radii[rr] / plate_scale
+            apertures = CircularAperture(coords, r=radius_pixel)
+            phot_table = aperture_photometry(img, apertures)
+
+            energy = phot_table['aperture_sum']
+
+            bkg_sum = apertures.area() * bkg_mean
+            
+            enc_energy[:, rr] = energy - bkg_sum
+
+            # Calculate the sum((PSF - bkg))^2 -- have to do this for each star.
+            # Only do this on the last radius measurement.
+            # if rr == (len(radii) - 1):
+            if radii[rr] == 1.0:
+                for ss in range(N_stars):
+                    aperture_ss = CircularAperture(coords[:,ss], r=radius_pixel)
+                    
+                    phot2_table = aperture_photometry((img - bkg_mean[ss])**2, aperture_ss)
+
+                    int_psf2 = phot2_table['aperture_sum'][0]
+                    int_psf2 /= enc_energy[ss, rr]**2 # normalize
+
+                    int_psf2_all[ss] = int_psf2
+
+        # Normalize all the curves so that the mean of the last 5 bins = 1
+        enc_energy /= np.tile(enc_energy[:, -5:].mean(axis=1), (len(radii), 1)).T
+
+        # Find the median EE curve. But first, trim to just the brightest stars.
+        idx = np.where(stars['flux'] > 5)[0]
+        enc_energy_final = np.median(enc_energy[idx], axis=0)
+
+        # Plot and save the EE curve and data.
+        _ee_out = open('ee/' + img_files[ii].replace('.fits', '_ee.txt'), 'w')
+        _ee_out.write('{0:10s}  {1:10s}\n'.format('#Radius', 'EE'))
+        _ee_out.write('{0:10s}  {1:10s}\n'.format('#(arcsec)', '()'))
+        for rr in range(len(radii)):
+            _ee_out.write('{0:10.2f}  {1:10.4f}\n'.format(radii[rr], enc_energy_final[rr]))
+        _ee_out.close()
+
+        # Find the 50% and 80% EE values
+        ee50_rad = radii[ np.where(enc_energy_final >= 0.5)[0][0] ]
+        ee80_rad = radii[ np.where(enc_energy_final >= 0.8)[0][0] ]
+
+        # Find the median NEA. Convert into arcsec^2
+        nea = 1.0 / int_psf2_all[idx].mean()
+        nea *= plate_scale**2
+
+        plt.clf()
+        plt.plot(radii, enc_energy_final, 'k-')
+        plt.axvline(ee50_rad, color='r', linestyle='--', label='r(50% EE)')
+        plt.axvline(ee80_rad, color='g', linestyle='--', label='r(80% EE)')
+        plt.xlabel('Radius (arcsec)')
+        plt.ylabel('Encircled Energy')
+        plt.legend(loc='lower right')
+        plt.pause(0.05)
+        plt.savefig('ee/' +  img_files[ii].replace('.fits', '_ee.png'))
+
+        # Calculate the average FWHM.
+        xfwhm = stars['x_fwhm'][idx].mean()
+        yfwhm = stars['y_fwhm'][idx].mean()
+        fwhm = np.mean([stars['x_fwhm'][idx], stars['y_fwhm'][idx]])
+        fwhm_std = np.std([stars['x_fwhm'][idx], stars['y_fwhm'][idx]])
+        theta = stars['theta'][idx].mean()
+
+        s_ee50[ii] = ee50_rad
+        s_ee80[ii] = ee80_rad
+        s_xfwhm[ii] = xfwhm
+        s_yfwhm[ii] = yfwhm
+        s_theta[ii] = theta
+        s_fwhm[ii] = fwhm
+        s_fwhm_std[ii] = fwhm_std
+        s_NEA[ii] = nea
+
+    stats = table.Table([img_files, s_fwhm, s_fwhm_std, s_ee50, s_ee80, s_NEA, s_xfwhm, s_yfwhm, s_theta],
+                                names=('Image', 'FWHM', 'FWHM_std', 'EE50', 'EE80', 'NEA', 'xFWHM', 'yFWHM', 'theta'),
+                            meta={'name':'Stats Table'})
+
+    stats.write(output_stats, overwrite=True)
+                        
+    return

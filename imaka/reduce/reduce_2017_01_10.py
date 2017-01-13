@@ -18,38 +18,38 @@ def make_sky():
     sky_frames = ['{0:s}sky{1:03d}.fits'.format(sky_dir, ss) for ss in sky_num]
     calib.makedark(sky_frames, 'pleiades_sky.fits')
     
-    sky_num = [20, 21, 30, 31]
-    sky_frames = ['{0:s}sky{1:03d}.fits'.format(sky_dir, ss) for ss in sky_num]
-    calib.makedark(sky_frames, 'pleiades_sky_020.fits')
+    # sky_num = [20, 21, 30, 31]
+    # sky_frames = ['{0:s}sky{1:03d}.fits'.format(sky_dir, ss) for ss in sky_num]
+    # calib.makedark(sky_frames, 'pleiades_sky_020.fits')
 
-    sky_num = [46, 47, 56, 57]
-    sky_frames = ['{0:s}sky{1:03d}.fits'.format(sky_dir, ss) for ss in sky_num]
-    calib.makedark(sky_frames, 'pleiades_sky_046.fits')
+    # sky_num = [46, 47, 56, 57]
+    # sky_frames = ['{0:s}sky{1:03d}.fits'.format(sky_dir, ss) for ss in sky_num]
+    # calib.makedark(sky_frames, 'pleiades_sky_046.fits')
 
-    sky_num = [70, 71, 84, 85]
-    sky_frames = ['{0:s}sky{1:03d}.fits'.format(sky_dir, ss) for ss in sky_num]
-    calib.makedark(sky_frames, 'pleiades_sky_070.fits')
+    # sky_num = [70, 71, 84, 85]
+    # sky_frames = ['{0:s}sky{1:03d}.fits'.format(sky_dir, ss) for ss in sky_num]
+    # calib.makedark(sky_frames, 'pleiades_sky_070.fits')
 
-    sky_num = [98, 99, 112, 113]
-    sky_frames = ['{0:s}sky{1:03d}.fits'.format(sky_dir, ss) for ss in sky_num]
-    calib.makedark(sky_frames, 'pleiades_sky_098.fits')
+    # sky_num = [98, 99, 112, 113]
+    # sky_frames = ['{0:s}sky{1:03d}.fits'.format(sky_dir, ss) for ss in sky_num]
+    # calib.makedark(sky_frames, 'pleiades_sky_098.fits')
 
-    sky_num = [126, 127, 140, 141]
-    sky_frames = ['{0:s}sky{1:03d}.fits'.format(sky_dir, ss) for ss in sky_num]
-    calib.makedark(sky_frames, 'pleiades_sky_126.fits')
+    # sky_num = [126, 127, 140, 141]
+    # sky_frames = ['{0:s}sky{1:03d}.fits'.format(sky_dir, ss) for ss in sky_num]
+    # calib.makedark(sky_frames, 'pleiades_sky_126.fits')
 
-    sky_num = [140, 141, 154, 155]
-    sky_frames = ['{0:s}sky{1:03d}.fits'.format(sky_dir, ss) for ss in sky_num]
-    calib.makedark(sky_frames, 'pleiades_sky_140.fits')
+    # sky_num = [140, 141, 154, 155]
+    # sky_frames = ['{0:s}sky{1:03d}.fits'.format(sky_dir, ss) for ss in sky_num]
+    # calib.makedark(sky_frames, 'pleiades_sky_140.fits')
 
-    sky_num = [168, 169, 186, 187]
-    sky_frames = ['{0:s}sky{1:03d}.fits'.format(sky_dir, ss) for ss in sky_num]
-    calib.makedark(sky_frames, 'pleiades_sky_168.fits')
+    # sky_num = [168, 169, 186, 187]
+    # sky_frames = ['{0:s}sky{1:03d}.fits'.format(sky_dir, ss) for ss in sky_num]
+    # calib.makedark(sky_frames, 'pleiades_sky_168.fits')
 
-    # Note this is the 45 sec integration (the rest are the 30 sec integration)
-    sky_num = [204, 205, 222, 240, 241]
-    sky_frames = ['{0:s}sky{1:03d}.fits'.format(sky_dir, ss) for ss in sky_num]
-    calib.makedark(sky_frames, 'pleiades_sky_204.fits')
+    # # Note this is the 45 sec integration (the rest are the 30 sec integration)
+    # sky_num = [204, 205, 222, 240, 241]
+    # sky_frames = ['{0:s}sky{1:03d}.fits'.format(sky_dir, ss) for ss in sky_num]
+    # calib.makedark(sky_frames, 'pleiades_sky_204.fits')
 
     return
     
@@ -158,7 +158,7 @@ def find_stars_pleiades_binned_open():
 
     img_files = img_files_1 + img_files_2
     
-    reduce_fli.find_stars_bin(img_files, fwhm=10, threshold=6)
+    reduce_fli.find_stars_bin(img_files, fwhm=8, threshold=6)
 
     return
     
@@ -182,6 +182,30 @@ def find_stars_pleiades_binned_closed():
 
     img_files = img_files_1 + img_files_2
     reduce_fli.find_stars_bin(img_files, fwhm=3, threshold=6)
+
+    return
+
+def calc_star_stats_open():
+    data_dir = '/Users/jlu/data/imaka/2017_01_10/fli/Pleiades/'
+    os.chdir(data_dir)
+    
+    fnum_1 = [10, 11, 14, 15, 18, 19, 24, 25, 28, 29, 34, 35]
+    fnum_1 += [38, 39, 40, 41, 44, 45, 50, 51, 60, 61]
+    fnum_1 += [64, 65, 68, 69, 74, 75, 78, 79, 82, 83, 88, 89]
+    fnum_1 += [92, 93, 96, 97, 102, 103]
+    img_files_1 = ['obj{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum_1]
+    
+    fnum_2 = [106, 107, 110, 111, 116, 117]
+    fnum_2 = [120, 121, 124, 125, 130, 131]
+    fnum_2 = [134, 135, 138, 139, 144, 145, 148, 149, 152, 153, 158, 159]
+    fnum_2 = [162, 163, 166, 167, 172, 173, 176, 177, 180, 181, 184, 185, 190, 191, 194, 195]
+    fnum_2 = [198, 199, 202, 203, 208, 209, 212, 213, 216, 217, 220,
+                221, 226, 227, 230, 231, 234, 235, 238, 239, 244, 245, 248, 249, 252, 253]
+    img_files_2 = ['obj_o{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum_2]
+
+    img_files = img_files_1 + img_files_2
+
+    reduce_fli.calc_star_stats(img_files, output_stats='stats_open.fits')
 
     return
 
