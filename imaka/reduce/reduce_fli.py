@@ -1,3 +1,4 @@
+import math
 import pylab as plt
 from PIL import Image
 import numpy as np
@@ -31,9 +32,12 @@ from astropy.stats import sigma_clipped_stats
 from astropy.modeling import models, fitting
 import poppy
 import pdb
-from imaka.reduce import reduce_fli
-
+from flystar import match
+from flystar import align
+from flystar import transforms
 from imaka.reduce import calib
+import ccdproc
+from scipy.ndimage import interpolation
 
 
 scale = 40.0 # mas/pixel
@@ -160,7 +164,8 @@ def find_stars_bin(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=
             cutouts = np.zeros((len(sources), cutout_size, cutout_size), dtype=float)
             sigma_init_guess = fwhm_curr * gaussian_fwhm_to_sigma
             g2d_model = models.Gaussian2D(1.0, cutout_half_size, cutout_half_size,
-                                              sigma_init_guess, sigma_init_guess, theta=0)
+                                              sigma_init_guess, sigma_init_guess, theta=0,
+                                              bounds={'x_stddev':[0, 20], 'y_stddev':[0, 20]})
             g2d_fitter = fitting.LevMarLSQFitter()
             cut_y, cut_x = np.mgrid[:cutout_size, :cutout_size]
         
@@ -366,19 +371,24 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
     radii = np.arange(0.05, max_radius, 0.05)
 
     # Create arrays for all the final statistics.
-    s_ee50 = np.zeros(len(img_files), dtype=float)
-    s_ee80 = np.zeros(len(img_files), dtype=float)
-    s_xfwhm = np.zeros(len(img_files), dtype=float)
-    s_yfwhm = np.zeros(len(img_files), dtype=float)
-    s_theta = np.zeros(len(img_files), dtype=float)
-    s_fwhm = np.zeros(len(img_files), dtype=float)
-    s_fwhm_std = np.zeros(len(img_files), dtype=float)
-    s_NEA = np.zeros(len(img_files), dtype=float)
+    N_files = len(img_files)
+    s_time = np.zeros(N_files, dtype='S15')
+    s_ee50 = np.zeros(N_files, dtype=float)
+    s_ee80 = np.zeros(N_files, dtype=float)
+    s_xfwhm = np.zeros(N_files, dtype=float)
+    s_yfwhm = np.zeros(N_files, dtype=float)
+    s_theta = np.zeros(N_files, dtype=float)
+    s_fwhm = np.zeros(N_files, dtype=float)
+    s_fwhm_std = np.zeros(N_files, dtype=float)
+    s_NEA = np.zeros(N_files, dtype=float)
+    s_NEA2 = np.zeros(N_files, dtype=float)
     
-    for ii in range(len(img_files)):
+    for ii in range(N_files):
         # Load up the image to work on.
         print("Working on image: ", img_files[ii])
         img, hdr = fits.getdata(img_files[ii], header=True)
+
+        s_time[ii] = hdr['TIMEOBS']
 
         # Get the bin fraction from the header
         bin_factor = hdr['BINFAC']
@@ -414,8 +424,7 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
 
             # Calculate the sum((PSF - bkg))^2 -- have to do this for each star.
             # Only do this on the last radius measurement.
-            # if rr == (len(radii) - 1):
-            if radii[rr] == 1.0:
+            if rr == (len(radii) - 1):
                 for ss in range(N_stars):
                     aperture_ss = CircularAperture(coords[:,ss], r=radius_pixel)
                     
@@ -449,9 +458,13 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
         ee80_rad = radii[ np.where(enc_energy_final >= 0.8)[0][0] ]
 
         # Find the median NEA. Convert into arcsec^2
-        nea = 1.0 / int_psf2_all[idx].mean()
-        nea *= plate_scale**2
+        nea2 = 1.0 / np.median(int_psf2_all[idx])
+        nea2 *= plate_scale**2
 
+        # Calculate the NEA in a different way.
+        nea = 1.0 / (np.diff(enc_energy_final)**2 / (2.0 * math.pi * radii[1:] * np.diff(radii))).sum()
+
+        
         plt.clf()
         plt.plot(radii, enc_energy_final, 'k-')
         plt.axvline(ee50_rad, color='r', linestyle='--', label='r(50% EE)')
@@ -477,11 +490,189 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
         s_fwhm[ii] = fwhm
         s_fwhm_std[ii] = fwhm_std
         s_NEA[ii] = nea
+        s_NEA2[ii] = nea2
 
-    stats = table.Table([img_files, s_fwhm, s_fwhm_std, s_ee50, s_ee80, s_NEA, s_xfwhm, s_yfwhm, s_theta],
-                                names=('Image', 'FWHM', 'FWHM_std', 'EE50', 'EE80', 'NEA', 'xFWHM', 'yFWHM', 'theta'),
+    stats = table.Table([img_files, s_time, s_fwhm, s_fwhm_std, s_ee50, s_ee80, s_NEA, s_NEA2, s_xfwhm, s_yfwhm, s_theta],
+                                names=('Image', 'TIME', 'FWHM', 'FWHM_std', 'EE50', 'EE80', 'NEA', 'NEA2', 'xFWHM', 'yFWHM', 'theta'),
                             meta={'name':'Stats Table'})
+    
+    stats['FWHM'].format = '7.3f'
+    stats['FWHM_std'].format = '7.3f'
+    stats['EE50'].format = '7.3f'
+    stats['EE80'].format = '7.3f'
+    stats['NEA'].format = '7.3f'
+    stats['NEA2'].format = '7.3f'
+    stats['xFWHM'].format = '7.3f'
+    stats['yFWHM'].format = '7.3f'
+    stats['theta'].format = '7.3f'
 
+    add_frame_number_column(stats)
+    
     stats.write(output_stats, overwrite=True)
+    stats.write(output_stats.replace('.fits', 'csv'), format='csv') # Auto overwrites
                         
     return
+
+def add_frame_number_column(stats_table):
+    # Get the frame numbers for plotting.
+    frame_num = np.zeros(len(stats_table), dtype=int)
+    for ii in range(len(stats_table)):
+        foo = stats_table['Image'][ii].index('bin')
+
+        frame_num[ii] = int(stats_table['Image'][ii][foo - 4:foo - 1])
+        frame_num_col = table.Column(frame_num, name='Index')
+
+    stats_table.add_column(frame_num_col, index=1)
+
+    return
+
+
+def shift_and_add(img_files, starlists, output_root, method='mean', clip_sigma=None):
+    """
+    Take a stack of images and starlists, calculate the 
+    """
+    plate_scale_orig = 0.04 # " / pixel
+    N_files = len(img_files)
+
+    # Loop through all the starlists and get the transformations.
+    # We will align all frames to the first frame. We can repeat
+    # this process. 
+    shift_trans = get_transforms_from_starlists(starlists)
+
+    # Make some arrays to store the stack of images... this is a big array.
+    # But it allows us to do some clever sigma clipping or median combine.
+    # We only do this if asked (becaues it is RAM intensive).
+    if method != 'mean':
+        img, hdr = fits.getdata(img_files[0], header=True)
+        
+        image_stack = np.zeros((N_files, img.shape[0], img.shape[1]), dtype=float)
+        image_cover = np.zeros((N_files, img.shape[0], img.shape[1]), dtype=int)
+
+        ccddata_arr = []
+
+
+    # Now loop through all the images and stack them.
+    for ii in range(N_files):
+        # Load up the image to work on.
+        print("Shifting image: ", img_files[ii])
+        img, hdr = fits.getdata(img_files[ii], header=True)
+
+        # Make a coverage map that will also get shifted.
+        img_covers = np.ones(img.shape, dtype=int)
+
+        # Pull out the shifts
+        shiftx = shift_trans[ii].px[0]
+        shifty = shift_trans[ii].py[0]
+
+        # Make an array to hold our final image.
+        if method == 'mean':
+            if ii == 0:
+                final_image = np.zeros(img.shape, dtype=float)
+                final_count = np.zeros(img.shape, dtype=int)
+
+            # Shift the image and the coverage image and add to total
+            final_image += interpolation.shift(img, (shifty, shiftx), order=1, cval=0)
+            final_count += interpolation.shift(img_covers, (shifty, shiftx), order=1, cval=0)
+        else:
+            # image_stack[ii, :, :] = interpolation.shift(img, (shifty, shiftx), order=1, cval=0)
+            # image_cover[ii, :, :] = interpolation.shift(img_covers, (shifty, shiftx), order=1, cval=0)
+            img_tmp = interpolation.shift(img, (shifty, shiftx), order=1, cval=0)
+            img_cnt_tmp = interpolation.shift(img_covers, (shifty, shiftx), order=1, cval=0)
+
+            ccddata_cur = ccdproc.CCDData(img_tmp, unit=units.adu)
+
+            ccddata_arr.append(ccddata_cur)
+
+            
+    # Done with all the images... do clipping, combining, or averaging.
+    # Depends on method.
+    if method == 'mean':
+        final_image /= final_count
+        final_image[final_count == 0] = 0
+
+    if method == 'median':
+        final_image = np.median(image_stack, axis=0)
+
+    if method == 'meanclip':
+        # avg = image_stack.mean(axis=0)
+        # std = image_stack.std(axis=0)
+
+        combiner = ccdproc.Combiner(ccddata_arr)
+        combiner.sigma_clipping()
+        final_image = combiner.average_combine()
+
+    fits.writeto(output_root + '.fits', final_image.data)
+    
+
+    return
+    
+
+def get_transforms_from_starlists(starlists):
+    plate_scale_orig = 0.04 # " / pixel
+    N_files = len(starlists)
+    N_brite = 7
+    N_passes = 2
+
+    # Read in the first image and use this as the initial
+    stars_ref = read_starlist(starlists[0])
+
+    for nn in range(N_passes):
+        # These will be the reference positions in the next pass... calculate them in this pass.
+        x_ref_avg = np.zeros(len(stars_ref), dtype=float)
+        y_ref_avg = np.zeros(len(stars_ref), dtype=float)
+        n_ref_avg = np.zeros(len(stars_ref), dtype=int)
+
+        trans = []
+
+        for ii in range(len(starlists)):
+            # Load up the corresponding starlist.
+            stars = read_starlist(starlists[ii])
+
+            t = align.initial_align(stars, stars_ref, briteN=N_brite, transformModel=transforms.Shift, req_match=3)
+
+            idx1, idx2 = align.transform_and_match(stars, stars_ref, t, dr_tol=5, dm_tol=None)
+
+            t, N_trans = align.find_transform(stars[idx1], None, stars_ref[idx2], transModel=transforms.Shift)
+
+            trans.append(t)
+
+            # Do a final matching to update reference positions.
+            idx1, idx2 = align.transform_and_match(stars, stars_ref, t, dr_tol=5, dm_tol=None)
+
+            xnew, ynew = t.evaluate(stars[idx1]['x'], stars[idx1]['y'])
+
+            x_ref_avg[idx2] += xnew
+            y_ref_avg[idx2] += ynew
+            n_ref_avg[idx2] += 1
+
+        if nn < (N_passes - 1):
+            # Find the average position of any matched stars in the reference epoch.
+            # This will improve our reference list later on. Trim down to those stars
+            # in more than one frame.
+            x_ref_avg /= n_ref_avg
+            y_ref_avg /= n_ref_avg
+        
+            idx = np.where(n_ref_avg > 1)[0]
+            stars_ref = stars_ref[idx]
+        
+            stars_ref['x'] = x_ref_avg[idx]
+            stars_ref['y'] = y_ref_avg[idx]
+
+    return trans
+
+
+
+
+def read_starlist(starlist):
+    """
+    Read in a starlist and change the column names to be useful
+    with flystar.
+    """
+    stars = table.Table.read(starlist, format='ascii')
+
+    stars.rename_column('xcentroid', 'x')
+    stars.rename_column('ycentroid', 'y')
+    stars.rename_column('mag', 'm')
+
+    return stars
+    

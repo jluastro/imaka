@@ -3,6 +3,7 @@ import numpy as np
 from astropy.io import fits
 from astropy import table
 from astropy import units
+import scipy
 import glob
 from imaka.reduce import reduce_fli
 from imaka.reduce import calib
@@ -70,7 +71,7 @@ def find_stars_pleiades_binned_ttf():
     fnum += [68, 69, 70, 80, 81, 82, 86, 87, 88, 95, 96, 97, 107, 108, 109, 120, 121, 122, 129, 130, 131]
     img_files = ['obj_ttf{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum]
     
-    # reduce_fli.find_stars_bin(img_files, fwhm=5, threshold=6)
+    reduce_fli.find_stars_bin(img_files, fwhm=5, threshold=6)
     reduce_fli.calc_star_stats(img_files, output_stats='stats_ttf.fits')
 
     return
@@ -85,16 +86,6 @@ def find_stars_pleiades_binned_closed():
     
     reduce_fli.find_stars_bin(img_files, fwhm=3, threshold=6)
     reduce_fli.calc_star_stats(img_files, output_stats='stats_closed.fits')
-
-    return
-
-def calc_star_stats_open():
-    data_dir = '/Users/jlu/data/imaka/2017_01_10/fli/Pleiades/'
-    os.chdir(data_dir)
-    
-    fnum = [10, 11]
-    img_files = ['obj{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum]
-    reduce_fli.calc_star_stats(img_files)
 
     return
 
@@ -215,10 +206,6 @@ def plot_stats():
     st = table.Table.read('stats_ttf.fits')
     sc = table.Table.read('stats_closed.fits')
 
-    add_frame_number_column(so)
-    add_frame_number_column(st)
-    add_frame_number_column(sc)
-
     scale = 0.12
 
     # FWHM
@@ -229,7 +216,7 @@ def plot_stats():
     plt.xlabel('Frame Number')
     plt.ylabel('FWHM (")')
     plt.legend(numpoints=1)
-    plt.ylim(0, 1)
+    plt.ylim(0, 1.5)
     plt.savefig('plots/fwhm_vs_frame.png')
 
     # EE 50
@@ -240,7 +227,7 @@ def plot_stats():
     plt.xlabel('Frame Number')
     plt.ylabel('Radius of 50% Encircled Energy (")')
     plt.legend(numpoints=1)
-    plt.ylim(0, 2)
+    plt.ylim(0, 1.5)
     plt.savefig('plots/ee50_vs_frame.png')
 
     # EE 80
@@ -251,7 +238,7 @@ def plot_stats():
     plt.xlabel('Frame Number')
     plt.ylabel('Radius of 80% Encircled Energy (")')
     plt.legend(numpoints=1)
-    plt.ylim(0, 2)
+    plt.ylim(0, 1.5)
     plt.savefig('plots/ee80_vs_frame.png')
 
     # NEA
@@ -262,9 +249,20 @@ def plot_stats():
     plt.xlabel('Frame Number')
     plt.ylabel('Noise Equivalent Area (Sq. Arcsec)')
     plt.legend(numpoints=1)
-    # plt.ylim(0, 2)
+    plt.ylim(0, 3)
     plt.savefig('plots/nea_vs_frame.png')
 
+    # NEA2
+    plt.clf()
+    plt.plot(so['Index'], so['NEA2'], 'bo', label='Open')
+    plt.plot(st['Index'], st['NEA2'], 'go', label='TTF')
+    plt.plot(sc['Index'], sc['NEA2'], 'ro', label='Closed')
+    plt.xlabel('Frame Number')
+    plt.ylabel('Noise Equivalent Area (Sq. Arcsec)')
+    plt.legend(numpoints=1)
+    plt.ylim(0, 3)
+    plt.savefig('plots/nea2_vs_frame.png')
+    
     # FWHM for each direction
     plt.clf()
     plt.plot(so['Index'], so['xFWHM']*scale, 'bo', label='Open X')
@@ -278,20 +276,114 @@ def plot_stats():
     plt.legend(numpoints=1, fontsize=10)
     plt.ylim(0, 1.5)
     plt.savefig('plots/xyfwhm_vs_frame.png')
+
+    
+    # 
+    # Plot ratio of improvements. First we need to find a matching
+    # closed loop image to go with each open (and TTF) image.
+    #
+    tree_sc = scipy.spatial.KDTree(np.array([sc['Index']]).T)
+    dist_oc, idx_in_c_of_o = tree_sc.query(np.array([so['Index']]).T, 1)
+    dist_tc, idx_in_c_of_t = tree_sc.query(np.array([st['Index']]).T, 1)
+
+    # FWHM
+    plt.clf()
+    plt.plot(so['Index'], sc['FWHM'][idx_in_c_of_o] / so['FWHM'], 'bo', label='Closed / Open')
+    plt.plot(st['Index'], sc['FWHM'][idx_in_c_of_t] / st['FWHM'], 'ro', label='Closed / TTF')
+    plt.xlabel('Frame Number')
+    plt.ylabel('Ratio of FWHM')
+    plt.legend(numpoints=1)
+    plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
+    plt.ylim(0, 1.3)
+    plt.savefig('plots/fwhm_ratio_vs_frame.png')
+
+    # EE 50
+    plt.clf()
+    plt.plot(so['Index'], sc['EE50'][idx_in_c_of_o] / so['EE50'], 'bo', label='Closed / Open')
+    plt.plot(st['Index'], sc['EE50'][idx_in_c_of_t] / st['EE50'], 'ro', label='Closed / TTF')
+    plt.xlabel('Frame Number')
+    plt.ylabel('Ratio of 50% EE Radius')
+    plt.legend(numpoints=1)
+    plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
+    plt.ylim(0, 1.3)
+    plt.savefig('plots/ee50_ratio_vs_frame.png')
+
+    # EE 80
+    plt.clf()
+    plt.plot(so['Index'], sc['EE80'][idx_in_c_of_o] / so['EE80'], 'bo', label='Closed / Open')
+    plt.plot(st['Index'], sc['EE80'][idx_in_c_of_t] / st['EE80'], 'ro', label='Closed / TTF')
+    plt.xlabel('Frame Number')
+    plt.ylabel('Ratio of 80% EE Radius')
+    plt.legend(numpoints=1)
+    plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
+    plt.ylim(0, 1.3)
+    plt.savefig('plots/ee80_ratio_vs_frame.png')
+
+    # NEA
+    plt.clf()
+    plt.plot(so['Index'], sc['NEA'][idx_in_c_of_o] / so['NEA'], 'bo', label='Closed / Open')
+    plt.plot(st['Index'], sc['NEA'][idx_in_c_of_t] / st['NEA'], 'ro', label='Closed / TTF')
+    plt.xlabel('Frame Number')
+    plt.ylabel('Ratio of NEA')
+    plt.legend(numpoints=1)
+    plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
+    plt.ylim(0, 1.3)
+    plt.savefig('plots/nea_ratio_vs_frame.png')
+
+    # NEA2
+    plt.clf()
+    plt.plot(so['Index'], sc['NEA2'][idx_in_c_of_o] / so['NEA2'], 'bo', label='Closed / Open')
+    plt.plot(st['Index'], sc['NEA2'][idx_in_c_of_t] / st['NEA2'], 'ro', label='Closed / TTF')
+    plt.xlabel('Frame Number')
+    plt.ylabel('Ratio of NEA2')
+    plt.legend(numpoints=1)
+    plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
+    plt.ylim(0, 1.3)
+    plt.savefig('plots/nea2_ratio_vs_frame.png')
+    
+    # FWHM for each direction
+    plt.clf()
+    plt.plot(so['Index'], sc['xFWHM'][idx_in_c_of_o] / so['xFWHM'], 'bo', label='X Closed / Open')
+    plt.plot(st['Index'], sc['xFWHM'][idx_in_c_of_t] / st['xFWHM'], 'ro', label='X Closed / TTF')
+    plt.plot(so['Index'], sc['yFWHM'][idx_in_c_of_o] / so['yFWHM'], 'b^', label='Y Closed / Open')
+    plt.plot(st['Index'], sc['yFWHM'][idx_in_c_of_t] / st['yFWHM'], 'r^', label='Y Closed / TTF')
+    plt.xlabel('Frame Number')
+    plt.ylabel('Ratio of FWHM')
+    plt.legend(numpoints=1, fontsize=10)
+    plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
+    plt.ylim(0, 1.3)
+    plt.savefig('plots/xyfwhm_ratio_vs_frame.png')
     
     return
 
-def add_frame_number_column(stats_table):
-    # Get the frame numbers for plotting.
-    frame_num = np.zeros(len(stats_table), dtype=int)
-    for ii in range(len(stats_table)):
-        foo = stats_table['Image'][ii].index('bin')
 
-        frame_num[ii] = int(stats_table['Image'][ii][foo - 4:foo - 1])
-        frame_num_col = table.Column(frame_num, name='Index')
 
-    stats_table.add_column(frame_num_col)
+def stack_open():
+    """
+    Stack the open loop images.
+    """
+    fnum = [56, 57, 58]
+    # fnum += [77, 78, 79, 92, 93, 94, 98, 99, 100, 104, 105, 106, 113, 114]
+    # fnum += [115, 126, 127, 128, 135]
+    img_files = ['obj_o{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum]
+    starlists = ['obj_o{0:03d}_bin_nobkg_stars.txt'.format(ii) for ii in fnum]
 
+    reduce_fli.shift_and_add(img_files, starlists, 'stack_open.fits', method='meanclip')
+    
     return
 
+def stack_ttf():
+    """
+    Stack the TTF closed loop images.
+    """
+    return
+
+def stack_closed():
+    """
+    Stack the closed loop images.
+    """
+    return
+
+
         
+
