@@ -104,7 +104,66 @@ def clean_images(img_files, rebin=10, sky_frame=None):
         fits.writeto(img_files[ii].replace('.fits', '_bin_nobkg.fits'), img_final, hdr, clobber=True)
 
     return
+
+def makeflat(flat_files, dark_files):
     
+    ##Dark subtracts and combines flats
+
+    # Read in the dark images
+    print('\nReading in dark files...')
+    darks = np.array([fits.getdata(dark) for dark in dark_files])
+
+    # Read in the flat images
+    print('\nReading in flat files...')
+    flats = np.array([fits.getdata(flat) for flat in flat_files])
+
+    #Dark subtraction
+    print('\nSubtracting darks from flats...')
+    flat_ds = flats - darks 
+
+    #Normalize each of the flats:
+    print('\nNormalizing each flat...')
+    norm_flats = []
+    for i in range(len(flat_ds)):
+        mean, median, stdev = sigma_clipped_stats(flat_ds[i], sigma=3, iters=2, axis=None)
+        norm = flat_ds[i] / median
+        norm_flats.append(norm)
+
+    # Sigma clip  (about the median)
+    print('\nSigma clipping (3 sigma, 2 iterations) about the median...')
+    mean, median, stdev = sigma_clipped_stats(norm_flats, sigma=3, iters=2, axis=0)
+
+    # Median combine the masked images.
+    print('\nMedian combining all images...')
+    flat = median.data
+    
+    return flat
+
+def rebin(a, bin_fac):
+    
+    #bins an array 'a' by a factor 'bin_fac'; sums pixels
+
+    img_bin = block_reduce(a, (bin_fac, bin_fac), func=np.sum)
+    return img_bin
+
+
+def flat_sky_reduction(img_files, sky_frame, flat_frame):
+    
+    ##Subtracts sky and applies flat
+    
+    for ii in range(len(img_files)):
+        print('Working on image: ', img_files[ii])
+        img, hdr = fits.getdata(img_files[ii], header=True)
+        
+        sky = fits.getdata(sky_frame)
+        flat = fits.getdata(flat_frame)
+        
+        img_final = (img - sky) / flat
+        
+        fits.writeto(img_files[ii].replace('.fits', '_bin_nobkg.fits'), img_final, hdr, clobber=True)
+        
+    return
+
 def find_stars_bin(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=False):
     """
     img_files - a list of image files.
@@ -259,7 +318,6 @@ def find_stars_bin(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=
     
 def find_outlier_pixels(data, tolerance=3, worry_about_edges=True, median_filter_size=10):
     """Find the hot or dead pixels in a 2D dataset. 
-
     Parameters
     ----------
     data: numpy array (2D)
@@ -273,7 +331,6 @@ def find_outlier_pixels(data, tolerance=3, worry_about_edges=True, median_filter
     Return
     ------
     The function returns a list of hot pixels and also an image with with hot pixels removed
-
     """
     from scipy.ndimage import median_filter
     blurred = median_filter(data, size=median_filter_size)
@@ -675,4 +732,3 @@ def read_starlist(starlist):
     stars.rename_column('mag', 'm')
 
     return stars
-    
