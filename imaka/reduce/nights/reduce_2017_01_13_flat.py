@@ -23,7 +23,7 @@ def make_sky():
 
     return
 
-def make_flat()
+def make_flat():
     flat_dir = "/Volumes/g/lu/data/imaka/2017_01_13/fli/twilights/"
 
     flat_num = [0, 1, 2, 3, 4, 5, 6]
