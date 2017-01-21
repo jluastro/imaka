@@ -37,7 +37,7 @@ def make_flat():
     dark_frames = ['{0:s}dark_{1:03d}.fits'.format(flat_dir, ss) for ss in flat_num]
     flat2 = reduce_fli.makeflat(flat_frames, dark_frames)
 
-    flat1_rebin3 = rebin(flat1, 3)[:,:-1]/9
+    flat1_rebin3 = reduce_fli.rebin(flat1, 3)[:,:-1]/9
     mean, median, stdev = sigma_clipped_stats([flat1_rebin3, flat2], sigma=3, iters=2, axis=0)
     hdu = fits.PrimaryHDU(median.data)
     hdu.writeto('flat.fits')    
@@ -187,17 +187,53 @@ def find_stars_pleiades_binned_closed():
 
 
 def calc_star_stats():
-    fnum = [34, 35, 36, 43, 44, 45, 56, 57, 58, 59]
+
+    # open first half of night
+    fnum1 = [34, 35, 36, 43, 44, 45, 56, 57, 58, 59, 68, 69, 70, 71, 83, 84, 85, 86]
+    fnum2 = [95, 96, 97, 98, 480, 582, 583, 584, 585] 
+    fnum = fnum1 + fnum2 
     img_files = ['obj_o{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum]
     reduce_fli.calc_star_stats(img_files, output_stats='stats_open.fits')
 
-    fnum = [37, 38, 39, 49, 50, 51, 60, 61, 62, 63]
-    img_files = ['obj_ttf{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum]
-    reduce_fli.calc_star_stats(img_files, output_stats='stats_ttf.fits')
+    # open second half of night
+    fnum1 = [609, 610, 611, 612, 622, 623, 624, 636, 637, 638, 639, 1010, 1011]
+    fnum2 = [1012, 1013, 1022, 1023, 1024, 1025, 1034, 1035, 1036, 1037, 1049, 1052, 1061]
+    fnum3 = [1062, 1063, 1064, 1073, 1074, 1075, 1076, 1088, 1089, 1090, 1091, 1104, 1105]
+    fnum4 = [1106, 1107]
+    fnum = fnum1 + fnum2 + fnum3 + fnum4   
+    img_files = ['obj_o{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum]
+    reduce_fli.calc_star_stats(img_files, output_stats='stats_open2.fits')
 
-    fnum = [31, 32, 33, 40, 41, 42, 52, 53, 54, 55]
+    # ttf first half of the night
+    fnum1 = [37, 38, 39, 49, 50, 51, 60, 61, 62, 63, 75, 76, 77, 78, 87, 88, 89, 90]
+    fnum2 = [586, 587, 588, 589]
+    fnum = fnum1 + fnum2
+    img_files = ['obj_ttf{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum]
+    reduce_fli.calc_star_stats(img_files, output_stats='stats_ttf1.fits')
+
+    # ttf second half of the night
+    fnum1 = [601, 602, 603, 604, 614, 615, 616, 629, 630, 631, 1014, 1015, 1016, 1017]
+    fnum2 = [1026, 1027, 1028, 1029, 1041, 1042, 1043, 1044, 1053, 1054, 1055, 1056, 1065]
+    fnum3 = [1066, 1067, 1068, 1080, 1081, 1082, 1083, 1092, 1093, 1094, 1095]
+    fnum = fnum1 + fnum2 + fnum3
+    img_files = ['obj_ttf{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum]
+    reduce_fli.calc_star_stats(img_files, output_stats='stats_ttf2.fits')
+    
+    # closed first half of the night
+    fnum1 = [31, 32, 33, 40, 41, 42, 52, 53, 54, 55, 64, 65, 66, 67, 79, 80, 81, 82, 91, 92]
+    fnum2 = [93, 94, 417, 448, 479, 577, 578, 579, 580, 581, 590, 591, 592, 593]
+    fnum = fnum1 + fnum2
     img_files = ['obj_c{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum]
-    reduce_fli.calc_star_stats(img_files, output_stats='stats_closed.fits')
+    reduce_fli.calc_star_stats(img_files, output_stats='stats_closed1.fits')
+        
+    # closed second half of night
+    fnum1 = [605, 606, 607, 608, 618, 619, 620, 632, 633, 634, 635, 1006, 1007, 1008]
+    fnum2 = [1009, 1018, 1019, 1020, 1021, 1030, 1031, 1032, 1033, 1045, 1046, 1047, 1048]
+    fnum3 = [1057, 1058, 1059, 1060, 1069, 1070, 1071, 1072, 1084, 1085, 1086, 1087, 1096]
+    fnum4 = [1097, 1098, 1099]
+    fnum = fnum1 + fnum2 + fnum3 + fnum4
+    img_files = ['obj_c{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum]
+    reduce_fli.calc_star_stats(img_files, output_stats='stats_closed2.fits')
 
     plot_stats()
     
