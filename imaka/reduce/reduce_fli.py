@@ -38,6 +38,8 @@ from flystar import transforms
 from imaka.reduce import calib
 import ccdproc
 from scipy.ndimage import interpolation
+import scipy.ndimage
+from astropy.table import Table
 
 
 scale = 40.0 # mas/pixel
@@ -732,3 +734,55 @@ def read_starlist(starlist):
     stars.rename_column('mag', 'm')
 
     return stars
+
+
+def calc_empirical_FWHM(img_files, star_lists):
+    
+    #Input: image files, obj_x000_bin_nobkg_stars.txt file !!must be run after find_stars!!
+    #output: writes new file obj_x_000_bin_nobkg_stars_FWHM.txt
+
+    #read in image data
+    images = np.array([fits.getdata(image) for image in img_files])
+
+    for ii in range(len(images)):
+        print("Working on image: ", img_files[ii].split('/')[-1])
+
+        #read in centroid coordinates from _bin_nobkg_stars.txt
+        with open(star_lists[ii], "r") as f:
+            xcents = []; ycents = []; ids    = []
+            for line in f:
+                pieces = line.split('   ')
+                x_cent = pieces[1]; y_cent = pieces[2]; iden = pieces[0]
+                xcents.append(x_cent); ycents.append(y_cent); ids.append(iden)
+        xcents.pop(0); ycents.pop(0), ids.pop(0)
+
+        FWHM_list = []
+        peaks = []
+        
+        for i in range(len(xcents)):
+           
+            # Make a 20x20 patch centered on centroid, oversample and interpolate
+            x_cent = float(xcents[i]); y_cent = float(ycents[i])
+            one_star = images[ii][y_cent-10 : y_cent+10, x_cent-10 : x_cent+10]
+            over_samp_5 = scipy.ndimage.zoom(one_star, 5, order = 1)
+
+            
+            # Find area of stars above half max and calculate equivalnent circle diameter
+            max_flux = np.amax(over_samp_5) 
+            peaks.append(max_flux)
+            half_max = max_flux / 2.0
+            idx = np.where(over_samp_5 >= half_max)
+            area_count = len(idx[0])
+            FWHM = (2.0* ((area_count / np.pi) ** 0.5)) / 5.0
+            FWHM_list.append(FWHM)
+        
+        print("     Sources calculated:", len(FWHM_list))
+        print("     Writing text file...")
+        
+        # Write data to file
+        t = Table([ids, xcents, ycents, FWHM_list, peaks],\
+                  names=('id', 'xcentroid', 'ycentroid', 'FWHM', 'peak'), meta={'name': 'empirical FWHM'})
+                            
+        t.write(img_files[ii].replace('.fits', '_stars_FWHM.txt'), format='ascii.fixed_width', delimiter=None, bookend=False)
+
+    return
