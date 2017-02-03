@@ -441,6 +441,8 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
     s_fwhm_std = np.zeros(N_files, dtype=float)
     s_NEA = np.zeros(N_files, dtype=float)
     s_NEA2 = np.zeros(N_files, dtype=float)
+    s_emp_fwhm = np.zeros(N_files, dtype=float)
+    s_emp_fwhm_std = np.zeros(N_files, dtype=float)
     
     for ii in range(N_files):
         # Load up the image to work on.
@@ -540,6 +542,29 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
         fwhm = np.mean([stars['x_fwhm'][idx], stars['y_fwhm'][idx]])
         fwhm_std = np.std([stars['x_fwhm'][idx], stars['y_fwhm'][idx]])
         theta = stars['theta'][idx].mean()
+        
+        # calculate emperical FWHM 
+
+        emp_FWHM_list = []
+       
+        for jj in range(len(stars)):
+           
+            # Make a 20x20 patch centered on centroid, oversample and interpolate
+            x_cent = float(coords[0][jj]); y_cent = float(coords[1][jj])
+            one_star = img[y_cent-10 : y_cent+10, x_cent-10 : x_cent+10]
+            over_samp_5 = scipy.ndimage.zoom(one_star, 5, order = 1)
+
+            # Find area of stars above half max and calculate equivalnent circle diameter
+            max_flux = np.amax(over_samp_5) 
+            half_max = max_flux / 2.0
+            idx = np.where(over_samp_5 >= half_max)
+            area_count = len(idx[0])
+            emp_FWHM = (2.0* ((area_count / np.pi) ** 0.5)) / 5.0
+            emp_FWHM_list.append(emp_FWHM)
+ 
+        # Take median of all stars in image
+        med_emp_FWHM = np.median(emp_FWHM_list)
+        std_emp_FWHM = np.std(emp_FWHM_list)
 
         s_ee50[ii] = ee50_rad
         s_ee80[ii] = ee80_rad
@@ -550,9 +575,11 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
         s_fwhm_std[ii] = fwhm_std
         s_NEA[ii] = nea
         s_NEA2[ii] = nea2
+        s_emp_fwhm[ii] = med_emp_FWHM
+        s_emp_fwhm_std[ii] = std_emp_FWHM
 
-    stats = table.Table([img_files, s_time, s_fwhm, s_fwhm_std, s_ee50, s_ee80, s_NEA, s_NEA2, s_xfwhm, s_yfwhm, s_theta],
-                                names=('Image', 'TIME', 'FWHM', 'FWHM_std', 'EE50', 'EE80', 'NEA', 'NEA2', 'xFWHM', 'yFWHM', 'theta'),
+    stats = table.Table([img_files, s_time, s_fwhm, s_fwhm_std, s_ee50, s_ee80, s_NEA, s_NEA2, s_xfwhm, s_yfwhm, s_theta, s_emp_fwhm, s_emp_fwhm_std],
+                                names=('Image', 'TIME', 'FWHM', 'FWHM_std', 'EE50', 'EE80', 'NEA', 'NEA2', 'xFWHM', 'yFWHM', 'theta', 'emp_fwhm', 'emp_fwhm_std'),
                             meta={'name':'Stats Table'})
     
     stats['FWHM'].format = '7.3f'
@@ -564,13 +591,16 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
     stats['xFWHM'].format = '7.3f'
     stats['yFWHM'].format = '7.3f'
     stats['theta'].format = '7.3f'
+    stats['emp_fwhm'].format = '7.3f'
+    stats['emp_fwhm_std'].format = '7.3f'
 
     add_frame_number_column(stats)
     
     stats.write(output_stats, overwrite=True)
-    stats.write(output_stats.replace('.fits', 'csv'), format='csv') # Auto overwrites
+    stats.write(output_stats.replace('.fits', '.csv'), format='csv') # Auto overwrites
                         
     return
+
 
 def add_frame_number_column(stats_table):
     # Get the frame numbers for plotting.
