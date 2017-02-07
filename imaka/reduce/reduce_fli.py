@@ -566,7 +566,7 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
     add_frame_number_column(stats)
     
     stats.write(output_stats, overwrite=True)
-    stats.write(output_stats.replace('.fits', 'csv'), format='csv') # Auto overwrites
+    stats.write(output_stats.replace('.fits', '.csv'), format='csv') # Auto overwrites
                         
     return
 
@@ -658,9 +658,9 @@ def shift_and_add(img_files, starlists, output_root, method='mean', clip_sigma=N
         combiner.sigma_clipping()
         final_image = combiner.average_combine()
 
-    fits.writeto(output_root + '.fits', final_image.data)
+    # Save file (note we are just using the last hdr... not necessarily the best)
+    fits.writeto(output_root + '.fits', final_image, hdr, clobber=True)
     
-
     return
     
 

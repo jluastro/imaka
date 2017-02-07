@@ -5,8 +5,8 @@ from astropy import table
 from astropy import units
 import scipy
 import glob
-import reduce_fli
-import calib
+from imaka.reduce import reduce_fli
+from imaka.reduce import calib
 import os
 
 def make_sky():
@@ -506,3 +506,42 @@ def plot_stats():
     
     return
 
+def stack_pleiades_west_ttf():
+    """
+    Stack all the images from the night for the Open loop, TTF closed loop, and GLAO closed loop
+    images. Calculate statstics on all three.
+    """
+    # open second half of night (on west field
+    open_img_nums = [609, 610, 611, 612, 622, 623, 624, 636, 637, 638, 639, 1010, 1011]
+    open_img_nums += [1012, 1013, 1022, 1023, 1024, 1025, 1034, 1035, 1036, 1037, 1049, 1052, 1061]
+    open_img_nums += [1062, 1063, 1064, 1073, 1074, 1075, 1076, 1088, 1089, 1090, 1091, 1104, 1105]
+    open_img_nums += [1106, 1107]
+    open_images = ['obj_o{0:03d}_bin_nobkg.fits'.format(ii) for ii in open_img_nums]
+    open_starlists = ['obj_o{0:03d}_bin_nobkg_stars.txt'.format(ii) for ii in open_img_nums]
+    open_output_root = 'west_stack_open'
+    reduce_fli.shift_and_add(open_images, open_starlists, open_output_root, method='mean')
+
+    # TTF closed second half of night (on west field)
+    ttf_img_nums = [601, 602, 603, 604, 614, 615, 616, 629, 630, 631, 1014, 1015, 1016, 1017]
+    ttf_img_nums += [1026, 1027, 1028, 1029, 1041, 1042, 1043, 1044, 1053, 1054, 1055, 1056, 1065]
+    ttf_img_nums += [1066, 1067, 1068, 1080, 1081, 1082, 1083, 1092, 1093, 1094, 1095]
+    ttf_images = ['obj_ttf{0:03d}_bin_nobkg.fits'.format(ii) for ii in ttf_img_nums]
+    ttf_starlists = ['obj_ttf{0:03d}_bin_nobkg_stars.txt'.format(ii) for ii in ttf_img_nums]
+    ttf_output_root = 'west_stack_ttf'
+    reduce_fli.shift_and_add(ttf_images, ttf_starlists, ttf_output_root, method='mean')
+
+    # GLAO closed second half of night (on west field
+    closed_img_nums = [605, 606, 607, 608, 618, 619, 620, 632, 633, 634, 635, 1006, 1007, 1008]
+    closed_img_nums += [1009, 1018, 1019, 1020, 1021, 1030, 1032, 1033, 1045, 1046, 1047, 1048]
+    closed_img_nums += [1057, 1058, 1059, 1060, 1069, 1070, 1071, 1072, 1084, 1085, 1086, 1087, 1096]
+    closed_img_nums += [1097, 1098, 1099]
+    closed_images = ['obj_c{0:03d}_bin_nobkg.fits'.format(ii) for ii in closed_img_nums]
+    closed_starlists = ['obj_c{0:03d}_bin_nobkg_stars.txt'.format(ii) for ii in closed_img_nums]
+    closed_output_root = 'west_stack_closed'
+    reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
+
+    # Calc stats on all the stacked images
+    img_files = ['west_stack_open.fits', 'west_stack_ttf.fits', 'west_stack_closed.fits']
+    reduce_fli.calc_star_stats(img_files, output_stats='stats_stacks.fits')
+
+    return
