@@ -38,6 +38,8 @@ from flystar import transforms
 from imaka.reduce import calib
 import ccdproc
 from scipy.ndimage import interpolation
+import scipy.ndimage
+from astropy.table import Table
 
 
 scale = 40.0 # mas/pixel
@@ -439,6 +441,8 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
     s_fwhm_std = np.zeros(N_files, dtype=float)
     s_NEA = np.zeros(N_files, dtype=float)
     s_NEA2 = np.zeros(N_files, dtype=float)
+    s_emp_fwhm = np.zeros(N_files, dtype=float)
+    s_emp_fwhm_std = np.zeros(N_files, dtype=float)
     
     for ii in range(N_files):
         # Load up the image to work on.
@@ -538,6 +542,29 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
         fwhm = np.mean([stars['x_fwhm'][idx], stars['y_fwhm'][idx]])
         fwhm_std = np.std([stars['x_fwhm'][idx], stars['y_fwhm'][idx]])
         theta = stars['theta'][idx].mean()
+        
+        # calculate emperical FWHM 
+
+        emp_FWHM_list = []
+       
+        for jj in range(len(stars)):
+           
+            # Make a 20x20 patch centered on centroid, oversample and interpolate
+            x_cent = float(coords[0][jj]); y_cent = float(coords[1][jj])
+            one_star = img[y_cent-10 : y_cent+10, x_cent-10 : x_cent+10]
+            over_samp_5 = scipy.ndimage.zoom(one_star, 5, order = 1)
+
+            # Find area of stars above half max and calculate equivalnent circle diameter
+            max_flux = np.amax(over_samp_5) 
+            half_max = max_flux / 2.0
+            idx = np.where(over_samp_5 >= half_max)
+            area_count = len(idx[0])
+            emp_FWHM = (2.0* ((area_count / np.pi) ** 0.5)) / 5.0
+            emp_FWHM_list.append(emp_FWHM)
+ 
+        # Take median of all stars in image
+        med_emp_FWHM = np.median(emp_FWHM_list)
+        std_emp_FWHM = np.std(emp_FWHM_list)
 
         s_ee50[ii] = ee50_rad
         s_ee80[ii] = ee80_rad
@@ -548,9 +575,11 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
         s_fwhm_std[ii] = fwhm_std
         s_NEA[ii] = nea
         s_NEA2[ii] = nea2
+        s_emp_fwhm[ii] = med_emp_FWHM
+        s_emp_fwhm_std[ii] = std_emp_FWHM
 
-    stats = table.Table([img_files, s_time, s_fwhm, s_fwhm_std, s_ee50, s_ee80, s_NEA, s_NEA2, s_xfwhm, s_yfwhm, s_theta],
-                                names=('Image', 'TIME', 'FWHM', 'FWHM_std', 'EE50', 'EE80', 'NEA', 'NEA2', 'xFWHM', 'yFWHM', 'theta'),
+    stats = table.Table([img_files, s_time, s_fwhm, s_fwhm_std, s_ee50, s_ee80, s_NEA, s_NEA2, s_xfwhm, s_yfwhm, s_theta, s_emp_fwhm, s_emp_fwhm_std],
+                                names=('Image', 'TIME', 'FWHM', 'FWHM_std', 'EE50', 'EE80', 'NEA', 'NEA2', 'xFWHM', 'yFWHM', 'theta', 'emp_fwhm', 'emp_fwhm_std'),
                             meta={'name':'Stats Table'})
     
     stats['FWHM'].format = '7.3f'
@@ -562,6 +591,8 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
     stats['xFWHM'].format = '7.3f'
     stats['yFWHM'].format = '7.3f'
     stats['theta'].format = '7.3f'
+    stats['emp_fwhm'].format = '7.3f'
+    stats['emp_fwhm_std'].format = '7.3f'
 
     add_frame_number_column(stats)
     
@@ -569,6 +600,7 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
     stats.write(output_stats.replace('.fits', '.csv'), format='csv') # Auto overwrites
                         
     return
+
 
 def add_frame_number_column(stats_table):
     # Get the frame numbers for plotting.
@@ -732,3 +764,55 @@ def read_starlist(starlist):
     stars.rename_column('mag', 'm')
 
     return stars
+
+
+def calc_empirical_FWHM(img_files, star_lists):
+    
+    #Input: image files, obj_x000_bin_nobkg_stars.txt file !!must be run after find_stars!!
+    #output: writes new file obj_x_000_bin_nobkg_stars_FWHM.txt
+
+    #read in image data
+    images = np.array([fits.getdata(image) for image in img_files])
+
+    for ii in range(len(images)):
+        print("Working on image: ", img_files[ii].split('/')[-1])
+
+        #read in centroid coordinates from _bin_nobkg_stars.txt
+        with open(star_lists[ii], "r") as f:
+            xcents = []; ycents = []; ids    = []
+            for line in f:
+                pieces = line.split('   ')
+                x_cent = pieces[1]; y_cent = pieces[2]; iden = pieces[0]
+                xcents.append(x_cent); ycents.append(y_cent); ids.append(iden)
+        xcents.pop(0); ycents.pop(0), ids.pop(0)
+
+        FWHM_list = []
+        peaks = []
+        
+        for i in range(len(xcents)):
+           
+            # Make a 20x20 patch centered on centroid, oversample and interpolate
+            x_cent = float(xcents[i]); y_cent = float(ycents[i])
+            one_star = images[ii][y_cent-10 : y_cent+10, x_cent-10 : x_cent+10]
+            over_samp_5 = scipy.ndimage.zoom(one_star, 5, order = 1)
+
+            
+            # Find area of stars above half max and calculate equivalnent circle diameter
+            max_flux = np.amax(over_samp_5) 
+            peaks.append(max_flux)
+            half_max = max_flux / 2.0
+            idx = np.where(over_samp_5 >= half_max)
+            area_count = len(idx[0])
+            FWHM = (2.0* ((area_count / np.pi) ** 0.5)) / 5.0
+            FWHM_list.append(FWHM)
+        
+        print("     Sources calculated:", len(FWHM_list))
+        print("     Writing text file...")
+        
+        # Write data to file
+        t = Table([ids, xcents, ycents, FWHM_list, peaks],\
+                  names=('id', 'xcentroid', 'ycentroid', 'FWHM', 'peak'), meta={'name': 'empirical FWHM'})
+                            
+        t.write(img_files[ii].replace('.fits', '_stars_FWHM.txt'), format='ascii.fixed_width', delimiter=None, bookend=False)
+
+    return
