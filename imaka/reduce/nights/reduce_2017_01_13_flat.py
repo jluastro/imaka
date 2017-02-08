@@ -540,8 +540,15 @@ def stack_pleiades_west_ttf():
     closed_output_root = 'west_stack_closed'
     reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
 
-    # Calc stats on all the stacked images
+    return
+
+
+def analyze_stacks():
     img_files = ['west_stack_open.fits', 'west_stack_ttf.fits', 'west_stack_closed.fits']
+    
+    find_stars_bin(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=True)
+    
+    # Calc stats on all the stacked images
     reduce_fli.calc_star_stats(img_files, output_stats='stats_stacks.fits')
 
     return
