@@ -69,7 +69,7 @@ def fix_bad_pixels(img):
     return cleanarr
 
 
-def clean_images(img_files, rebin=10, sky_frame=None):
+def clean_images(img_files, output_path, rebin=10, sky_frame=None):
     from scipy.ndimage import median_filter
 
     sky_bin = None   # Indiciates we haven't loaded the sky frame yet.
@@ -103,7 +103,7 @@ def clean_images(img_files, rebin=10, sky_frame=None):
             img_final = img_bin - sky_bin
 
         # Save the final image.
-        fits.writeto(img_files[ii].replace('.fits', '_bin_nobkg.fits'), img_final, hdr, clobber=True)
+        fits.writeto(output_path + img_files[ii].replace('.fits', '_bin_nobkg.fits').split('/')[-1], img_final, hdr, clobber=True)
 
     return
 
