@@ -151,7 +151,7 @@ def find_stars_pleiades_binned_tt():
     os.chdir(data_dir)  
     
     fnum = [134, 135, 136, 137, 138, 139, 140]
-    img_files = ['obj_tt{0:03d}.fits'.format(ii) for ii in fnum]
+    img_files = ['obj_tt{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum]
     reduce_fli.find_stars_bin(img_files, fwhm=4, threshold=6)
     
     return
@@ -165,7 +165,7 @@ def find_stars_pleiades_binned_ttf():
     fnum2 = [169, 170, 173, 174, 175, 176, 181, 182, 187, 188, 189, 190, 202, 203, 208, 209, 214]
     fnum3 = [215, 220, 221, 224, 225, 228, 229]
     fnum = fnum1 + fnum2 + fnum3
-    img_files = ['obj_ttf{0:03d}.fits'.format(ii) for ii in fnum]
+    img_files = ['obj_ttf{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum]
     reduce_fli.find_stars_bin(img_files, fwhm=4, threshold=6)
     
     return
