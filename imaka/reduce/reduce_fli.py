@@ -149,7 +149,7 @@ def rebin(a, bin_fac):
     return img_bin
 
 
-def flat_sky_reduction(img_files, sky_frame, flat_frame):
+def flat_sky_reduction(img_files, output_path, sky_frame, flat_frame):
     
     ##Subtracts sky and applies flat
     
@@ -162,9 +162,11 @@ def flat_sky_reduction(img_files, sky_frame, flat_frame):
         
         img_final = (img - sky) / flat
         
-        fits.writeto(img_files[ii].replace('.fits', '_bin_nobkg.fits'), img_final, hdr, clobber=True)
+        
+        fits.writeto(output_path + img_files[ii].replace('.fits', '_bin_nobkg.fits').split('/')[-1], img_final, hdr, clobber=True)
         
     return
+
 
 def find_stars_bin(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=False):
     """
