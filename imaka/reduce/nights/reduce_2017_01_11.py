@@ -8,6 +8,7 @@ import reduce_fli
 import calib
 import pdb
 import os
+#from flystar import match
 
 def make_sky():
     sky_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/Pleiades/'
