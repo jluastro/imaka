@@ -1,3 +1,4 @@
+import os
 import math
 import pylab as plt
 from PIL import Image
@@ -38,11 +39,22 @@ from flystar import transforms
 from imaka.reduce import calib
 import ccdproc
 from scipy.ndimage import interpolation
+from scipy.ndimage import median_filter
 import scipy.ndimage
 from astropy.table import Table
+from skimage.measure import block_reduce
+
 
 
 scale = 40.0 # mas/pixel
+
+def rebin(a, bin_fac):
+    """
+    Bins an array 'a' by a factor 'bin_fac'; sums pixels
+    """
+    img_bin = block_reduce(a, (bin_fac, bin_fac), func=np.sum)
+    
+    return img_bin
 
 def subtract_dark(image_file, dark_file):
     # Dark subtract an image.
@@ -59,6 +71,7 @@ def subtract_dark(image_file, dark_file):
 
     return img_ds
 
+
 def fix_bad_pixels(img):
     crmask, cleanarr = detect_cosmics(img, sigclip=5, sigfrac=0.3, objlim=5.0, gain=1.0,
                                       readnoise=6.5, satlevel=65535.0, pssl=0, niter=4,
@@ -69,118 +82,103 @@ def fix_bad_pixels(img):
     return cleanarr
 
 
-def clean_images(img_files, rebin=10, sky_frame=None):
-    from scipy.ndimage import median_filter
-
-    sky_bin = None   # Indiciates we haven't loaded the sky frame yet.
-
-    for ii in range(len(img_files)):
-        print('Working on image: ', img_files[ii])
-        img, hdr = fits.getdata(img_files[ii], header=True)
-
-        # # Fix hot and dead pixels
-        # print('\t Fix bad pixels')
-        # bad_pixels, img_cr = find_outlier_pixels(img, tolerance=5, worry_about_edges=False)
-        img_cr = img
- 
-        # Bin by a factor of 10 (or as specified).
-        print('\t Bin by a factor of ', rebin)
-        from skimage.measure import block_reduce
-        img_bin = block_reduce(img_cr, (rebin, rebin), func=np.sum)
-        fits.writeto(img_files[ii].replace('.fits', '_bin.fits'), img_bin, hdr, clobber=True)
-
-        # Subtract background.
-        if sky_frame == None:
-            bkg_box_size = int(round(img_bin.shape[0] / 10.))
-            print('\t Subtract background with smoothing box size of ', bkg_box_size)
-            blurred = median_filter(img_bin, size=bkg_box_size)
-            img_final = img_bin - blurred.astype(float)
-        else:
-            if sky_bin == None:
-                sky = fits.getdata(sky_frame)
-                sky_bin = block_reduce(sky, (rebin, rebin), func=np.sum)
-                
-            img_final = img_bin - sky_bin
-
-        # Save the final image.
-        fits.writeto(img_files[ii].replace('.fits', '_bin_nobkg.fits'), img_final, hdr, clobber=True)
-
-    return
-
-def makeflat(flat_files, dark_files):
+def clean_images(img_files, out_dir, rebin=1, sky_frame=None, flat_frame=None, fix_bad_pixels=False):
+    """
+    Clean a stack of imaka images. Options include:
+      - sky subtraction
+      - flat fielding
+      - bad pixel fixing
+      - rebinning
     
-    ##Dark subtracts and combines flats
+    """
+    print('\nREDUCE_FLI: clean_images()')
 
-    # Read in the dark images
-    print('\nReading in dark files...')
-    darks = np.array([fits.getdata(dark) for dark in dark_files])
+    sky = None
+    flat = None
 
-    # Read in the flat images
-    print('\nReading in flat files...')
-    flats = np.array([fits.getdata(flat) for flat in flat_files])
-
-    #Dark subtraction
-    print('\nSubtracting darks from flats...')
-    flat_ds = flats - darks 
-
-    #Normalize each of the flats:
-    print('\nNormalizing each flat...')
-    norm_flats = []
-    for i in range(len(flat_ds)):
-        mean, median, stdev = sigma_clipped_stats(flat_ds[i], sigma=3, iters=2, axis=None)
-        norm = flat_ds[i] / median
-        norm_flats.append(norm)
-
-    # Sigma clip  (about the median)
-    print('\nSigma clipping (3 sigma, 2 iterations) about the median...')
-    mean, median, stdev = sigma_clipped_stats(norm_flats, sigma=3, iters=2, axis=0)
-
-    # Median combine the masked images.
-    print('\nMedian combining all images...')
-    flat = median.data
-    
-    return flat
-
-def rebin(a, bin_fac):
-    
-    #bins an array 'a' by a factor 'bin_fac'; sums pixels
-
-    img_bin = block_reduce(a, (bin_fac, bin_fac), func=np.sum)
-    return img_bin
-
-
-def flat_sky_reduction(img_files, sky_frame, flat_frame):
-    
-    ##Subtracts sky and applies flat
-    
-    for ii in range(len(img_files)):
-        print('Working on image: ', img_files[ii])
-        img, hdr = fits.getdata(img_files[ii], header=True)
-        
+    # If we are doing sky subtraction with a separate sky, then load it up
+    if sky_frame != None:
         sky = fits.getdata(sky_frame)
+
+        if rebin != 1:
+            sky = block_reduce(sky, (rebin, rebin), func=np.sum)
+
+    # If we are doing flat fielding, then load it up
+    if flat_frame != None:
         flat = fits.getdata(flat_frame)
         
-        img_final = (img - sky) / flat
-        
-        fits.writeto(img_files[ii].replace('.fits', '_bin_nobkg.fits'), img_final, hdr, clobber=True)
-        
+
+    #####
+    # Loop through the image stack
+    #####
+    for ii in range(len(img_files)):
+        print('  Working on image: ', img_files[ii])
+
+        # Read image in
+        img, hdr = fits.getdata(img_files[ii], header=True)
+
+        # Clean it
+        img_clean, bad_pixels = clean_single_image(img, sky=sky, flat=flat, rebin=rebin, fix_bad_pixels=fix_bad_pixels)
+
+        # Write it out
+        file_dir, file_name = os.path.split(img_files[ii])
+        out_name = file_name.replace('.fits', '_clean.fits')
+        fits.writeto(out_dir + out_name, img_clean, hdr, clobber=True)
+
+        if bad_pixels != None:
+            mask_name = file_name.replace('.fits', '_mask.fits')
+            fits.writeto(out_dir + mask_name, bad_pixels, hdr, clobber=True)
+            
     return
 
-def find_stars_bin(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=False):
+
+def clean_single_image(img, sky=None, flat=None, rebin=1, fix_bad_pixels=False, verbose=False):
+    # Bin by a factor of 10 (or as specified).
+    if rebin != 1:
+        print('  Bin by a factor of ', rebin)
+        img = block_reduce(img, (rebin, rebin), func=np.sum)
+
+    # Subtract background.
+    if sky is None:
+        bkg_box_size = int(round(img.shape[0] / 10.))
+        print('  Subtract background with smoothing box size of ', bkg_box_size)
+        blurred = median_filter(img_bin, size=bkg_box_size)
+        img = img - blurred.astype(float)
+    else:
+        img = img - sky
+
+    # Flat field.
+    if flat is None:
+        print('  Dividing by flat')
+        img = img / flat
+
+    # Fix hot and dead pixels
+    if fix_bad_pixels:
+        print('\t Fix bad pixels')
+        bad_pixels, img = find_outlier_pixels(img, tolerance=5, worry_about_edges=False)
+    else:
+        bad_pixels = None
+            
+    return img, bad_pixels
+
+
+def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=False):
     """
     img_files - a list of image files.
     fwhm - First guess at the FWHM of the PSF for the first pass on the first image.
     threshold - the SNR threshold (mean + threshold*std) above which to search for sources.
     N_passes - how many times to find sources, recalc the PSF FWHM, and find sources again. 
     """
+    print('\nREDUCE_FLI: find_stars()')
+    
     for ii in range(len(img_files)):
-        print("Working on image: ", img_files[ii])
+        print("  Working on image: ", img_files[ii])
         img, hdr = fits.getdata(img_files[ii], header=True)
 
         fwhm_curr = fwhm
 
         # Calculate the bacgkround and noise (iteratively)
-        print("\t Calculating background")
+        print("    Calculating background")
         bkg_threshold = 3
         for nn in range(5):
             if nn == 0:
@@ -507,7 +505,9 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
         enc_energy_final = np.median(enc_energy[idx], axis=0)
 
         # Plot and save the EE curve and data.
-        _ee_out = open('ee/' + img_files[ii].replace('.fits', '_ee.txt'), 'w')
+        img_dir_name, img_file_name = os.path.split(img_files[ii])
+        ee_dir = img_dir_name + 'ee/'
+        _ee_out = open(ee_dir + img_file_name.replace('.fits', '_ee.txt'), 'w')
         _ee_out.write('{0:10s}  {1:10s}\n'.format('#Radius', 'EE'))
         _ee_out.write('{0:10s}  {1:10s}\n'.format('#(arcsec)', '()'))
         for rr in range(len(radii)):
@@ -534,7 +534,7 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
         plt.ylabel('Encircled Energy')
         plt.legend(loc='lower right')
         plt.pause(0.05)
-        plt.savefig('ee/' +  img_files[ii].replace('.fits', '_ee.png'))
+        plt.savefig(ee_dir + img_file_name.replace('.fits', '_ee.png'))
 
         # Calculate the average FWHM.
         xfwhm = stars['x_fwhm'][idx].mean()
@@ -578,8 +578,10 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
         s_emp_fwhm[ii] = med_emp_FWHM
         s_emp_fwhm_std[ii] = std_emp_FWHM
 
-    stats = table.Table([img_files, s_time, s_fwhm, s_fwhm_std, s_ee50, s_ee80, s_NEA, s_NEA2, s_xfwhm, s_yfwhm, s_theta, s_emp_fwhm, s_emp_fwhm_std],
-                                names=('Image', 'TIME', 'FWHM', 'FWHM_std', 'EE50', 'EE80', 'NEA', 'NEA2', 'xFWHM', 'yFWHM', 'theta', 'emp_fwhm', 'emp_fwhm_std'),
+    stats = table.Table([img_files, s_time, s_fwhm, s_fwhm_std, s_ee50, s_ee80,
+                             s_NEA, s_NEA2, s_xfwhm, s_yfwhm, s_theta, s_emp_fwhm, s_emp_fwhm_std],
+                             names=('Image', 'TIME', 'FWHM', 'FWHM_std', 'EE50', 'EE80',
+                                        'NEA', 'NEA2', 'xFWHM', 'yFWHM', 'theta', 'emp_fwhm', 'emp_fwhm_std'),
                             meta={'name':'Stats Table'})
     
     stats['FWHM'].format = '7.3f'
@@ -690,9 +692,9 @@ def shift_and_add(img_files, starlists, output_root, method='mean', clip_sigma=N
         combiner.sigma_clipping()
         final_image = combiner.average_combine()
 
-    fits.writeto(output_root + '.fits', final_image.data)
+    # Save file (note we are just using the last hdr... not necessarily the best)
+    fits.writeto(output_root + '.fits', final_image, hdr, clobber=True)
     
-
     return
     
 
