@@ -84,18 +84,19 @@ def find_stars_pleiades_open():
     reduce_dir = root_dir + 'reduce/pleiades/'
     
     # Old Naming Scheme
-    fnum1 = [10, 11, 14, 15, 18, 19, 24, 25, 28, 29, 34, 35, 38, 39, 40, 41, 44, 45, 50, 51, 55]
-    fnum2 = [60, 61, 64, 65, 68, 69, 74, 75, 78, 79, 82, 83, 88, 89, 92, 93, 96, 97, 102, 103]
-    fnum = fnum1 + fnum2 
-    img_files = [reduce_dir + 'obj{0:03d}_clean.fits'.format(ii) for ii in fnum]
-    reduce_fli.find_stars(img_files, fwhm=5, threshold=6)
+#     fnum1 = [10, 11, 14, 15, 18, 19, 24, 25, 28, 29, 34, 35, 38, 39, 40, 41, 44, 45, 50, 51, 55]
+#     fnum2 = [60, 61, 64, 65, 68, 69, 74, 75, 78, 79, 82, 83, 88, 89, 92, 93, 96, 97, 102, 103]
+#     fnum = fnum1 + fnum2 
+#     img_files = [reduce_dir + 'obj{0:03d}_clean.fits'.format(ii) for ii in fnum]
+#     reduce_fli.find_stars(img_files, fwhm=5, threshold=6)
 
     # New Naming Scheme
-    fnum1 = [106, 107, 110, 111, 116, 117, 120, 121, 124, 125, 130, 131, 134, 135, 138, 139, 144]
-    fnum2 = [145, 148, 149, 152, 153, 158, 159, 162, 163, 166, 167, 172, 173, 176, 177, 180, 181]
+    #fnum1 = [106, 107, 110, 111, 116, 117, 120, 121, 124, 125, 130, 131, 134, 135, 138, 139, 144]
+    #fnum2 = [145, 148, 149, 152, 153, 158, 159, 162, 163, 166, 167, 172, 173, 176, 177, 180, 181]
     fnum3 = [184, 185, 190, 191, 194, 195, 198, 199, 202, 203, 208, 209, 212, 213, 216, 217]
     fnum4 = [220, 221, 226, 227, 230, 231, 235, 238, 239, 244, 245, 248, 249, 252, 253]
-    fnum = fnum1 + fnum2 + fnum3 + fnum4
+    #fnum = fnum1 + fnum2 + fnum3 + fnum4
+    fnum = fnum3 + fnum4
     img_files = [reduce_dir + 'obj_o{0:03d}_clean.fits'.format(ii) for ii in fnum]
     reduce_fli.find_stars(img_files, fwhm=5, threshold=6)
 
@@ -124,15 +125,15 @@ def find_stars_pleiades_closed():
 
 
 def calc_star_stats_open():
-    reduce_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/reduce/'
-    stats_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/reduce/stats/'
+    reduce_dir = '/Volumes/g/lu/data/imaka/2017_01_10/fli/reduce/'
+    stats_dir = '/Volumes/g/lu/data/imaka/2017_01_10/fli/reduce/stats/'
     os.chdir(data_dir)
 
     # Old Naming Scheme
     fnum1 = [10, 11, 14, 15, 18, 19, 24, 25, 28, 29, 34, 35, 38, 39, 40, 41, 44, 45, 50, 51, 55]
     fnum2 = [60, 61, 64, 65, 68, 69, 74, 75, 78, 79, 82, 83, 88, 89, 92, 93, 96, 97, 102, 103]
     fnum = fnum1 + fnum2 
-    img_files_old = ['obj{0:03d}_clean.fits'.format(ii) for ii in fnum]
+    img_files_old_name = ['obj{0:03d}_clean.fits'.format(ii) for ii in fnum]
     
     #New Naming Scheme
     fnum1 = [106, 107, 110, 111, 116, 117, 120, 121, 124, 125, 130, 131, 134, 135, 138, 139, 144]
@@ -142,21 +143,35 @@ def calc_star_stats_open():
     fnum = fnum1 + fnum2 + fnum3 + fnum4
     img_files_new_name = ['obj_o{0:03d}_clean.fits'.format(ii) for ii in fnum]
     
-    img_files = img_files
+    img_files = img_files_old_name + img_files_new_name
     
-    #reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_open.fits')
+    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_open.fits')
     
     return
 
-    fnum1 = [10, 11, 14, 15, 18, 19, 24, 25, 28, 29, 34, 35, 38, 39, 40, 41, 44, 45, 50, 51, 55]
-    fnum2 = [60, 61, 64, 65, 68, 69, 74, 75, 78, 79, 82, 83, 88, 89, 92, 93, 96, 97, 102, 103]
-    fnum = fnum1 + fnum2 
-    img_files = [reduce_dir + 'obj{0:03d}_clean.fits'.format(ii) for ii in fnum]
-    reduce_fli.find_stars(img_files, fwhm=5, threshold=6)
 
-    # New Naming Scheme
-    fnum1 = [106, 107, 110, 111, 116, 117, 120, 121, 124, 125, 130, 131, 134, 135, 138, 139, 144]
-    fnum2 = [145, 148, 149, 152, 153, 158, 159, 162, 163, 166, 167, 172, 173, 176, 177, 180, 181]
-    fnum3 = [184, 185, 190, 191, 194, 195, 198, 199, 202, 203, 208, 209, 212, 213, 216, 217]
-    fnum4 = [220, 221, 226, 227, 230, 231, 235, 238, 239, 244, 245, 248, 249, 252, 253]
+def calc_star_stats_closed():
+    reduce_dir = '/Volumes/g/lu/data/imaka/2017_01_10/fli/reduce/'
+    stats_dir = '/Volumes/g/lu/data/imaka/2017_01_10/fli/reduce/stats/'
+    os.chdir(data_dir)
+
+    # Old Naming Scheme
+    fnum1 = [8, 9, 12, 13, 16, 17, 22, 23, 26, 27, 32, 33, 36, 37, 42, 43, 48, 49, 52, 53, 58, 59]
+    fnum2 = [62, 63, 66, 67, 72, 73, 76, 77, 80, 81, 86, 87, 90, 91, 94, 95, 100, 101, 104, 105]
+    fnum =  fnum1 + fnum2
+    img_files_old_name = ['obj{0:03d}_clean.fits'.format(ii) for ii in fnum]
+    
+    #New Naming Scheme
+    fnum1 = [108, 109, 114, 115, 118, 119, 122, 123, 128, 129, 132, 133, 136, 137, 142, 143, 146]
+    fnum2 = [147, 150, 151, 156, 157, 160, 161, 164, 165, 170, 171, 174, 175, 178, 179, 182, 183]
+    fnum3 = [188, 189, 192, 193, 196, 197, 200, 201, 206, 207, 210, 211, 214, 215, 218, 219, 224]
+    fnum4 = [225, 228, 229, 232, 233, 236, 237, 242, 243, 246, 247, 250, 251]
     fnum = fnum1 + fnum2 + fnum3 + fnum4
+    img_files_new_name = ['obj_c{0:03d}_clean.fits'.format(ii) for ii in fnum]
+    
+    img_files = img_files_old_name + img_files_new_name
+    
+    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'closed_open.fits')
+    
+    return
+
