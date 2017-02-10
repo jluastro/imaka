@@ -39,20 +39,20 @@ def reduce_pleiades_binned_open():
 
     fnum = [9, 10, 13, 14, 17, 18, 21, 22, 28, 29, 32, 33, 36, 37, 40, 41, 46, 47, 50, 51, 54, 55, 58, 59]
     img_files = ['obj_o{0:03d}.fits'.format(ii) for ii in fnum]
-    reduce_fli.flat_sky_reduction(img_files, output_path=out_dir, sky_frame=sky_dir + 'pleiades_sky_023.fits', flat_frame=flat_dir + 'flat.fits')
+    reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'pleiades_sky_023.fits', flat_frame=flat_dir + 'flat.fits')
 
     fnum = [64, 65, 68, 69, 72, 73, 76, 77, 82, 83, 86, 87, 90, 91, 94, 95, 100, 101, 104, 105, 108, 109, 112, \
             113, 118, 119, 122, 123, 126, 127, 130, 131]
     img_files = ['obj_o{0:03d}.fits'.format(ii) for ii in fnum]
-    reduce_fli.flat_sky_reduction(img_files, output_path=out_dir, sky_frame=sky_dir + 'pleiades_sky_025.fits', flat_frame=flat_dir + 'flat.fits')
+    reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'pleiades_sky_025.fits', flat_frame=flat_dir + 'flat.fits')
 
     fnum = [141, 142, 149, 150]
     img_files = ['obj_o{0:03d}.fits'.format(ii) for ii in fnum]
-    reduce_fli.flat_sky_reduction(img_files, output_path=out_dir, sky_frame=sky_dir + 'pleiades_sky_078.fits', flat_frame=flat_dir + 'flat.fits')
+    reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'pleiades_sky_078.fits', flat_frame=flat_dir + 'flat.fits')
     
     fnum = [179, 180, 185, 186, 193, 194, 200, 201, 206, 207, 212, 213, 218, 219]
     img_files = ['obj_o{0:03d}.fits'.format(ii) for ii in fnum]
-    reduce_fli.flat_sky_reduction(img_files, output_path=out_dir, sky_frame=sky_dir + 'pleiades_sky_195.fits', flat_frame=flat_dir + 'flat.fits')
+    reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'pleiades_sky_195.fits', flat_frame=flat_dir + 'flat.fits')
      
     return
     
@@ -69,19 +69,19 @@ def reduce_pleiades_binned_closed():
     fnum2 = [53, 56, 57, 62, 63]
     fnum = fnum1 + fnum2
     img_files = ['obj_c{0:03d}.fits'.format(ii) for ii in fnum]
-    reduce_fli.flat_sky_reduction(img_files, output_path=out_dir, sky_frame=sky_dir + 'pleiades_sky_025.fits', flat_frame=flat_dir + 'flat.fits')
+    reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'pleiades_sky_025.fits', flat_frame=flat_dir + 'flat.fits')
     
     fnum1 = [66, 67, 70, 71, 74, 75, 80, 81, 84, 85, 88, 89, 92, 93, 98, 99, 102, 103, 106]
     fnum2 = [107, 110, 111, 116, 117, 120, 121, 124, 125, 128, 129]
     fnum = fnum1 + fnum2
     img_files = ['obj_c{0:03d}.fits'.format(ii) for ii in fnum]
-    reduce_fli.flat_sky_reduction(img_files, output_path=out_dir, sky_frame=sky_dir + 'pleiades_sky_78.fits', flat_frame=flat_dir + 'flat.fits')
+    reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'pleiades_sky_78.fits', flat_frame=flat_dir + 'flat.fits')
 
     fnum1 = [155, 156, 163, 164, 167, 168, 171, 172, 177, 178, 183, 184, 191, 192, 198, 199]
     fnum2 = [204, 205 ,210, 211, 216, 217, 222, 223, 226, 227, 230, 231]
     fnum = fnum1 + fnum2
     img_files = ['obj_c{0:03d}.fits'.format(ii) for ii in fnum]
-    reduce_fli.flat_sky_reduction(img_files, output_path=out_dir, sky_frame=sky_dir + 'pleiades_sky_195.fits', flat_frame=flat_dir + 'flat.fits')
+    reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'pleiades_sky_195.fits', flat_frame=flat_dir + 'flat.fits')
 
     return
 
@@ -95,7 +95,7 @@ def reduce_pleiades_binned_tt():
     
     fnum = [134, 135, 136, 137, 138, 139, 140]
     img_files = ['obj_tt{0:03d}.fits'.format(ii) for ii in fnum]
-    reduce_fli.flat_sky_reduction(img_files, output_path=out_dir, sky_frame=sky_dir + 'pleiades_sky_078.fits', flat_frame=flat_dir + 'flat.fits')
+    reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'pleiades_sky_078.fits', flat_frame=flat_dir + 'flat.fits')
 
     return
 
@@ -112,7 +112,7 @@ def reduce_pleiades_binned_ttf():
     fnum3 = [215, 220, 221, 224, 225, 228, 229]
     fnum = fnum1 + fnum2 + fnum3
     img_files = ['obj_ttf{0:03d}.fits'.format(ii) for ii in fnum]
-    reduce_fli.flat_sky_reduction(img_files, output_path=out_dir, sky_frame=sky_dir + 'pleiades_sky_195.fits', flat_frame=flat_dir + 'flat.fits')
+    reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'pleiades_sky_195.fits', flat_frame=flat_dir + 'flat.fits')
     
     return
 
@@ -126,12 +126,12 @@ def find_stars_pleiades_binned_open():
     fnum3 = [100, 101, 104, 105, 108, 109, 112, 113, 118, 119, 122, 123, 126, 127, 130, 131]
     fnum4 = [141, 142, 149, 150, 179, 180, 185, 186, 193, 194, 200, 201, 206, 207, 212, 213, 218, 219]
     fnum = fnum1 + fnum2 + fnum3 + fnum4
-    img_files = ['obj_o{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum]
-    reduce_fli.find_stars_bin(img_files, fwhm=8, threshold=6)
+    img_files = ['obj_o{0:03d}_clean.fits'.format(ii) for ii in fnum]
+    reduce_fli.find_stars(img_files, fwhm=5, threshold=6)
 
     return
     
-def find_stars_pleiades_binned_closed():
+def find_stars_pleiades_closed():
     data_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/reduce/'
     os.chdir(data_dir)
     
@@ -141,38 +141,39 @@ def find_stars_pleiades_binned_closed():
     fnum4 = [155, 156, 163, 164, 167, 168, 171, 172, 177, 178, 183, 184, 191, 192, 198, 199]
     fnum5 = [204, 205 ,210, 211, 216, 217, 222, 223, 226, 227, 230, 231]
     fnum = fnum1 #+ fnum2 + fnum3 + fnum4 + fnum5
-    img_files = ['obj_c{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum]
-    reduce_fli.find_stars_bin(img_files, fwhm=4, threshold=6)
+    img_files = ['obj_c{0:03d}_clean.fits'.format(ii) for ii in fnum]
+    reduce_fli.find_stars(img_files, fwhm=5, threshold=6)
 
     return
 
-def find_stars_pleiades_binned_tt():
+def find_stars_pleiades_tt():
     data_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/reduce/'
     os.chdir(data_dir)  
     
     fnum = [134, 135, 136, 137, 138, 139, 140]
-    img_files = ['obj_tt{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum]
-    reduce_fli.find_stars_bin(img_files, fwhm=4, threshold=6)
+    img_files = ['obj_tt{0:03d}_clean.fits'.format(ii) for ii in fnum]
+    reduce_fli.find_stars(img_files, fwhm=5, threshold=6)
     
     return
 
 
-def find_stars_pleiades_binned_ttf():
+def find_stars_pleiades_ttf():
     data_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/reduce/'
     os.chdir(data_dir)  
-    
-    fnum1 = [143, 144, 145, 146, 147, 148, 151, 152, 153, 154, 157, 157, 158, 161, 162, 165, 166]
+    #[143, 144, 145, 146, 147, 148, 151, 
+    fnum1 = [152, 153, 154, 157, 157, 158, 161, 162, 165, 166]
     fnum2 = [169, 170, 173, 174, 175, 176, 181, 182, 187, 188, 189, 190, 202, 203, 208, 209, 214]
     fnum3 = [215, 220, 221, 224, 225, 228, 229]
     fnum = fnum1 + fnum2 + fnum3
-    img_files = ['obj_ttf{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum]
-    reduce_fli.find_stars_bin(img_files, fwhm=4, threshold=6)
+    img_files = ['obj_ttf{0:03d}_clean.fits'.format(ii) for ii in fnum]
+    reduce_fli.find_stars(img_files, fwhm=5, threshold=6)
     
     return
 
     
 def calc_star_stats_open():
-    data_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/reduce/'
+    reduce_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/reduce/'
+    stats_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/reduce/stats/'
     os.chdir(data_dir)
 
     fnum1 = [9, 10, 13, 14, 17, 18, 21, 22, 28, 29, 32, 33, 36, 37, 40, 41, 46, 47, 50, 51]
@@ -180,13 +181,14 @@ def calc_star_stats_open():
     fnum3 = [100, 101, 104, 105, 108, 109, 112, 113, 118, 119, 122, 123, 126, 127, 130, 131]
     fnum4 = [141, 142, 149, 150, 179, 180, 185, 186, 193, 194, 200, 201, 206, 207, 212, 213, 218, 219]
     fnum = fnum1 + fnum2 + fnum3 + fum4
-    img_files = ['obj_o{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum]
-    reduce_fli.calc_star_stats(img_files, output_stats='stats_open2.fits')
+    img_files = ['obj_o{0:03d}_clean.fits'.format(ii) for ii in fnum]
+    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_open.fits')
     
     return
 
 def calc_star_stats_closed():
-    data_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/reduce/'
+    reduce_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/reduce/'
+    stats_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/reduce/stats/'
     os.chdir(data_dir)
     
     fnum1 = [7, 8, 12, 15, 16, 19, 20, 26, 27, 30, 31, 34, 35, 38, 39, 44, 45, 48, 49, 52]
@@ -195,32 +197,7 @@ def calc_star_stats_closed():
     fnum4 = [155, 156, 163, 164, 167, 168, 171, 172, 177, 178, 183, 184, 191, 192, 198, 199]
     fnum5 = [204, 205 ,210, 211, 216, 217, 222, 223, 226, 227, 230, 231]
     fnum = fnum1 + fnum2 + fnum3 + fnum4 + fnum5
-    img_files = ['obj_c{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum]    
-    reduce_fli.calc_star_stats(img_files, output_stats='stats_closed.fits')
+    img_files = ['obj_c{0:03d}_clean.fits'.format(ii) for ii in fnum]    
+    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closed.fits')
 
-    return
-
-
-def calc_star_stats_tt():
-    data_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/reduce/'
-    os.chdir(data_dir)
-        
-    fnum = [134, 135, 136, 137, 138, 139, 140]
-    img_files = ['obj_tt{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum]    
-    reduce_fli.calc_star_stats(img_files, output_stats='stats_tt.fits')
-    
-    return
-
-
-def calc_star_stats_ttf():
-    data_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/reduce/'
-    os.chdir(data_dir)
-        
-    fnum1 = [143, 144, 145, 146, 147, 148, 151, 152, 153, 154, 157, 157, 158, 161, 162, 165, 166]
-    fnum2 = [169, 170, 173, 174, 175, 176, 181, 182, 187, 188, 189, 190, 202, 203, 208, 209, 214]
-    fnum3 = [215, 220, 221, 224, 225, 228, 229]
-    fnum = fnum1 + fnum2 + fnum3
-    img_files = ['obj_ttf{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum]    
-    reduce_fli.calc_star_stats(img_files, output_stats='stats_ttf.fits')
-    
     return
