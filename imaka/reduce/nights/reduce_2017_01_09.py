@@ -13,66 +13,78 @@ import os
 from flystar import match
 import shutil
 
+imaka_dir = '/Volumes/g/lu/data/imaka/'
+root_dir = imaka_dir + '2017_01_09/fli/'
+
 def make_sky():
     # Didn't take skies, so just copy over the one from Tuesday night.
-    old_sky = '/Users/jlu/data/imaka/2017_01_10/fli/Pleiades/pleiades_sky.fits'
-    new_sky = '/Users/jlu/data/imaka/2017_01_09/fli/Pleiades_E/pleiades_sky.fits'
-
+    old_sky = imaka_dir + '2017_01_10/fli/reduce/sky/pleiades_sky.fits'
+    new_sky = root_dir + 'reduce/sky/pleiades_sky.fits'
     shutil.copyfile(old_sky, new_sky)
+    return
     
-        
-def reduce_pleiades_binned_open():
-    sky_dir = '/Users/jlu/data/imaka/2017_01_09/fli/Pleiades_E/'
-    data_dir = '/Users/jlu/data/imaka/2017_01_09/fli/Pleiades_E/'
-    os.chdir(data_dir)
+def make_flat():
+    # Didn't take flats, so just copy over the one from Friday night.
+    old_flat = imaka_dir + '2017_01_13/fli/calib/flat.fits'
+    new_flat = root_dir + 'calib/flat.fits'
+    shutil.copyfile(old_flat, new_flat)
+    return
+    
+    
+def reduce_pleiades():
+    ##########
+    # Open Loop
+    ##########
+    data_dir = root_dir + 'Pleiades/'
+    sky_file = root_dir + 'reduce/sky/flat.fits'
+    flat_file = root_dir + 'reduce/calib/sky.fits'
+    out_dir = root_dir + 'reduce/pleiades/'
 
     fnum = np.arange(57, 67)
-    img_files = ['obj{0:03d}.fits'.format(ii) for ii in fnum]
+    img_files = ['{0:s}/obj{1:03d}.fits'.format(data_dir, ii) for ii in fnum]
 
-    reduce_fli.clean_images(img_files, rebin=1, sky_frame=sky_dir + 'pleiades_sky.fits')
+    reduce_fli.clean_images(img_files, out_dir, rebin=1,
+                                sky_frame=sky_file,
+                                flat_frame=flat_file)
 
-    return
+    ##########
+    # Closed Loop
+    ##########
+    data_dir = root_dir + 'Pleiades/'
+    sky_file = root_dir + 'reduce/sky/flat.fits'
+    flat_file = root_dir + 'reduce/calib/sky.fits'
+    out_dir = root_dir + 'reduce/pleiades/'
     
-
-def reduce_pleiades_binned_closed():
-    sky_dir = '/Users/jlu/data/imaka/2017_01_09/fli/Pleiades_E/'
-    data_dir = '/Users/jlu/data/imaka/2017_01_09/fli/Pleiades_E/'
-    os.chdir(data_dir)
-
     fnum = np.arange(47, 57)
-    img_files = ['obj{0:03d}.fits'.format(ii) for ii in fnum]
+    img_files = ['{0:s}/obj{1:03d}.fits'.format(data_dir, ii) for ii in fnum]
 
-    reduce_fli.clean_images(img_files, rebin=1, sky_frame=sky_dir + 'pleiades_sky.fits')
+    reduce_fli.clean_images(img_files, out_dir, rebin=1,
+                                sky_frame=sky_file,
+                                flat_frame=flat_file)
 
     return
     
-def find_stars_pleiades_binned_open():
-    data_dir = '/Users/jlu/data/imaka/2017_01_09/fli/Pleiades_E/'
-    os.chdir(data_dir)
-    
+def find_stars_pleiades():
+    ##########
+    # Open Loop
+    ##########
     fnum = np.arange(57, 67)
-    img_files = ['obj{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum]
+    img_files = ['{0:s}/obj{1:03d}_clean.fits'.format(data_dir, ii) for ii in fnum]
 
-    reduce_fli.find_stars_bin(img_files, fwhm=2, threshold=6)
-
-    return
+    reduce_fli.find_stars(img_files, fwhm=2, threshold=6)
     
-def find_stars_pleiades_binned_closed():
-    data_dir = '/Users/jlu/data/imaka/2017_01_09/fli/Pleiades_E/'
-    os.chdir(data_dir)
-    
+    ##########
+    # Closed Loop 
+    ##########
     fnum = np.arange(47, 57)
-    img_files = ['obj{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum]
+    img_files = ['{0:s}/obj{1:03d}_clean.fits'.format(data_dir, ii) for ii in fnum]
 
-    reduce_fli.find_stars_bin(img_files, fwhm=2, threshold=6)
+    reduce_fli.find_stars(img_files, fwhm=2, threshold=6)
 
     return
 
 
 def compare_fwhm_list():
-    data_dir = '/Users/jlu/data/imaka/2017_01_09/fli/Pleiades_E/'
-    os.chdir(data_dir)
-    
     o_list = np.arange(57, 67) # Open
     c_list = np.arange(47, 57) # Closed
     
@@ -83,7 +95,8 @@ def compare_fwhm_list():
         closed_list = 'obj{0:03d}_bin_nobkg_stars.txt'.format(c_list[ii])
 
         compare_fwhm(open_list, closed_list, scale=3*0.04, flux_min=4)
-        pdb.set_trace()
+
+    return
 
 def compare_fwhm(open_list, closed_list, scale=0.04, flux_min=2.0):
     topen = table.Table.read(open_list, format='ascii')
