@@ -37,16 +37,16 @@ def make_flat():
 
     util.mkdir(flat_out_dir)
     
-    # flat_num = [0, 1, 2, 3, 4, 5, 6]
-    # flat_frames = ['{0:s}twi_{1:03d}.fits'.format(flat_raw_dir, ss) for ss in flat_num]
-    # dark_frames = ['{0:s}dark_{1:03d}.fits'.format(flat_raw_dir, ss) for ss in flat_num]
-    # calib.makeflat(flat_frames, dark_frames, flat_out_dir + 'flat_1.fits')
+    flat_num = [0, 1, 2, 3, 4, 5, 6]
+    flat_frames = ['{0:s}twi_{1:03d}.fits'.format(flat_raw_dir, ss) for ss in flat_num]
+    dark_frames = ['{0:s}dark_{1:03d}.fits'.format(flat_raw_dir, ss) for ss in flat_num]
+    calib.makeflat(flat_frames, dark_frames, flat_out_dir + 'flat_1.fits')
 
-    # flat_num = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, \
-    #            26, 27, 28, 29]
-    # flat_frames = ['{0:s}twi_{1:03d}.fits'.format(flat_raw_dir, ss) for ss in flat_num]
-    # dark_frames = ['{0:s}dark_{1:03d}.fits'.format(flat_raw_dir, ss) for ss in flat_num]
-    # calib.makeflat(flat_frames, dark_frames, flat_out_dir + 'flat_2.fits')
+    flat_num = [8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, \
+               26, 27, 28, 29]
+    flat_frames = ['{0:s}twi_{1:03d}.fits'.format(flat_raw_dir, ss) for ss in flat_num]
+    dark_frames = ['{0:s}dark_{1:03d}.fits'.format(flat_raw_dir, ss) for ss in flat_num]
+    calib.makeflat(flat_frames, dark_frames, flat_out_dir + 'flat_2.fits')
 
     flat1 = fits.getdata(flat_out_dir + 'flat_1.fits')
     flat2 = fits.getdata(flat_out_dir + 'flat_2.fits')
@@ -66,32 +66,32 @@ def reduce_pleiades():
 
     util.mkdir(out_dir)
 
-    # #####
-    # # Open Loop First Half
-    # #####
-    # ###What to do with obj_o594-597??? look at images to see orientation
-    # ###obj_o640 has a 0.5s integration time...whut
-    # ###obj_o613.fits in log but not in data.... also 624
-    # fnum1 = [34, 35, 36, 43, 44, 45, 56, 57, 58, 59, 68, 69, 70, 71, 83, 84, 85, 86]
-    # fnum2 = [95, 96, 97, 98, 480, 582, 583, 584, 585]
-    # fnum = fnum1 + fnum2
-    # img_files = ['{0:s}/obj_o{1:03d}.fits'.format(data_dir, ii) for ii in fnum]
-    # reduce_fli.clean_images(img_files, out_dir, rebin=1,
-    #                             sky_frame=sky_dir + 'pleiades_sky_46.fits',
-    #                             flat_frame=flat_dir + 'flat.fits')
+    #####
+    # Open Loop First Half
+    #####
+    ###What to do with obj_o594-597??? look at images to see orientation
+    ###obj_o640 has a 0.5s integration time...whut
+    ###obj_o613.fits in log but not in data.... also 624
+    fnum1 = [34, 35, 36, 43, 44, 45, 56, 57, 58, 59, 68, 69, 70, 71, 83, 84, 85, 86]
+    fnum2 = [95, 96, 97, 98, 480, 582, 583, 584, 585]
+    fnum = fnum1 + fnum2
+    img_files = ['{0:s}/obj_o{1:03d}.fits'.format(data_dir, ii) for ii in fnum]
+    reduce_fli.clean_images(img_files, out_dir, rebin=1,
+                                sky_frame=sky_dir + 'pleiades_sky_46.fits',
+                                flat_frame=flat_dir + 'flat.fits')
 
-    # #####
-    # # Open Loop Second Half
-    # #####
-    # fnum1 = [609, 610, 611, 612, 622, 623, 624, 636, 637, 638, 639, 1010, 1011]
-    # fnum2 = [1012, 1013, 1022, 1023, 1024, 1025, 1034, 1035, 1036, 1037, 1049, 1052, 1061]
-    # fnum3 = [1062, 1063, 1064, 1073, 1074, 1075, 1076, 1088, 1089, 1090, 1091, 1104, 1105]
-    # fnum4 = [1106, 1107]
-    # fnum = fnum1 + fnum2 + fnum3 + fnum4
-    # img_files = ['{0:s}/obj_o{1:03d}.fits'.format(data_dir, ii) for ii in fnum]
-    # reduce_fli.clean_images(img_files, out_dir, rebin=1,
-    #                             sky_frame=sky_dir + 'pleiades_sky_598.fits',
-    #                             flat_frame=flat_dir + 'flat.fits')
+    #####
+    # Open Loop Second Half
+    #####
+    fnum1 = [609, 610, 611, 612, 622, 623, 624, 636, 637, 638, 639, 1010, 1011]
+    fnum2 = [1012, 1013, 1022, 1023, 1024, 1025, 1034, 1035, 1036, 1037, 1049, 1052, 1061]
+    fnum3 = [1062, 1063, 1064, 1073, 1074, 1075, 1076, 1088, 1089, 1090, 1091, 1104, 1105]
+    fnum4 = [1106, 1107]
+    fnum = fnum1 + fnum2 + fnum3 + fnum4
+    img_files = ['{0:s}/obj_o{1:03d}.fits'.format(data_dir, ii) for ii in fnum]
+    reduce_fli.clean_images(img_files, out_dir, rebin=1,
+                                sky_frame=sky_dir + 'pleiades_sky_598.fits',
+                                flat_frame=flat_dir + 'flat.fits')
 
     
     #####
