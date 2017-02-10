@@ -94,6 +94,7 @@ def find_stars_pleiades_ttf():
     fnum5 = [236, 246, 247, 248, 255, 256, 257, 264, 265, 266, 276, 277, 282, 283, 288]
     fnum6 = [289, 294, 295, 306, 307, 308, 315, 316, 317]
     fnum =  fnum1 + fnum2 + fnum3 + fnum4 + fnum5 + fnum6   
+    img_files = [reduce_dir + 'obj_ttf{0:03d}_clean.fits'.format(ii) for ii in fnum]
     reduce_fli.find_stars(img_files, fwhm=5, threshold=6)
 
     return
@@ -107,7 +108,8 @@ def find_stars_pleiades_closed():
     fnum4 = [192, 193, 194, 201, 202, 203, 213, 214, 215, 222, 223, 224, 228, 229, 230, 237]
     fnum5 = [238, 239, 249, 250, 251, 258, 259, 260, 267, 268, 269, 278, 279, 284, 285, 290]
     fnum6 = [291, 296, 297, 309, 310, 311, 318, 319, 320]
-    fnum =  fnum1 + fnum2 + fnum3 + fnum4 + fnum5 + fnum6    
+    fnum =  fnum1 + fnum2 + fnum3 + fnum4 + fnum5 + fnum6 
+    img_files = [reduce_dir + 'obj_c{0:03d}_clean.fits'.format(ii) for ii in fnum]
     reduce_fli.find_stars(img_files, fwhm=3, threshold=6)
 
     return
@@ -406,7 +408,3 @@ def stack_closed():
     Stack the closed loop images.
     """
     return
-
-
-        
-
