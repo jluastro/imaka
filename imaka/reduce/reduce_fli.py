@@ -37,13 +37,15 @@ from flystar import match
 from flystar import align
 from flystar import transforms
 from imaka.reduce import calib
+from imaka.reduce import util
 import ccdproc
 from scipy.ndimage import interpolation
 from scipy.ndimage import median_filter
 import scipy.ndimage
 from astropy.table import Table
 from skimage.measure import block_reduce
-
+from datetime import datetime
+import pytz
 
 
 scale = 40.0 # mas/pixel
@@ -429,7 +431,10 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
 
     # Create arrays for all the final statistics.
     N_files = len(img_files)
-    s_time = np.zeros(N_files, dtype='S15')
+    s_time_hst = np.zeros(N_files, dtype='S15')
+    s_time_utc = np.zeros(N_files, dtype='S15')
+    s_date_hst = np.zeros(N_files, dtype='S15')
+    s_date_utc = np.zeros(N_files, dtype='S15')
     s_ee50 = np.zeros(N_files, dtype=float)
     s_ee80 = np.zeros(N_files, dtype=float)
     s_xfwhm = np.zeros(N_files, dtype=float)
@@ -447,7 +452,21 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
         print("Working on image: ", img_files[ii])
         img, hdr = fits.getdata(img_files[ii], header=True)
 
-        s_time[ii] = hdr['TIMEOBS']
+        # Make dates and times in UT.
+        # The time comes in from the header with "hh:mm:ss PM" in HST.
+        # The date comes in from the header in HST.
+        time_tmp = hdr['TIMEOBS']
+        date_tmp = hdr['DATEOBS']
+        hst_tz = pytz.timezone('US/Hawaii')
+
+        dt_hst = datetime.strptime(date_tmp + ' ' + time_tmp, '%d/%m/%Y %I:%M:%S %p')
+        dt_hst = hst_tz.localize(dt_hst)
+        dt_utc = dt_hst.astimezone(pytz.utc)
+
+        s_time_hst[ii] = str(dt_hst.time())
+        s_date_hst[ii] = str(dt_hst.date())
+        s_time_utc[ii] = str(dt_utc.time())
+        s_date_utc[ii] = str(dt_utc.date())
 
         # Get the bin fraction from the header
         bin_factor = hdr['BINFAC']
@@ -506,7 +525,8 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
 
         # Plot and save the EE curve and data.
         img_dir_name, img_file_name = os.path.split(img_files[ii])
-        ee_dir = img_dir_name + 'ee/'
+        ee_dir = img_dir_name + '/ee/'
+        util.mkdir(ee_dir)
         _ee_out = open(ee_dir + img_file_name.replace('.fits', '_ee.txt'), 'w')
         _ee_out.write('{0:10s}  {1:10s}\n'.format('#Radius', 'EE'))
         _ee_out.write('{0:10s}  {1:10s}\n'.format('#(arcsec)', '()'))
@@ -525,7 +545,6 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
         # Calculate the NEA in a different way.
         nea = 1.0 / (np.diff(enc_energy_final)**2 / (2.0 * math.pi * radii[1:] * np.diff(radii))).sum()
 
-        
         plt.clf()
         plt.plot(radii, enc_energy_final, 'k-')
         plt.axvline(ee50_rad, color='r', linestyle='--', label='r(50% EE)')
@@ -544,27 +563,39 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
         theta = stars['theta'][idx].mean()
         
         # calculate emperical FWHM 
+        emp_FWHM_list = np.zeros(N_stars, dtype=float)
 
-        emp_FWHM_list = []
-       
-        for jj in range(len(stars)):
-           
-            # Make a 20x20 patch centered on centroid, oversample and interpolate
-            x_cent = float(coords[0][jj]); y_cent = float(coords[1][jj])
-            one_star = img[y_cent-10 : y_cent+10, x_cent-10 : x_cent+10]
+        for jj in range(N_stars):
+            # Make a 21x21 patch centered on centroid, oversample and interpolate
+            x_cent = int(round(float(coords[0][jj])))
+            y_cent = int(round(float(coords[1][jj])))
+            one_star = img[y_cent-10 : y_cent+10+1, x_cent-10 : x_cent+10+1]  # Odd box, with center in middle pixel.
             over_samp_5 = scipy.ndimage.zoom(one_star, 5, order = 1)
 
-            # Find area of stars above half max and calculate equivalnent circle diameter
+            # # Make an array with the radius at each pixel.
+            # y_1d = np.arange(over_samp_5.shape[0])
+            # x_1d = np.arange(over_samp_5.shape[1])
+            # y_2d, x_2d = np.meshgrid(y_1d, x_1d)
+            # r_2d = np.hypot(x_2d, y_2d)
+
+            # Find the pixels where the flux is a above half max value.
             max_flux = np.amax(over_samp_5) 
             half_max = max_flux / 2.0
             idx = np.where(over_samp_5 >= half_max)
-            area_count = len(idx[0])
-            emp_FWHM = (2.0* ((area_count / np.pi) ** 0.5)) / 5.0
-            emp_FWHM_list.append(emp_FWHM)
+            
+            # Find the equivalent circle diameter for the area of pixels.
+            #    Area = \pi * (FWHM / 2.0)**2
+            area_count = len(idx[0]) / 5**2   # area in pix**2 -- note we went back to raw pixels (not oversampled)
+            emp_FWHM = 2.0 * (area_count / np.pi)**0.5
+            emp_FWHM_list[jj] = emp_FWHM
  
-        # Take median of all stars in image
-        med_emp_FWHM = np.median(emp_FWHM_list)
-        std_emp_FWHM = np.std(emp_FWHM_list)
+        # Find the median empirical FWHM of all stars. But first, trim to just the brightest stars.
+        idx = np.where(stars['flux'] > 5)[0]
+        if len(idx) == 0:
+            # Didn't find any bright stars... use all of them.
+            idx = np.arange(N_stars)
+        med_emp_FWHM = np.median(emp_FWHM_list[idx])
+        std_emp_FWHM = np.std(emp_FWHM_list[idx])
 
         s_ee50[ii] = ee50_rad
         s_ee80[ii] = ee80_rad
@@ -578,9 +609,14 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
         s_emp_fwhm[ii] = med_emp_FWHM
         s_emp_fwhm_std[ii] = std_emp_FWHM
 
-    stats = table.Table([img_files, s_time, s_fwhm, s_fwhm_std, s_ee50, s_ee80,
+    
+    # Make a date array that holds UTC.
+
+    stats = table.Table([img_files, s_date_utc, s_time_utc, s_date_hst, s_time_hst,
+                             s_fwhm, s_fwhm_std, s_ee50, s_ee80,
                              s_NEA, s_NEA2, s_xfwhm, s_yfwhm, s_theta, s_emp_fwhm, s_emp_fwhm_std],
-                             names=('Image', 'TIME', 'FWHM', 'FWHM_std', 'EE50', 'EE80',
+                             names=('Image', 'DATE_UTC', 'TIME_UTC', 'DATE_HST', 'TIME_HST',
+                                        'FWHM', 'FWHM_std', 'EE50', 'EE80',
                                         'NEA', 'NEA2', 'xFWHM', 'yFWHM', 'theta', 'emp_fwhm', 'emp_fwhm_std'),
                             meta={'name':'Stats Table'})
     
@@ -608,7 +644,7 @@ def add_frame_number_column(stats_table):
     # Get the frame numbers for plotting.
     frame_num = np.zeros(len(stats_table), dtype=int)
     for ii in range(len(stats_table)):
-        foo = stats_table['Image'][ii].index('bin')
+        foo = stats_table['Image'][ii].index('clean')
 
         frame_num[ii] = int(stats_table['Image'][ii][foo - 4:foo - 1])
         frame_num_col = table.Column(frame_num, name='Index')
