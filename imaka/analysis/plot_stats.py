@@ -107,7 +107,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.legend(numpoints=1)
     plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
     plt.ylim(0, 1.3)
-    plt.savefig(plots_dir + 'fwhm_vs_frame.png')
+    plt.savefig(plots_dir + 'fwhm_vs_frame' + suffix + '.png')
 
     #####
     # Empirical FWHM
@@ -135,7 +135,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.legend(numpoints=1)
     plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
     plt.ylim(0, 1.3)
-    plt.savefig(plots_dir + 'efwhm_vs_frame.png')
+    plt.savefig(plots_dir + 'efwhm_vs_frame' + suffix + '.png')
     
     
     #####
@@ -162,7 +162,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.legend(numpoints=1)
     plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
     plt.ylim(0, 1.3)
-    plt.savefig(plots_dir + 'ee50_vs_frame.png')
+    plt.savefig(plots_dir + 'ee50_vs_frame' + suffix + '.png')
 
     #####
     # EE 80
@@ -188,7 +188,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.legend(numpoints=1)
     plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
     plt.ylim(0, 1.3)
-    plt.savefig(plots_dir + 'ee80_vs_frame.png')
+    plt.savefig(plots_dir + 'ee80_vs_frame' + suffix + '.png')
 
     #####
     # NEA
@@ -214,7 +214,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.legend(numpoints=1)
     plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
     plt.ylim(0, 1.3)
-    plt.savefig(plots_dir + 'nea_vs_frame.png')
+    plt.savefig(plots_dir + 'nea_vs_frame' + suffix + '.png')
     
     #####
     # NEA2
@@ -240,7 +240,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.legend(numpoints=1)
     plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
     plt.ylim(0, 1.3)
-    plt.savefig(plots_dir + 'nea2_vs_frame.png')
+    plt.savefig(plots_dir + 'nea2_vs_frame' + suffix + '.png')
 
     #####
     # FWHM for each direction
@@ -271,7 +271,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.legend(numpoints=1, fontsize=10)
     plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
     plt.ylim(0, 1.3)
-    plt.savefig(plots_dir + 'xyfwhm_vs_frame.png')
+    plt.savefig(plots_dir + 'xyfwhm_vs_frame' + suffix + '.png')
 
     
     ##########
@@ -313,7 +313,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.legend(numpoints=1)
     plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
     plt.ylim(0, 1.3)
-    plt.savefig(plots_dir + 'fwhm_vs_time.png')
+    plt.savefig(plots_dir + 'fwhm_vs_time' + suffix + '.png')
 
     #####
     # Empirical FWHM
@@ -343,7 +343,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.legend(numpoints=1)
     plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
     plt.ylim(0, 1.3)
-    plt.savefig(plots_dir + 'efwhm_vs_time.png')
+    plt.savefig(plots_dir + 'efwhm_vs_time' + suffix + '.png')
     
     #####
     # EE 50
@@ -373,7 +373,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.legend(numpoints=1)
     plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
     plt.ylim(0, 1.3)
-    plt.savefig(plots_dir + 'ee50_vs_time.png')
+    plt.savefig(plots_dir + 'ee50_vs_time' + suffix + '.png')
 
     #####
     # EE 80
@@ -403,7 +403,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.legend(numpoints=1)
     plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
     plt.ylim(0, 1.3)
-    plt.savefig(plots_dir + 'ee80_vs_time.png')
+    plt.savefig(plots_dir + 'ee80_vs_time' + suffix + '.png')
 
     #####
     # NEA
@@ -433,7 +433,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.legend(numpoints=1)
     plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
     plt.ylim(0, 1.3)
-    plt.savefig(plots_dir + 'nea_vs_time.png')
+    plt.savefig(plots_dir + 'nea_vs_time' + suffix + '.png')
 
     #####
     # NEA2
@@ -463,7 +463,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.legend(numpoints=1)
     plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
     plt.ylim(0, 1.3)
-    plt.savefig(plots_dir + 'nea2_vs_time.png')
+    plt.savefig(plots_dir + 'nea2_vs_time' + suffix + '.png')
     
     #####
     # FWHM for each direction
@@ -497,7 +497,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.legend(numpoints=1, fontsize=10)
     plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
     plt.ylim(0, 1.3)
-    plt.savefig(plots_dir + 'xyfwhm_vs_time.png')
+    plt.savefig(plots_dir + 'xyfwhm_vs_time' + suffix + '.png')
     
     return
 
