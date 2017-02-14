@@ -201,9 +201,9 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.plot(st['Index'], st['NEA'], 'go', label='TTF')
     plt.plot(sc['Index'], sc['NEA'], 'ro', label='Closed')
     plt.xlabel('Frame Number')
-    plt.ylabel('Noise Equivalent Area (Sq. Arcsec)')
+    plt.ylabel('NEA (Sq. Arcsec)')
     plt.legend(numpoints=1)
-    plt.ylim(0, 3)
+    plt.ylim(0, 5)
     plt.title(date)
     
     plt.subplot(122)
@@ -213,7 +213,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.ylabel('Ratio of NEA')
     plt.legend(numpoints=1)
     plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
-    plt.ylim(0, 1.3)
+    plt.ylim(0, 1.5)
     plt.savefig(plots_dir + 'nea_vs_frame' + suffix + '.png')
     
     #####
@@ -227,9 +227,9 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.plot(st['Index'], st['NEA2'], 'go', label='TTF')
     plt.plot(sc['Index'], sc['NEA2'], 'ro', label='Closed')
     plt.xlabel('Frame Number')
-    plt.ylabel('Noise Equivalent Area (Sq. Arcsec)')
+    plt.ylabel('NEA2 (Sq. Arcsec)')
     plt.legend(numpoints=1)
-    plt.ylim(0, 3)
+    plt.ylim(0, 5)
     plt.title(date)
 
     plt.subplot(122)
@@ -239,7 +239,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.ylabel('Ratio of NEA2')
     plt.legend(numpoints=1)
     plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
-    plt.ylim(0, 1.3)
+    plt.ylim(0, 1.5)
     plt.savefig(plots_dir + 'nea2_vs_frame' + suffix + '.png')
 
     #####
@@ -418,9 +418,9 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.gca().xaxis.set_major_formatter(time_fmt)
     plt.xticks(rotation=35)
     plt.xlabel('UTC Time (hr)')
-    plt.ylabel('Noise Equivalent Area (Sq. Arcsec)')
+    plt.ylabel('NEA (Sq. Arcsec)')
     plt.legend(numpoints=1)
-    plt.ylim(0, 3)
+    plt.ylim(0, 5)
     plt.title(date)
 
     plt.subplot(122)
@@ -432,7 +432,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.ylabel('Ratio of NEA')
     plt.legend(numpoints=1)
     plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
-    plt.ylim(0, 1.3)
+    plt.ylim(0, 1.5)
     plt.savefig(plots_dir + 'nea_vs_time' + suffix + '.png')
 
     #####
@@ -448,9 +448,9 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.gca().xaxis.set_major_formatter(time_fmt)
     plt.xticks(rotation=35)
     plt.xlabel('UTC Time (hr)')
-    plt.ylabel('Noise Equivalent Area (Sq. Arcsec)')
+    plt.ylabel('NEA2 (Sq. Arcsec)')
     plt.legend(numpoints=1)
-    plt.ylim(0, 3)
+    plt.ylim(0, 5)
     plt.title(date)
 
     plt.subplot(122)
@@ -462,7 +462,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.ylabel('Ratio of NEA2')
     plt.legend(numpoints=1)
     plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
-    plt.ylim(0, 1.3)
+    plt.ylim(0, 1.5)
     plt.savefig(plots_dir + 'nea2_vs_time' + suffix + '.png')
     
     #####
