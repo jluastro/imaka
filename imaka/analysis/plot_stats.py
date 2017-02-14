@@ -1,3 +1,4 @@
+import csv
 import numpy as np
 import pylab as plt
 import scipy.spatial
@@ -500,11 +501,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     
     return
 
-import csv
-import numpy as np
-import matplotlib.pyplot as plt
-
-def make_stats_plot(stats_csv_file, plot_title):
+def compare_fwhm(stats_csv_file, plot_title):
     
     #Makes a figure of several plots comparing different measures of FWHM
     #(empirical, gaussian, NEA)
