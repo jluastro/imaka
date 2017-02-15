@@ -161,8 +161,8 @@ def find_stars_pleiades_tt():
 def find_stars_pleiades_ttf():
     data_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/reduce/'
     os.chdir(data_dir)  
-    #[143, 144, 145, 146, 147, 148, 151, 
-    fnum1 = [152, 153, 154, 157, 157, 158, 161, 162, 165, 166]
+    #
+    fnum1 = [143, 144, 145, 146, 147, 148, 151, 152, 153, 154, 157, 157, 158, 161, 162, 165, 166]
     fnum2 = [169, 170, 173, 174, 175, 176, 181, 182, 187, 188, 189, 190, 202, 203, 208, 209, 214]
     fnum3 = [215, 220, 221, 224, 225, 228, 229]
     fnum = fnum1 + fnum2 + fnum3
@@ -201,4 +201,28 @@ def calc_star_stats_closed():
     img_files = ['obj_c{0:03d}_clean.fits'.format(ii) for ii in fnum]    
     reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closed.fits')
 
+    return
+
+def calc_star_stats_tt():
+    reduce_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/reduce/'
+    stats_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/reduce/stats/'
+    os.chdir(data_dir)
+
+    fnum = [134, 135, 136, 137, 138, 139, 140]
+    img_files = ['obj_tt{0:03d}_clean.fits'.format(ii) for ii in fnum]
+    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_tt.fits')
+    
+    return
+
+def calc_star_stats_ttf():
+    reduce_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/reduce/'
+    stats_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/reduce/stats/'
+    os.chdir(data_dir)
+
+    fnum1 = [143, 144, 145, 146, 147, 148, 151, 152, 153, 154, 157, 157, 158, 161, 162, 165, 166]
+    fnum2 = [169, 170, 173, 174, 175, 176, 181, 182, 187, 188, 189, 190, 202, 203, 208, 209, 214]
+    fnum3 = [215, 220, 221, 224, 225, 228, 229]
+    fnum = fnum1 + fnum2 + fnum3    img_files = ['obj_ttf{0:03d}_clean.fits'.format(ii) for ii in fnum]
+    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_ttf.fits')
+    
     return
