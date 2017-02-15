@@ -4,11 +4,14 @@ from astropy.io import fits
 from astropy import table
 from astropy import units
 import glob
-import reduce_fli
-import calib
+from imaka.reduce import reduce_fli
+from imaka.reduce import calib
+from imaka.reduce import util
 import pdb
-import os
+import os, shutil
 #from flystar import match
+
+root_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/'
 
 def make_sky():
     sky_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/Pleiades/'
@@ -31,11 +34,21 @@ def make_sky():
 
     return
 
+def make_flat():
+    # Didn't take flats, so just copy over the one from Friday night.
+    old_flat = imaka_dir + '2017_01_13/fli/calib/flat.fits'
+    new_flat = root_dir + 'calib/flat.fits'
+    shutil.copyfile(old_flat, new_flat)
+    return
+
+
 def reduce_pleiades_binned_open():
-    sky_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/Pleiades/'
-    data_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/Pleiades/'
-    flat_dir = '/Volumes/g/lu/data/imaka/2017_01_13/fli/twilights/'
-    out_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/reduce/'
+    sky_dir = root_dir + 'reduce/sky/'
+    data_dir = root_dir + 'Pleiades/'
+    flat_dir = root_dir + 'reduce/calib/'
+    out_dir = root_dir + 'reduce/pleiades/'
+
+    util.mkdir(out_dir)
     os.chdir(data_dir)
 
     fnum = [9, 10, 13, 14, 17, 18, 21, 22, 28, 29, 32, 33, 36, 37, 40, 41, 46, 47, 50, 51, 54, 55, 58, 59]
@@ -59,10 +72,10 @@ def reduce_pleiades_binned_open():
     
 
 def reduce_pleiades_binned_closed():
-    sky_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/Pleiades/'
-    data_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/Pleiades/'
-    flat_dir = '/Volumes/g/lu/data/imaka/2017_01_13/fli/twilights/'
-    out_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/reduce/'
+    sky_dir = root_dir + 'reduce/sky/'
+    data_dir = root_dir + 'Pleiades/'
+    flat_dir = root_dir + 'reduce/flat/'
+    out_dir = root_dir + 'reduce/pleiades/'
 
     os.chdir(data_dir)
 
@@ -88,10 +101,10 @@ def reduce_pleiades_binned_closed():
 
 
 def reduce_pleiades_binned_tt():
-    sky_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/Pleiades/'
-    data_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/Pleiades/'
-    flat_dir = '/Volumes/g/lu/data/imaka/2017_01_13/fli/twilights/'
-    out_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/reduce/'
+    sky_dir = root_dir + 'reduce/sky/'
+    data_dir = root_dir + 'Pleiades/'
+    flat_dir = root_dir + 'reduce/flat/'
+    out_dir = root_dir + 'reduce/pleiades/'
     os.chdir(data_dir)
     
     fnum = [134, 135, 136, 137, 138, 139, 140]
@@ -102,10 +115,10 @@ def reduce_pleiades_binned_tt():
 
 
 def reduce_pleiades_binned_ttf():
-    sky_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/Pleiades/'
-    data_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/Pleiades/'
-    flat_dir = '/Volumes/g/lu/data/imaka/2017_01_13/fli/twilights/'
-    out_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/reduce/'
+    sky_dir = root_dir + 'reduce/sky/'
+    data_dir = root_dir + 'Pleiades/'
+    flat_dir = root_dir + 'reduce/flat/'
+    out_dir = root_dir + 'reduce/pleiades/'
     os.chdir(data_dir)
     
     fnum1 = [143, 144, 145, 146, 147, 148, 151, 152, 153, 154, 157, 157, 158, 161, 162, 165, 166]
@@ -119,7 +132,7 @@ def reduce_pleiades_binned_ttf():
 
     
 def find_stars_pleiades_binned_open():
-    data_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/reduce/'
+    data_dir = root_dir + 'reduce/'
     os.chdir(data_dir)
       
     fnum1 = [9, 10, 13, 14, 17, 18, 21, 22, 28, 29, 32, 33, 36, 37, 40, 41, 46, 47, 50, 51]
@@ -133,7 +146,7 @@ def find_stars_pleiades_binned_open():
     return
     
 def find_stars_pleiades_closed():
-    data_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/reduce/'
+    data_dir = root_dir + 'reduce/'
     os.chdir(data_dir)
     
     fnum1 = [7, 8, 12, 15, 16, 19, 20, 26, 27, 30, 31, 34, 35, 38, 39, 44, 45, 48, 49, 52]
@@ -148,7 +161,7 @@ def find_stars_pleiades_closed():
     return
 
 def find_stars_pleiades_tt():
-    data_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/reduce/'
+    data_dir = root_dir + 'reduce/'
     os.chdir(data_dir)  
     
     fnum = [134, 135, 136, 137, 138, 139, 140]
@@ -159,7 +172,7 @@ def find_stars_pleiades_tt():
 
 
 def find_stars_pleiades_ttf():
-    data_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/reduce/'
+    data_dir = root_dir + 'reduce/'
     os.chdir(data_dir)  
     #[143, 144, 145, 146, 147, 148, 151, 
     fnum1 = [152, 153, 154, 157, 157, 158, 161, 162, 165, 166]
@@ -173,8 +186,8 @@ def find_stars_pleiades_ttf():
 
     
 def calc_star_stats_open():
-    reduce_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/reduce/'
-    stats_dir = '/Volumes/g/lu/data/imaka/2017_01_11/fli/reduce/stats/'
+    reduce_dir = root_dir + 'reduce/'
+    stats_dir = root_dir + 'stats/'
     os.chdir(data_dir)
 
     fnum1 = [9, 10, 13, 14, 17, 18, 21, 22, 28, 29, 32, 33, 36, 37, 40, 41, 46, 47, 50, 51]
