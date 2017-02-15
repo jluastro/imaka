@@ -68,10 +68,14 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plots_dir = root_dir + date + '/fli/reduce/plots/'
 
     util.mkdir(plots_dir)
+    hasTTF = True
     
     so = Table.read(stats_dir + 'stats_open' + suffix + '.fits')   # Open Loop
-    st = Table.read(stats_dir + 'stats_ttf' + suffix + '.fits')    # TTF-only loop
     sc = Table.read(stats_dir + 'stats_closed' + suffix + '.fits') # Closed loop
+    try:
+        st = Table.read(stats_dir + 'stats_ttf' + suffix + '.fits')    # TTF-only loop
+    except FileNotFoundError:
+        hasTTF = False
 
     scale = 0.12
 
@@ -81,7 +85,8 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     #
     tree_sc = scipy.spatial.KDTree(np.array([sc['Index']]).T)
     dist_oc, idx_in_c_of_o = tree_sc.query(np.array([so['Index']]).T, 1)
-    dist_tc, idx_in_c_of_t = tree_sc.query(np.array([st['Index']]).T, 1)
+    if hasTTF:
+        dist_tc, idx_in_c_of_t = tree_sc.query(np.array([st['Index']]).T, 1)
 
     #####
     # FWHM vs. Frame
@@ -91,7 +96,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.clf()
     plt.subplot(121)
     plt.plot(so['Index'], so['FWHM']*scale, 'bo', label='Open')
-    plt.plot(st['Index'], st['FWHM']*scale, 'go', label='TTF')
+    if hasTTF: plt.plot(st['Index'], st['FWHM']*scale, 'go', label='TTF')
     plt.plot(sc['Index'], sc['FWHM']*scale, 'ro', label='Closed')
     plt.xlabel('Frame Number')
     plt.ylabel('Gaussian-Fit FWHM (")')
@@ -101,7 +106,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
 
     plt.subplot(122)
     plt.plot(so['Index'], sc['FWHM'][idx_in_c_of_o] / so['FWHM'], 'bo', label='Closed / Open')
-    plt.plot(st['Index'], sc['FWHM'][idx_in_c_of_t] / st['FWHM'], 'ro', label='Closed / TTF')
+    if hasTTF: plt.plot(st['Index'], sc['FWHM'][idx_in_c_of_t] / st['FWHM'], 'ro', label='Closed / TTF')
     plt.xlabel('Frame Number')
     plt.ylabel('Ratio of Gaussian-Fit FWHM')
     plt.legend(numpoints=1)
@@ -117,7 +122,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.clf()
     plt.subplot(121)
     plt.plot(so['Index'], so['emp_fwhm']*scale, 'bo', label='Open')
-    plt.plot(st['Index'], st['emp_fwhm']*scale, 'go', label='TTF')
+    if hasTTF: plt.plot(st['Index'], st['emp_fwhm']*scale, 'go', label='TTF')
     plt.plot(sc['Index'], sc['emp_fwhm']*scale, 'ro', label='Closed')
     # plt.errorbar(so['Index'], so['emp_fwhm']*scale, fmt='bo', yerr=so['emp_fwhm_std'], label='Open')
     # plt.errorbar(st['Index'], st['emp_fwhm']*scale, fmt='go', yerr=st['emp_fwhm_std'], label='TTF')
@@ -129,7 +134,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
 
     plt.subplot(122)
     plt.plot(so['Index'], sc['emp_fwhm'][idx_in_c_of_o] / so['emp_fwhm'], 'bo', label='Closed / Open')
-    plt.plot(st['Index'], sc['emp_fwhm'][idx_in_c_of_t] / st['emp_fwhm'], 'ro', label='Closed / TTF')
+    if hasTTF: plt.plot(st['Index'], sc['emp_fwhm'][idx_in_c_of_t] / st['emp_fwhm'], 'ro', label='Closed / TTF')
     plt.xlabel('Frame Number')
     plt.ylabel('Ratio of Empircal FWHM')
     plt.legend(numpoints=1)
@@ -146,7 +151,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.clf()
     plt.subplot(121)
     plt.plot(so['Index'], so['EE50'], 'bo', label='Open')
-    plt.plot(st['Index'], st['EE50'], 'go', label='TTF')
+    if hasTTF: plt.plot(st['Index'], st['EE50'], 'go', label='TTF')
     plt.plot(sc['Index'], sc['EE50'], 'ro', label='Closed')
     plt.xlabel('Frame Number')
     plt.ylabel('Radius of 50% Encircled Energy (")')
@@ -156,7 +161,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
 
     plt.subplot(122)
     plt.plot(so['Index'], sc['EE50'][idx_in_c_of_o] / so['EE50'], 'bo', label='Closed / Open')
-    plt.plot(st['Index'], sc['EE50'][idx_in_c_of_t] / st['EE50'], 'ro', label='Closed / TTF')
+    if hasTTF: plt.plot(st['Index'], sc['EE50'][idx_in_c_of_t] / st['EE50'], 'ro', label='Closed / TTF')
     plt.xlabel('Frame Number')
     plt.ylabel('Ratio of 50% EE Radius')
     plt.legend(numpoints=1)
@@ -172,7 +177,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.clf()
     plt.subplot(121)
     plt.plot(so['Index'], so['EE80'], 'bo', label='Open')
-    plt.plot(st['Index'], st['EE80'], 'go', label='TTF')
+    if hasTTF: plt.plot(st['Index'], st['EE80'], 'go', label='TTF')
     plt.plot(sc['Index'], sc['EE80'], 'ro', label='Closed')
     plt.xlabel('Frame Number')
     plt.ylabel('Radius of 80% Encircled Energy (")')
@@ -182,7 +187,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     
     plt.subplot(122)
     plt.plot(so['Index'], sc['EE80'][idx_in_c_of_o] / so['EE80'], 'bo', label='Closed / Open')
-    plt.plot(st['Index'], sc['EE80'][idx_in_c_of_t] / st['EE80'], 'ro', label='Closed / TTF')
+    if hasTTF: plt.plot(st['Index'], sc['EE80'][idx_in_c_of_t] / st['EE80'], 'ro', label='Closed / TTF')
     plt.xlabel('Frame Number')
     plt.ylabel('Ratio of 80% EE Radius')
     plt.legend(numpoints=1)
@@ -198,7 +203,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.clf()
     plt.subplot(121)
     plt.plot(so['Index'], so['NEA'], 'bo', label='Open')
-    plt.plot(st['Index'], st['NEA'], 'go', label='TTF')
+    if hasTTF: plt.plot(st['Index'], st['NEA'], 'go', label='TTF')
     plt.plot(sc['Index'], sc['NEA'], 'ro', label='Closed')
     plt.xlabel('Frame Number')
     plt.ylabel('NEA (Sq. Arcsec)')
@@ -208,7 +213,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     
     plt.subplot(122)
     plt.plot(so['Index'], sc['NEA'][idx_in_c_of_o] / so['NEA'], 'bo', label='Closed / Open')
-    plt.plot(st['Index'], sc['NEA'][idx_in_c_of_t] / st['NEA'], 'ro', label='Closed / TTF')
+    if hasTTF: plt.plot(st['Index'], sc['NEA'][idx_in_c_of_t] / st['NEA'], 'ro', label='Closed / TTF')
     plt.xlabel('Frame Number')
     plt.ylabel('Ratio of NEA')
     plt.legend(numpoints=1)
@@ -224,7 +229,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.clf()
     plt.subplot(121)
     plt.plot(so['Index'], so['NEA2'], 'bo', label='Open')
-    plt.plot(st['Index'], st['NEA2'], 'go', label='TTF')
+    if hasTTF: plt.plot(st['Index'], st['NEA2'], 'go', label='TTF')
     plt.plot(sc['Index'], sc['NEA2'], 'ro', label='Closed')
     plt.xlabel('Frame Number')
     plt.ylabel('NEA2 (Sq. Arcsec)')
@@ -234,7 +239,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
 
     plt.subplot(122)
     plt.plot(so['Index'], sc['NEA2'][idx_in_c_of_o] / so['NEA2'], 'bo', label='Closed / Open')
-    plt.plot(st['Index'], sc['NEA2'][idx_in_c_of_t] / st['NEA2'], 'ro', label='Closed / TTF')
+    if hasTTF: plt.plot(st['Index'], sc['NEA2'][idx_in_c_of_t] / st['NEA2'], 'ro', label='Closed / TTF')
     plt.xlabel('Frame Number')
     plt.ylabel('Ratio of NEA2')
     plt.legend(numpoints=1)
@@ -250,10 +255,10 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.clf()
     plt.subplot(121)
     plt.plot(so['Index'], so['xFWHM']*scale, 'bo', label='Open X')
-    plt.plot(st['Index'], st['xFWHM']*scale, 'go', label='TTF X')
+    if hasTTF: plt.plot(st['Index'], st['xFWHM']*scale, 'go', label='TTF X')
     plt.plot(sc['Index'], sc['xFWHM']*scale, 'ro', label='Closed X')
     plt.plot(so['Index'], so['yFWHM']*scale, 'b^', label='Open Y')
-    plt.plot(st['Index'], st['yFWHM']*scale, 'g^', label='TTF Y')
+    if hasTTF: plt.plot(st['Index'], st['yFWHM']*scale, 'g^', label='TTF Y')
     plt.plot(sc['Index'], sc['yFWHM']*scale, 'r^', label='Closed Y')
     plt.xlabel('Frame Number')
     plt.ylabel('Gaussian-Fit FWHM (")')
@@ -263,9 +268,9 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
 
     plt.subplot(122)
     plt.plot(so['Index'], sc['xFWHM'][idx_in_c_of_o] / so['xFWHM'], 'bo', label='X Closed / Open')
-    plt.plot(st['Index'], sc['xFWHM'][idx_in_c_of_t] / st['xFWHM'], 'ro', label='X Closed / TTF')
+    if hasTTF: plt.plot(st['Index'], sc['xFWHM'][idx_in_c_of_t] / st['xFWHM'], 'ro', label='X Closed / TTF')
     plt.plot(so['Index'], sc['yFWHM'][idx_in_c_of_o] / so['yFWHM'], 'b^', label='Y Closed / Open')
-    plt.plot(st['Index'], sc['yFWHM'][idx_in_c_of_t] / st['yFWHM'], 'r^', label='Y Closed / TTF')
+    if hasTTF: plt.plot(st['Index'], sc['yFWHM'][idx_in_c_of_t] / st['yFWHM'], 'r^', label='Y Closed / TTF')
     plt.xlabel('Frame Number')
     plt.ylabel('Ratio of Gaussian-Fit FWHM')
     plt.legend(numpoints=1, fontsize=10)
@@ -279,7 +284,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     ##########
 
     utc_o_dt = [datetime.strptime(so['TIME_UTC'][ii], '%I:%M:%S') for ii in range(len(so))]
-    utc_t_dt = [datetime.strptime(st['TIME_UTC'][ii], '%I:%M:%S') for ii in range(len(st))]
+    if hasTTF: utc_t_dt = [datetime.strptime(st['TIME_UTC'][ii], '%I:%M:%S') for ii in range(len(st))]
     utc_c_dt = [datetime.strptime(sc['TIME_UTC'][ii], '%I:%M:%S') for ii in range(len(sc))]
 
     time_fmt = mp_dates.DateFormatter('%H:%M')    
@@ -293,7 +298,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.clf()
     plt.subplot(121)
     plt.plot(utc_o_dt, so['FWHM']*scale, 'bo', label='Open')
-    plt.plot(utc_t_dt, st['FWHM']*scale, 'go', label='TTF')
+    if hasTTF: plt.plot(utc_t_dt, st['FWHM']*scale, 'go', label='TTF')
     plt.plot(utc_c_dt, sc['FWHM']*scale, 'ro', label='Closed')
     plt.gca().xaxis.set_major_formatter(time_fmt)
     plt.xticks(rotation=35)
@@ -305,7 +310,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
 
     plt.subplot(122)
     plt.plot(utc_o_dt, sc['FWHM'][idx_in_c_of_o] / so['FWHM'], 'bo', label='Closed / Open')
-    plt.plot(utc_t_dt, sc['FWHM'][idx_in_c_of_t] / st['FWHM'], 'ro', label='Closed / TTF')
+    if hasTTF: plt.plot(utc_t_dt, sc['FWHM'][idx_in_c_of_t] / st['FWHM'], 'ro', label='Closed / TTF')
     plt.gca().xaxis.set_major_formatter(time_fmt)
     plt.xticks(rotation=35)
     plt.xlabel('UTC Time (hr)')
@@ -323,7 +328,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.clf()
     plt.subplot(121)
     plt.plot(utc_o_dt, so['emp_fwhm']*scale, 'bo', label='Open')
-    plt.plot(utc_t_dt, st['emp_fwhm']*scale, 'go', label='TTF')
+    if hasTTF: plt.plot(utc_t_dt, st['emp_fwhm']*scale, 'go', label='TTF')
     plt.plot(utc_c_dt, sc['emp_fwhm']*scale, 'ro', label='Closed')
     plt.gca().xaxis.set_major_formatter(time_fmt)
     plt.xticks(rotation=35)
@@ -335,7 +340,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
 
     plt.subplot(122)
     plt.plot(utc_o_dt, sc['emp_fwhm'][idx_in_c_of_o] / so['emp_fwhm'], 'bo', label='Closed / Open')
-    plt.plot(utc_t_dt, sc['emp_fwhm'][idx_in_c_of_t] / st['emp_fwhm'], 'ro', label='Closed / TTF')
+    if hasTTF: plt.plot(utc_t_dt, sc['emp_fwhm'][idx_in_c_of_t] / st['emp_fwhm'], 'ro', label='Closed / TTF')
     plt.gca().xaxis.set_major_formatter(time_fmt)
     plt.xticks(rotation=35)
     plt.xlabel('UTC Time (hr)')
@@ -353,7 +358,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.clf()
     plt.subplot(121)
     plt.plot(utc_o_dt, so['EE50'], 'bo', label='Open')
-    plt.plot(utc_t_dt, st['EE50'], 'go', label='TTF')
+    if hasTTF: plt.plot(utc_t_dt, st['EE50'], 'go', label='TTF')
     plt.plot(utc_c_dt, sc['EE50'], 'ro', label='Closed')
     plt.gca().xaxis.set_major_formatter(time_fmt)
     plt.xticks(rotation=35)
@@ -365,7 +370,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
 
     plt.subplot(122)
     plt.plot(utc_o_dt, sc['EE50'][idx_in_c_of_o] / so['EE50'], 'bo', label='Closed / Open')
-    plt.plot(utc_t_dt, sc['EE50'][idx_in_c_of_t] / st['EE50'], 'ro', label='Closed / TTF')
+    if hasTTF: plt.plot(utc_t_dt, sc['EE50'][idx_in_c_of_t] / st['EE50'], 'ro', label='Closed / TTF')
     plt.gca().xaxis.set_major_formatter(time_fmt)
     plt.xticks(rotation=35)
     plt.xlabel('UTC Time (hr)')
@@ -383,7 +388,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.clf()
     plt.subplot(121)
     plt.plot(utc_o_dt, so['EE80'], 'bo', label='Open')
-    plt.plot(utc_t_dt, st['EE80'], 'go', label='TTF')
+    if hasTTF: plt.plot(utc_t_dt, st['EE80'], 'go', label='TTF')
     plt.plot(utc_c_dt, sc['EE80'], 'ro', label='Closed')
     plt.gca().xaxis.set_major_formatter(time_fmt)
     plt.xticks(rotation=35)
@@ -395,7 +400,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
 
     plt.subplot(122)
     plt.plot(utc_o_dt, sc['EE80'][idx_in_c_of_o] / so['EE80'], 'bo', label='Closed / Open')
-    plt.plot(utc_t_dt, sc['EE80'][idx_in_c_of_t] / st['EE80'], 'ro', label='Closed / TTF')
+    if hasTTF: plt.plot(utc_t_dt, sc['EE80'][idx_in_c_of_t] / st['EE80'], 'ro', label='Closed / TTF')
     plt.gca().xaxis.set_major_formatter(time_fmt)
     plt.xticks(rotation=35)
     plt.xlabel('UTC Time (hr)')
@@ -413,7 +418,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.clf()
     plt.subplot(121)
     plt.plot(utc_o_dt, so['NEA'], 'bo', label='Open')
-    plt.plot(utc_t_dt, st['NEA'], 'go', label='TTF')
+    if hasTTF: plt.plot(utc_t_dt, st['NEA'], 'go', label='TTF')
     plt.plot(utc_c_dt, sc['NEA'], 'ro', label='Closed')
     plt.gca().xaxis.set_major_formatter(time_fmt)
     plt.xticks(rotation=35)
@@ -425,7 +430,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
 
     plt.subplot(122)
     plt.plot(utc_o_dt, sc['NEA'][idx_in_c_of_o] / so['NEA'], 'bo', label='Closed / Open')
-    plt.plot(utc_t_dt, sc['NEA'][idx_in_c_of_t] / st['NEA'], 'ro', label='Closed / TTF')
+    if hasTTF: plt.plot(utc_t_dt, sc['NEA'][idx_in_c_of_t] / st['NEA'], 'ro', label='Closed / TTF')
     plt.gca().xaxis.set_major_formatter(time_fmt)
     plt.xticks(rotation=35)
     plt.xlabel('UTC Time (hr)')
@@ -443,7 +448,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.clf()
     plt.subplot(121)
     plt.plot(utc_o_dt, so['NEA2'], 'bo', label='Open')
-    plt.plot(utc_t_dt, st['NEA2'], 'go', label='TTF')
+    if hasTTF: plt.plot(utc_t_dt, st['NEA2'], 'go', label='TTF')
     plt.plot(utc_c_dt, sc['NEA2'], 'ro', label='Closed')
     plt.gca().xaxis.set_major_formatter(time_fmt)
     plt.xticks(rotation=35)
@@ -455,7 +460,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
 
     plt.subplot(122)
     plt.plot(utc_o_dt, sc['NEA2'][idx_in_c_of_o] / so['NEA2'], 'bo', label='Closed / Open')
-    plt.plot(utc_t_dt, sc['NEA2'][idx_in_c_of_t] / st['NEA2'], 'ro', label='Closed / TTF')
+    if hasTTF: plt.plot(utc_t_dt, sc['NEA2'][idx_in_c_of_t] / st['NEA2'], 'ro', label='Closed / TTF')
     plt.gca().xaxis.set_major_formatter(time_fmt)
     plt.xticks(rotation=35)
     plt.xlabel('UTC Time (hr)')
@@ -472,10 +477,10 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     plt.subplots_adjust(left=0.1, bottom=0.15)
     plt.subplot(121)
     plt.plot(utc_o_dt, so['xFWHM']*scale, 'bo', label='Open X')
-    plt.plot(utc_t_dt, st['xFWHM']*scale, 'go', label='TTF X')
+    if hasTTF: plt.plot(utc_t_dt, st['xFWHM']*scale, 'go', label='TTF X')
     plt.plot(utc_c_dt, sc['xFWHM']*scale, 'ro', label='Closed X')
     plt.plot(utc_o_dt, so['yFWHM']*scale, 'b^', label='Open Y')
-    plt.plot(utc_t_dt, st['yFWHM']*scale, 'g^', label='TTF Y')
+    if hasTTF: plt.plot(utc_t_dt, st['yFWHM']*scale, 'g^', label='TTF Y')
     plt.plot(utc_c_dt, sc['yFWHM']*scale, 'r^', label='Closed Y')
     plt.gca().xaxis.set_major_formatter(time_fmt)
     plt.xticks(rotation=35)
@@ -487,9 +492,9 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     
     plt.subplot(122)
     plt.plot(utc_o_dt, sc['xFWHM'][idx_in_c_of_o] / so['xFWHM'], 'bo', label='X Closed / Open')
-    plt.plot(utc_t_dt, sc['xFWHM'][idx_in_c_of_t] / st['xFWHM'], 'ro', label='X Closed / TTF')
+    if hasTTF: plt.plot(utc_t_dt, sc['xFWHM'][idx_in_c_of_t] / st['xFWHM'], 'ro', label='X Closed / TTF')
     plt.plot(utc_o_dt, sc['yFWHM'][idx_in_c_of_o] / so['yFWHM'], 'b^', label='Y Closed / Open')
-    plt.plot(utc_t_dt, sc['yFWHM'][idx_in_c_of_t] / st['yFWHM'], 'r^', label='Y Closed / TTF')
+    if hasTTF: plt.plot(utc_t_dt, sc['yFWHM'][idx_in_c_of_t] / st['yFWHM'], 'r^', label='Y Closed / TTF')
     plt.gca().xaxis.set_major_formatter(time_fmt)
     plt.xticks(rotation=35)
     plt.xlabel('UTC Time (hr)')

@@ -5,9 +5,9 @@ from astropy import table
 from astropy import units
 import scipy
 import glob
-import reduce_fli
-import calib
-import util
+from imaka.reduce import reduce_fli
+from imaka.reduce import calib
+from imaka.reduce import util
 import pdb
 import os
 #from flystar import match
@@ -16,8 +16,10 @@ root_dir = '/Volumes/g/lu/data/imaka/2017_01_10/fli/'
 
 def make_sky():
 
-    sky_dir = '/Volumes/g/lu/data/imaka/2017_01_10/fli/Pleiades/'
+    sky_raw_dir = root_dir + 'Pleiades/'
+    sky_out_dir = root_dir + 'reduce/sky/'
 
+    util.mkdir(sky_out_dir)
     
     # 30 second integration time
     sky_num = [20, 21, 30, 31, 46, 47, 56, 57, 70, 71, 84, 85, 98, 99, 112, 113, \
@@ -31,7 +33,14 @@ def make_sky():
     calib.makedark(sky_frames, 'pleiades_sky_45s.fits')
 
     return
-        
+
+def make_flat():
+    # Didn't take flats, so just copy over the one from Friday night.
+    old_flat = imaka_dir + '2017_01_13/fli/calib/flat.fits'
+    new_flat = root_dir + 'calib/flat.fits'
+    shutil.copyfile(old_flat, new_flat)
+    return
+
 def reduce_pleiades():
     sky_dir = root_dir + 'reduce/sky/'
     data_dir = root_dir + 'Pleiades/'
@@ -169,7 +178,7 @@ def calc_star_stats_closed():
     
     img_files = img_files_old_name + img_files_new_name
     
-    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'closed_open.fits')
+    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closed.fits')
     
     return
 
