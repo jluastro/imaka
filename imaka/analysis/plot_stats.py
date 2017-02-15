@@ -506,7 +506,7 @@ def plot_stack_stats(date, suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'
     
     return
 
-def compare_fwhm(stats_csv_file, plot_title):
+def compare_fwhm(stats_csv_file, plot_title, out_dir):
     
     #Makes a figure of several plots comparing different measures of FWHM
     #(empirical, gaussian, NEA)
@@ -525,11 +525,11 @@ def compare_fwhm(stats_csv_file, plot_title):
                 full_labels = row
             else:
                 FWHM.append(float(row[6]))
-                NEA_FWHM.append((2*(float(row[10])/np.pi)**0.5))
+                NEA_FWHM.append((((float(row[10])/0.12)/np.pi)**0.5)*2)
                 xFWHM.append(float(row[12]))
                 yFWHM.append(float(row[13]))
                 emp_FWHM.append(float(row[15]))
-
+      
     plt.figure(figsize=(15,10))
     plt.suptitle(plot_title, fontsize=24)
 
@@ -588,6 +588,6 @@ def compare_fwhm(stats_csv_file, plot_title):
 
     plt.subplots_adjust(hspace=0.25, wspace=0.25)
 
-    plt.savefig(stats_csv_file.replace('.csv', '_plot.png'))
+    plt.savefig(out_dir + stats_csv_file.replace('.csv', '_plot.png'))
     
     return
