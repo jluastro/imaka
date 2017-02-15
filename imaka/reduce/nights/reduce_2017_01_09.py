@@ -83,6 +83,22 @@ def find_stars_pleiades():
 
     return
 
+def calc_star_stats():
+    
+    reduce_dir = root_dir + 'reduce/pleiades/'
+    stats_dir = root_dir + 'reduce/stats/'
+    
+    #open loop
+    fnum = np.arrange(57, 67)
+    img_files = ['{0:s}/obj{1:03d}_clean.fits'.format(reduce_dir, ii) for ii in fnum]
+    reduce_fli.calc_star_stats(img_files, output_stats='stats_open.fits')
+
+    #closed loop
+    fnum = np.arrange(47, 57)
+    img_files = ['obj_o{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum]
+    reduce_fli.calc_star_stats(img_files, output_stats='stats_closed.fits')
+    
+    return
 
 def compare_fwhm_list():
     o_list = np.arange(57, 67) # Open
