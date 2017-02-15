@@ -33,12 +33,12 @@ from astropy.stats import sigma_clipped_stats
 from astropy.modeling import models, fitting
 import poppy
 import pdb
-#from flystar import match
-#from flystar import align
-#from flystar import transforms
+from flystar import match
+from flystar import align
+from flystar import transforms
 import calib
 import util
-#import ccdproc
+import ccdproc
 from scipy.ndimage import interpolation
 from scipy.ndimage import median_filter
 import scipy.ndimage
@@ -461,10 +461,17 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
         hst_tz = pytz.timezone('US/Hawaii')
 
         if hdr['SHUTTER'] == True:
-            dt_hst = datetime.strptime(date_tmp + ' ' + time_tmp, '%m/%d/%Y %H:%M:%S')
+            dt_hst = datetime.datetime.strptime(date_tmp + ' ' + time_tmp, '%m/%d/%Y %H:%M:%S')
         else:
-            dt_hst = datetime.strptime(date_tmp + ' ' + time_tmp, '%d/%m/%Y %I:%M:%S %p')
+            dt_hst = datetime.datetime.strptime(date_tmp + ' ' + time_tmp, '%d/%m/%Y %I:%M:%S %p')
         dt_hst = hst_tz.localize(dt_hst)
+        
+        # make hst date switch over at midnight 
+        noon = datetime.time(12, 0, 0) #assuming you'll never be taking images at local noon...
+        del_day = datetime.timedelta(days=1)
+        if dt_hst.time() < noon:
+            dt_hst += del_day
+            
         dt_utc = dt_hst.astimezone(pytz.utc)
 
         s_time_hst[ii] = str(dt_hst.time())
@@ -642,20 +649,6 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
     stats.write(output_stats, overwrite=True)
     stats.write(output_stats.replace('.fits', '.csv'), format='csv') # Auto overwrites
                         
-    return
-
-
-def add_frame_number_column(stats_table):
-    # Get the frame numbers for plotting.
-    frame_num = np.zeros(len(stats_table), dtype=int)
-    for ii in range(len(stats_table)):
-        foo = stats_table['Image'][ii].index('clean')
-
-        frame_num[ii] = int(stats_table['Image'][ii][foo - 4:foo - 1])
-        frame_num_col = table.Column(frame_num, name='Index')
-
-    stats_table.add_column(frame_num_col, index=1)
-
     return
 
 
