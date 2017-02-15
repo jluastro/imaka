@@ -459,7 +459,10 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
         date_tmp = hdr['DATEOBS']
         hst_tz = pytz.timezone('US/Hawaii')
 
-        dt_hst = datetime.strptime(date_tmp + ' ' + time_tmp, '%d/%m/%Y %I:%M:%S %p')
+        if hdr['SHUTTER'] == True:
+            dt_hst = datetime.strptime(date_tmp + ' ' + time_tmp, '%m/%d/%Y %I:%M:%S %p')
+        else:
+            dt_hst = datetime.strptime(date_tmp + ' ' + time_tmp, '%d/%m/%Y %I:%M:%S %p')
         dt_hst = hst_tz.localize(dt_hst)
         dt_utc = dt_hst.astimezone(pytz.utc)
 
