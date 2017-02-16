@@ -649,3 +649,89 @@ def compare_fwhm(stats_files, out_dir):
         plt.savefig(out_dir + file.split("/")[-1].replace('.csv', '_plot.png'))
 
     return
+
+def plot_stats_mdp(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'):
+    """
+    Make a suite of standard plots for the stats on a given night. 
+
+    Parameters
+    ----------
+    date : str
+        The date string for which to plot up the stats (i.e. '20170113').
+
+    Optional Parameters
+    -------------------
+    suffixes : numpy array of strings
+        stats files have the name stats_<suffixes[0]>.fits, etc.
+    root_dir : str
+        The root directory for the <date> observing run directories. The
+        stats files will be searched for in:
+        <root_dir>/<date>/fli/reduce/stats/
+    """
+    stats_dir = root_dir + date + '/fli/reduce/stats/'
+    plots_dir = root_dir + date + '/fli/reduce/plots/'
+
+    util.mkdir(plots_dir)
+
+    stats = []
+    utc = []
+
+    for suffix in suffixes:
+        st = Table.read(stats_dir + 'stats_' + suffix + '.fits')
+        stats.append(st)
+
+        utc_dt = [datetime.strptime(st['TIME_UTC'][ii], '%I:%M:%S') for ii in range(len(st))]
+        utc.append(utc_dt)
+
+    scale = 0.12
+    
+    time_fmt = mp_dates.DateFormatter('%H:%M')    
+
+    plt.figure(1, figsize=(6, 6))
+    plt.clf()
+    for ii in range(len(suffixes)):
+        plt.plot(utc[ii], stats[ii]['emp_fwhm']*scale, marker='o', linestyle='none', label=suffixes[ii])
+    plt.gca().xaxis.set_major_formatter(time_fmt)
+    plt.xticks(rotation=35)
+    plt.xlabel('UTC Time (hr)')
+    plt.ylabel('Empirical FWHM (")')
+    plt.legend(numpoints=1)
+    plt.ylim(0, 1.5)
+    plt.title(date)
+    plt.savefig(plots_dir + 'mdp_efwhm_vs_time' + out_suffix + '.png')
+
+    plt.figure(2, figsize=(6, 6))
+    plt.clf()
+    for ii in range(len(suffixes)):
+        plt.plot(utc[ii], stats[ii]['NEA'], marker='o', linestyle='none', label=suffixes[ii])
+    plt.gca().xaxis.set_major_formatter(time_fmt)
+    plt.xticks(rotation=35)
+    plt.xlabel('UTC Time (hr)')
+    plt.ylabel('NEA (Sq. Arcsec)')
+    plt.legend(numpoints=1)
+    plt.ylim(0, 5)
+    plt.title(date)
+    plt.savefig(plots_dir + 'mdp_nea_vs_time' + out_suffix + '.png')
+
+    plt.figure(3, figsize=(6, 6))
+    plt.clf()
+    for ii in range(len(suffixes)):
+        plt.plot(stats[ii]['MASS'], stats[ii]['emp_fwhm']*scale, marker='o', linestyle='none', label=suffixes[ii])
+    plt.xlabel('MASS Seeing (")')
+    plt.ylabel('Empirical FWHM (")')
+    plt.legend()
+    plt.ylim(0, 1.5)
+    plt.title(date)
+    plt.savefig(plots_dir + 'mdp_mass_vs_efwhm' + out_suffix + '.png')
+
+    plt.figure(4, figsize=(6, 6))
+    plt.clf()
+    for ii in range(len(suffixes)):
+        plt.plot(stats[ii]['MASS'], stats[ii]['NEA'], marker='o', linestyle='none', label=suffixes[ii])
+    plt.xlabel('MASS Seeing (")')
+    plt.ylabel('NEQ (Sq. Arcsec)')
+    plt.legend()
+    plt.ylim(0, 5)
+    plt.title(date)
+    plt.savefig(plots_dir + 'mdp_mass_vs_nea' + out_suffix + '.png')
+    
