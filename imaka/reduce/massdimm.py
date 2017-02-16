@@ -1,5 +1,5 @@
-#!/usr/bin/env python
-'''############################################################################
+'''
+############################################################################
 ## imaka_massdimm.py
 ##  
 ## Reads in an imaka fits frame and finds matching FWHM from MASS and DIMM 
@@ -8,11 +8,13 @@
 ## df 2017-02-08. MASS/DIMM reading functions based on massdimm.py by jlu
 ## last modifield df 2017-02-15
 ## to run on onaga: cat imaka_massdimm.py | ssh imaka@onaga.ifa.hawaii.edu python -
-'''############################################################################
+############################################################################
+'''
 
 import numpy as np
 import os
 from astropy.io import fits
+from astropy.table import Table
 from pandas import read_csv
 from datetime import datetime
 import socket
@@ -60,12 +62,12 @@ class Image(object):
         return np.array([self.timeInHours])
 
 
-class Table(object):
+class StatsTable(object):
     ''' Input a FITS table '''
-    def __init__ (self, tablfile):
-        self.infile = tablfile
+    def __init__ (self, tablefile):
+        self.infile = tablefile
 
-        self.data = fits.open(self.infile)[1].data
+        self.data = Table.read(tablefile)
 
     def time(self):
         ''' Extracts time from FITS table. Returns array of hh, mm, ss '''
@@ -76,6 +78,14 @@ class Table(object):
 
         return self.time_24
 
+    def get_datetimes(self):
+        dt_utc = []
+        for ii in range(len(self.data)):
+            dt_str = self.data['DATE_UTC'] + ' ' + self.data['TIME_UTC'][ii]
+            dt.append( datetime.strptime(dt_str, '%Y:%m:%d %H:%M:%S') )
+
+        return dt_utc
+    
     def fwhm(self):
         self.fwhm  = self.data['FWHM']
         return self.fwhm
@@ -312,10 +322,12 @@ def append_mass_dimm(stats_file, massdimm_dir, realtime=False):
 
     # Read in the stats file, which contains the times of the
     # individual exposures. 
-    stats = Table(stats_file)
+    stats = StatsTable(stats_file)
 
     # Fetch the UT dates and times from the table. 
-    datatime = datafile.get_datetimes()
+    dt_utc = datafile.get_datetimes()
+
+    # Get the set of unique UT Dates. 
 
 
     
