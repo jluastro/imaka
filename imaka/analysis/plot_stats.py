@@ -735,7 +735,7 @@ def plot_stats_mdp(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root
     plt.title(date)
     plt.savefig(plots_dir + 'mdp_mass_vs_nea' + out_suffix + '.png')
 
-    plt.figure(3, figsize=(6, 6))
+    plt.figure(5, figsize=(6, 6))
     plt.clf()
     for ii in range(len(suffixes)):
         plt.plot(stats[ii]['DIMM'], stats[ii]['emp_fwhm']*scale, marker='o', linestyle='none', label=suffixes[ii])
@@ -746,7 +746,7 @@ def plot_stats_mdp(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root
     plt.title(date)
     plt.savefig(plots_dir + 'mdp_dimm_vs_efwhm' + out_suffix + '.png')
 
-    plt.figure(4, figsize=(6, 6))
+    plt.figure(6, figsize=(6, 6))
     plt.clf()
     for ii in range(len(suffixes)):
         plt.plot(stats[ii]['DIMM'], stats[ii]['NEA'], marker='o', linestyle='none', label=suffixes[ii])
