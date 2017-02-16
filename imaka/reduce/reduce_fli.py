@@ -1,23 +1,12 @@
 import os
 import math
 import pylab as plt
-from PIL import Image
 import numpy as np
 from astropy.io import fits
 from astropy import table
 from astropy import units
-import glob
-import photutils
-from astropy.convolution import Gaussian2DKernel
-from astropy.stats import gaussian_fwhm_to_sigma
 import pdb
 #from astroscrappy import detect_cosmics
-import pylab as plt
-from PIL import Image
-import numpy as np
-from astropy.io import fits
-from astropy import table
-from astropy import units
 import glob
 import photutils
 from photutils import psf
@@ -26,16 +15,14 @@ from photutils import DAOStarFinder
 from photutils import CircularAperture
 from photutils import CircularAnnulus
 from photutils import aperture_photometry
-from astropy.convolution import Gaussian2DKernel
 from astropy.stats import gaussian_fwhm_to_sigma
 from astropy.stats import sigma_clipped_stats
 from astropy.modeling import models, fitting
-import pdb
 from flystar import match
 from flystar import align
 from flystar import transforms
-import calib
-import util
+from imaka.reduce import calib
+from imaka.reduce import util
 import ccdproc
 from scipy.ndimage import interpolation
 from scipy.ndimage import median_filter

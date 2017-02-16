@@ -295,6 +295,54 @@ def fetch_data(utDate, saveTo):
     urllib.urlretrieve(url, saveTo + massproFile)
     
 
+def append_mass_dimm(stats_file, massdimm_dir, realtime=False):
+    """
+    Parameters
+    ----------
+    stats_file : str
+        Full path to the stats file which will be read in to get
+        dates and times of individual frames. 
+    massdimm_dir : str
+        The root directory of the MASS/DIMM data. Within this 
+        directory, there should be sub-directories with <date>.
+    realtime : boolean
+        Specify whether we are running in realtime... WHAT DOES 
+        THIS MEAN?
+    """
+
+    # Read in the stats file, which contains the times of the
+    # individual exposures. 
+    stats = Table(stats_file)
+
+    # Fetch the UT dates and times from the table. 
+    datatime = datafile.get_datetimes()
+
+
+    
+
+    dimmvalue  = DIMM(massdimmdir    +td+'.dimm.dat')   .indexTime(datatime)
+    massvalue  = MASS(massdimmdir    +td+'.mass.dat')   .indexTime(datatime)
+    profvalues = MASSPROF(massdimmdir+td+'.masspro.dat').indexTime(datatime)
+
+    ## display results
+    if isfitsimg:
+    	print('MASS:', massvalue, 'DIMM:', dimmvalue)
+    else:
+        if filename.endswith('md.fits'):
+            pass
+        else:
+            datafile.add_dimm(dimmvalue)
+            datafile.add_mass(massvalue)
+            datafile.add_profile(profvalues)
+            datafile.output()
+            #output(td, datafile.r0(), datafile.EE80(), massvalue, dimmvalue)
+
+    print('Done!')
+
+
+    
+    
+    
 if __name__ == "__main__":
     ## initialize ##
     realtime = False    #set by hand
