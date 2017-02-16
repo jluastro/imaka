@@ -446,6 +446,7 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
 
         if hdr['SHUTTER'] == True:
             dt_hst = datetime.datetime.strptime(date_tmp + ' ' + time_tmp, '%m/%d/%Y %H:%M:%S')
+            dt_hst = hst_tz.localize(dt_hst)
         else:
             dt_hst = datetime.datetime.strptime(date_tmp + ' ' + time_tmp, '%d/%m/%Y %I:%M:%S %p')
             dt_hst = hst_tz.localize(dt_hst)
