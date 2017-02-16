@@ -65,18 +65,18 @@ def find_stars_pleiades():
     reduce_dir = root_dir + 'reduce/pleiades/'
     
     # Open loop
-    fnum = [44, 47, 50, 51, 53, 54, 56, 60, 63, 66, 69, 72, 75, 78, 81, 84, 87]    
-    img_files = [reduce_dir + 'obj{0:04}_o_clean.fits'.format(ii) for ii in fnum]
-    reduce_fli.find_stars(img_files, fwhm=5, threshold=6)
+#     fnum = [44, 47, 50, 51, 53, 54, 56, 60, 63, 66, 69, 72, 75, 78, 81, 84, 87]    
+#     img_files = [reduce_dir + 'obj{0:04}_o_clean.fits'.format(ii) for ii in fnum]
+#     reduce_fli.find_stars(img_files, fwhm=5, threshold=6)
     
     # Closed loop
     fnum1 = [40, 41, 43, 45, 46, 48, 49, 52, 55, 57, 58, 59, 61, 62]
     fnum2 = [64, 67, 70, 73, 76, 79, 82, 85, 88]
     fnum = fnum1 + fnum2
-    img_files_1 = [data_dir + 'obj{0:04d}_c_clean.fits'.format(ii) for ii in fnum]
+    img_files_1 = [reduce_dir + 'obj{0:04d}_c_clean.fits'.format(ii) for ii in fnum]
     
     fnum = np.arange(35, 40)
-    img_files_2 = [data_dir + "obj{0:04d}_clean.fits".format(ii) for ii in fnum]
+    img_files_2 = [reduce_dir + "obj{0:04d}_clean.fits".format(ii) for ii in fnum]
     
     img_files = img_files_1 + img_files_2    
     reduce_fli.find_stars(img_files, fwhm=3, threshold=6)
@@ -103,10 +103,10 @@ def calc_star_stats():
     fnum1 = [40, 41, 43, 45, 46, 48, 49, 52, 55, 57, 58, 59, 61, 62]
     fnum2 = [64, 67, 70, 73, 76, 79, 82, 85, 88]
     fnum = fnum1 + fnum2
-    img_files_1 = [data_dir + 'obj{0:04d}_c_clean.fits'.format(ii) for ii in fnum]
+    img_files_1 = [reduce_dir + 'obj{0:04d}_c_clean.fits'.format(ii) for ii in fnum]
     
     fnum = np.arange(35, 40)
-    img_files_2 = [data_dir + "obj{0:04d}_clean.fits".format(ii) for ii in fnum]
+    img_files_2 = [reduce_dir + "obj{0:04d}_clean.fits".format(ii) for ii in fnum]
     
     img_files = img_files_1 + img_files_2
     reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closed.fits')
