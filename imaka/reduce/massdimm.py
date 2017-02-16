@@ -1,13 +1,26 @@
 '''
 ############################################################################
-## imaka_massdimm.py
+## massdimm.py
 ##  
 ## Reads in an imaka fits frame and finds matching FWHM from MASS and DIMM 
 ## from the MKWC page. Fits file path/name can be given as the argument.
 ##
-## df 2017-02-08. MASS/DIMM reading functions based on massdimm.py by jlu
+## Dora Fohring 2017-02-08 -- MASS/DIMM reading functions based on massdimm.py by jlu
 ## last modifield df 2017-02-15
-## to run on onaga: cat imaka_massdimm.py | ssh imaka@onaga.ifa.hawaii.edu python -
+##
+
+Examples:
+
+from imaka.reduce import massdimm
+
+mass_dimm_dir = '/Users/jlu/data/imaka/20170113/mkwc/'
+
+stats_file = '/imaka/20170113/fli/reduce/stats/stats_closed1.fits'
+massdimm.append_mass_dimm(stats_file, mass_dimm_dir)
+
+fits_file_test = '/imaka/20170113/fli/reduce/pleiades/obj_o1036_clean.fits'
+massdimm.get_mass_dimm_for_image(fits_file_test, mass_dimm_dir)
+
 ############################################################################
 '''
 
@@ -39,7 +52,26 @@ def plotRo(dateSuffix):
 
 
 class DIMM(object):
+    """
+    An object that can load a DIMM fil and find the nearest DIMM date
+    given any time. 
+    """
     def __init__(self, dimmfile):
+        """
+        Load up a DIMM file into this object. You can then access the following 
+        object variables that contain numpy arrays:
+
+        year 
+        month
+        day
+        hour -- UT, 24 hour based (int)
+        minute 
+        second
+        timeInHours -- UT, 24 hour based, float
+
+        r0
+        
+        """
         table = read_csv(dimmfile, delim_whitespace=True, names= \
             ['year', 'month', 'day', 'hour', 'minute', 'second', 'seeing'])
         
@@ -88,6 +120,21 @@ class DIMM(object):
 class MASS(object):
 
     def __init__(self, massfile):
+        """
+        Load up a MASS file into this object. You can then access the following 
+        object variables that contain numpy arrays:
+
+        year 
+        month
+        day
+        hour -- UT, 24 hour based (int)
+        minute 
+        second
+        timeInHours -- UT, 24 hour based, float
+
+        r0
+        
+        """
         self.file = massfile
 
         # redid this to not use asciidata module but pandas instead
@@ -136,6 +183,21 @@ class MASS(object):
 class MASSPROF(object):
 
     def __init__(self, proffile):
+        """
+        Load up a MASS file into this object. You can then access the following 
+        object variables that contain numpy arrays:
+
+        year 
+        month
+        day
+        hour -- UT, 24 hour based (int)
+        minute 
+        second
+        timeInHours -- UT, 24 hour based, float
+
+        r0
+        
+        """
         self.file = proffile
 
         # redid this to not use asciidata module but pandas instead
@@ -186,7 +248,20 @@ class MASSPROF(object):
         return closestVals, timeDiff
 
 def fetch_data(utDate, saveTo):
-    ''' Saves massdimm files to directory specified.'''
+    '''Saves massdimm files to directory specified. The output files
+    will have the format:
+
+    <utDate>.mass.dat
+    <utDate>.dimm.dat
+    <utDate>.massprof.dat
+
+    Parameters
+    ----------
+    utDate : str
+        The string UT date in the format such as 20170113 for 2017-01-13
+    saveTo : str
+        The directory where the retrieved MASS DIMM profiles will be stored.
+    '''
     import urllib
 
     print('Saving MASS/DIMM data to directory:')
@@ -212,8 +287,10 @@ def fetch_data(utDate, saveTo):
     urllib.request.urlretrieve(url, saveTo + massproFile)
     
 
-def append_mass_dimm(stats_file, massdimm_dir, realtime=False):
-    """
+def append_mass_dimm(stats_file, massdimm_dir):
+    """Append new columns for the MASS seeing, the DIMM seeing, and the full MASS profile. 
+    Save the resulting files to a new file called <stats_file_root>_mpd.<stats_file_extension>.
+
     Parameters
     ----------
     stats_file : str
@@ -222,9 +299,6 @@ def append_mass_dimm(stats_file, massdimm_dir, realtime=False):
     massdimm_dir : str
         The root directory of the MASS/DIMM data. Within this 
         directory, there should be sub-directories with <date>.
-    realtime : boolean
-        Specify whether we are running in realtime... WHAT DOES 
-        THIS MEAN?
     """
 
     # Read in the stats file, which contains the times of the
@@ -306,7 +380,16 @@ def append_mass_dimm(stats_file, massdimm_dir, realtime=False):
     return
 
 
-def get_mass_dimm_for_image(fits_file, massdimm_dir, realtime=False):
+def get_mass_dimm_for_image(fits_file, massdimm_dir):
+    """Print the MASS and DIMM seeing for a single FITS image. 
+
+    Parameters
+    ----------
+    fits_file : str
+        Full or relative path name to the FITS file.
+    massdimm_dir : str
+        The directory to look for the MASS/DIMM data. 
+    """
     hdr = fits.getheader(fits_file)
     
     time_tmp = hdr['TIMEOBS']
