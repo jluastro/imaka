@@ -105,7 +105,7 @@ class Table(object):
     def add_profile(self, profcols):
         ''' Adds new profile columns to table '''
         orig_cols  = self.data.columns
-        pdb.set_trace()
+
         new_cols   = fits.ColDefs(\
             [fits.Column(name='Cn2dh_05', format='D', array=profcols[0]), \
              fits.Column(name='Cn2dh_1' , format='D', array=profcols[1]), \
@@ -240,7 +240,7 @@ class MASSPROF(object):
 
         self.profs = np.array([table['cn2dh_05'], table['cn2dh_1'], table['cn2dh_2'], \
             table['cn2dh_4'], table['cn2dh_8'], table['cn2dh_16']]).T
-        pdb.set_trace()
+
         # Convert from HST to UT
         self.hour += 10
         
@@ -318,7 +318,7 @@ if __name__ == "__main__":
         #datadir     = '/Volumes/DATA/imaka/20170111/ao/'
         #filename    = 'aocb_20170111_205.fits'
         td          = '20170114'  # <-- set this by hand
-        filename    = 'stats_ttf2.fits'  # <-- set this by hand
+        filename    = 'stats_closed2.fits'  # <-- set this by hand
         ## The format bit is needed when the data directory is in HST on 201701 and before
         datadir     = '/Volumes/DATA4/imaka/{0}/fli/reduce/stats/'.format(int(float(td))-1)
         massdimmdir = '/Volumes/DATA4/imaka/{0}/mkwc/'.format(int(float(td))-1)
@@ -350,11 +350,9 @@ if __name__ == "__main__":
 
     ## get mass/dimm times
     datatime = datafile.time()
-    print(massdimmdir+ td +'.mass.dat')
-    print(datatime)
 
-    massvalue  = MASS(massdimmdir    +td+'.mass.dat')   .indexTime(datatime)
     dimmvalue  = DIMM(massdimmdir    +td+'.dimm.dat')   .indexTime(datatime)
+    massvalue  = MASS(massdimmdir    +td+'.mass.dat')   .indexTime(datatime)
     profvalues = MASSPROF(massdimmdir+td+'.masspro.dat').indexTime(datatime)
 
     ## display results
