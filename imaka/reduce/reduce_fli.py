@@ -10,7 +10,6 @@ import glob
 import photutils
 from astropy.convolution import Gaussian2DKernel
 from astropy.stats import gaussian_fwhm_to_sigma
-import poppy
 import pdb
 #from astroscrappy import detect_cosmics
 import pylab as plt
@@ -31,7 +30,6 @@ from astropy.convolution import Gaussian2DKernel
 from astropy.stats import gaussian_fwhm_to_sigma
 from astropy.stats import sigma_clipped_stats
 from astropy.modeling import models, fitting
-import poppy
 import pdb
 from flystar import match
 from flystar import align
