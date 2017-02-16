@@ -448,15 +448,14 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
             dt_hst = datetime.datetime.strptime(date_tmp + ' ' + time_tmp, '%m/%d/%Y %H:%M:%S')
         else:
             dt_hst = datetime.datetime.strptime(date_tmp + ' ' + time_tmp, '%d/%m/%Y %I:%M:%S %p')
-        dt_hst = hst_tz.localize(dt_hst)
-        
-        # make hst date switch over at midnight 
-        noon = datetime.time(12, 0, 0) #assuming you'll never be taking images at local noon...
-        del_day = datetime.timedelta(days=1)
-        if dt_hst.time() < noon:
-            dt_hst += del_day
-            
+            dt_hst = hst_tz.localize(dt_hst)
+            noon = datetime.time(12, 0, 0) #assuming you'll never be taking images at local noon...
+            del_day = datetime.timedelta(days=1)
+            if dt_hst.time() < noon:
+                dt_hst += del_day
+                    
         dt_utc = dt_hst.astimezone(pytz.utc)
+
 
         s_time_hst[ii] = str(dt_hst.time())
         s_date_hst[ii] = str(dt_hst.date())
