@@ -650,6 +650,26 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
     return
 
 
+def add_frame_number_column(stats_table):
+    # Get the frame numbers for plotting.
+    frame_num = np.zeros(len(stats_table), dtype=int)
+    for ii in range(len(stats_table)):
+
+        full_name = stats_table['Image'][ii]
+        last_bit = full_name.split("/")[-1]
+        number = '0'
+        for character in last_bit:
+            if character.isdigit() == True:
+                digit = (character)
+                number += digit
+
+        frame_num[ii] = int(number)
+        frame_num_col = table.Column(frame_num, name='Index')
+
+    stats_table.add_column(frame_num_col, index=1)
+
+    return
+
 def shift_and_add(img_files, starlists, output_root, method='mean', clip_sigma=None):
     """
     Take a stack of images and starlists, calculate the 
