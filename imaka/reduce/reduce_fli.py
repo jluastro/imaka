@@ -12,7 +12,7 @@ from astropy.convolution import Gaussian2DKernel
 from astropy.stats import gaussian_fwhm_to_sigma
 import poppy
 import pdb
-from astroscrappy import detect_cosmics
+#from astroscrappy import detect_cosmics
 import pylab as plt
 from PIL import Image
 import numpy as np
@@ -36,8 +36,8 @@ import pdb
 from flystar import match
 from flystar import align
 from flystar import transforms
-from imaka.reduce import calib
-from imaka.reduce import util
+import calib
+import util
 import ccdproc
 from scipy.ndimage import interpolation
 from scipy.ndimage import median_filter
@@ -460,10 +460,17 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
         hst_tz = pytz.timezone('US/Hawaii')
 
         if hdr['SHUTTER'] == True:
-            dt_hst = datetime.strptime(date_tmp + ' ' + time_tmp, '%m/%d/%Y %I:%M:%S %p')
+            dt_hst = datetime.datetime.strptime(date_tmp + ' ' + time_tmp, '%m/%d/%Y %H:%M:%S')
         else:
-            dt_hst = datetime.strptime(date_tmp + ' ' + time_tmp, '%d/%m/%Y %I:%M:%S %p')
+            dt_hst = datetime.datetime.strptime(date_tmp + ' ' + time_tmp, '%d/%m/%Y %I:%M:%S %p')
         dt_hst = hst_tz.localize(dt_hst)
+        
+        # make hst date switch over at midnight 
+        noon = datetime.time(12, 0, 0) #assuming you'll never be taking images at local noon...
+        del_day = datetime.timedelta(days=1)
+        if dt_hst.time() < noon:
+            dt_hst += del_day
+            
         dt_utc = dt_hst.astimezone(pytz.utc)
 
         s_time_hst[ii] = str(dt_hst.time())
@@ -572,8 +579,9 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
             # Make a 21x21 patch centered on centroid, oversample and interpolate
             x_cent = int(round(float(coords[0][jj])))
             y_cent = int(round(float(coords[1][jj])))
-            one_star = img[y_cent-10 : y_cent+10+1, x_cent-10 : x_cent+10+1]  # Odd box, with center in middle pixel.
-            over_samp_5 = scipy.ndimage.zoom(one_star, 5, order = 1)
+            if y_cent-10 > 0 and x_cent-10 > 0 and y_cent+10<np.shape(img)[0] and x_cent+10<np.shape(img)[1]:
+                one_star = img[y_cent-10 : y_cent+10+1, x_cent-10 : x_cent+10+1]  # Odd box, with center in middle pixel.
+                over_samp_5 = scipy.ndimage.zoom(one_star, 5, order = 1)
 
             # # Make an array with the radius at each pixel.
             # y_1d = np.arange(over_samp_5.shape[0])
@@ -581,16 +589,16 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
             # y_2d, x_2d = np.meshgrid(y_1d, x_1d)
             # r_2d = np.hypot(x_2d, y_2d)
 
-            # Find the pixels where the flux is a above half max value.
-            max_flux = np.amax(over_samp_5) 
-            half_max = max_flux / 2.0
-            idx = np.where(over_samp_5 >= half_max)
+                # Find the pixels where the flux is a above half max value.
+                max_flux = np.amax(over_samp_5) 
+                half_max = max_flux / 2.0
+                idx = np.where(over_samp_5 >= half_max)
             
-            # Find the equivalent circle diameter for the area of pixels.
-            #    Area = \pi * (FWHM / 2.0)**2
-            area_count = len(idx[0]) / 5**2   # area in pix**2 -- note we went back to raw pixels (not oversampled)
-            emp_FWHM = 2.0 * (area_count / np.pi)**0.5
-            emp_FWHM_list[jj] = emp_FWHM
+                # Find the equivalent circle diameter for the area of pixels.
+                #    Area = \pi * (FWHM / 2.0)**2
+                area_count = len(idx[0]) / 5**2   # area in pix**2 -- note we went back to raw pixels (not oversampled)
+                emp_FWHM = 2.0 * (area_count / np.pi)**0.5
+                emp_FWHM_list[jj] = emp_FWHM
  
         # Find the median empirical FWHM of all stars. But first, trim to just the brightest stars.
         idx = np.where(stars['flux'] > 5)[0]
@@ -640,20 +648,6 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
     stats.write(output_stats, overwrite=True)
     stats.write(output_stats.replace('.fits', '.csv'), format='csv') # Auto overwrites
                         
-    return
-
-
-def add_frame_number_column(stats_table):
-    # Get the frame numbers for plotting.
-    frame_num = np.zeros(len(stats_table), dtype=int)
-    for ii in range(len(stats_table)):
-        foo = stats_table['Image'][ii].index('clean')
-
-        frame_num[ii] = int(stats_table['Image'][ii][foo - 4:foo - 1])
-        frame_num_col = table.Column(frame_num, name='Index')
-
-    stats_table.add_column(frame_num_col, index=1)
-
     return
 
 
