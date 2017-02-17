@@ -9,6 +9,10 @@ from imaka.reduce import util
 from datetime import datetime
 from matplotlib import dates as mp_dates
 import pdb
+import glob
+import matplotlib.pyplot as plt
+import matplotlib
+import datetime
 
 def fetch_stats_from_onaga(dates, output_root):
     """
@@ -850,3 +854,115 @@ def plot_profile(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root_d
     plt.title(date, fontsize=12)
     plt.savefig(plots_dir + 'mass_profile' + out_suffix + '.png')
     
+    return
+
+def plot_abc(date, suffixes=['open', 'closed'], out_suffix='', root_dir=''):
+
+    #plots different FWHMs as function of UTC time
+
+    colors = ['b', 'g', 'r', 'c', 'm', 'k', 'yellow', 'purple', 'orange']
+
+    stats_file_root = root_dir + date + '/FLI/reduce/stats/'
+    stats_files = []
+    for suffix in suffixes:
+        name = stats_file_root + "stats_" + suffix + ".csv"
+        stats_files.append(name)
+        
+###NEA FWHM PLOT###
+
+    plt.figure()
+    for ii in range(len(stats_files)):
+        data_label = stats_files[ii].split("/")[-1].split("_")[1].split(".")[0]
+        TIME_UTC = []
+        NEA_FWHM = []
+        with open(stats_files[ii], "r") as f:
+            reader = csv.reader(f)
+            for row in reader:
+                if row[0] == 'Image':
+                    labels = [row[5], row[10], row[15]]
+                    full_labels = row
+                else:
+                    TIME_UTC.append(row[5])
+                    NEA_FWHM.append((((float(row[10])/0.12)/np.pi)**0.5)*2)
+
+        date_times = []
+        for time in TIME_UTC:
+            dt_obj = datetime.datetime.strptime(time, '%H:%M:%S')
+            dt_obj.strftime("%I:%M:%S %p")
+            date_times.append(dt_obj)
+        dates = matplotlib.dates.date2num(date_times)
+        plt.plot_date(dates, NEA_FWHM, colors[ii]+'o', alpha=0.5, label=data_label)
+
+    plt.legend(loc=2, bbox_to_anchor=(1, 1))
+    plt.xticks(rotation=45)
+    plt.xlabel("UTC Time")
+    plt.ylabel("NEA FWHM")
+    plt.title("NEA FWHM over Time", fontsize=18)
+
+###EMPIRICAL FWHM PLOT###
+    
+    plt.figure()
+    for ii in range(len(stats_files)):
+        data_label = stats_files[ii].split("/")[-1].split("_")[1].split(".")[0]
+        TIME_UTC = []
+        emp_FWHM = []
+        with open(stats_files[ii], "r") as f:
+            reader = csv.reader(f)
+            for row in reader:
+                if row[0] == 'Image':
+                    labels = [row[5], row[10], row[15]]
+                    full_labels = row
+                else:
+                    TIME_UTC.append(row[5])
+                    emp_FWHM.append(float(row[15]))
+
+        date_times = []
+        for time in TIME_UTC:
+            dt_obj = datetime.datetime.strptime(time, '%H:%M:%S')
+            dt_obj.strftime("%I:%M:%S %p")
+            date_times.append(dt_obj)
+        dates = matplotlib.dates.date2num(date_times)
+        plt.plot_date(dates, emp_FWHM, colors[ii]+'o', alpha=0.5, label=data_label)
+
+    plt.legend(loc=2, bbox_to_anchor=(1, 1))
+    plt.xticks(rotation=45)
+    plt.xlabel("UTC Time")
+    plt.ylabel("Empirical FWHM")
+    plt.title("Empirical FWHM over Time", fontsize=18)    
+
+
+###GAUSSIAN FWHM PLOT###
+
+    plt.figure()
+    for ii in range(len(stats_files)):
+        data_label = stats_files[ii].split("/")[-1].split("_")[1].split(".")[0]
+        TIME_UTC = []
+        x_FWHM = []
+        y_FWHM = []
+        with open(stats_files[ii], "r") as f:
+            reader = csv.reader(f)
+            for row in reader:
+                if row[0] == 'Image':
+                    labels = [row[5], row[10], row[15]]
+                    full_labels = row
+                else:
+                    TIME_UTC.append(row[5])
+                    x_FWHM.append(float(row[12]))
+                    y_FWHM.append(float(row[13]))
+
+        date_times = []
+        for time in TIME_UTC:
+            dt_obj = datetime.datetime.strptime(time, '%H:%M:%S')
+            dt_obj.strftime("%I:%M:%S %p")
+            date_times.append(dt_obj)
+        dates = matplotlib.dates.date2num(date_times)
+        plt.plot_date(dates, x_FWHM, colors[ii]+"o", alpha=0.5, label=data_label)
+        plt.plot_date(dates, y_FWHM, colors[ii]+"s", alpha=0.5, label=data_label)
+
+    plt.legend(loc=2, bbox_to_anchor=(1, 1))
+    plt.xticks(rotation=45)
+    plt.xlabel("UTC Time")
+    plt.ylabel("Gaussian FWHM")
+    plt.title("Gaussian FWHM over Time (Circle = x, Square = y)", fontsize=18)
+
+    return
