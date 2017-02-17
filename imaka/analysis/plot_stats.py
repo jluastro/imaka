@@ -27,7 +27,7 @@ def fetch_stats_from_onaga(dates, output_root):
         that parallels that on onaga:
             <output_root>/<date>/fli/reduce/stats/*
     """
-    all_dates = ['20170110', '20170111', '20170112', '20170113']
+    all_dates = ['20170109', '20170110', '20170111', '20170112', '20170113']
 
     if dates == 'all' or dates == None:
         dates = all_dates
@@ -815,8 +815,9 @@ def plot_profile(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root_d
     
     time_fmt = mp_dates.DateFormatter('%H:%M')    
 
-    hlis = [0.2, 0.5, 1, 2, 4, 8, 16]
-    altitudes = ['Cn2dh_05', 'Cn2dh_1', 'Cn2dh_2', 'Cn2dh_4', 'Cn2dh_8', 'Cn2dh_16']
+    hlis = [0, 0.5, 1, 2, 4, 8, 16]
+    pdb.set_trace()
+    altitudes = ['Cn2dh_005', 'Cn2dh_010', 'Cn2dh_020', 'Cn2dh_040', 'Cn2dh_080', 'Cn2dh_160']
     
     allprofs = []    
     for altitude in altitudes:
@@ -828,11 +829,9 @@ def plot_profile(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root_d
     for jj in range(len(suffixes)):
         gl.extend(stats[jj]['DIMM'] - stats[jj]['MASS'])
 
-    pdb.set_trace()
     allprofs = np.array(allprofs)
-    mmask = np.isnan(allprofs) == False
-    mprofs = allprofs * mmask
-    profave = np.array(np.mean(mprofs, axis=1))
+    mprofs = np.ma.masked_invalid(allprofs)
+    profave = np.mean(mprofs, axis=1)
 
     ## sets zero and negative numbers to a very small value
     gl = np.array(gl)
@@ -841,7 +840,6 @@ def plot_profile(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root_d
     
     cngl = 0.98*0.00000055*206265/gl**(-5/3) / (16.7*(0.00000055)**(-2))
     profave = np.insert(profave, obj=0, values=np.mean(cngl))
-
     plt.figure(1)
     plt.clf()
     plt.plot(profave, hlis)
@@ -849,4 +847,5 @@ def plot_profile(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root_d
     plt.ylabel(r'h (km)')
     plt.title(date, fontsize=12)
     plt.savefig(plots_dir + 'mass_profile' + out_suffix + '.png')
+    plt.show()
     
