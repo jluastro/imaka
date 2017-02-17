@@ -8,6 +8,7 @@ import os, pdb
 from imaka.reduce import util
 from datetime import datetime
 from matplotlib import dates as mp_dates
+import pdb
 
 def fetch_stats_from_onaga(dates, output_root):
     """
@@ -650,7 +651,7 @@ def compare_fwhm(stats_files, out_dir):
 
     return
 
-def plot_stats_mdp(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root_dir='/Users/jlu/work/imaka/pleiades/'):
+def plot_stats_mdp(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root_dir='/Users/dorafohring/Desktop/imaka/data/'):
     """
     Make a suite of standard plots for the stats on a given night. 
 
@@ -756,4 +757,96 @@ def plot_stats_mdp(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root
     plt.ylim(0, 5)
     plt.title(date)
     plt.savefig(plots_dir + 'mdp_dimm_vs_nea' + out_suffix + '.png')
+
+def plot_profile(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root_dir='/Users/dorafohring/Desktop/imaka/data/'):
+    """
+    Make a suite of standard plots for the stats on a given night. 
+
+    Parameters
+    ----------
+    date : str
+        The date string for which to plot up the stats (i.e. '20170113').
+
+    Optional Parameters
+    -------------------
+    suffixes : numpy array of strings
+        stats files have the name stats_<suffixes[0]>.fits, etc.
+    root_dir : str
+        The root directory for the <date> observing run directories. The
+        stats files will be searched for in:
+        <root_dir>/<date>/fli/reduce/stats/
+    """
+    latexParams = {
+                'figure.dpi'      :150,
+                #'figure.figsize':[3.32,2.49],
+                'figure.figsize'  : [3.3, 4.2],
+                'axes.labelsize'  : 10,
+                'xtick.labelsize' : 10,
+                'ytick.labelsize' : 10,
+                'font.family'     : 'serif',
+                'font.serif'      : 'Computer Modern Roman',
+                'text.usetex'     : True,
+                'figure.subplot.top':0.90,
+                'figure.subplot.right':0.95,
+                'figure.subplot.bottom':0.15,
+                'figure.subplot.left':0.15,
+                'lines.linewidth':1.5,
+                'lines.markersize':3
+                }
+
+    plt.rcParams.update(latexParams)
+
+    stats_dir = root_dir + date + '/fli/reduce/stats/'
+    plots_dir = root_dir + date + '/fli/reduce/plots/'
+
+    util.mkdir(plots_dir)
+
+    stats = []
+    utc = []
+    
+    for suffix in suffixes:
+        st = Table.read(stats_dir + 'stats_' + suffix + '_mdp.fits')
+        stats.append(st)
+
+        utc_dt = [datetime.strptime(st['TIME_UTC'][ii], '%I:%M:%S') for ii in range(len(st))]
+        utc.append(utc_dt)
+
+    scale = 0.12
+    
+    time_fmt = mp_dates.DateFormatter('%H:%M')    
+
+    hlis = [0.2, 0.5, 1, 2, 4, 8, 16]
+    altitudes = ['Cn2dh_05', 'Cn2dh_1', 'Cn2dh_2', 'Cn2dh_4', 'Cn2dh_8', 'Cn2dh_16']
+    
+    allprofs = []    
+    for altitude in altitudes:
+        combine = []
+        for ii in range(len(suffixes)): 
+            combine.extend(stats[ii][altitude])  
+        allprofs.append(combine)
+    gl = []        
+    for jj in range(len(suffixes)):
+        gl.extend(stats[jj]['DIMM'] - stats[jj]['MASS'])
+
+    pdb.set_trace()
+    allprofs = np.array(allprofs)
+    mmask = np.isnan(allprofs) == False
+    mprofs = allprofs * mmask
+    profave = np.array(np.mean(mprofs, axis=1))
+
+    ## sets zero and negative numbers to a very small value
+    gl = np.array(gl)
+    gindex = gl < 0.01
+    gl[gindex] = 0.01
+    
+    cngl = 0.98*0.00000055*206265/gl**(-5/3) / (16.7*(0.00000055)**(-2))
+    profave = np.insert(profave, obj=0, values=np.mean(cngl))
+
+    plt.figure(1)
+    plt.clf()
+    plt.plot(profave, hlis)
+    plt.xlabel(r'C_n^2 dh')
+    plt.ylabel(r'h (km)')
+    plt.title(date, fontsize=12)
+    plt.savefig(plots_dir + 'mass_profile' + out_suffix + '.png')
     
