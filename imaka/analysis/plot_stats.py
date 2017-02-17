@@ -44,7 +44,7 @@ def fetch_stats_from_onaga(dates, output_root):
 
     return
 
-def load_stats_from_onaga(dates, output_root):
+def load_stats_to_onaga(dates, input_root):
     """
     SCP stats files (FITS tables) from onaga and place them in a mirrored 
     directory structure on your local machine. 
@@ -55,11 +55,11 @@ def load_stats_from_onaga(dates, output_root):
         List of date strings (e.g. '20170113') to process.
         You can also use 'all' or None and the entire available 
         list of all dates will be used. 
-    output_root : str
-        The root directory where the transferred files will be stored. Note
-        that this is just the root and under this will be stored a structure
+    input_root : str
+        The root directory where the files to be transferred are pulled from. Note
+        that this is just the root and under this should be a structure
         that parallels that on onaga:
-            <output_root>/<date>/fli/reduce/stats/*
+            <input_root>/<date>/fli/reduce/stats/*
     """
     all_dates = ['20170110', '20170111', '20170112', '20170113']
 
@@ -67,12 +67,12 @@ def load_stats_from_onaga(dates, output_root):
         dates = all_dates
 
     for date in dates:
-        local_file = '{0:s}/{1:s}/fli/reduce/stats/stats*.fits'.format(output_root, date)
+        local_file = '{0:s}/{1:s}/fli/reduce/stats/stats*.fits'.format(input_root, date)
         destination = 'imaka@onaga.ifa.hawaii.edu:/Volumes/DATA4/imaka/{0:s}/fli/reduce/stats/'.format(date)
 
         print(local_file)
         print(destination)
-        p = subprocess.Popen(["scp", local_file, destination])
+        p = subprocess.Popen("scp " + local_file + " " + destination, shell=True)
         sts = os.waitpid(p.pid, 0)
 
     return
