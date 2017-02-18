@@ -235,7 +235,8 @@ def calc_star_stats_ttf():
     fnum1 = [143, 144, 145, 146, 147, 148, 151, 152, 153, 154, 157, 157, 158, 161, 162, 165, 166]
     fnum2 = [169, 170, 173, 174, 175, 176, 181, 182, 187, 188, 189, 190, 202, 203, 208, 209, 214]
     fnum3 = [215, 220, 221, 224, 225, 228, 229]
-    fnum = fnum1 + fnum2 + fnum3    img_files = ['obj_ttf{0:03d}_clean.fits'.format(ii) for ii in fnum]
+    fnum = fnum1 + fnum2 + fnum3
+    img_files = ['obj_ttf{0:03d}_clean.fits'.format(ii) for ii in fnum]
     reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_ttf.fits')
     
     return

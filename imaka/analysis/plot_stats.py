@@ -8,11 +8,11 @@ import os, pdb
 from imaka.reduce import util
 from datetime import datetime
 from matplotlib import dates as mp_dates
+from matplotlib import ticker
 import pdb
 import glob
 import matplotlib.pyplot as plt
 import matplotlib
-import datetime
 
 def fetch_stats_from_onaga(dates, output_root):
     """
@@ -75,9 +75,9 @@ def load_stats_to_onaga(dates, input_root):
         local_file = '{0:s}/{1:s}/fli/reduce/stats/stats*.fits'.format(input_root, date)
         destination = 'imaka@onaga.ifa.hawaii.edu:/Volumes/DATA4/imaka/{0:s}/fli/reduce/stats/'.format(date)
 
-        print(local_file)
-        print(destination)
-        p = subprocess.Popen("scp " + local_file + " " + destination, shell=True)
+        cmd = "scp " + local_file + " " + destination
+        print(cmd)
+        p = subprocess.Popen(cmd, shell=True)
         sts = os.waitpid(p.pid, 0)
 
     return
@@ -559,53 +559,32 @@ def plot_stack_stats(date, suffixes=['open', 'ttf', 'closed'], root_dir='/Users/
     return
 
 def compare_fwhm(stats_files, out_dir):
-    
     #Makes a figure of several plots comparing different measures of FWHM
     #(empirical, gaussian, NEA)
     
-    for file in stats_files:
+    for ss in range(len(stats_files)):
+        stats = Table.read(stats_files[ss])
+
+        FWHM = stats['FWHM']
+        xFWHM = stats['xFWHM']
+        yFWHM = stats['yFWHM']
+        NEA_FWHM = nea_to_fwhm(stats['NEA'])
+        emp_FWHM = stats['emp_fwhm']
         
-        #extract/calculate FWHMs
-    
-        FWHM = []
-        xFWHM = []
-        yFWHM = []
-        NEA_FWHM = []
-        emp_FWHM = []
-        with open(file, "r") as f:
-            reader = csv.reader(f)
-            for row in reader:
-                if row[0] == 'Image':
-                    labels = [row[6], row[10], row[12], row[13], row[15]]
-                    full_labels = row
-                else:
-                    FWHM.append(float(row[6]))
-                    NEA_FWHM.append((((float(row[10])/0.12)/np.pi)**0.5)*2)
-                    xFWHM.append(float(row[12]))
-                    yFWHM.append(float(row[13]))
-                    emp_FWHM.append(float(row[15]))
+        # Make plot
 
-        #Make plot
+        # Get plot title from file name
+        title_seg = stats_files[ss].split("_")[-1]
+        title_seg = title_seg.split('.')[0]
 
-        #Get plot title from file name
-        title_seg = file.split("_")[-1]
-        if title_seg == 'closed.csv':
-            loop_type = "Closed Loop"
-        elif title_seg == 'open.csv':
-            loop_type = "Open Loop"
-        elif title_seg == "tt.csv":
-            loop_type = "TT"
-        elif title_seg == "ttf.csv":
-            loop_type = "TTF"
-
-        names = file.split("/")
+        names = stats_files[ss].split("/")
         for directory in names:
             if "201" in directory:
                 date = (directory[4:6]+"/"+directory[6:]+"/"+directory[0:4])
 
-        plot_title = date + " FWHM Comparison: "+loop_type
+        plot_title = date + " FWHM Comparison: "+ title_seg
 
-        #Make figure
+        # Make figure
         
         plt.figure(figsize=(15,10))
         plt.suptitle(plot_title, fontsize=24)
@@ -661,11 +640,13 @@ def compare_fwhm(stats_files, out_dir):
         plt.plot(plot_edge+1, plot_edge+1, 'o', markersize=10, color='purple', label='Average')
         plt.legend(loc=10, frameon=False, fontsize=18)
         plt.axis([0, plot_edge, 0, plot_edge])
-        plt.tick_params(axis='both', which='both', bottom='off', top='off', left='off', right='off', labelbottom='off', labelleft='off') # labels along the bottom edge are off
+        plt.tick_params(axis='both', which='both', bottom='off', top='off', left='off', right='off',
+                            labelbottom='off', labelleft='off') # labels along the bottom edge are off
 
         plt.subplots_adjust(hspace=0.25, wspace=0.25)
 
-        plt.savefig(out_dir + file.split("/")[-1].replace('.csv', '_plot.png'))
+        out_file = stats_files[ss].split("/")[-1].replace('.fits', '_fwhm_comp.png')
+        plt.savefig(out_dir + out_file)
 
     return
 
@@ -691,31 +672,56 @@ def plot_stats_mdp(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root
     plots_dir = root_dir + date + '/fli/reduce/plots/'
 
     util.mkdir(plots_dir)
+    
+    colors = get_color_list()
 
     stats = []
     utc = []
+    all_utc = None
+    all_dimm = None
+    all_mass = None
 
-    for suffix in suffixes:
+    for ss in range(len(suffixes)):
+        suffix = suffixes[ss]
+        
         st = Table.read(stats_dir + 'stats_' + suffix + '.fits')
         stats.append(st)
 
         utc_dt = [datetime.strptime(st['TIME_UTC'][ii], '%I:%M:%S') for ii in range(len(st))]
         utc.append(utc_dt)
 
+        # combine MASS/DIMM for all tables.
+        if ss == 0:
+            all_utc = utc_dt
+            all_dimm = st['DIMM']
+            all_mass = st['MASS']
+        else:
+            all_utc = all_utc + utc_dt
+            all_dimm = np.concatenate([all_dimm, st['DIMM']])
+            all_mass = np.concatenate([all_mass, st['MASS']])
+
     scale = 0.12
     
     time_fmt = mp_dates.DateFormatter('%H:%M')    
+    time_loc = ticker.MaxNLocator(nbins=6)
 
     plt.figure(1, figsize=(6, 6))
     plt.clf()
+
     for ii in range(len(suffixes)):
-        plt.plot(utc[ii], stats[ii]['emp_fwhm']*scale, marker='o', linestyle='none', label=suffixes[ii])
+        c = np.take(colors, ii, mode='wrap')
+        plt.plot(utc[ii], stats[ii]['emp_fwhm']*scale, marker='o', color=c, linestyle='none', label=suffixes[ii])
+        
+    plt.plot(all_utc, all_dimm, marker='x', color='fuchsia', linestyle='none', label='DIMM')
+    plt.plot(all_utc, all_mass, marker='+', color='dodgerblue', linestyle='none', label='MASS')
+            
     plt.gca().xaxis.set_major_formatter(time_fmt)
+    plt.gca().xaxis.set_major_locator(time_loc)
     plt.xticks(rotation=35)
     plt.xlabel('UTC Time (hr)')
     plt.ylabel('Empirical FWHM (")')
-    plt.legend(numpoints=1)
-    plt.ylim(0, 1.5)
+    plt.legend(numpoints=1, fontsize=10)
+    plt.ylim(0, 2.0)
     plt.title(date)
     plt.savefig(plots_dir + 'mdp_efwhm_vs_time' + out_suffix + '.png')
 
@@ -724,10 +730,11 @@ def plot_stats_mdp(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root
     for ii in range(len(suffixes)):
         plt.plot(utc[ii], stats[ii]['NEA'], marker='o', linestyle='none', label=suffixes[ii])
     plt.gca().xaxis.set_major_formatter(time_fmt)
+    plt.gca().xaxis.set_major_locator(time_loc)
     plt.xticks(rotation=35)
     plt.xlabel('UTC Time (hr)')
     plt.ylabel('NEA (Sq. Arcsec)')
-    plt.legend(numpoints=1)
+    plt.legend(numpoints=1, fontsize=10)
     plt.ylim(0, 5)
     plt.title(date)
     plt.savefig(plots_dir + 'mdp_nea_vs_time' + out_suffix + '.png')
@@ -761,7 +768,7 @@ def plot_stats_mdp(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root
     plt.xlabel('DIMM Seeing (")')
     plt.ylabel('Empirical FWHM (")')
     plt.legend()
-    plt.ylim(0, 1.5)
+    plt.ylim(0, 2.0)
     plt.title(date)
     plt.savefig(plots_dir + 'mdp_dimm_vs_efwhm' + out_suffix + '.png')
 
@@ -869,114 +876,95 @@ def plot_profile(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root_d
 
     return
 
-def plot_abc(date, suffixes=['open', 'closed'], out_suffix='', root_dir=''):
+def plot_best_stats(date, suffixes=['open', 'closed'], out_suffix='', root_dir=''):
 
     #plots different FWHMs as function of UTC time
 
     colors = ['b', 'g', 'r', 'c', 'm', 'k', 'yellow', 'purple', 'orange']
 
-    stats_file_root = root_dir + date + '/FLI/reduce/stats/'
-    stats_files = []
-    for suffix in suffixes:
-        name = stats_file_root + "stats_" + suffix + ".csv"
-        stats_files.append(name)
-        
-    ###NEA FWHM PLOT###
+    stats_dir = root_dir + date + '/fli/reduce/stats/'
+    plots_dir = root_dir + date + '/fli/reduce/plots/'
 
-    plt.figure()
-    for ii in range(len(stats_files)):
-        data_label = stats_files[ii].split("/")[-1].split("_")[1].split(".")[0]
-        TIME_UTC = []
-        NEA_FWHM = []
-        with open(stats_files[ii], "r") as f:
-            reader = csv.reader(f)
-            for row in reader:
-                if row[0] == 'Image':
-                    labels = [row[5], row[10], row[15]]
-                    full_labels = row
-                else:
-                    TIME_UTC.append(row[5])
-                    NEA_FWHM.append((((float(row[10])/0.12)/np.pi)**0.5)*2)
-
-        date_times = []
-        for time in TIME_UTC:
-            dt_obj = datetime.datetime.strptime(time, '%H:%M:%S')
-            dt_obj.strftime("%I:%M:%S %p")
-            date_times.append(dt_obj)
-        dates = matplotlib.dates.date2num(date_times)
-        plt.plot_date(dates, NEA_FWHM, colors[ii]+'o', alpha=0.5, label=data_label)
-
-    plt.legend(loc=2, bbox_to_anchor=(1, 1))
-    plt.xticks(rotation=45)
-    plt.xlabel("UTC Time")
-    plt.ylabel("NEA FWHM")
-    plt.title("NEA FWHM over Time", fontsize=18)
-
-    ###EMPIRICAL FWHM PLOT###
+    scale = 0.12
     
+    stats = []
+    utcs = []
+    max_fwhm = 0.0
+    for suffix in suffixes:
+        ss = Table.read(stats_dir + 'stats_' + suffix + '.fits')
+        stats.append( ss )
+        utc_dt = [datetime.strptime(ss['TIME_UTC'][ii], '%I:%M:%S') for ii in range(len(ss))]
+        utcs.append(utc_dt)
+
+        # Add NEA FWHM to table (temporarily)
+        ss['NEA_FWHM'] = nea_to_fwhm(ss['NEA'])
+
+        # Get the max value of all the FWHMs
+        max_fwhm_tmp = np.max([ss['NEA_FWHM'], ss['emp_fwhm'], ss['xFWHM'], ss['yFWHM']])
+        if max_fwhm_tmp > max_fwhm:
+            max_fwhm = max_fwhm_tmp
+        
+
+    time_fmt = mp_dates.DateFormatter('%H:%M')
+    time_loc = ticker.MaxNLocator(nbins=6)
+
+    
+    #####
+    # NEA FWHM PLOT
+    #####
     plt.figure()
-    for ii in range(len(stats_files)):
-        data_label = stats_files[ii].split("/")[-1].split("_")[1].split(".")[0]
-        TIME_UTC = []
-        emp_FWHM = []
-        with open(stats_files[ii], "r") as f:
-            reader = csv.reader(f)
-            for row in reader:
-                if row[0] == 'Image':
-                    labels = [row[5], row[10], row[15]]
-                    full_labels = row
-                else:
-                    TIME_UTC.append(row[5])
-                    emp_FWHM.append(float(row[15]))
-
-        date_times = []
-        for time in TIME_UTC:
-            dt_obj = datetime.datetime.strptime(time, '%H:%M:%S')
-            dt_obj.strftime("%I:%M:%S %p")
-            date_times.append(dt_obj)
-        dates = matplotlib.dates.date2num(date_times)
-        plt.plot_date(dates, emp_FWHM, colors[ii]+'o', alpha=0.5, label=data_label)
-
-    plt.legend(loc=2, bbox_to_anchor=(1, 1))
-    plt.xticks(rotation=45)
+    for ii in range(len(stats)):
+        # Convert NEA to FWHM using NEA = pi * (FWHM*scale/2)**2
+        nea_fwhm = nea_to_fwhm(stats[ii]['NEA'])
+        plt.plot(utcs[ii], nea_fwhm, color=colors[ii], marker='o', label=suffixes[ii],
+                     alpha=0.5, linestyle='none')
+        
+    plt.gca().xaxis.set_major_formatter(time_fmt)
+    plt.gca().xaxis.set_major_locator(time_loc)
+    plt.legend(loc=2, bbox_to_anchor=(1, 1), numpoints=1)
+    plt.xticks(rotation=35)
+    plt.ylim(0, 2)
     plt.xlabel("UTC Time")
-    plt.ylabel("Empirical FWHM")
-    plt.title("Empirical FWHM over Time", fontsize=18)    
+    plt.ylabel('NEA FWHM (")')
+    plt.title(date)
 
-
-    ###GAUSSIAN FWHM PLOT###
-
+    #####
+    # EMPIRICAL FWHM PLOT
+    #####
     plt.figure()
-    for ii in range(len(stats_files)):
-        data_label = stats_files[ii].split("/")[-1].split("_")[1].split(".")[0]
-        TIME_UTC = []
-        x_FWHM = []
-        y_FWHM = []
-        with open(stats_files[ii], "r") as f:
-            reader = csv.reader(f)
-            for row in reader:
-                if row[0] == 'Image':
-                    labels = [row[5], row[10], row[15]]
-                    full_labels = row
-                else:
-                    TIME_UTC.append(row[5])
-                    x_FWHM.append(float(row[12]))
-                    y_FWHM.append(float(row[13]))
+    for ii in range(len(stats)):
+        plt.plot(utcs[ii], stats[ii]['emp_fwhm']*scale, color=colors[ii], marker='o', label=suffixes[ii],
+                     alpha=0.5, linestyle='none')
 
-        date_times = []
-        for time in TIME_UTC:
-            dt_obj = datetime.datetime.strptime(time, '%H:%M:%S')
-            dt_obj.strftime("%I:%M:%S %p")
-            date_times.append(dt_obj)
-        dates = matplotlib.dates.date2num(date_times)
-        plt.plot_date(dates, x_FWHM, colors[ii]+"o", alpha=0.5, label=data_label)
-        plt.plot_date(dates, y_FWHM, colors[ii]+"s", alpha=0.5, label=data_label)
-
-    plt.legend(loc=2, bbox_to_anchor=(1, 1))
-    plt.xticks(rotation=45)
+    plt.gca().xaxis.set_major_formatter(time_fmt)
+    plt.gca().xaxis.set_major_locator(time_loc)
+    plt.legend(loc=2, bbox_to_anchor=(1, 1), numpoints=1)
+    plt.xticks(rotation=35)
+    plt.ylim(0, 2)
     plt.xlabel("UTC Time")
-    plt.ylabel("Gaussian FWHM")
-    plt.title("Gaussian FWHM over Time (Circle = x, Square = y)", fontsize=18)
+    plt.ylabel('Empirical FWHM (")')
+    plt.title(date) 
+
+
+    #####
+    # GAUSSIAN FWHM PLOT
+    #####
+    plt.figure()
+    for ii in range(len(stats)):
+        plt.plot(utcs[ii], stats[ii]['xFWHM']*scale, color=colors[ii], label='X ' + suffixes[ii],
+                     marker="o", alpha=0.5, linestyle='none')
+        plt.plot(utcs[ii], stats[ii]['yFWHM']*scale, color=colors[ii], label='Y ' + suffixes[ii],
+                     marker="^", alpha=0.5, linestyle='none')
+    plt.gca().xaxis.set_major_formatter(time_fmt)
+    plt.gca().xaxis.set_major_locator(time_loc)
+    plt.legend(loc=2, bbox_to_anchor=(1, 1), numpoints=1)
+    plt.xticks(rotation=35)
+    plt.ylim(0, 2)
+    plt.xlabel("UTC Time")
+    plt.ylabel('Gaussian FWHM (")')
+    plt.title(date)
+    plt.savefig(plots_dir + 'fwhm_vs_frame' + suffix + '.png')
+    
 
     return
 
@@ -991,3 +979,22 @@ def get_color_list():
     colors = [item['color'] for item in prop_cycler]
     return colors
 
+
+def nea_to_fwhm(nea):
+    """
+    Convert the Noise Equivalent Area using the following relation (King 1983, King 1971):
+
+    \frac{b}{ \int \phi^2 dA } = 30.8 \sigma^2 b
+
+    which is appropriate for a seeing-limited PSF (and probably GLAO as well. For a 
+    gaussian, the factor would be 4 * pi; but real PSFs have extended tails. 
+
+    The noise-equivalent area is:
+
+    NEA = 1.0 / \int \phi^2 dA = 1.0 / \sum (f_i - b)^2
+    """
+    sigma = np.sqrt( nea / 30.8 )
+
+    fwhm = 2.355 * sigma
+    
+    return fwhm

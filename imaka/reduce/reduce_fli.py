@@ -856,3 +856,4 @@ def calc_empirical_FWHM(img_files, star_lists):
         t.write(img_files[ii].replace('.fits', '_stars_FWHM.txt'), format='ascii.fixed_width', delimiter=None, bookend=False)
 
     return
+
