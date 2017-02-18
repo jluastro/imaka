@@ -826,20 +826,10 @@ def plot_profile(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root_d
     util.mkdir(plots_dir)
 
     stats = []
-    utc = []
     
     for suffix in suffixes:
         st = Table.read(stats_dir + 'stats_' + suffix + '_mdp.fits')
         stats.append(st)
-
-        utc_dt = [datetime.strptime(st['TIME_UTC'][ii], '%I:%M:%S') for ii in range(len(st))]
-        utc.append(utc_dt)
-
-    scale = 0.12
-    
-    time_fmt = mp_dates.DateFormatter('%H:%M')    
-
-    hlis = [0, 0.5, 1, 2, 4, 8, 16]
 
     altitudes = ['Cn2dh_005', 'Cn2dh_010', 'Cn2dh_020', 'Cn2dh_040', 'Cn2dh_080', 'Cn2dh_160']
     
@@ -864,6 +854,9 @@ def plot_profile(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root_d
     
     cngl = 0.98*0.00000055*206265/gl**(-5/3) / (16.7*(0.00000055)**(-2))
     profave = np.insert(profave, obj=0, values=np.mean(cngl))
+
+    hlis = [0, 0.5, 1, 2, 4, 8, 16]
+
     plt.figure(1)
     plt.clf()
     plt.plot(profave, hlis)
@@ -873,6 +866,69 @@ def plot_profile(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root_d
     plt.savefig(plots_dir + 'mass_profile' + out_suffix + '.png')
     plt.show()
 
+    return
+
+def plot_all_profiles(dates, root_dir='/Users/dorafohring/Desktop/imaka/data/'):
+    """
+    Make a suite of standard plots for the stats on a given night. 
+
+    Parameters
+    ----------
+    dates : str
+        The date strings for which to plot up the stats (i.e. ['20170113', '20170114']).
+
+    Optional Parameters
+    -------------------
+    root_dir : str
+        The root directory for the <date> observing run directories. The
+        stats files will be searched for in:
+        <root_dir>/<date>/fli/reduce/stats/
+    """
+
+    stats = []
+
+    for date in dates:
+        dir = root_dir + date + '/fli/reduce/stats/'
+        mdpfiles = [item for item in os.listdir(dir) if item.endswith('mdp.fits')]
+        for file in mdpfiles:
+            st = Table.read(dir + file)
+            stats.append(st)
+
+    altitudes = ['Cn2dh_005', 'Cn2dh_010', 'Cn2dh_020', 'Cn2dh_040', 'Cn2dh_080', 'Cn2dh_160']
+    
+    allprofs = []    
+    for altitude in altitudes:
+        combine = []
+        for ii in range(len(st)): 
+            combine.extend(stats[ii][altitude])  
+        allprofs.append(combine)
+    gl = []        
+    for jj in range(len(st)):
+        gl.extend(stats[jj]['DIMM'] - stats[jj]['MASS'])
+
+    allprofs = np.array(allprofs)
+    mprofs = np.ma.masked_invalid(allprofs)
+    profave = np.mean(mprofs, axis=1)
+
+    ## sets zero and negative numbers to a very small value
+    gl = np.array(gl)
+    gindex = gl < 0.01
+    gl[gindex] = 0.01
+    
+    cngl = 0.98*0.00000055*206265/gl**(-5/3) / (16.7*(0.00000055)**(-2))
+    profave = np.insert(profave, obj=0, values=np.mean(cngl))
+
+    hlis = [0, 0.5, 1, 2, 4, 8, 16]
+
+    plt.figure(1)
+    plt.clf()
+    plt.plot(profave, hlis)
+    plt.xlabel(r'C_n^2 dh')
+    plt.ylabel(r'h (km)')
+    plt.title('Average profile over all nights', fontsize=12)
+    plt.savefig(root_dir + 'ave_profile.png')
+    plt.show()
+ 
     return
 
 def plot_best_stats(date, suffixes=['open', 'closed'], out_suffix='', root_dir=''):
