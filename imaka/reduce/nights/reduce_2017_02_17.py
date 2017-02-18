@@ -5,11 +5,11 @@ from astropy import table
 from astropy import units
 import scipy
 import glob
-import reduce_fli
-import calib
-import util
+from imaka.reduce import reduce_fli
+from imaka.reduce import calib
+from imaka.reduce import util
 import pdb
-import os
+import os, shutil
 
 root_dir = '/Users/fatimaabdurrahman/Desktop/20170217/FLI/'
 
