@@ -9,7 +9,6 @@ from imaka.reduce import util
 from datetime import datetime
 from matplotlib import dates as mp_dates
 from matplotlib import ticker
-import pdb
 import glob
 import matplotlib.pyplot as plt
 import matplotlib
@@ -907,7 +906,6 @@ def plot_best_stats(date, suffixes=['open', 'closed'], out_suffix='', root_dir='
 
     time_fmt = mp_dates.DateFormatter('%H:%M')
     time_loc = ticker.MaxNLocator(nbins=6)
-
     
     #####
     # NEA FWHM PLOT
