@@ -8,7 +8,6 @@ import os, pdb
 from imaka.reduce import util
 from datetime import datetime
 from matplotlib import dates as mp_dates
-import pdb
 import glob
 import matplotlib.pyplot as plt
 import matplotlib
@@ -900,7 +899,7 @@ def plot_abc(date, suffixes=['open', 'closed'], out_suffix='', root_dir=''):
 
         date_times = []
         for time in TIME_UTC:
-            dt_obj = datetime.datetime.strptime(time, '%H:%M:%S')
+            dt_obj = datetime.strptime(time, '%H:%M:%S')
             dt_obj.strftime("%I:%M:%S %p")
             date_times.append(dt_obj)
         dates = matplotlib.dates.date2num(date_times)
@@ -931,7 +930,7 @@ def plot_abc(date, suffixes=['open', 'closed'], out_suffix='', root_dir=''):
 
         date_times = []
         for time in TIME_UTC:
-            dt_obj = datetime.datetime.strptime(time, '%H:%M:%S')
+            dt_obj = datetime.strptime(time, '%H:%M:%S')
             dt_obj.strftime("%I:%M:%S %p")
             date_times.append(dt_obj)
         dates = matplotlib.dates.date2num(date_times)
@@ -965,7 +964,7 @@ def plot_abc(date, suffixes=['open', 'closed'], out_suffix='', root_dir=''):
 
         date_times = []
         for time in TIME_UTC:
-            dt_obj = datetime.datetime.strptime(time, '%H:%M:%S')
+            dt_obj = datetime.strptime(time, '%H:%M:%S')
             dt_obj.strftime("%I:%M:%S %p")
             date_times.append(dt_obj)
         dates = matplotlib.dates.date2num(date_times)
