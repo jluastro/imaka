@@ -852,7 +852,7 @@ def plot_profile(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root_d
     gindex = gl < 0.01
     gl[gindex] = 0.01
     
-    cngl = 0.98*0.00000055*206265/gl**(-5/3) / (16.7*(0.00000055)**(-2))
+    cngl = (0.98*0.00000055*206265/gl)**(-5/3) / (16.7*(0.00000055)**(-2))
     profave = np.insert(profave, obj=0, values=np.mean(cngl))
 
     hlis = [0, 0.5, 1, 2, 4, 8, 16]
@@ -860,7 +860,7 @@ def plot_profile(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root_d
     plt.figure(1)
     plt.clf()
     plt.plot(profave, hlis)
-    plt.xlabel(r'C_n^2 dh')
+    plt.xlabel(r'$C_n^2$ dh ($m^{1/3}$)')
     plt.ylabel(r'h (km)')
     plt.title(date, fontsize=12)
     plt.savefig(plots_dir + 'mass_profile' + out_suffix + '.png')
@@ -915,7 +915,8 @@ def plot_all_profiles(dates, root_dir='/Users/dorafohring/Desktop/imaka/data/'):
     gindex = gl < 0.01
     gl[gindex] = 0.01
     
-    cngl = 0.98*0.00000055*206265/gl**(-5/3) / (16.7*(0.00000055)**(-2))
+    cngl = (0.98*0.00000055*206265/gl)**(-5/3) / (16.7*(0.00000055)**(-2))
+
     profave = np.insert(profave, obj=0, values=np.mean(cngl))
 
     hlis = [0, 0.5, 1, 2, 4, 8, 16]
@@ -923,7 +924,7 @@ def plot_all_profiles(dates, root_dir='/Users/dorafohring/Desktop/imaka/data/'):
     plt.figure(1)
     plt.clf()
     plt.plot(profave, hlis)
-    plt.xlabel(r'C_n^2 dh')
+    plt.xlabel(r'$C_n^2$ dh ($m^{1/3}$)')
     plt.ylabel(r'h (km)')
     plt.title('Average profile over all nights', fontsize=12)
     plt.savefig(root_dir + 'ave_profile.png')
