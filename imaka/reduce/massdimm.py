@@ -103,19 +103,25 @@ class DIMM(object):
         Fetch the closest row of data for a specified time (UT).
         """
         closestVals = []
+        closestDts  = []
+
         for item in hhmmss:
             timeDiff = abs(self.timeInHours - item)
             closestIndex = timeDiff.argmin()
 
             ## Make sure we aren't off by more than an hour
             if timeDiff[closestIndex] > 1.0:
-                print('Could not find DIMM data close to ', item)
+                print('Could not find MASS data close to ', item) 
                 closestVal = -1.
             else:
                 closestVal = self.seeing[closestIndex]
-            closestVals.append(closestVal)
 
-        return closestVals, timeDiff
+            closestVals.append(closestVal)
+            closestDts.append(timeDiff[closestIndex])
+
+        closestVals = np.array(closestVals).T
+
+        return closestVals, closestDts
 
 class MASS(object):
 
@@ -166,6 +172,8 @@ class MASS(object):
         """
 
         closestVals = []
+        closestDts  = []
+
         for item in hhmmss:
             timeDiff = abs(self.timeInHours - item)
             closestIndex = timeDiff.argmin()
@@ -176,9 +184,13 @@ class MASS(object):
                 closestVal = -1.
             else:
                 closestVal = self.free_seeing[closestIndex]
-            closestVals.append(closestVal)
 
-        return closestVals, timeDiff
+            closestVals.append(closestVal)
+            closestDts.append(timeDiff[closestIndex])
+
+        closestVals = np.array(closestVals).T
+
+        return closestVals, closestDts
 
 class MASSPROF(object):
 
@@ -232,20 +244,25 @@ class MASSPROF(object):
         """
 
         closestVals = []
+        closestDts  = []
+
         for item in hhmmss:
             timeDiff = abs(self.timeInHours - item)
             closestIndex = timeDiff.argmin()
+
             ## Make sure we aren't off by more than an hour
             if timeDiff[closestIndex] > 1.0:
                 print('Could not find MASS data close to ', item) 
                 closestVal = -1.
             else:
                 closestVal = self.profs[closestIndex]
+
             closestVals.append(closestVal)
+            closestDts.append(timeDiff[closestIndex])
 
         closestVals = np.array(closestVals).T
 
-        return closestVals, timeDiff
+        return closestVals, closestDts
 
 def fetch_data(utDate, saveTo):
     '''Saves massdimm files to directory specified. The output files
