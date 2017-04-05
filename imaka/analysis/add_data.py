@@ -34,6 +34,7 @@ def append_alt_data(stats_file, alt_file, date):
 
     alt_date = np.zeros(len(stats), dtype=str)
     alt_time = np.zeros(len(stats), dtype=str)
+    int_seeing = np.zeros(len(stats), dtype=float)
     alt_0 = np.zeros(len(stats), dtype=float)
     alt_60 = np.zeros(len(stats), dtype=float)
     alt_120 = np.zeros(len(stats), dtype=float)
@@ -81,21 +82,23 @@ def append_alt_data(stats_file, alt_file, date):
         ## Add matching data to new table
         alt_date[min_index] = HST_date_str
         alt_time[min_index] = HST_time_str
-        alt_0[min_index] = new_table[:,1][ii]
-        alt_60[min_index] = new_table[:,2][ii]
-        alt_120[min_index] = new_table[:,3][ii]
-        alt_180[min_index] = new_table[:,4][ii]
-        alt_240[min_index] = new_table[:,5][ii]
-        alt_300[min_index] = new_table[:,6][ii]
-        alt_360[min_index] = new_table[:,7][ii]
-        alt_420[min_index] = new_table[:,8][ii]
-        alt_480[min_index] = new_table[:,9][ii]
-        alt_560[min_index] = new_table[:,10][ii]
-        alt_4000[min_index] = new_table[:,11][ii]
+        int_seeing[min_index] = new_table[:,1][ii]
+        alt_0[min_index] = new_table[:,2][ii]
+        alt_60[min_index] = new_table[:,3][ii]
+        alt_120[min_index] = new_table[:,4][ii]
+        alt_180[min_index] = new_table[:,5][ii]
+        alt_240[min_index] = new_table[:,6][ii]
+        alt_300[min_index] = new_table[:,7][ii]
+        alt_360[min_index] = new_table[:,8][ii]
+        alt_420[min_index] = new_table[:,9][ii]
+        alt_480[min_index] = new_table[:,10][ii]
+        alt_560[min_index] = new_table[:,11][ii]
+        alt_4000[min_index] = new_table[:,12][ii]
 
     ##Make columns to append to table
     col_date = Column(name='alt_HST_date', data=alt_date)
     col_time = Column(name='alt_HST_time', data=alt_time)
+    col_int_seeing =Column(name='int_seeing', data=int_seeing)
     col_alt_0 =Column(name='alt_0', data=alt_0)
     col_alt_60 =Column(name='alt_60', data=alt_60)
     col_alt_120 =Column(name='alt_120', data=alt_120)
@@ -110,7 +113,7 @@ def append_alt_data(stats_file, alt_file, date):
 
     ## make new stats file with appended data
 
-    stats.add_columns([col_date, col_time, col_alt_0, col_alt_60, col_alt_120, \
+    stats.add_columns([col_date, col_time, col_int_seeing, col_alt_0, col_alt_60, col_alt_120, \
                       col_alt_180, col_alt_240, col_alt_300, col_alt_360, \
                       col_alt_420, col_alt_480, col_alt_560, col_alt_4000])
 
@@ -118,6 +121,7 @@ def append_alt_data(stats_file, alt_file, date):
     stats.write(stats_file_root + '_alt' + stats_file_ext, overwrite=True)
     
     return
+
 
 
 
