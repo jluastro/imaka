@@ -1105,6 +1105,7 @@ def plot_fwhmvt(open_file, closed_file, comp_col, obs_wav, title, plots_dir):
     plt.ylabel(comp_col)
     plt.xlabel("UTC Time")
     plt.xticks(rotation=35)
+    plt.ylim(0, 2.5)
     plt.title(title)
     plt.gca().xaxis.set_major_formatter(mp_dates.DateFormatter('%H:%M'))
     plt.legend()
