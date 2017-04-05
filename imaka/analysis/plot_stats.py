@@ -1056,6 +1056,14 @@ def nea_to_fwhm(nea):
     return fwhm
 
 def plot_fwhmvt(open_file, closed_file, comp_col, obs_wav, title, plots_dir):
+    
+    #open_file and closed_file are the fits stats files
+    #plots fwhm for open and closed and mass/dimm seeing vs time
+    #'comp_col' is what column of data to compare (e.g. 'emp_fwhm')
+    #obs_wav is the wavelength of that observation, to scale it to the 500 nm mass/dimm observations
+    #title: title for generated plot
+    #plots_dir: directory to put generated plot in
+    
     #Read in data
     stats1 = Table.read(open_file)
     stats2 = Table.read(closed_file)
