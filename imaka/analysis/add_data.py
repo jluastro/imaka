@@ -127,14 +127,14 @@ def append_alt_data(stats_file, alt_file, date):
 
 
 
-def match_cols(base_file, comp_file, comp_col):
+def match_cols(open_file, closed_file, comp_col):
     
     #time matches colums of data from different stats files, e.g. matches FWHM column from 
     #a given open stats file to those in a closed file from the same night.
     
     #inputs:
-        #base_file: the stats file that you are matching to
-        #comp_file: the comparison file to match
+        #open_file: the stats file that you are matching to
+        #closed_file: the comparison file to match
         #comp_col: the column you want (e.g., NEA1, emp_FWHM, etc)
         
     #outputs:
@@ -143,20 +143,22 @@ def match_cols(base_file, comp_file, comp_col):
         #data_1: the column of whatever comp_col described from the base file
         #data_2: the column of whatever comp_col described from the comparison file 
             
-    stats1 = Table.read(base_file)
-    stats2 = Table.read(comp_file)
-        
+    stats1 = Table.read(open_file)
+    stats2 = Table.read(closed_file)
+    
+    a = 0    
     if len(stats1) > len(stats2):
-        stats1 = Table.read(comp_file)
-        stats2 = Table.read(base_file)
+        stats1 = Table.read(closed_file)
+        stats2 = Table.read(open_file)
+        a+=1
 
     UTC_TIME = np.zeros(len(stats1), dtype='S15')
     UTC_DATE = np.zeros(len(stats2), dtype='S15')
-    data_open = np.zeros(len(stats1),dtype=float)
-    data_closed = np.zeros(len(stats1), dtype=float)
+    data_1 = np.zeros(len(stats1),dtype=float)
+    data_2 = np.zeros(len(stats1), dtype=float)
 
     for ii in range(len(stats1)):
-        data_open[ii] = stats1[comp_col][ii]
+        data_1[ii] = stats1[comp_col][ii]
 
         dt_str = stats1['DATE_UTC'][ii] + ' ' + stats1['TIME_UTC'][ii]
         dt_utc = datetime.datetime.strptime(dt_str, '%Y-%m-%d %H:%M:%S')
@@ -169,7 +171,7 @@ def match_cols(base_file, comp_file, comp_col):
             times2.append(diff)
 
         min_id = np.argmin(times2)
-        data_closed[ii] = stats2[comp_col][min_id]
+        data_2[ii] = stats2[comp_col][min_id]
 
         time2_str = stats2['DATE_UTC'][min_id] + ' ' + stats2['TIME_UTC'][min_id]
         time2_utc = datetime.datetime.strptime(time2_str, '%Y-%m-%d %H:%M:%S')
@@ -180,10 +182,13 @@ def match_cols(base_file, comp_file, comp_col):
         date_time = ((ave_time.isoformat().split('T')))
         UTC_TIME[ii] = str(date_time[1])[:8] #cuts of .5 second if present
         UTC_DATE[ii] = str(date_time[0])
+	
+    if a == 1:
+        data_open = data_2
+        data_closed = data_1
+    else:
+        data_open = data_1
+        data_closed = data_2
 
     return  UTC_TIME, UTC_DATE, data_open, data_closed
-
-
-
-
 
