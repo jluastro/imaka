@@ -1094,12 +1094,8 @@ def plot_fwhmvt(open_file, closed_file, comp_col, obs_wav, title, plots_dir):
         times.append(dt_obj)
 
     plt.figure(1, figsize=(12, 6))
-    if len(stats1) < len(stats2):
-        plt.plot(times, (data1/scale)*cal_fac, 'o', label="Open")
-        plt.plot(times, (data2/scale)*cal_fac, 'ro', label="Closed")
-    else:
-        plt.plot(times, (data1/scale)*cal_fac, 'ro', label="Closed")
-        plt.plot(times, (data2/scale)*cal_fac, 'o', label="Open")
+    plt.plot(times, (data1/scale)*cal_fac, 'o', label="Open")
+    plt.plot(times, (data2/scale)*cal_fac, 'ro', label="Closed")
     plt.plot(times, dimm, 'b-')
     plt.plot(times, mass, 'r-')
     plt.ylabel(comp_col)
