@@ -12,6 +12,7 @@ from matplotlib import ticker
 import glob
 import matplotlib.pyplot as plt
 import matplotlib
+from imaka.analysis import add_data
 
 def fetch_stats_from_onaga(dates, output_root):
     """
@@ -1053,3 +1054,57 @@ def nea_to_fwhm(nea):
     fwhm = 2.355 * sigma
     
     return fwhm
+
+def plot_fwhmvt(open_file, closed_file, comp_col, obs_wav, title, plots_dir):
+    
+    #open_file and closed_file are the fits stats files
+    #plots fwhm for open and closed and mass/dimm seeing vs time
+    #'comp_col' is what column of data to compare (e.g. 'emp_fwhm')
+    #obs_wav is the wavelength of that observation, to scale it to the 500 nm mass/dimm observations
+    #title: title for generated plot
+    #plots_dir: directory to put generated plot in
+    
+    #Read in data
+    stats1 = Table.read(open_file)
+    stats2 = Table.read(closed_file)
+
+    #Match open and closed data in time
+    time, date, data1, data2 = add_data.match_cols(open_file, closed_file, comp_col)
+
+    #Get mass/dimm data
+    if len(stats1) < len(stats2):
+        mass = stats1['MASS']
+        dimm = stats1['DIMM']
+    else:
+        mass = stats2['MASS']
+        dimm = stats2['DIMM']
+    
+
+    scale = 12
+
+    #info for scaling wavelength to mass/dimm wavelength
+    cal_wav = 500 #mass/dimm data wavelength (nm)
+    cal_fac = (obs_wav/cal_wav)**(1/5) #calibration factor
+
+    #Plot fwhm and seeing vs time
+    times = []
+    for i in range(len(time)):
+        string = str(date[i])+str(time[i])
+        dt_obj = datetime.strptime(string, "b'%Y-%m-%d'b'%H:%M:%S'")
+        times.append(dt_obj)
+
+    plt.figure(1, figsize=(12, 6))
+    plt.plot(times, (data1/scale)*cal_fac, 'o', label="Open")
+    plt.plot(times, (data2/scale)*cal_fac, 'ro', label="Closed")
+    plt.plot(times, dimm, 'b-')
+    plt.plot(times, mass, 'r-')
+    plt.ylabel(comp_col)
+    plt.xlabel("UTC Time")
+    plt.xticks(rotation=35)
+    plt.ylim(0, 2.5)
+    plt.title(title)
+    plt.gca().xaxis.set_major_formatter(mp_dates.DateFormatter('%H:%M'))
+    plt.legend()
+
+    plt.savefig(plots_dir + 'fwhm_v_time' + '.png')
+    return
