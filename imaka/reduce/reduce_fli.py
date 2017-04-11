@@ -29,7 +29,7 @@ from scipy.ndimage import median_filter
 import scipy.ndimage
 from astropy.table import Table
 from skimage.measure import block_reduce
-from datetime import datetime
+import datetime
 import pytz
 
 
@@ -252,8 +252,9 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
                     plt.clf()
                     plt.imshow(cutouts[ss] - g2d_image)
                     plt.pause(0.05)
-                
+
                     pdb.set_trace()
+                
 
                 x_fwhm[ss] = g2d_params.x_stddev.value / gaussian_fwhm_to_sigma
                 y_fwhm[ss] = g2d_params.y_stddev.value / gaussian_fwhm_to_sigma
@@ -270,8 +271,10 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
             final_psf_mod /= final_psf_count
             final_psf_obs /= final_psf_obs.sum()
             final_psf_mod /= final_psf_mod.sum()
-            fits.writeto(img_files[ii].replace('.fits', '_psf_obs.fits'), final_psf_obs, hdr, clobber=True)
-            fits.writeto(img_files[ii].replace('.fits', '_psf_mod.fits'), final_psf_mod, hdr, clobber=True)
+            fits.writeto(img_files[ii].replace('.fits', '_psf_obs.fits'), final_psf_obs,
+                             hdr, clobber=True)
+            fits.writeto(img_files[ii].replace('.fits', '_psf_mod.fits'), final_psf_mod,
+                             hdr, clobber=True)
 
             # Drop sources with flux (signifiance) that isn't good enough.
             # Empirically this is <1.2

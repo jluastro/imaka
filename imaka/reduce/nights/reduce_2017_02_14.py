@@ -126,3 +126,4 @@ def calc_star_stats():
     reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_tt.fits')
     
     return
+
