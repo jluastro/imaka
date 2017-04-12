@@ -1069,7 +1069,7 @@ def plot_fwhmvt(open_file, closed_file, comp_col, obs_wav, title, plots_dir):
     stats2 = Table.read(closed_file)
 
     #Match open and closed data in time
-    time, date, data1, data2 = add_data.match_cols(open_file, closed_file, comp_col)
+    time, date, data1, data2, err1, err2 = add_data.match_cols(open_file, closed_file, comp_col)
 
     #Get mass/dimm data
     if len(stats1) < len(stats2):
@@ -1086,6 +1086,9 @@ def plot_fwhmvt(open_file, closed_file, comp_col, obs_wav, title, plots_dir):
     cal_wav = 500 #mass/dimm data wavelength (nm)
     cal_fac = (obs_wav/cal_wav)**(1/5) #calibration factor
 
+    open_err = err1 * cal_fac / scale
+    closed_err = err2 * cal_fac / scale
+    
     #Plot fwhm and seeing vs time
     times = []
     for i in range(len(time)):
@@ -1094,8 +1097,8 @@ def plot_fwhmvt(open_file, closed_file, comp_col, obs_wav, title, plots_dir):
         times.append(dt_obj)
 
     plt.figure(1, figsize=(12, 6))
-    plt.plot(times, (data1/scale)*cal_fac, 'o', label="Open")
-    plt.plot(times, (data2/scale)*cal_fac, 'ro', label="Closed")
+    plt.errorbar(times, (data1/scale)*cal_fac, yerr=open_err, fmt='o', label="Open")
+    plt.errorbar(times, (data2/scale)*cal_fac, yerr=closed_err, fmt='ro', label="Closed")
     plt.plot(times, dimm, 'b-')
     plt.plot(times, mass, 'r-')
     plt.ylabel(comp_col)
@@ -1107,4 +1110,249 @@ def plot_fwhmvt(open_file, closed_file, comp_col, obs_wav, title, plots_dir):
     plt.legend()
 
     plt.savefig(plots_dir + 'fwhm_v_time' + '.png')
+    return
+
+
+
+
+def plot_EE(labels, data_dir_root, stats_dir_end):
+
+    plt.figure(1, figsize=(12, 12))
+    plt.subplots_adjust(left=0.1, bottom=0.15)
+    plt.subplot(221)
+
+    for item in labels:
+
+        root_dir = data_dir_root + item[0] + stats_dir_end
+        open_file = root_dir + "stats_open_mdp.fits"
+        closed_file = root_dir + "stats_"+item[1]+"_mdp.fits"
+
+        open_data = Table.read(open_file)
+        closed_data = Table.read(closed_file)
+        time, date, data1, data2, err1, err2 = add_data.match_cols(open_file, closed_file, 'EE80')
+
+        if len(open_data) >= len(closed_data):
+            co_rat = data2/data1 #closed to open ratio of 80% EE
+            plt.plot(closed_data['MASS'], co_rat, 'o', label=item[0])
+        else:
+            co_rat = data2/data1 #closed to open ratio of 80% EE
+            plt.plot(open_data['MASS'], co_rat, 'o', label=item[0])
+
+    plt.plot([0,1.2],[1,1], 'k--')
+    plt.xlabel('MASS Seeing (as)')
+    plt.ylabel('Closed EE80 / Open EE80')
+    plt.title('Ratio of Closed to Open EE80 vs MASS')
+    plt.axis([0, 1.2, 0, 1.2])
+    plt.legend(loc=4)
+
+    #####
+
+    col = 'EE50'
+    seeing = 'MASS'
+    plt.subplot(222)
+
+    for item in labels:
+
+        root_dir = data_dir_root + item[0] + stats_dir_end
+        open_file = root_dir + "stats_open_mdp.fits"
+        closed_file = root_dir + "stats_"+item[1]+"_mdp.fits"
+
+        open_data = Table.read(open_file)
+        closed_data = Table.read(closed_file)
+        time, date, data1, data2, err1, err2= add_data.match_cols(open_file, closed_file, 'EE50')
+
+        if len(open_data) >= len(closed_data):
+            co_rat = data2/data1 #closed to open ratio of 80% EE
+            plt.plot(closed_data['MASS'], co_rat, 'o', label=item[0])
+        else:
+            co_rat = data2/data1 #closed to open ratio of 80% EE
+            plt.plot(open_data['MASS'], co_rat, 'o', label=item[0])
+
+    plt.plot([0,1.2],[1,1], 'k--')
+    plt.xlabel('MASS Seeing (as)')
+    plt.ylabel('Closed EE50 / Open EE50')
+    plt.title('Ratio of Closed to Open EE50 vs MASS')
+    plt.axis([0, 1.2, 0, 1.2])
+    plt.legend(loc=4)
+
+    ####
+
+    plt.subplot(223)
+
+    for item in labels:
+
+        root_dir = data_dir_root + item[0] + stats_dir_end
+        open_file = root_dir + "stats_open_mdp.fits"
+        closed_file = root_dir + "stats_"+item[1]+"_mdp.fits"
+
+        open_data = Table.read(open_file)
+        closed_data = Table.read(closed_file)
+        time, date, data1, data2, err1, err2 = add_data.match_cols(open_file, closed_file, 'EE80')
+
+        if len(open_data) >= len(closed_data):
+            co_rat = data2/data1 #closed to open ratio of 80% EE
+            plt.plot(closed_data['DIMM'], co_rat, 'o', label=item[0])
+        else:
+            co_rat = data2/data1 #closed to open ratio of 80% EE
+            plt.plot(open_data['DIMM'], co_rat, 'o', label=item[0])
+
+    plt.plot([0,1.2],[1,1], 'k--')
+    plt.xlabel('DIMM Seeing (as)')
+    plt.ylabel('Closed EE80 / Open EE80')
+    plt.title('Ratio of Closed to Open EE80 vs DIMM')
+    plt.axis([0, 1.2, 0, 1.2])
+    plt.legend(loc=4)
+
+
+    # ###
+    plt.subplot(224)
+
+    for item in labels:
+
+        root_dir = data_dir_root + item[0] + stats_dir_end
+        open_file = root_dir + "stats_open_mdp.fits"
+        closed_file = root_dir + "stats_"+item[1]+"_mdp.fits"
+
+        open_data = Table.read(open_file)
+        closed_data = Table.read(closed_file)
+        time, date, data1, data2, err1, err2 = add_data.match_cols(open_file, closed_file, 'EE50')
+
+        if len(open_data) >= len(closed_data):
+            co_rat = data2/data1 #closed to open ratio of 80% EE
+            plt.plot(closed_data['DIMM'], co_rat, 'o', label=item[0])
+        else:
+            co_rat = data2/data1 #closed to open ratio of 80% EE
+            plt.plot(open_data['DIMM'], co_rat, 'o', label=item[0])
+
+    plt.plot([0,1.2],[1,1], 'k--')
+    plt.xlabel('DIMM Seeing (as)')
+    plt.ylabel('Closed EE50 / Open EE50')
+    plt.title('Ratio of Closed to Open EE50 vs DIMM')
+    plt.axis([0, 1.2, 0, 1.2])
+    plt.legend(loc=4)
+
+    return
+
+
+
+
+def plot_week_fwhm(labels, data_dir_root, stats_dir_end, title):
+    
+    #plots fwhm vs seeing (open v dimm and closed v mass) for a week of observing
+    #inputs:
+        #labels: a list of entries of the form [date, closed stat ending, wavelength]
+                #e.g ['20170217', 'closeda', 658]
+        #data_dir_root: directory before data, e.g. "/Users/astrouser/Desktop/Reserach/imaka/RUN4/"
+        #stats_dir_end: location of stats file after date dir, e.g.: "/FLI/reduce/stats/"
+        #title: a string for the title of the plot
+    
+    
+    open_file1 = data_dir_root+labels[0][0]+stats_dir_end + "stats_open_mdp.fits"
+    open_file2 = data_dir_root+labels[1][0]+stats_dir_end + "stats_open_mdp.fits"
+    open_file3 = data_dir_root+labels[2][0]+stats_dir_end + "stats_open_mdp.fits"
+    if len(labels) > 3:
+        open_file4 = data_dir_root+labels[3][0]+stats_dir_end + "stats_open_mdp.fits"
+    if len(labels) > 4:
+        open_file5 = data_dir_root+labels[4][0]+stats_dir_end + "stats_open_mdp.fits"
+
+    o1 = Table.read(open_file1)
+    o2 = Table.read(open_file2)
+    o3 = Table.read(open_file3)
+    if len(labels) > 3:
+        o4 = Table.read(open_file4)
+    if len(labels) > 4:
+        o5 = Table.read(open_file5)
+
+    closed_file1 = data_dir_root +labels[0][0]+stats_dir_end + "stats_"+labels[0][1]+"_mdp.fits"
+    closed_file2 = data_dir_root +labels[1][0]+stats_dir_end + "stats_"+labels[1][1]+"_mdp.fits"
+    closed_file3 = data_dir_root +labels[2][0]+stats_dir_end + "stats_"+labels[2][1]+"_mdp.fits"
+    if len(labels) > 3:
+        closed_file4 = data_dir_root +labels[3][0]+stats_dir_end + "stats_"+labels[3][1]+"_mdp.fits"
+    if len(labels) > 4:
+        closed_file5 = data_dir_root +labels[4][0]+stats_dir_end + "stats_"+labels[4][1]+"_mdp.fits"
+
+    c1 = Table.read(closed_file1)
+    c2 = Table.read(closed_file2)
+    c3 = Table.read(closed_file3)
+    if len(labels) > 3:
+        c4 = Table.read(closed_file4)
+    if len(labels) > 4:
+        c5 = Table.read(closed_file5)
+
+    scale=12
+
+    col = 'emp_fwhm'
+
+    plt.figure(1, figsize=(8, 8))
+    plt.plot(o1['DIMM'], o1[col]*((labels[0][2]/500)**(1/5))/scale, 'bo', label='Open vs DIMM')
+    plt.plot(o2['DIMM'], o2[col]*((labels[1][2]/500)**(1/5))/scale, 'bo', label='_nolegend_')
+    plt.plot(o3['DIMM'], o3[col]*((labels[2][2]/500)**(1/5))/scale, 'bo', label='_nolegend_')
+    if len(labels) > 3:
+        plt.plot(o4['DIMM'], o4[col]*((labels[3][2]/500)**(1/5))/scale, 'bo', label='_nolegend_')
+    if len(labels) > 4:
+        plt.plot(o5['DIMM'], o5[col]*((labels[4][2]/500)**(1/5))/scale, 'bo', label='_nolegend_')
+
+    plt.plot(c1['MASS'], c1[col]*((labels[0][2]/500)**(1/5))/scale, 'ro', label='Closed vs MASS')
+    plt.plot(c2['MASS'], c2[col]*((labels[1][2]/500)**(1/5))/scale, 'ro', label='_nolegend_')
+    plt.plot(c3['MASS'], c3[col]*((labels[2][2]/500)**(1/5))/scale, 'ro', label='_nolegend_')
+    if len(labels) > 3:
+        plt.plot(c4['MASS'], c4[col]*((labels[3][2]/500)**(1/5))/scale, 'ro', label='_nolegend_')
+    if len(labels) > 4:
+        plt.plot(c5['MASS'], c5[col]*((labels[4][2]/500)**(1/5))/scale, 'ro', label='_nolegend_')
+
+    plt.plot([0, 2], [0, 2], 'k-')
+    plt.xlabel('Seeing (as)')
+    plt.ylabel('Empirical FWHM (as)')
+    plt.title(title)
+    plt.legend(loc=2)
+
+    return
+
+
+def plot_hist(labels, data_dir_root, stats_dir_end, title):
+
+    scale=12
+
+    open_file1 = data_dir_root + labels[0][0] + stats_dir_end + "stats_open_mdp.fits"
+    open_file2 = data_dir_root + labels[1][0] + stats_dir_end + "stats_open_mdp.fits"
+    open_file3 = data_dir_root + labels[2][0] + stats_dir_end + "stats_open_mdp.fits"
+
+    o1 = np.array(Table.read(open_file1)['emp_fwhm']*((labels[0][2]/500)**(1/5))/scale)
+    o2 = np.array(Table.read(open_file2)['emp_fwhm']*((labels[1][2]/500)**(1/5))/scale)
+    o3 = np.array(Table.read(open_file3)['emp_fwhm']*((labels[2][2]/500)**(1/5))/scale)
+
+    closed_file1 = data_dir_root +labels[0][0]+stats_dir_end + "stats_"+labels[0][1]+"_mdp.fits"
+    closed_file2 = data_dir_root +labels[1][0]+stats_dir_end + "stats_"+labels[1][1]+"_mdp.fits"
+    closed_file3 = data_dir_root +labels[2][0]+stats_dir_end + "stats_"+labels[2][1]+"_mdp.fits"
+
+    c1 = np.array(Table.read(closed_file1)['emp_fwhm']*((labels[0][2]/500)**(1/5))/scale)
+    c2 = np.array(Table.read(closed_file2)['emp_fwhm']*((labels[1][2]/500)**(1/5))/scale)
+    c3 = np.array(Table.read(closed_file3)['emp_fwhm']*((labels[2][2]/500)**(1/5))/scale)
+
+    all_fwhm_open = np.concatenate((o1, o2, o3), axis=0)
+    all_fwhm_closed = np.concatenate((c1, c2, c3), axis=0)
+        
+    if len(labels) > 3:
+        open_file4 = data_dir_root + labels[3][0] + stats_dir_end + "stats_open_mdp.fits"
+        o4 = np.array(Table.read(open_file4)['emp_fwhm']*((labels[3][2]/500)**(1/5))/scale)
+        closed_file4 = data_dir_root +labels[3][0]+stats_dir_end + "stats_"+labels[3][1]+"_mdp.fits"
+        c4 = np.array(Table.read(closed_file4)['emp_fwhm']*((labels[3][2]/500)**(1/5))/scale)
+        all_fwhm_open = np.concatenate((o1, o2, o3, o4), axis=0)
+        all_fwhm_closed = np.concatenate((c1, c2, c3, c4), axis=0)
+    
+    if len(labels) > 4:
+        open_file5 = data_dir_root + labels[4][0] + stats_dir_end + "stats_open_mdp.fits"
+        o5 = np.array(Table.read(open_file5)['emp_fwhm']*((labels[4][2]/500)**(1/5))/scale)
+        closed_file5 = data_dir_root +labels[4][0]+stats_dir_end + "stats_"+labels[4][1]+"_mdp.fits"
+        c5 = np.array(Table.read(closed_file5)['emp_fwhm']*((labels[4][2]/500)**(1/5))/scale)
+        all_fwhm_open = np.concatenate((o1, o2, o3, o4, o5), axis=0)
+        all_fwhm_closed = np.concatenate((c1, c2, c3, c4, c5), axis=0) 
+        
+    plt.figure(2, figsize =(10, 6))
+    plt.hist(all_fwhm_open, bins=15, alpha=0.5, color='blue', label='Open Loop')
+    plt.hist(all_fwhm_closed, bins=15, alpha=0.5, color='red', label='Closed Loop')
+    plt.legend(loc=1)
+    plt.xlabel('Empirical FWHM')
+    plt.title(title)
+    
     return
