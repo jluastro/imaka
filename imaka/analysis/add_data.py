@@ -153,12 +153,15 @@ def match_cols(open_file, closed_file, comp_col):
         a+=1
 
     UTC_TIME = np.zeros(len(stats1), dtype='S15')
-    UTC_DATE = np.zeros(len(stats2), dtype='S15')
+    UTC_DATE = np.zeros(len(stats1), dtype='S15')
     data_1 = np.zeros(len(stats1),dtype=float)
     data_2 = np.zeros(len(stats1), dtype=float)
+    data_1_err = np.zeros(len(stats1), dtype=float)
+    data_2_err = np.zeros(len(stats1), dtype=float)
 
     for ii in range(len(stats1)):
         data_1[ii] = stats1[comp_col][ii]
+        data_1_err[ii] = stats1['emp_fwhm_std'][ii]
 
         dt_str = stats1['DATE_UTC'][ii] + ' ' + stats1['TIME_UTC'][ii]
         dt_utc = datetime.datetime.strptime(dt_str, '%Y-%m-%d %H:%M:%S')
@@ -172,6 +175,7 @@ def match_cols(open_file, closed_file, comp_col):
 
         min_id = np.argmin(times2)
         data_2[ii] = stats2[comp_col][min_id]
+        data_2_err[ii] = stats2['emp_fwhm_std'][min_id]
 
         time2_str = stats2['DATE_UTC'][min_id] + ' ' + stats2['TIME_UTC'][min_id]
         time2_utc = datetime.datetime.strptime(time2_str, '%Y-%m-%d %H:%M:%S')
@@ -185,10 +189,16 @@ def match_cols(open_file, closed_file, comp_col):
 	
     if a == 1:
         data_open = data_2
+        data_open_err = data_2_err
         data_closed = data_1
+        data_closed_err = data_1_err
     else:
         data_open = data_1
+        data_open_err = data_1_err
         data_closed = data_2
+        data_closed_err = data_2_err
 
-    return  UTC_TIME, UTC_DATE, data_open, data_closed
+    return  UTC_TIME, UTC_DATE, data_open, data_closed, data_open_err, data_closed_err
+
+
 
