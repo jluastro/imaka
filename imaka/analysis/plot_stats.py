@@ -1117,122 +1117,90 @@ def plot_fwhmvt(open_file, closed_file, comp_col, obs_wav, title, plots_dir):
 
 def plot_EE(labels, data_dir_root, stats_dir_end):
 
-    plt.figure(1, figsize=(12, 12))
+    plt.figure(1, figsize=(12, 4))
+    plt.title('Main Title')
     plt.subplots_adjust(left=0.1, bottom=0.15)
-    plt.subplot(221)
+    plt.subplot(131)
 
     for item in labels:
 
         root_dir = data_dir_root + item[0] + stats_dir_end
         open_file = root_dir + "stats_open_mdp.fits"
         closed_file = root_dir + "stats_"+item[1]+"_mdp.fits"
-
         open_data = Table.read(open_file)
         closed_data = Table.read(closed_file)
         time, date, data1, data2, err1, err2 = add_data.match_cols(open_file, closed_file, 'EE80')
 
         if len(open_data) >= len(closed_data):
             co_rat = data2/data1 #closed to open ratio of 80% EE
-            plt.plot(closed_data['MASS'], co_rat, 'o', label=item[0])
+            plt.plot(closed_data['DIMM']-closed_data['MASS'], co_rat, 'o', label=item[0])
         else:
             co_rat = data2/data1 #closed to open ratio of 80% EE
-            plt.plot(open_data['MASS'], co_rat, 'o', label=item[0])
+            plt.plot(open_data['DIMM']-open_data['MASS'], co_rat, 'o', label=item[0])
 
     plt.plot([0,1.2],[1,1], 'k--')
-    plt.xlabel('MASS Seeing (as)')
-    plt.ylabel('Closed EE80 / Open EE80')
-    plt.title('Ratio of Closed to Open EE80 vs MASS')
-    plt.axis([0, 1.2, 0, 1.2])
-    plt.legend(loc=4)
+    plt.xlabel('DIMM-MASS (as)')
+    plt.ylabel('Closed EE / Open EE')
+    plt.title('80EE')
+    plt.axis([0, 2, 0, 2])
+    #plt.legend(loc=4)
 
     #####
 
-    col = 'EE50'
-    seeing = 'MASS'
-    plt.subplot(222)
+
+    plt.subplot(132)
 
     for item in labels:
 
         root_dir = data_dir_root + item[0] + stats_dir_end
         open_file = root_dir + "stats_open_mdp.fits"
         closed_file = root_dir + "stats_"+item[1]+"_mdp.fits"
-
         open_data = Table.read(open_file)
         closed_data = Table.read(closed_file)
         time, date, data1, data2, err1, err2= add_data.match_cols(open_file, closed_file, 'EE50')
 
         if len(open_data) >= len(closed_data):
             co_rat = data2/data1 #closed to open ratio of 80% EE
-            plt.plot(closed_data['MASS'], co_rat, 'o', label=item[0])
+            plt.plot(closed_data['DIMM']-closed_data['MASS'], co_rat, 'o', label=item[0])
         else:
             co_rat = data2/data1 #closed to open ratio of 80% EE
-            plt.plot(open_data['MASS'], co_rat, 'o', label=item[0])
+            plt.plot(open_data['DIMM']-open_data['MASS'], co_rat, 'o', label=item[0])
 
     plt.plot([0,1.2],[1,1], 'k--')
-    plt.xlabel('MASS Seeing (as)')
-    plt.ylabel('Closed EE50 / Open EE50')
-    plt.title('Ratio of Closed to Open EE50 vs MASS')
-    plt.axis([0, 1.2, 0, 1.2])
-    plt.legend(loc=4)
+    plt.xlabel('DIMM-MASS (as)')
+    #plt.ylabel('Closed EE50 / Open EE50')
+    plt.title('50EE')
+    plt.axis([0, 2, 0, 2])
+    #plt.legend(loc=1)
 
     ####
 
-    plt.subplot(223)
+    plt.subplot(133)
 
     for item in labels:
 
         root_dir = data_dir_root + item[0] + stats_dir_end
         open_file = root_dir + "stats_open_mdp.fits"
         closed_file = root_dir + "stats_"+item[1]+"_mdp.fits"
-
         open_data = Table.read(open_file)
         closed_data = Table.read(closed_file)
-        time, date, data1, data2, err1, err2 = add_data.match_cols(open_file, closed_file, 'EE80')
+        time, date, data1, data2, err1, err2 = add_data.match_cols(open_file, closed_file, 'EE25')
 
         if len(open_data) >= len(closed_data):
             co_rat = data2/data1 #closed to open ratio of 80% EE
-            plt.plot(closed_data['DIMM'], co_rat, 'o', label=item[0])
+            plt.plot(closed_data['DIMM']-closed_data['MASS'], co_rat, 'o', label=item[0])
         else:
             co_rat = data2/data1 #closed to open ratio of 80% EE
-            plt.plot(open_data['DIMM'], co_rat, 'o', label=item[0])
+            plt.plot(open_data['MASS']-open_data['MASS'], co_rat, 'o', label=item[0])
 
     plt.plot([0,1.2],[1,1], 'k--')
-    plt.xlabel('DIMM Seeing (as)')
-    plt.ylabel('Closed EE80 / Open EE80')
-    plt.title('Ratio of Closed to Open EE80 vs DIMM')
-    plt.axis([0, 1.2, 0, 1.2])
-    plt.legend(loc=4)
-
-
-    # ###
-    plt.subplot(224)
-
-    for item in labels:
-
-        root_dir = data_dir_root + item[0] + stats_dir_end
-        open_file = root_dir + "stats_open_mdp.fits"
-        closed_file = root_dir + "stats_"+item[1]+"_mdp.fits"
-
-        open_data = Table.read(open_file)
-        closed_data = Table.read(closed_file)
-        time, date, data1, data2, err1, err2 = add_data.match_cols(open_file, closed_file, 'EE50')
-
-        if len(open_data) >= len(closed_data):
-            co_rat = data2/data1 #closed to open ratio of 80% EE
-            plt.plot(closed_data['DIMM'], co_rat, 'o', label=item[0])
-        else:
-            co_rat = data2/data1 #closed to open ratio of 80% EE
-            plt.plot(open_data['DIMM'], co_rat, 'o', label=item[0])
-
-    plt.plot([0,1.2],[1,1], 'k--')
-    plt.xlabel('DIMM Seeing (as)')
-    plt.ylabel('Closed EE50 / Open EE50')
-    plt.title('Ratio of Closed to Open EE50 vs DIMM')
-    plt.axis([0, 1.2, 0, 1.2])
-    plt.legend(loc=4)
+    plt.xlabel('DIMM-MASS (as)')
+    #plt.ylabel('Closed EE25 / Open EE25')
+    plt.title('25EE')
+    plt.axis([0, 2, 0, 2])
+    plt.legend(loc=1)
 
     return
-
 
 
 
