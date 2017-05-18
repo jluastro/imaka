@@ -201,4 +201,104 @@ def match_cols(open_file, closed_file, comp_col):
     return  UTC_TIME, UTC_DATE, data_open, data_closed, data_open_err, data_closed_err
 
 
+def add_filter(file, filter_name):
+    
+    ## Edits fits file header and adds a 'FILTER' card with the given value 'filter_name'.
+    ## Meant to use on runs before run 5 that didn't have filter info in header so updated reduction pipeline can 
+    ## pull info from header rather than have it hardcoded
+    
+    hdulist = fits.open(file, mode='update')
+    hdulist[0].header.set('FILTER', filter_name)
+    hdulist.flush()
+    hdulist.close()
+    
+    return
+
+
+def week_table(data_dir_root, stats_dir_end, labels):
+
+    #creates a table for a week of observing showing nightly averages:
+    # UT Date | average open fwhm | average closed fwhm | average DIMM seeing | average MASS seeing
+    #inputs:
+         #data_dir_root: directory containing nightly data files, e.g.:  "/Users/fatimaabdurrahman/Desktop/Research/RUN4/"
+         #stats_dir_root: the rest of the path to the stats directory after date, e.g.: "/FLI/reduce/stats/"
+         #labels: a list of three-element entries, which each have a date string, closed stat file name, and wavelength, e.g.: [['20170214', 'closed', 806], ['20170215', 'closed', 806], ['20170216', 'closeda', 806],['20170217', 'closeda', 1000], ['20170218', 'closeda', 658]]
+
+    # function writes a file "nightly_aves.fits" in the data_dir_root directory of output table
+         
+    date = []
+    open_ave = np.zeros(len(labels), dtype=float)
+    closed_ave = np.zeros(len(labels), dtype=float)
+    DIMM_ave = np.zeros(len(labels), dtype=float)
+    MASS_ave = np.zeros(len(labels), dtype=float)
+
+    for i in range(len(labels)):
+        open_file = data_dir_root+labels[i][0]+stats_dir_end+'stats_open_mdp.fits'
+        closed_file = data_dir_root+labels[i][0]+stats_dir_end+'stats_'+labels[i][1]+'_mdp.fits'
+        open_data = Table.read(open_file)
+        closed_data = Table.read(closed_file)
+
+        scale = 12
+
+        open_ave[i] = np.mean(np.array(open_data['emp_fwhm']))*((500/labels[i][2])**(1/5))/scale
+        closed_ave[i] = np.mean(np.array(closed_data['emp_fwhm']))*((500/labels[i][2])**(1/5))/scale
+        MASS_ave[i] = np.mean(np.concatenate((np.array(closed_data['MASS']), np.array(open_data['MASS'])), axis=0))
+        DIMM_ave[i] = np.mean(np.concatenate((np.array(closed_data['DIMM']), np.array(open_data['DIMM'])), axis=0))
+        string = labels[i][0][0:4]+"-"+labels[i][0][4:6]+"-"+labels[i][0][6:8]
+        date.append(string)
+
+    t = Table([date, open_ave, closed_ave, DIMM_ave, MASS_ave], names=('HST_Date', 'ave_open_fwhm', 'ave_closed_fwhm', 'ave_DIMM', 'ave_MASS'))
+    t.write(data_dir_root+"nightly_aves.fits", overwrite=True)
+
+    
+    return
+
+
+def read_starlist(starlist_file):
+    data=[]
+    f = open(starlist_file, 'r')
+    for line in f:
+        data.append(line)
+    f.close()
+
+    new_data =[]
+    for line in data:
+        new_line = []
+        for element in line.split(" "):
+            if element != '':
+                new_line.append(element)
+        new_data.append(new_line)
+
+    array = np.array(new_data)
+
+    x_cents_str = array[:,1][1:]
+    y_cents_str = array[:,2][1:]
+    x_fwhm_str = array[:,11][1:]
+    y_fwhm_str = array[:,12][1:]
+    roundness_str = array[:,4][1:]
+
+    x_cents=np.zeros(len(x_cents_str), dtype=float)
+    y_cents=np.zeros(len(x_cents_str), dtype=float)
+    x_fwhm=np.zeros(len(x_cents_str), dtype=float)
+    y_fwhm=np.zeros(len(x_cents_str), dtype=float)
+    roundness=np.zeros(len(x_cents_str), dtype=float)
+
+    for i in range(len(x_cents_str)):
+        if 0<float(x_fwhm_str[i])<45 and 0<float(y_fwhm_str[i])<45:
+            x_cents[i]=float(x_cents_str[i])
+            y_cents[i]=float(y_cents_str[i])
+            x_fwhm[i]=float(x_fwhm_str[i])
+            y_fwhm[i]=float(y_fwhm_str[i])
+            roundness[i]=float(roundness_str[i])
+
+
+
+    fwhm = (x_fwhm + y_fwhm)/2
+
+    #define coordinate center of image and star distances from center
+    y_cent = 3066/2
+    x_cent = 4088/2
+    dist=(((x_cents-x_cent)**2)+((y_cents-y_cent)**2))**0.5
+    
+    return x_cents, y_cents, fwhm, x_fwhm, y_fwhm, roundness, dist
 
