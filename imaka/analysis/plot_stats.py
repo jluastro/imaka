@@ -111,7 +111,7 @@ def plot_stack_stats(date, suffixes=['open', 'ttf', 'closed'], root_dir='/Users/
     for suffix in suffixes:
         stats.append(Table.read(stats_dir + 'stats_' + suffix + '.fits'))
 
-    scale = 0.12
+    scale = 0.04
     colors = get_color_list()
 
     # 
@@ -132,7 +132,7 @@ def plot_stack_stats(date, suffixes=['open', 'ttf', 'closed'], root_dir='/Users/
     plt.clf()
     plt.subplot(121)
     for ss in range(len(suffixes)):
-        plt.plot(stats[ss]['Index'], stats[ss]['FWHM']*scale, marker='o', linestyle='none', label=suffixes[ss])
+        plt.plot(stats[ss]['Index'], stats[ss]['FWHM']*stats[ss]['BINFAC']*scale, marker='o', linestyle='none', label=suffixes[ss])
     plt.xlabel('Frame Number')
     plt.ylabel('Gaussian-Fit FWHM (")')
     plt.legend(numpoints=1)
@@ -159,7 +159,7 @@ def plot_stack_stats(date, suffixes=['open', 'ttf', 'closed'], root_dir='/Users/
     plt.clf()
     plt.subplot(121)
     for ss in range(len(suffixes)):
-        plt.plot(stats[ss]['Index'], stats[ss]['emp_fwhm']*scale, marker='o', linestyle='none', label=suffixes[ss])
+        plt.plot(stats[ss]['Index'], stats[ss]['emp_fwhm']*stats[ss]['BINFAC']*scale, marker='o', linestyle='none', label=suffixes[ss])
     plt.xlabel('Frame Number')
     plt.ylabel('Empirical FWHM (")')
     plt.legend(numpoints=1)
@@ -295,8 +295,8 @@ def plot_stack_stats(date, suffixes=['open', 'ttf', 'closed'], root_dir='/Users/
     plt.subplot(121)
     for ss in range(len(suffixes)):
         c = np.take(colors, ss, mode='wrap')        
-        plt.plot(stats[ss]['Index'], stats[ss]['xFWHM']*scale, marker='o', color=c, linestyle='none', label='X ' + suffixes[ss])
-        plt.plot(stats[ss]['Index'], stats[ss]['yFWHM']*scale, marker='^', color=c, linestyle='none', label='Y ' + suffixes[ss])
+        plt.plot(stats[ss]['Index'], stats[ss]['xFWHM']*stats[ss]['BINFAC']*scale, marker='o', color=c, linestyle='none', label='X ' + suffixes[ss])
+        plt.plot(stats[ss]['Index'], stats[ss]['yFWHM']*stats[ss]['BINFAC']*scale, marker='^', color=c, linestyle='none', label='Y ' + suffixes[ss])
     plt.xlabel('Frame Number')
     plt.ylabel('Gaussian-Fit FWHM (")')
     plt.legend(numpoints=1, fontsize=10)
@@ -337,7 +337,7 @@ def plot_stack_stats(date, suffixes=['open', 'ttf', 'closed'], root_dir='/Users/
     plt.clf()
     plt.subplot(121)
     for ss in range(len(suffixes)):
-        plt.plot(utcs[ss], stats[ss]['FWHM']*scale, marker='o', linestyle='none', label=suffixes[ss])
+        plt.plot(utcs[ss], stats[ss]['FWHM']*stats[ss]['BINFAC']*scale, marker='o', linestyle='none', label=suffixes[ss])
     plt.gca().xaxis.set_major_formatter(time_fmt)
     plt.xticks(rotation=35)
     plt.xlabel('UTC Time (hr)')
@@ -369,7 +369,7 @@ def plot_stack_stats(date, suffixes=['open', 'ttf', 'closed'], root_dir='/Users/
     plt.clf()
     plt.subplot(121)
     for ss in range(len(suffixes)):
-        plt.plot(utcs[ss], stats[ss]['emp_fwhm']*scale, marker='o', linestyle='none', label=suffixes[ss])
+        plt.plot(utcs[ss], stats[ss]['emp_fwhm']*stats[ss]['BINFAC']*scale, marker='o', linestyle='none', label=suffixes[ss])
     plt.gca().xaxis.set_major_formatter(time_fmt)
     plt.xticks(rotation=35)
     plt.xlabel('UTC Time (hr)')
@@ -529,8 +529,8 @@ def plot_stack_stats(date, suffixes=['open', 'ttf', 'closed'], root_dir='/Users/
     plt.subplot(121)
     for ss in range(len(suffixes)):
         c = np.take(colors, ss, mode='wrap')        
-        plt.plot(utcs[ss], stats[ss]['xFWHM']*scale, marker='o', color=c, linestyle='none', label='X ' + suffixes[ss])
-        plt.plot(utcs[ss], stats[ss]['yFWHM']*scale, marker='^', color=c, linestyle='none', label='Y ' + suffixes[ss])
+        plt.plot(utcs[ss], stats[ss]['xFWHM']*stats[ss]['BINFAC']*scale, marker='o', color=c, linestyle='none', label='X ' + suffixes[ss])
+        plt.plot(utcs[ss], stats[ss]['yFWHM']*stats[ss]['BINFAC']*scale, marker='^', color=c, linestyle='none', label='Y ' + suffixes[ss])
     plt.gca().xaxis.set_major_formatter(time_fmt)
     plt.xticks(rotation=35)
     plt.xlabel('UTC Time (hr)')
@@ -700,7 +700,7 @@ def plot_stats_mdp(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root
             all_dimm = np.concatenate([all_dimm, st['DIMM']])
             all_mass = np.concatenate([all_mass, st['MASS']])
 
-    scale = 0.12
+    scale = 0.04
     
     time_fmt = mp_dates.DateFormatter('%H:%M')    
     time_loc = ticker.MaxNLocator(nbins=6)
@@ -710,7 +710,7 @@ def plot_stats_mdp(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root
 
     for ii in range(len(suffixes)):
         c = np.take(colors, ii, mode='wrap')
-        plt.plot(utc[ii], stats[ii]['emp_fwhm']*scale, marker='o', color=c, linestyle='none', label=suffixes[ii])
+        plt.plot(utc[ii], stats[ii]['emp_fwhm']*stats[ii]['BINFAC']*scale, marker='o', color=c, linestyle='none', label=suffixes[ii])
         
     plt.plot(all_utc, all_dimm, marker='x', color='fuchsia', linestyle='none', label='DIMM')
     plt.plot(all_utc, all_mass, marker='+', color='dodgerblue', linestyle='none', label='MASS')
@@ -742,7 +742,7 @@ def plot_stats_mdp(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root
     plt.figure(3, figsize=(6, 6))
     plt.clf()
     for ii in range(len(suffixes)):
-        plt.plot(stats[ii]['MASS'], stats[ii]['emp_fwhm']*scale, marker='o', linestyle='none', label=suffixes[ii])
+        plt.plot(stats[ii]['MASS'], stats[ii]['emp_fwhm']*stats[ii]['BINFAC']*scale, marker='o', linestyle='none', label=suffixes[ii])
     plt.xlabel('MASS Seeing (")')
     plt.ylabel('Empirical FWHM (")')
     plt.legend()
@@ -764,7 +764,7 @@ def plot_stats_mdp(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root
     plt.figure(5, figsize=(6, 6))
     plt.clf()
     for ii in range(len(suffixes)):
-        plt.plot(stats[ii]['DIMM'], stats[ii]['emp_fwhm']*scale, marker='o', linestyle='none', label=suffixes[ii])
+        plt.plot(stats[ii]['DIMM'], stats[ii]['emp_fwhm']*stats[ii]['BINFAC']*scale, marker='o', linestyle='none', label=suffixes[ii])
     plt.xlabel('DIMM Seeing (")')
     plt.ylabel('Empirical FWHM (")')
     plt.legend()
@@ -939,8 +939,8 @@ def plot_best_stats(date, suffixes=['open', 'closed'], out_suffix='', root_dir='
 
     colors = ['b', 'g', 'r', 'c', 'm', 'k', 'yellow', 'purple', 'orange']
 
-    stats_dir = root_dir + date + '/fli/reduce/stats/'
-    plots_dir = root_dir + date + '/fli/reduce/plots/'
+    stats_dir = root_dir + date + '/FLI/reduce/stats/'
+    plots_dir = root_dir + date + '/FLI/reduce/plots/'
 
     scale = 0.12
     
@@ -950,7 +950,7 @@ def plot_best_stats(date, suffixes=['open', 'closed'], out_suffix='', root_dir='
     for suffix in suffixes:
         ss = Table.read(stats_dir + 'stats_' + suffix + '.fits')
         stats.append( ss )
-        utc_dt = [datetime.strptime(ss['TIME_UTC'][ii], '%I:%M:%S') for ii in range(len(ss))]
+        utc_dt = [datetime.strptime(ss['TIME_UTC'][ii], '%H:%M:%S') for ii in range(len(ss))]
         utcs.append(utc_dt)
 
         # Add NEA FWHM to table (temporarily)
@@ -979,7 +979,7 @@ def plot_best_stats(date, suffixes=['open', 'closed'], out_suffix='', root_dir='
     plt.gca().xaxis.set_major_locator(time_loc)
     plt.legend(loc=2, bbox_to_anchor=(1, 1), numpoints=1)
     plt.xticks(rotation=35)
-    plt.ylim(0, 2)
+    #plt.ylim(0, 2)
     plt.xlabel("UTC Time")
     plt.ylabel('NEA FWHM (")')
     plt.title(date)
@@ -989,14 +989,14 @@ def plot_best_stats(date, suffixes=['open', 'closed'], out_suffix='', root_dir='
     #####
     plt.figure()
     for ii in range(len(stats)):
-        plt.plot(utcs[ii], stats[ii]['emp_fwhm']*scale, color=colors[ii], marker='o', label=suffixes[ii],
+        plt.plot(utcs[ii], stats[ii]['emp_fwhm']*stats[ii]['BINFAC']*scale, color=colors[ii], marker='o', label=suffixes[ii],
                      alpha=0.5, linestyle='none')
 
     plt.gca().xaxis.set_major_formatter(time_fmt)
     plt.gca().xaxis.set_major_locator(time_loc)
     plt.legend(loc=2, bbox_to_anchor=(1, 1), numpoints=1)
     plt.xticks(rotation=35)
-    plt.ylim(0, 2)
+    #plt.ylim(0, 2)
     plt.xlabel("UTC Time")
     plt.ylabel('Empirical FWHM (")')
     plt.title(date) 
@@ -1007,15 +1007,15 @@ def plot_best_stats(date, suffixes=['open', 'closed'], out_suffix='', root_dir='
     #####
     plt.figure()
     for ii in range(len(stats)):
-        plt.plot(utcs[ii], stats[ii]['xFWHM']*scale, color=colors[ii], label='X ' + suffixes[ii],
+        plt.plot(utcs[ii], stats[ii]['xFWHM']*stats[ii]['BINFAC']*scale, color=colors[ii], label='X ' + suffixes[ii],
                      marker="o", alpha=0.5, linestyle='none')
-        plt.plot(utcs[ii], stats[ii]['yFWHM']*scale, color=colors[ii], label='Y ' + suffixes[ii],
+        plt.plot(utcs[ii], stats[ii]['yFWHM']*stats[ii]['BINFAC']*scale, color=colors[ii], label='Y ' + suffixes[ii],
                      marker="^", alpha=0.5, linestyle='none')
     plt.gca().xaxis.set_major_formatter(time_fmt)
     plt.gca().xaxis.set_major_locator(time_loc)
     plt.legend(loc=2, bbox_to_anchor=(1, 1), numpoints=1)
     plt.xticks(rotation=35)
-    plt.ylim(0, 2)
+    #plt.ylim(0, 2)
     plt.xlabel("UTC Time")
     plt.ylabel('Gaussian FWHM (")')
     plt.title(date)
@@ -1055,7 +1055,7 @@ def nea_to_fwhm(nea):
     
     return fwhm
 
-def plot_fwhmvt(open_file, closed_file, comp_col, obs_wav, title, plots_dir):
+def plot_fwhmvt(open_file, closed_file, comp_col, title, plots_dir):
     
     #open_file and closed_file are the fits stats files
     #plots fwhm for open and closed and mass/dimm seeing vs time
@@ -1070,25 +1070,30 @@ def plot_fwhmvt(open_file, closed_file, comp_col, obs_wav, title, plots_dir):
 
     #Match open and closed data in time
     time, date, data1, data2, err1, err2 = add_data.match_cols(open_file, closed_file, comp_col)
-
+    calib = []
+    
     #Get mass/dimm data
     if len(stats1) < len(stats2):
         mass = stats1['MASS']
         dimm = stats1['DIMM']
+        for i in range(len(stats1)):
+            wvln = filter2wv(stats1['FILTER'][i])
+            scale = 4 * stats1['BINFAC'][i]
+            factor = ((500/wvln)**0.2) / scale
+            calib.append(factor)
+
     else:
         mass = stats2['MASS']
         dimm = stats2['DIMM']
-    
+        for i in range(len(stats2)):
+            wvln = filter2wv(stats2['FILTER'][i])
+            scale = 4 * stats2['BINFAC'][i]
+            factor = ((500/wvln)**0.2) / scale
+            calib.append(factor)
+                
+    open_err = err1 * calib
+    closed_err = err2 * calib
 
-    scale = 12
-
-    #info for scaling wavelength to mass/dimm wavelength
-    cal_wav = 500 #mass/dimm data wavelength (nm)
-    cal_fac = (obs_wav/cal_wav)**(1/5) #calibration factor
-
-    open_err = err1 * cal_fac / scale
-    closed_err = err2 * cal_fac / scale
-    
     #Plot fwhm and seeing vs time
     times = []
     for i in range(len(time)):
@@ -1097,8 +1102,8 @@ def plot_fwhmvt(open_file, closed_file, comp_col, obs_wav, title, plots_dir):
         times.append(dt_obj)
 
     plt.figure(1, figsize=(12, 6))
-    plt.errorbar(times, (data1/scale)*cal_fac, yerr=open_err, fmt='o', label="Open")
-    plt.errorbar(times, (data2/scale)*cal_fac, yerr=closed_err, fmt='ro', label="Closed")
+    plt.errorbar(times, data1*calib, yerr=open_err, fmt='o', label="Open")
+    plt.errorbar(times, data2*calib, yerr=closed_err, fmt='ro', label="Closed")
     plt.plot(times, dimm, 'b-')
     plt.plot(times, mass, 'r-')
     plt.ylabel(comp_col)
@@ -1111,7 +1116,6 @@ def plot_fwhmvt(open_file, closed_file, comp_col, obs_wav, title, plots_dir):
 
     plt.savefig(plots_dir + 'fwhm_v_time' + '.png')
     return
-
 
 
 
@@ -1252,21 +1256,21 @@ def plot_week_fwhm(labels, data_dir_root, stats_dir_end, title):
     col = 'emp_fwhm'
 
     plt.figure(1, figsize=(8, 8))
-    plt.plot(o1['DIMM'], o1[col]*((labels[0][2]/500)**(1/5))/scale, 'bo', label='Open vs DIMM')
-    plt.plot(o2['DIMM'], o2[col]*((labels[1][2]/500)**(1/5))/scale, 'bo', label='_nolegend_')
-    plt.plot(o3['DIMM'], o3[col]*((labels[2][2]/500)**(1/5))/scale, 'bo', label='_nolegend_')
+    plt.plot(o1['DIMM'], o1[col]*((500/labels[0][2])**(1/5))/scale, 'bo', label='Open vs DIMM')
+    plt.plot(o2['DIMM'], o2[col]*((500/labels[1][2])**(1/5))/scale, 'bo', label='_nolegend_')
+    plt.plot(o3['DIMM'], o3[col]*((500/labels[2][2])**(1/5))/scale, 'bo', label='_nolegend_')
     if len(labels) > 3:
-        plt.plot(o4['DIMM'], o4[col]*((labels[3][2]/500)**(1/5))/scale, 'bo', label='_nolegend_')
+        plt.plot(o4['DIMM'], o4[col]*((500/labels[3][2])**(1/5))/scale, 'bo', label='_nolegend_')
     if len(labels) > 4:
-        plt.plot(o5['DIMM'], o5[col]*((labels[4][2]/500)**(1/5))/scale, 'bo', label='_nolegend_')
+        plt.plot(o5['DIMM'], o5[col]*((500/labels[4][2])**(1/5))/scale, 'bo', label='_nolegend_')
 
-    plt.plot(c1['MASS'], c1[col]*((labels[0][2]/500)**(1/5))/scale, 'ro', label='Closed vs MASS')
-    plt.plot(c2['MASS'], c2[col]*((labels[1][2]/500)**(1/5))/scale, 'ro', label='_nolegend_')
-    plt.plot(c3['MASS'], c3[col]*((labels[2][2]/500)**(1/5))/scale, 'ro', label='_nolegend_')
+    plt.plot(c1['MASS'], c1[col]*((500/labels[0][2])**(1/5))/scale, 'ro', label='Closed vs MASS')
+    plt.plot(c2['MASS'], c2[col]*((500/labels[1][2])**(1/5))/scale, 'ro', label='_nolegend_')
+    plt.plot(c3['MASS'], c3[col]*((500/labels[2][2])**(1/5))/scale, 'ro', label='_nolegend_')
     if len(labels) > 3:
-        plt.plot(c4['MASS'], c4[col]*((labels[3][2]/500)**(1/5))/scale, 'ro', label='_nolegend_')
+        plt.plot(c4['MASS'], c4[col]*((500/labels[3][2])**(1/5))/scale, 'ro', label='_nolegend_')
     if len(labels) > 4:
-        plt.plot(c5['MASS'], c5[col]*((labels[4][2]/500)**(1/5))/scale, 'ro', label='_nolegend_')
+        plt.plot(c5['MASS'], c5[col]*((500/labels[4][2])**(1/5))/scale, 'ro', label='_nolegend_')
 
     plt.plot([0, 2], [0, 2], 'k-')
     plt.xlabel('Seeing (as)')
@@ -1285,34 +1289,34 @@ def plot_hist(labels, data_dir_root, stats_dir_end, title):
     open_file2 = data_dir_root + labels[1][0] + stats_dir_end + "stats_open_mdp.fits"
     open_file3 = data_dir_root + labels[2][0] + stats_dir_end + "stats_open_mdp.fits"
 
-    o1 = np.array(Table.read(open_file1)['emp_fwhm']*((labels[0][2]/500)**(1/5))/scale)
-    o2 = np.array(Table.read(open_file2)['emp_fwhm']*((labels[1][2]/500)**(1/5))/scale)
-    o3 = np.array(Table.read(open_file3)['emp_fwhm']*((labels[2][2]/500)**(1/5))/scale)
+    o1 = np.array(Table.read(open_file1)['emp_fwhm']*((500/labels[0][2])**(1/5))/scale)
+    o2 = np.array(Table.read(open_file2)['emp_fwhm']*((500/labels[1][2])**(1/5))/scale)
+    o3 = np.array(Table.read(open_file3)['emp_fwhm']*((500/labels[2][2])**(1/5))/scale)
 
     closed_file1 = data_dir_root +labels[0][0]+stats_dir_end + "stats_"+labels[0][1]+"_mdp.fits"
     closed_file2 = data_dir_root +labels[1][0]+stats_dir_end + "stats_"+labels[1][1]+"_mdp.fits"
     closed_file3 = data_dir_root +labels[2][0]+stats_dir_end + "stats_"+labels[2][1]+"_mdp.fits"
 
-    c1 = np.array(Table.read(closed_file1)['emp_fwhm']*((labels[0][2]/500)**(1/5))/scale)
-    c2 = np.array(Table.read(closed_file2)['emp_fwhm']*((labels[1][2]/500)**(1/5))/scale)
-    c3 = np.array(Table.read(closed_file3)['emp_fwhm']*((labels[2][2]/500)**(1/5))/scale)
+    c1 = np.array(Table.read(closed_file1)['emp_fwhm']*((500/labels[0][2])**(1/5))/scale)
+    c2 = np.array(Table.read(closed_file2)['emp_fwhm']*((500/labels[1][2])**(1/5))/scale)
+    c3 = np.array(Table.read(closed_file3)['emp_fwhm']*((500/labels[2][2])**(1/5))/scale)
 
     all_fwhm_open = np.concatenate((o1, o2, o3), axis=0)
     all_fwhm_closed = np.concatenate((c1, c2, c3), axis=0)
         
     if len(labels) > 3:
         open_file4 = data_dir_root + labels[3][0] + stats_dir_end + "stats_open_mdp.fits"
-        o4 = np.array(Table.read(open_file4)['emp_fwhm']*((labels[3][2]/500)**(1/5))/scale)
+        o4 = np.array(Table.read(open_file4)['emp_fwhm']*((500/labels[3][2])**(1/5))/scale)
         closed_file4 = data_dir_root +labels[3][0]+stats_dir_end + "stats_"+labels[3][1]+"_mdp.fits"
-        c4 = np.array(Table.read(closed_file4)['emp_fwhm']*((labels[3][2]/500)**(1/5))/scale)
+        c4 = np.array(Table.read(closed_file4)['emp_fwhm']*((500/labels[3][2])**(1/5))/scale)
         all_fwhm_open = np.concatenate((o1, o2, o3, o4), axis=0)
         all_fwhm_closed = np.concatenate((c1, c2, c3, c4), axis=0)
     
     if len(labels) > 4:
         open_file5 = data_dir_root + labels[4][0] + stats_dir_end + "stats_open_mdp.fits"
-        o5 = np.array(Table.read(open_file5)['emp_fwhm']*((labels[4][2]/500)**(1/5))/scale)
+        o5 = np.array(Table.read(open_file5)['emp_fwhm']*((500/labels[4][2])**(1/5))/scale)
         closed_file5 = data_dir_root +labels[4][0]+stats_dir_end + "stats_"+labels[4][1]+"_mdp.fits"
-        c5 = np.array(Table.read(closed_file5)['emp_fwhm']*((labels[4][2]/500)**(1/5))/scale)
+        c5 = np.array(Table.read(closed_file5)['emp_fwhm']*((500/labels[4][2])**(1/5))/scale)
         all_fwhm_open = np.concatenate((o1, o2, o3, o4, o5), axis=0)
         all_fwhm_closed = np.concatenate((c1, c2, c3, c4, c5), axis=0) 
         
@@ -1324,3 +1328,54 @@ def plot_hist(labels, data_dir_root, stats_dir_end, title):
     plt.title(title)
     
     return
+
+
+def filter2wv(filter_label):
+
+    #converts filter label from fits header into wavelength in nanometers 
+    
+    if filter_label == "I":
+        return 806
+    elif filter_label == "R":
+        return 658
+    elif filter_label == "1_micronlp":
+        return 1000
+    else: 
+        print("Filter not found: defaulting to 500 nm")
+        return 500
+
+
+def plot_field_var(starlist):
+
+    mode=starlist.split("_")[-2]
+    x_cents, y_cents, fwhm, x_fwhm, y_fwhm, roundness, dist = add_data.read_starlist(starlist)
+    plt.figure(1, figsize=(12, 8))
+    plt.suptitle('Field Variability', fontsize=18)
+
+    plt.subplot(221)
+    plt.plot(dist, y_fwhm,'o', alpha=0.5)
+    plt.xlabel('Distance from center of image (pixels)')
+    plt.ylabel('Gaussian fit FWHM (not scaled)')
+    plt.title('PSF Size')
+
+    plt.subplot(222)
+    plt.plot(dist, x_fwhm/y_fwhm,'o', alpha=0.5); 
+    plt.xlabel('Distance from center of image (pixels)')
+    plt.ylabel('PSF Elongation (x_fwhm/y_fwhm)')
+    plt.title('PSF Elongation')
+
+    plt.subplot(223)
+    plt.scatter(x_cents, y_cents, c=fwhm)
+    plt.colorbar()
+    plt.xlabel('x coordinate')
+    plt.ylabel('y coordinate')
+
+    plt.subplot(224)
+    plt.scatter(x_cents, y_cents, c=x_fwhm/y_fwhm)
+    plt.colorbar()
+    plt.xlabel('x coordinate')
+    plt.ylabel('y coordinate')
+    
+    return
+
+
