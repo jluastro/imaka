@@ -942,7 +942,7 @@ def plot_best_stats(date, suffixes=['open', 'closed'], out_suffix='', root_dir='
     stats_dir = root_dir + date + '/FLI/reduce/stats/'
     plots_dir = root_dir + date + '/FLI/reduce/plots/'
 
-    scale = 0.12
+    scale = 0.08
     
     stats = []
     utcs = []
@@ -989,7 +989,7 @@ def plot_best_stats(date, suffixes=['open', 'closed'], out_suffix='', root_dir='
     #####
     plt.figure()
     for ii in range(len(stats)):
-        plt.plot(utcs[ii], stats[ii]['emp_fwhm']*stats[ii]['BINFAC']*scale, color=colors[ii], marker='o', label=suffixes[ii],
+        plt.plot(utcs[ii], stats[ii]['emp_fwhm']*scale, color=colors[ii], marker='o', label=suffixes[ii],
                      alpha=0.5, linestyle='none')
 
     plt.gca().xaxis.set_major_formatter(time_fmt)
@@ -1007,9 +1007,9 @@ def plot_best_stats(date, suffixes=['open', 'closed'], out_suffix='', root_dir='
     #####
     plt.figure()
     for ii in range(len(stats)):
-        plt.plot(utcs[ii], stats[ii]['xFWHM']*stats[ii]['BINFAC']*scale, color=colors[ii], label='X ' + suffixes[ii],
+        plt.plot(utcs[ii], stats[ii]['xFWHM']*scale, color=colors[ii], label='X ' + suffixes[ii],
                      marker="o", alpha=0.5, linestyle='none')
-        plt.plot(utcs[ii], stats[ii]['yFWHM']*stats[ii]['BINFAC']*scale, color=colors[ii], label='Y ' + suffixes[ii],
+        plt.plot(utcs[ii], stats[ii]['yFWHM']*scale, color=colors[ii], label='Y ' + suffixes[ii],
                      marker="^", alpha=0.5, linestyle='none')
     plt.gca().xaxis.set_major_formatter(time_fmt)
     plt.gca().xaxis.set_major_locator(time_loc)
@@ -1379,3 +1379,71 @@ def plot_field_var(starlist):
     return
 
 
+
+def plot_fwhmvt_nomatch(open_file, closed_file, comp_col, title, plots_dir):
+    
+    #open_file and closed_file are the fits stats files
+    #plots fwhm for open and closed and mass/dimm seeing vs time
+    #'comp_col' is what column of data to compare (e.g. 'emp_fwhm')
+    #obs_wav is the wavelength of that observation, to scale it to the 500 nm mass/dimm observations
+    #title: title for generated plot
+    #plots_dir: directory to put generated plot in
+    
+    #Read in data
+    stats1 = Table.read(open_file)
+    stats2 = Table.read(closed_file)
+
+    time1, date1, data1, data2, err1, err2 = add_data.match_cols(open_file, open_file, comp_col)
+    time2, date2, data1, data2, err1, err2 = add_data.match_cols(closed_file, closed_file, comp_col)
+
+
+    
+    calib1 = []; calib2=[]
+    
+    #Get mass/dimm data
+    mass = stats2['MASS']
+    dimm = stats1['DIMM']
+    for i in range(len(stats1)):
+        wvln = filter2wv(stats1['FILTER'][i])
+        scale = .04 * stats1['BINFAC'][i]
+        factor = ((500/wvln)**0.2) * scale
+        calib1.append(factor)
+
+    for i in range(len(stats2)):
+        wvln = filter2wv(stats2['FILTER'][i])
+        scale = .04 * stats2['BINFAC'][i]
+        factor = ((500/wvln)**0.2) * scale
+        calib2.append(factor)
+
+                
+    open_err = stats1['emp_fwhm_std'] * calib1
+    closed_err = stats2['emp_fwhm_std'] * calib2
+
+    #Plot fwhm and seeing vs time
+    times1 = []
+    for i in range(len(time1)):
+        string = str(date1[i])+str(time1[i])
+        dt_obj = datetime.strptime(string, "b'%Y-%m-%d'b'%H:%M:%S'")
+        times1.append(dt_obj)
+        
+    times2 = []
+    for i in range(len(time2)):
+        string = str(date2[i])+str(time2[i])
+        dt_obj = datetime.strptime(string, "b'%Y-%m-%d'b'%H:%M:%S'")
+        times2.append(dt_obj)
+
+    plt.figure(1, figsize=(12, 6))
+    plt.errorbar(times1, stats1['emp_fwhm']*calib1, yerr=open_err, fmt='o', label="Open")
+    plt.errorbar(times2, stats2['emp_fwhm']*calib2, yerr=closed_err, fmt='ro', label="Closed")
+    plt.plot(times1, dimm, 'b-')
+    plt.plot(times2, mass, 'r-')
+    plt.ylabel(comp_col)
+    plt.xlabel("UTC Time")
+    plt.xticks(rotation=35)
+    plt.ylim(0, 2.5)
+    plt.title(title)
+    plt.gca().xaxis.set_major_formatter(mp_dates.DateFormatter('%H:%M'))
+    plt.legend()
+
+    plt.savefig(plots_dir + 'fwhm_v_time' + '.png')
+    return
