@@ -12,10 +12,9 @@ import os, shutil
 
 root_dir = '/Users/fatimaabdurrahman/Desktop/Research/RUN5/20170517/FLI/'
 
-
 def make_flat():
     flat_raw_dir = root_dir + 'twilights/'
-    dark_raw_dir = root_dir + 'dark/'
+    dark_raw_dir = flat_raw_dir
     flat_out_dir = root_dir + "reduce/calib/"
 
     util.mkdir(flat_out_dir)
@@ -105,15 +104,15 @@ def calc_star_stats():
     stats_dir = root_dir +'reduce/stats/'
 
     
-#     # Open Loop
-#     fnum = [63, 67, 71, 75, 80, 84, 88, 92, 96, 100, 104, 108, 112, 124]
-#     img_files = [data_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in fnum]
-#     reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_open.fits')
+    # Open Loop
+    fnum = [63, 67, 71, 75, 80, 84, 88, 92, 96, 100, 104, 108, 112, 124]
+    img_files = [data_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in fnum]
+    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_open.fits')
 
-#     # Closed Loop
-#     fnum = [64, 68, 72, 76, 77, 81, 85, 89, 93, 97, 101, 105, 109, 113]
-#     img_files = [data_dir + 'obj{0:04d}_c_clean.fits'.format(ii) for ii in fnum]
-#     reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closed.fits')
+    # Closed Loop
+    fnum = [64, 68, 72, 76, 77, 81, 85, 89, 93, 97, 101, 105, 109, 113]
+    img_files = [data_dir + 'obj{0:04d}_c_clean.fits'.format(ii) for ii in fnum]
+    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closed.fits')
 
     # Closed A
     fnum = [65, 69, 73, 78, 82, 86,90, 94, 98, 102, 106, 110,114]
@@ -130,34 +129,37 @@ def calc_star_stats():
 def stack_FLD2():
 
     data_dir = root_dir + 'reduce/FLD2/'
-    stats_dir = root_dir +'reduce/stats/'
+    stats_dir = root_dir + 'reduce/stats/'
+    stacks_dir = root_dir + 'reduce/stacks/'
+
+    util.mkdir(stacks_dir)
 
     # Open Loop
     open_img_nums = [63, 67, 71, 75, 80, 84, 88, 92, 96, 100, 104, 108, 112, 124]
     open_images = [data_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in open_img_nums]
     open_starlists = [data_dir + 'obj{0:04d}_o_clean_stars.txt'.format(ii) for ii in open_img_nums]
-    open_output_root = data_dir + 'FLD2_stack_open'
+    open_output_root = stacks_dir + 'FLD2_stack_open'
     reduce_fli.shift_and_add(open_images, open_starlists, open_output_root, method='mean')
     
     # Closed Loop
     closed_img_nums = [64, 68, 72, 76, 77, 81, 85, 89, 93, 97, 101, 105, 109, 113]
     closed_images = [data_dir + 'obj{0:04d}_c_clean.fits'.format(ii) for ii in closed_img_nums]
     closed_starlists = [data_dir + 'obj{0:04d}_c_clean_stars.txt'.format(ii) for ii in closed_img_nums]
-    closed_output_root = data_dir + 'FLD2_stack_closed'
+    closed_output_root = stacks_dir + 'FLD2_stack_closed'
     reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
     
     # Closed A
     closed_img_nums = [65, 69, 73, 78, 82, 86, 90, 94,98, 102, 106, 110,114]
     closed_images = [data_dir + 'obj{0:04d}_cA_clean.fits'.format(ii) for ii in closed_img_nums]
     closed_starlists = [data_dir + 'obj{0:04d}_cA_clean_stars.txt'.format(ii) for ii in closed_img_nums]
-    closed_output_root = data_dir + 'FLD2_stack_closedA'
+    closed_output_root = stacks_dir + 'FLD2_stack_closedA'
     reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
     
     # Closed B
     closed_img_nums = [66, 70, 74, 79, 83, 87, 91, 95, 99, 103, 107, 111,115]
     closed_images = [data_dir + 'obj{0:04d}_cB_clean.fits'.format(ii) for ii in closed_img_nums]
     closed_starlists = [data_dir + 'obj{0:04d}_cB_clean_stars.txt'.format(ii) for ii in closed_img_nums]
-    closed_output_root = data_dir + 'FLD2_stack_closedB'
+    closed_output_root = stacks_dir + 'FLD2_stack_closedB'
     reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
 
     return
