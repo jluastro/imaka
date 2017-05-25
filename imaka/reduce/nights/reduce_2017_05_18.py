@@ -154,28 +154,34 @@ def stack_FLD2():
     util.mkdir(stacks_dir)
 
     # Open Loop
-    open_img_nums = []
+    open_img_nums = [20, 26, 32, 34, 38, 39, 40, 42, 45, 48, 51, 54, 57]
+    open_img_nums += [60, 63, 66, 69, 72, 75, 78, 81, 84, 87, 90, 93, 95]
+    open_img_nums += [99, 102, 105, 108, 111, 113, 116, 119,  122, 125, 128]
     open_images = [data_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in open_img_nums]
     open_starlists = [data_dir + 'obj{0:04d}_o_clean_stars.txt'.format(ii) for ii in open_img_nums]
     open_output_root = stacks_dir + 'FLD2_2_stack_open'
     reduce_fli.shift_and_add(open_images, open_starlists, open_output_root, method='mean')
     
     # Closed Loop
-    closed_img_nums = []
+    closed_img_nums = [19, 21, 22, 23, 24, 25, 27, 28, 29, 30, 31]
     closed_images = [data_dir + 'obj{0:04d}_c_clean.fits'.format(ii) for ii in closed_img_nums]
     closed_starlists = [data_dir + 'obj{0:04d}_c_clean_stars.txt'.format(ii) for ii in closed_img_nums]
     closed_output_root = stacks_dir + 'FLD2_2_stack_closed'
     reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
     
     # Closed A
-    closed_img_nums = []
+    closed_img_nums = [33, 41, 44, 47, 50, 53, 56, 59, 62, 65, 68]
+    closed_img_nums += [71, 74, 77, 80, 83, 86, 89, 92, 94]
+    closed_img_nums += [98, 101, 104, 107, 110, 112, 115, 118, 121, 124, 127]
     closed_images = [data_dir + 'obj{0:04d}_cA_clean.fits'.format(ii) for ii in closed_img_nums]
     closed_starlists = [data_dir + 'obj{0:04d}_cA_clean_stars.txt'.format(ii) for ii in closed_img_nums]
     closed_output_root = stacks_dir + 'FLD2_2_stack_closedA'
     reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
     
     # Closed B
-    closed_img_nums = []
+    closed_img_nums = [35, 36, 37, 43,46, 49, 52, 55, 58, 61, 64]
+    closed_img_nums += [67, 70, 73, 76, 79, 82, 85, 88, 91, 96]
+    fnumclosed_img_nums += [100, 103, 106, 109, 114, 117,120, 123, 126, 129]
     closed_images = [data_dir + 'obj{0:04d}_cB_clean.fits'.format(ii) for ii in closed_img_nums]
     closed_starlists = [data_dir + 'obj{0:04d}_cB_clean_stars.txt'.format(ii) for ii in closed_img_nums]
     closed_output_root = stacks_dir + 'FLD2_2_stack_closedB'
