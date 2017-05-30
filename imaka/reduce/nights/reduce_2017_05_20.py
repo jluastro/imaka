@@ -59,14 +59,12 @@ def reduce_FLD2():
     # Closed A
     fnum = [12, 13, 16, 19, 22, 25, 28, 31, 34, 37, 40, 43, 46, 49, 52, 55]
     fnum += [58, 61, 64, 67, 70, 73, 76, 79, 82, 85, 88, 91]
-    fnum += [98, 101, 104, 107, 110, 112, 115, 118, 121, 124, 127]
     img_files = [data_dir + 'obj{0:04d}_cA.fits'.format(ii) for ii in fnum]
     reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'FLD2_2_sky.fits', flat_frame = flat_dir + 'flat.fits')
 
     # Closed D
     fnum = [18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63]
     fnum += [66, 69, 72, 75, 78, 81, 84, 87, 90, 93]
-    fnum += [100, 103, 106, 109, 114, 117,120, 123, 126, 129]
     img_files = [data_dir + 'obj{0:04d}_cB.fits'.format(ii) for ii in fnum]
     reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'FLD2_2_sky.fits', flat_frame = flat_dir + 'flat.fits')
     
@@ -86,15 +84,13 @@ def find_stars_FLD2():
     
     fnum = [12, 13, 16, 19, 22, 25, 28, 31, 34, 37, 40, 43, 46, 49, 52, 55]
     fnum += [58, 61, 64, 67, 70, 73, 76, 79, 82, 85, 88, 91]
-    fnum += [98, 101, 104, 107, 110, 112, 115, 118, 121, 124, 127]
     img_files = [data_dir + 'obj{0:04d}_cA_clean.fits'.format(ii) for ii in fnum]
     reduce_fli.find_stars(img_files, fwhm=6, threshold=6)    
 
     # Closed D
     fnum = [18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63]
     fnum += [66, 69, 72, 75, 78, 81, 84, 87, 90, 93]
-    fnum += [100, 103, 106, 109, 114, 117,120, 123, 126, 129]
-    img_files = [data_dir + 'obj{0:04d}_cB_clean.fits'.format(ii) for ii in fnum]
+    img_files = [data_dir + 'obj{0:04d}_cD_clean.fits'.format(ii) for ii in fnum]
     reduce_fli.find_stars(img_files, fwhm=6, threshold=6)    
 
     return
@@ -114,16 +110,14 @@ def calc_star_stats():
     # Closed A
     fnum = [12, 13, 16, 19, 22, 25, 28, 31, 34, 37, 40, 43, 46, 49, 52, 55]
     fnum += [58, 61, 64, 67, 70, 73, 76, 79, 82, 85, 88, 91]
-    fnum += [98, 101, 104, 107, 110, 112, 115, 118, 121, 124, 127]
     img_files = [data_dir + "obj{0:04d}_cA_clean.fits".format(ii) for ii in fnum]
     reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closedA.fits')
 
     # Closed D
     fnum = [18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63]
     fnum += [66, 69, 72, 75, 78, 81, 84, 87, 90, 93]
-    fnum += [100, 103, 106, 109, 114, 117,120, 123, 126, 129]
-    img_files = [data_dir + "obj{0:04d}_cB_clean.fits".format(ii) for ii in fnum]
-    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closedB.fits')
+    img_files = [data_dir + "obj{0:04d}_cD_clean.fits".format(ii) for ii in fnum]
+    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closedD.fits')
     
     return 
 
@@ -141,24 +135,22 @@ def stack_FLD2():
     open_images = [data_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in open_img_nums]
     open_starlists = [data_dir + 'obj{0:04d}_o_clean_stars.txt'.format(ii) for ii in open_img_nums]
     open_output_root = stacks_dir + 'FLD2_2_stack_open'
-    reduce_fli.shift_and_add(open_images, open_starlists, open_output_root, method='mean')
+    #reduce_fli.shift_and_add(open_images, open_starlists, open_output_root, method='mean')
     
     # Closed A
     closed_img_nums = [12, 13, 16, 19, 22, 25, 28, 31, 34, 37, 40, 43, 46, 49, 52, 55]
-    fnum += [58, 61, 64, 67, 70, 73, 76, 79, 82, 85, 88, 91]
-    fnum += [98, 101, 104, 107, 110, 112, 115, 118, 121, 124, 127]
+    closed_img_nums += [58, 61, 64, 67, 70, 73, 76, 79, 82, 85, 88, 91]
     closed_images = [data_dir + 'obj{0:04d}_cA_clean.fits'.format(ii) for ii in closed_img_nums]
     closed_starlists = [data_dir + 'obj{0:04d}_cA_clean_stars.txt'.format(ii) for ii in closed_img_nums]
     closed_output_root = stacks_dir + 'FLD2_2_stack_closedA'
-    reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
+    #reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
     
     # Closed D
     closed_img_nums = [18, 21, 24, 27, 30, 33, 36, 39, 42, 45, 48, 51, 54, 57, 60, 63]
-    fnum += [66, 69, 72, 75, 78, 81, 84, 87, 90, 93]
-    fnum += [100, 103, 106, 109, 114, 117,120, 123, 126, 129]
-    closed_images = [data_dir + 'obj{0:04d}_cB_clean.fits'.format(ii) for ii in closed_img_nums]
-    closed_starlists = [data_dir + 'obj{0:04d}_cB_clean_stars.txt'.format(ii) for ii in closed_img_nums]
-    closed_output_root = stacks_dir + 'FLD2_2_stack_closedB'
+    closed_img_nums += [66, 69, 72, 75, 78, 81, 84, 87, 90, 93]
+    closed_images = [data_dir + 'obj{0:04d}_cD_clean.fits'.format(ii) for ii in closed_img_nums]
+    closed_starlists = [data_dir + 'obj{0:04d}_cD_clean_stars.txt'.format(ii) for ii in closed_img_nums]
+    closed_output_root = stacks_dir + 'FLD2_2_stack_closedD'
     reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
 
     return
@@ -169,9 +161,8 @@ def analyze_stacks():
     stats_dir = root_dir + 'reduce/stats/'
     
     img_files = [data_dir + 'FLD2_2_stack_open.fits',
-                 data_dir + 'FLD2_2_stack_closed.fits',
                  data_dir + 'FLD2_2_stack_closedA.fits',
-                 data_dir + 'FLD2_2_stack_closedB.fits']
+                 data_dir + 'FLD2_2_stack_closedD.fits']
     
     #Find stars in image
     reduce_fli.find_stars(img_files, fwhm=5, threshold=10, N_passes=2, plot_psf_compare=False)
