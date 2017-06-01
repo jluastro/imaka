@@ -132,6 +132,62 @@ def append_alt_data(stats_file, alt_file, date):
 
 
 
+def append_altaz(stats_file, img_file_dir):
+	
+# Reads coordinates and observation time/date from image headers, calculates alt/az coordinates and hour angle,
+# appends these values to stats tables.  Inputs: a single stats files, and the directory where the raw images 
+# are from which the headers should be read.
+    
+    mauna_kea = EarthLocation(lat=19.8206*u.deg, lon=-155.4681*u.deg, height=4207*u.m)
+    
+    # Read in stats table and image files in that table
+    stats_table = Table.read(stats_file)
+    img_files = stats_table['Image']
+    
+    # Make some empty columns for new data
+    az = np.zeros(len(img_files), dtype=float)
+    alt = np.zeros(len(img_files), dtype=float)
+    HA = []
+    # Calculate new data from each header
+    for ii in range(len(img_files)):
+        file = img_file_dir + img_files[ii].split("/")[-1]
+        
+        # Read in header data
+        data, hdr = fits.getdata(file, header=True)
+        DEC = hdr['DEC']
+        RA = hdr['RA']
+        UTIM = hdr['UTIME']
+        date = hdr['DATEOBS']
+        
+        # Define observation parameters
+        time = Time(date[6:]+"-"+date[0:2]+"-"+date[3:5]+ " " +UTIM, scale='utc', location=mauna_kea)
+        mauna_kea = EarthLocation(lat=19.8206*u.deg, lon=-155.4681*u.deg, height=4207*u.m)
+        c = SkyCoord(RA*u.hour, DEC*u.deg)
+        
+        # Calculate Alt/Az coordinates (both output in degrees)
+        alt_az = c.transform_to(AltAz(obstime=time, location=mauna_kea))
+        string = alt_az.to_string('decimal').split(" ")
+        az[ii] = string[0]
+        alt[ii] = string[1]
+        
+        # Calculate local sidereal time and hour angle:
+        lst = time.sidereal_time('apparent')
+        hour_angle = lst - c.ra
+        HA.append(hour_angle.to_string("hour"))
+    
+    HA = np.array(HA)
+    
+    # Make columns to append to table
+    col_az = Column(name='AZ', data=az)
+    col_alt = Column(name='ALT', data=alt)
+    col_HA = Column(name='HA', data=HA)
+    
+    stats_table.add_columns([col_az, col_alt, col_HA])
+    stats_file_root, stats_file_ext = os.path.splitext(stats_file)
+    stats_table.write(stats_file_root + '_altaz' + stats_file_ext, overwrite=True)
+    
+    return
+
 
 
 def match_cols(open_file, closed_file, comp_col):
