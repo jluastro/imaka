@@ -3,6 +3,9 @@ import numpy as np
 from imaka.analysis import plot_stats
 from astropy.table import Table, Column
 from astropy.io import fits
+from astropy.time import Time
+from astropy.coordinates import SkyCoord, EarthLocation, AltAz
+from astropy import units as u
 import datetime
 import os
 
