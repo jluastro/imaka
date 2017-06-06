@@ -63,14 +63,17 @@ def model_plot(model, image, amp, x_wid=5, y_wid=5, angle=0, fignumber=1, title=
     fit_p_o = fitting.LevMarLSQFitter()
     p_o = fit_p_o(p_init_o, x_o, y_o, z_o)
     residual_o = np.sum((z_o - p_o(x_o, y_o))**2)
-
+    PSF_mean = np.mean(z_o)
+    diff = z_o - PSF_mean
+    FUV = residual_o / np.sum((diff)**2)
     # Plotting
-    plt.figure(fignumber, figsize=(12, 2.5)); plt.suptitle("Open Loop")
+    plt.figure(fignumber, figsize=(12, 2.5)); plt.suptitle(title)
     plt.subplot(1,3,1); plt.imshow(z_o, origin='lower', interpolation='nearest');plt.colorbar(); plt.title("Data")
     plt.subplot(1,3,2); plt.imshow(p_o(x_o, y_o), origin='lower', interpolation='nearest');plt.colorbar(); plt.title("Model")
     plt.subplot(1,3,3); plt.imshow(z_o - p_o(x_o, y_o), origin='lower', interpolation='nearest');plt.colorbar(); plt.title("Residual")
     plt.tight_layout()
-    print("Least Squares Sums", "\n", "Open:",residual_o)
+    print("Least Squares Sum - ", title, ": ",'{:.2e}'.format(residual_o))
+    print("FUV - ", title, ": ",'{:.2e}'.format(FUV))
 
     return p_o
 
@@ -93,13 +96,18 @@ def model_plot_double(model, image, amp, x_wid_0=5, y_wid_0=5, x_wid_1=5, y_wid_
     p_o = fit_p_o(p_init_o, x_o, y_o, z_o)
     residual_o = np.sum((z_o - p_o(x_o, y_o))**2)
 
+    PSF_mean = np.mean(z_o)
+    diff = z_o - PSF_mean
+    FUV = residual_o / np.sum((diff)**2)
+
     # Plotting
-    plt.figure(fignumber, figsize=(12, 2.5)); plt.suptitle("Open Loop")
+    plt.figure(fignumber, figsize=(12, 2.5)); plt.suptitle(title)
     plt.subplot(1,3,1); plt.imshow(z_o, origin='lower', interpolation='nearest');plt.colorbar(); plt.title("Data")
     plt.subplot(1,3,2); plt.imshow(p_o(x_o, y_o), origin='lower', interpolation='nearest');plt.colorbar(); plt.title("Model")
     plt.subplot(1,3,3); plt.imshow(z_o - p_o(x_o, y_o), origin='lower', interpolation='nearest');plt.colorbar(); plt.title("Residual")
     plt.tight_layout()
-    print("Least Squares Sums", "\n", "Open:",residual_o)
+    print("Least Squares Sum - ", title, ": ",'{:.2e}'.format(residual_o))
+    print("FUV - ", title, ": ",'{:.2e}'.format(FUV))
 
     return p_o
 
