@@ -13,6 +13,9 @@ import glob
 import matplotlib.pyplot as plt
 import matplotlib
 from imaka.analysis import add_data
+from astropy.io import fits
+from pandas import read_csv
+
 
 def fetch_stats_from_onaga(dates, output_root):
     """
@@ -1078,8 +1081,8 @@ def plot_fwhmvt(open_file, closed_file, comp_col, title, plots_dir):
         dimm = stats1['DIMM']
         for i in range(len(stats1)):
             wvln = filter2wv(stats1['FILTER'][i])
-            scale = 4 * stats1['BINFAC'][i]
-            factor = ((500/wvln)**0.2) / scale
+            scale = 0.04 * stats1['BINFAC'][i]
+            factor = ((500/wvln)**0.2) * scale
             calib.append(factor)
 
     else:
@@ -1087,12 +1090,20 @@ def plot_fwhmvt(open_file, closed_file, comp_col, title, plots_dir):
         dimm = stats2['DIMM']
         for i in range(len(stats2)):
             wvln = filter2wv(stats2['FILTER'][i])
-            scale = 4 * stats2['BINFAC'][i]
-            factor = ((500/wvln)**0.2) / scale
+            scale = 0.04 * stats2['BINFAC'][i]
+            factor = ((500/wvln)**0.2) * scale
             calib.append(factor)
                 
     open_err = err1 * calib
+    print("open_err", len(open_err)) #####
     closed_err = err2 * calib
+    print("closed_err", len(closed_err)) #####
+    print("open_err", len(open_err)) #####
+    print('combo', len(data1*calib))
+
+    print("data1", len(data1))
+    print("data2", len(data2))
+    print("calib", len(calib))
 
     #Plot fwhm and seeing vs time
     times = []
@@ -1100,6 +1111,7 @@ def plot_fwhmvt(open_file, closed_file, comp_col, title, plots_dir):
         string = str(date[i])+str(time[i])
         dt_obj = datetime.strptime(string, "b'%Y-%m-%d'b'%H:%M:%S'")
         times.append(dt_obj)
+    print("times", len(times)) #####
 
     plt.figure(1, figsize=(12, 6))
     plt.errorbar(times, data1*calib, yerr=open_err, fmt='o', label="Open")
@@ -1147,6 +1159,7 @@ def plot_EE(labels, data_dir_root, stats_dir_end):
     plt.ylabel('Closed EE / Open EE')
     plt.title('80EE')
     plt.axis([0, 2, 0, 2])
+    plt.suptitle('Encircled Energy Profile')
     #plt.legend(loc=4)
 
     #####
@@ -1209,120 +1222,84 @@ def plot_EE(labels, data_dir_root, stats_dir_end):
 
 
 def plot_week_fwhm(labels, data_dir_root, stats_dir_end, title):
-    
-    #plots fwhm vs seeing (open v dimm and closed v mass) for a week of observing
-    #inputs:
-        #labels: a list of entries of the form [date, closed stat ending, wavelength]
-                #e.g ['20170217', 'closeda', 658]
-        #data_dir_root: directory before data, e.g. "/Users/astrouser/Desktop/Reserach/imaka/RUN4/"
-        #stats_dir_end: location of stats file after date dir, e.g.: "/FLI/reduce/stats/"
-        #title: a string for the title of the plot
-    
-    
-    open_file1 = data_dir_root+labels[0][0]+stats_dir_end + "stats_open_mdp.fits"
-    open_file2 = data_dir_root+labels[1][0]+stats_dir_end + "stats_open_mdp.fits"
-    open_file3 = data_dir_root+labels[2][0]+stats_dir_end + "stats_open_mdp.fits"
-    if len(labels) > 3:
-        open_file4 = data_dir_root+labels[3][0]+stats_dir_end + "stats_open_mdp.fits"
-    if len(labels) > 4:
-        open_file5 = data_dir_root+labels[4][0]+stats_dir_end + "stats_open_mdp.fits"
-
-    o1 = Table.read(open_file1)
-    o2 = Table.read(open_file2)
-    o3 = Table.read(open_file3)
-    if len(labels) > 3:
-        o4 = Table.read(open_file4)
-    if len(labels) > 4:
-        o5 = Table.read(open_file5)
-
-    closed_file1 = data_dir_root +labels[0][0]+stats_dir_end + "stats_"+labels[0][1]+"_mdp.fits"
-    closed_file2 = data_dir_root +labels[1][0]+stats_dir_end + "stats_"+labels[1][1]+"_mdp.fits"
-    closed_file3 = data_dir_root +labels[2][0]+stats_dir_end + "stats_"+labels[2][1]+"_mdp.fits"
-    if len(labels) > 3:
-        closed_file4 = data_dir_root +labels[3][0]+stats_dir_end + "stats_"+labels[3][1]+"_mdp.fits"
-    if len(labels) > 4:
-        closed_file5 = data_dir_root +labels[4][0]+stats_dir_end + "stats_"+labels[4][1]+"_mdp.fits"
-
-    c1 = Table.read(closed_file1)
-    c2 = Table.read(closed_file2)
-    c3 = Table.read(closed_file3)
-    if len(labels) > 3:
-        c4 = Table.read(closed_file4)
-    if len(labels) > 4:
-        c5 = Table.read(closed_file5)
-
-    scale=12
-
-    col = 'emp_fwhm'
 
     plt.figure(1, figsize=(8, 8))
-    plt.plot(o1['DIMM'], o1[col]*((500/labels[0][2])**(1/5))/scale, 'bo', label='Open vs DIMM')
-    plt.plot(o2['DIMM'], o2[col]*((500/labels[1][2])**(1/5))/scale, 'bo', label='_nolegend_')
-    plt.plot(o3['DIMM'], o3[col]*((500/labels[2][2])**(1/5))/scale, 'bo', label='_nolegend_')
-    if len(labels) > 3:
-        plt.plot(o4['DIMM'], o4[col]*((500/labels[3][2])**(1/5))/scale, 'bo', label='_nolegend_')
-    if len(labels) > 4:
-        plt.plot(o5['DIMM'], o5[col]*((500/labels[4][2])**(1/5))/scale, 'bo', label='_nolegend_')
+    scale = 0.04
+    for day in labels:
+        open_file = data_dir_root+day[0]+stats_dir_end + "stats_open_mdp.fits"
+        open_data = Table.read(open_file)
+        o_data = np.array(open_data['emp_fwhm'])
+        o_binfac = np.array(open_data['BINFAC'])
+        o_filt =  filter2wv(np.array(open_data['FILTER']))    
+        open_fin = o_data * scale* o_binfac * (500/o_filt)**(1/5)
+        DIMM = np.array(open_data['DIMM'])
 
-    plt.plot(c1['MASS'], c1[col]*((500/labels[0][2])**(1/5))/scale, 'ro', label='Closed vs MASS')
-    plt.plot(c2['MASS'], c2[col]*((500/labels[1][2])**(1/5))/scale, 'ro', label='_nolegend_')
-    plt.plot(c3['MASS'], c3[col]*((500/labels[2][2])**(1/5))/scale, 'ro', label='_nolegend_')
-    if len(labels) > 3:
-        plt.plot(c4['MASS'], c4[col]*((500/labels[3][2])**(1/5))/scale, 'ro', label='_nolegend_')
-    if len(labels) > 4:
-        plt.plot(c5['MASS'], c5[col]*((500/labels[4][2])**(1/5))/scale, 'ro', label='_nolegend_')
+        closed_file = data_dir_root +day[0]+stats_dir_end + "stats_"+day[1]+"_mdp.fits"
+        closed_data = Table.read(closed_file)
+        c_data = np.array(closed_data['emp_fwhm'])
+        c_binfac = np.array(closed_data['BINFAC'])
+        c_filt =  filter2wv(np.array(closed_data['FILTER']))    
+        closed_fin = c_data * scale* c_binfac * (500/c_filt)**(1/5)
+        MASS = np.array(closed_data['MASS'])
+
+        if day == labels[0]:
+            plt.plot(DIMM, open_fin, 'bo', label='Open vs DIMM')
+            plt.plot(MASS, closed_fin, 'ro', label='Closed vs MASS')
+        else:
+            plt.plot(DIMM, open_fin, 'bo')
+            plt.plot(MASS, closed_fin, 'ro')
 
     plt.plot([0, 2], [0, 2], 'k-')
     plt.xlabel('Seeing (as)')
     plt.ylabel('Empirical FWHM (as)')
     plt.title(title)
     plt.legend(loc=2)
-
+    
     return
 
 
 def plot_hist(labels, data_dir_root, stats_dir_end, title):
 
-    scale=12
+    scale=0.08
 
     open_file1 = data_dir_root + labels[0][0] + stats_dir_end + "stats_open_mdp.fits"
     open_file2 = data_dir_root + labels[1][0] + stats_dir_end + "stats_open_mdp.fits"
     open_file3 = data_dir_root + labels[2][0] + stats_dir_end + "stats_open_mdp.fits"
 
-    o1 = np.array(Table.read(open_file1)['emp_fwhm']*((500/labels[0][2])**(1/5))/scale)
-    o2 = np.array(Table.read(open_file2)['emp_fwhm']*((500/labels[1][2])**(1/5))/scale)
-    o3 = np.array(Table.read(open_file3)['emp_fwhm']*((500/labels[2][2])**(1/5))/scale)
+    o1 = np.array(Table.read(open_file1)['emp_fwhm']*((500/labels[0][2])**(1/5))*scale)
+    o2 = np.array(Table.read(open_file2)['emp_fwhm']*((500/labels[1][2])**(1/5))*scale)
+    o3 = np.array(Table.read(open_file3)['emp_fwhm']*((500/labels[2][2])**(1/5))*scale)
 
     closed_file1 = data_dir_root +labels[0][0]+stats_dir_end + "stats_"+labels[0][1]+"_mdp.fits"
     closed_file2 = data_dir_root +labels[1][0]+stats_dir_end + "stats_"+labels[1][1]+"_mdp.fits"
     closed_file3 = data_dir_root +labels[2][0]+stats_dir_end + "stats_"+labels[2][1]+"_mdp.fits"
 
-    c1 = np.array(Table.read(closed_file1)['emp_fwhm']*((500/labels[0][2])**(1/5))/scale)
-    c2 = np.array(Table.read(closed_file2)['emp_fwhm']*((500/labels[1][2])**(1/5))/scale)
-    c3 = np.array(Table.read(closed_file3)['emp_fwhm']*((500/labels[2][2])**(1/5))/scale)
+    c1 = np.array(Table.read(closed_file1)['emp_fwhm']*((500/labels[0][2])**(1/5))*scale)
+    c2 = np.array(Table.read(closed_file2)['emp_fwhm']*((500/labels[1][2])**(1/5))*scale)
+    c3 = np.array(Table.read(closed_file3)['emp_fwhm']*((500/labels[2][2])**(1/5))*scale)
 
     all_fwhm_open = np.concatenate((o1, o2, o3), axis=0)
     all_fwhm_closed = np.concatenate((c1, c2, c3), axis=0)
         
     if len(labels) > 3:
         open_file4 = data_dir_root + labels[3][0] + stats_dir_end + "stats_open_mdp.fits"
-        o4 = np.array(Table.read(open_file4)['emp_fwhm']*((500/labels[3][2])**(1/5))/scale)
+        o4 = np.array(Table.read(open_file4)['emp_fwhm']*((500/labels[3][2])**(1/5))*scale)
         closed_file4 = data_dir_root +labels[3][0]+stats_dir_end + "stats_"+labels[3][1]+"_mdp.fits"
-        c4 = np.array(Table.read(closed_file4)['emp_fwhm']*((500/labels[3][2])**(1/5))/scale)
+        c4 = np.array(Table.read(closed_file4)['emp_fwhm']*((500/labels[3][2])**(1/5))*scale)
         all_fwhm_open = np.concatenate((o1, o2, o3, o4), axis=0)
         all_fwhm_closed = np.concatenate((c1, c2, c3, c4), axis=0)
     
     if len(labels) > 4:
         open_file5 = data_dir_root + labels[4][0] + stats_dir_end + "stats_open_mdp.fits"
-        o5 = np.array(Table.read(open_file5)['emp_fwhm']*((500/labels[4][2])**(1/5))/scale)
+        o5 = np.array(Table.read(open_file5)['emp_fwhm']*((500/labels[4][2])**(1/5))*scale)
         closed_file5 = data_dir_root +labels[4][0]+stats_dir_end + "stats_"+labels[4][1]+"_mdp.fits"
-        c5 = np.array(Table.read(closed_file5)['emp_fwhm']*((500/labels[4][2])**(1/5))/scale)
+        c5 = np.array(Table.read(closed_file5)['emp_fwhm']*((500/labels[4][2])**(1/5))*scale)
         all_fwhm_open = np.concatenate((o1, o2, o3, o4, o5), axis=0)
         all_fwhm_closed = np.concatenate((c1, c2, c3, c4, c5), axis=0) 
         
     plt.figure(2, figsize =(10, 6))
-    plt.hist(all_fwhm_open, bins=15, alpha=0.5, color='blue', label='Open Loop')
-    plt.hist(all_fwhm_closed, bins=15, alpha=0.5, color='red', label='Closed Loop')
+    plt.hist(all_fwhm_open,  alpha=0.5, color='blue', label='Open Loop')
+    plt.hist(all_fwhm_closed, alpha=0.5, color='red', label='Closed Loop')
     plt.legend(loc=1)
     plt.xlabel('Empirical FWHM')
     plt.title(title)
@@ -1334,15 +1311,31 @@ def filter2wv(filter_label):
 
     #converts filter label from fits header into wavelength in nanometers 
     
-    if filter_label == "I":
-        return 806
-    elif filter_label == "R":
-        return 658
-    elif filter_label == "1_micronlp":
-        return 1000
-    else: 
-        print("Filter not found: defaulting to 500 nm")
-        return 500
+    if type(filter_label)==str:
+        if filter_label == "I":
+            return 806
+        elif filter_label == "R":
+            return 658
+        elif filter_label == "1_micronlp":
+            return 1000
+        else: 
+            print("Filter not found: defaulting to 500 nm")
+            return 500
+    else:
+        new_array = np.zeros(len(filter_label))
+        for i in range(len(filter_label)):
+            if filter_label[i] == "I":
+                new_array[i] = 806
+            elif filter_label[i] == "R":
+                new_array[i] = 658
+            elif filter_label == "1_micronlp":
+                rew_array[i] = 1000
+            else:
+                print("Filter not found: defaulting to 500 nm")
+                new_array[i] = 500
+        return new_array
+        
+                
 
 
 def plot_field_var(starlist):
@@ -1390,6 +1383,8 @@ def plot_fwhmvt_nomatch(open_file, closed_file, comp_col, title, plots_dir):
     #plots_dir: directory to put generated plot in
     
     #Read in data
+    comp_col = 'emp_fwhm'
+        #Read in data
     stats1 = Table.read(open_file)
     stats2 = Table.read(closed_file)
 
@@ -1397,10 +1392,10 @@ def plot_fwhmvt_nomatch(open_file, closed_file, comp_col, title, plots_dir):
     time2, date2, data1, data2, err1, err2 = add_data.match_cols(closed_file, closed_file, comp_col)
 
 
-    
+
     calib1 = []; calib2=[]
-    
-    #Get mass/dimm data
+
+        #Get mass/dimm data
     mass = stats2['MASS']
     dimm = stats1['DIMM']
     for i in range(len(stats1)):
@@ -1415,35 +1410,109 @@ def plot_fwhmvt_nomatch(open_file, closed_file, comp_col, title, plots_dir):
         factor = ((500/wvln)**0.2) * scale
         calib2.append(factor)
 
-                
-    open_err = stats1['emp_fwhm_std'] * calib1
-    closed_err = stats2['emp_fwhm_std'] * calib2
 
-    #Plot fwhm and seeing vs time
+    open_err = np.array(stats1['emp_fwhm_std']) * np.array(calib1)[:,0]
+    closed_err = np.array(stats2['emp_fwhm_std']) * np.array(calib2)[:,0]
+
+        #Plot fwhm and seeing vs time
     times1 = []
     for i in range(len(time1)):
         string = str(date1[i])+str(time1[i])
         dt_obj = datetime.strptime(string, "b'%Y-%m-%d'b'%H:%M:%S'")
         times1.append(dt_obj)
-        
+
     times2 = []
     for i in range(len(time2)):
         string = str(date2[i])+str(time2[i])
         dt_obj = datetime.strptime(string, "b'%Y-%m-%d'b'%H:%M:%S'")
         times2.append(dt_obj)
 
-    plt.figure(1, figsize=(12, 6))
-    plt.errorbar(times1, stats1['emp_fwhm']*calib1, yerr=open_err, fmt='o', label="Open")
-    plt.errorbar(times2, stats2['emp_fwhm']*calib2, yerr=closed_err, fmt='ro', label="Closed")
+    plt.figure(1, figsize=(12, 4))
+    plt.errorbar(times1, np.array(stats1['emp_fwhm'])*np.array(calib1)[:,0], yerr=open_err, fmt='o', label="Open")
+    plt.errorbar(times2, np.array(stats2['emp_fwhm'])*np.array(calib2)[:,0], yerr=closed_err, fmt='ro', label="Closed")
     plt.plot(times1, dimm, 'b-')
     plt.plot(times2, mass, 'r-')
     plt.ylabel(comp_col)
     plt.xlabel("UTC Time")
     plt.xticks(rotation=35)
-    plt.ylim(0, 2.5)
+    plt.ylim(0, 2)
     plt.title(title)
     plt.gca().xaxis.set_major_formatter(mp_dates.DateFormatter('%H:%M'))
     plt.legend()
 
     plt.savefig(plots_dir + 'fwhm_v_time' + '.png')
+    return
+
+
+
+def compare_seeing(date):
+
+    #compares Olivier's seeing data for integrated seeing and free atmosphere to Mauna Kea's MASS/DIMM measurments.  only date string needed, but assumes organization of files like on onaga, with massdimm and stats files available.
+    
+    if date[5] == "5":
+        run = "5"
+    elif date[5] == "2":
+        run = "4"
+    elif date[5] == "1":
+        run = "3"
+    stat_dir = "/Users/fatimaabdurrahman/Desktop/Research/RUN"+run+"/"+date+"/FLI/reduce/stats/"
+    md_dir = "/Users/fatimaabdurrahman/Desktop/Research/RUN"+run+"/"+date+"/FLI/reduce/massdimm/"
+    alt_file = stat_dir + "profile-data_"+date+"-noTT.fits"
+    dimm_file = md_dir +date+".dimm.dat"
+    mass_file = md_dir +date+".mass.dat"
+
+    table = read_csv(dimm_file, delim_whitespace=True, names= \
+                    ['year', 'month', 'day', 'hour', 'minute', 'second', 'seeing'])
+
+    year  = np.array(table['year'])
+    month = np.array(table['month'])
+    day   = np.array(table['day'])
+    hour   = np.array(table['hour'])
+    minute = np.array(table['minute'])
+    second = np.array(table['second'])
+    dimm_seeing = np.array(table['seeing'])
+    hour += 10
+    idx = np.where(hour >=24)[0]
+    day[idx] += 1
+    hour[idx] -= 24
+    timeInHours_dimm = hour + (minute/60.0) + (second/3600.0)
+
+
+    table = read_csv(mass_file, delim_whitespace=True, names= \
+                     ['year', 'month', 'day', 'hour', 'minute', 'second', 'seeing'])
+
+    year  = np.array(table['year'])
+    month = np.array(table['month'])
+    day   = np.array(table['day'])
+    hour   = np.array(table['hour'])
+    minute = np.array(table['minute'])
+    second = np.array(table['second'])
+    mass_seeing = np.array(table['seeing'])
+    hour += 10
+    idx = np.where(hour >=24)[0]
+    day[idx] += 1
+    hour[idx] -= 24
+    timeInHours_mass = hour + (minute/60.0) + (second/3600.0)
+
+    data = fits.getdata(alt_file)
+
+    #blues
+    f, (ax1, ax2) = plt.subplots(2, figsize=(15,5), sharex=True, sharey=True)
+    ax1.plot(timeInHours_dimm, dimm_seeing, '.-', color='#00bfff', markersize=10, label='DIMM')
+    ax1.plot(data[:,0], data[:,1], '.-', color='Navy', markersize=10, label='Our Data')
+    ax1.axis(plt.axis([np.amin(data[:,0])-((np.amax(data[:,0]-np.amin(data[:,0])))*0.1), np.amax(data[:,0])+((np.amax(data[:,0]-np.amin(data[:,0])))*0.1),0, np.amax(data[:,1])+0.2]))
+    ax1.set_title(date, fontsize=15)
+    ax1.set_ylabel('Integrated Seeing')
+
+#red
+    ax2.plot(timeInHours_mass, mass_seeing, '.-', color='Tomato', markersize=10, label='MASS')
+    ax2.plot(data[:,0], data[:,-1], '.-', color='Firebrick', markersize=10, label='Our Data')
+    ax2.set_ylabel('Free Atmosphere Seeing')
+    ax2.set_xlabel('UT Time')
+
+    # Fine-tune figure; make subplots close to each other and hide x ticks for
+    # all but bottom plot.
+    f.subplots_adjust(hspace=0)
+    plt.setp([a.get_xticklabels() for a in f.axes[:-1]], visible=False)
+    
     return
