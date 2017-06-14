@@ -287,16 +287,15 @@ def fetch_data(utDate, saveTo):
     util.mkdir(saveTo)
 
     urlRoot = 'http://mkwc.ifa.hawaii.edu/current/seeing/'
+    # Save the DIMM file
+    dimmFile = utDate + '.dimm.dat'
+    url = urlRoot + 'dimm/' + dimmFile
+    urllib.request.urlretrieve(url, saveTo + dimmFile)
     
     # Save the MASS file
     massFile = utDate + '.mass.dat'
     url = urlRoot + 'mass/' + massFile
     urllib.request.urlretrieve(url, saveTo + massFile)
-
-    # Save the DIMM file
-    dimmFile = utDate + '.dimm.dat'
-    url = urlRoot + 'dimm/' + dimmFile
-    urllib.request.urlretrieve(url, saveTo + dimmFile)
 
     # Save the MASS profile
     massproFile = utDate + '.masspro.dat'

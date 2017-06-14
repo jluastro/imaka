@@ -879,8 +879,8 @@ def plot_all_profiles(dates, root_dir='/Users/dorafohring/Desktop/imaka/data/'):
         The root directory for the <date> observing run directories. The
         stats files will be searched for in:
         <root_dir>/<date>/fli/reduce/stats/
-        """
-    
+    """
+    savedatadir = '/Users/dorafohring/Desktop/imaka/data/'
     stats = []
     
     for date in dates:
@@ -901,10 +901,7 @@ def plot_all_profiles(dates, root_dir='/Users/dorafohring/Desktop/imaka/data/'):
     gl = []
     for jj in range(len(st)):
         gl.extend(stats[jj]['DIMM'] - stats[jj]['MASS'])
-
     allprofs = np.array(allprofs)
-    mprofs = np.ma.masked_invalid(allprofs)
-    profave = np.mean(mprofs, axis=1)
     
     ## sets zero and negative numbers to a very small value
     gl = np.array(gl)
@@ -912,11 +909,18 @@ def plot_all_profiles(dates, root_dir='/Users/dorafohring/Desktop/imaka/data/'):
     gl[gindex] = 0.01
     
     cngl = (0.98*0.00000055*206265/gl)**(-5/3) / (16.7*(0.00000055)**(-2))
-    
-    profave = np.insert(profave, obj=0, values=np.mean(cngl))
-    
+
+    glprofs = np.zeros([7,len(gl)])
+    glprofs[0,:]  = cngl
+    glprofs[1:,:] = allprofs
+
+    mprofs = np.ma.masked_invalid(glprofs)
+
+    np.savetxt(savedatadir+'allprofs.txt', glprofs)
+
+    profave = np.mean(mprofs, axis=1)
+
     hlis = [0, 0.5, 1, 2, 4, 8, 16]
-    
     plt.figure(1)
     plt.clf()
     plt.plot(profave, hlis)
