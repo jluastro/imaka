@@ -895,11 +895,12 @@ def plot_all_profiles(dates, root_dir='/Users/dorafohring/Desktop/imaka/data/'):
     allprofs = []
     for altitude in altitudes:
         combine = []
-        for ii in range(len(st)):
+        pdb.set_trace()
+        for ii in range(len(stats)):
             combine.extend(stats[ii][altitude])
         allprofs.append(combine)
     gl = []
-    for jj in range(len(st)):
+    for jj in range(len(stats)):
         gl.extend(stats[jj]['DIMM'] - stats[jj]['MASS'])
     allprofs = np.array(allprofs)
     
@@ -916,7 +917,7 @@ def plot_all_profiles(dates, root_dir='/Users/dorafohring/Desktop/imaka/data/'):
 
     mprofs = np.ma.masked_invalid(glprofs)
 
-    np.savetxt(savedatadir+'allprofs.txt', glprofs)
+    #np.savetxt(savedatadir+'allprofs.txt', glprofs)
 
     profave = np.mean(mprofs, axis=1)
 
@@ -926,10 +927,29 @@ def plot_all_profiles(dates, root_dir='/Users/dorafohring/Desktop/imaka/data/'):
     plt.plot(profave, hlis)
     plt.xlabel(r'$C_n^2$ dh ($m^{1/3}$)')
     plt.ylabel(r'h (km)')
-    plt.title('Average profile over all nights', fontsize=12)
-    plt.savefig(root_dir + 'ave_profile.png')
+    #plt.title('Average profile over all nights', fontsize=12)
+    #plt.savefig(root_dir + 'ave_profile.png')
     plt.show()
     
+    ## summing all free layers
+    cnfree = np.sum(mprofs[1:], axis=0)
+    binprof = np.ma.append(mprofs[0],cnfree).reshape(2,len(cnfree))
+
+    ## to deal with masked arrays need to extract non-masked values
+    mprofs = [[y for y in row if y] for row in binprof]
+
+    ## Box and whisker plot
+    mpfig = plt.figure(2)
+    ax = mpfig.add_subplot(111)
+    ax.boxplot(mprofs, 0, '')
+    plt.xticks([1,2,], ['GL','FA'])
+    plt.scatter([1,2], [9.1571e-14, 2.52333348381e-13])
+    plt.xlabel('Layer altitude (km)')
+    plt.ylabel('Cn2dh ($m^{1/3}$)')
+    plt.show()
+    plt.savefig(root_dir + 'boxandwhisker.png')
+    pdb.set_trace()
+
     return
 
 def plot_best_stats(date, suffixes=['open', 'closed'], out_suffix='', root_dir=''):
@@ -952,7 +972,7 @@ def plot_best_stats(date, suffixes=['open', 'closed'], out_suffix='', root_dir='
         utc_dt = [datetime.strptime(ss['TIME_UTC'][ii], '%H:%M:%S') for ii in range(len(ss))]
         utcs.append(utc_dt)
         
-        # Add NEA FWHM to table (temporarily)
+        # Add NEA FWHM to table (temporarilyll)
         ss['NEA_FWHM'] = nea_to_fwhm(ss['NEA'])
         
         # Get the max value of all the FWHMs
