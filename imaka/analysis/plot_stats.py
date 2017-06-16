@@ -880,6 +880,24 @@ def plot_all_profiles(dates, root_dir='/Users/dorafohring/Desktop/imaka/data/'):
         stats files will be searched for in:
         <root_dir>/<date>/fli/reduce/stats/
     """
+    latexParams = {
+    'figure.dpi'      :150,
+        'figure.figsize':[3.32,2.49],
+            'axes.labelsize'  : 10,
+            'xtick.labelsize' : 10,
+            'ytick.labelsize' : 10,
+            'font.family'     : 'serif',
+            'font.serif'      : 'Computer Modern Roman',
+            'text.usetex'     : True,
+            'figure.subplot.top':0.90,
+            'figure.subplot.right':0.95,
+            'figure.subplot.bottom':0.15,
+            'figure.subplot.left':0.15,
+            'lines.linewidth':1.5,
+            'lines.markersize':3
+        }
+    plt.rcParams.update(latexParams)
+
     savedatadir = '/Users/dorafohring/Desktop/imaka/data/'
     stats = []
     
@@ -895,7 +913,6 @@ def plot_all_profiles(dates, root_dir='/Users/dorafohring/Desktop/imaka/data/'):
     allprofs = []
     for altitude in altitudes:
         combine = []
-        pdb.set_trace()
         for ii in range(len(stats)):
             combine.extend(stats[ii][altitude])
         allprofs.append(combine)
@@ -922,12 +939,11 @@ def plot_all_profiles(dates, root_dir='/Users/dorafohring/Desktop/imaka/data/'):
     profave = np.mean(mprofs, axis=1)
 
     hlis = [0, 0.5, 1, 2, 4, 8, 16]
-    plt.figure(1)
-    plt.clf()
+    plt.figure()
     plt.plot(profave, hlis)
     plt.xlabel(r'$C_n^2$ dh ($m^{1/3}$)')
     plt.ylabel(r'h (km)')
-    #plt.title('Average profile over all nights', fontsize=12)
+    plt.xlim((0, 8E-13))
     #plt.savefig(root_dir + 'ave_profile.png')
     plt.show()
     
@@ -939,16 +955,27 @@ def plot_all_profiles(dates, root_dir='/Users/dorafohring/Desktop/imaka/data/'):
     mprofs = [[y for y in row if y] for row in binprof]
 
     ## Box and whisker plot
-    mpfig = plt.figure(2)
-    ax = mpfig.add_subplot(111)
-    ax.boxplot(mprofs, 0, '')
-    plt.xticks([1,2,], ['GL','FA'])
-    plt.scatter([1,2], [9.1571e-14, 2.52333348381e-13])
-    plt.xlabel('Layer altitude (km)')
-    plt.ylabel('Cn2dh ($m^{1/3}$)')
+    plt.figure(2, figsize= (8.3, 4.2))
+    plt.subplot(121)
+    bins = np.arange(0, 1.3, 0.1)*10E-13
+    plt.hist(mprofs[0], bins=bins, normed=1, histtype='step', label='GL', cumulative=1, color='c')
+    plt.hist(mprofs[1], bins=bins, normed=1, histtype='step', label='FA', cumulative=1, color='r')
+    plt.legend(loc=4)
+    plt.xlabel('Cn2dh ($m^{1/3}$)')
+    plt.ylabel('Probability of being less than')
+
+    plt.subplot(122)
+    plt.xlim((0, 1.6E-12))
+    plt.boxplot(mprofs, 0, '', vert=False)
+    plt.yticks([1,2], ['GL','FA'])
+    plt.scatter([9.1571e-14, 2.52333348381e-13], [1,2] )
+    #plt.ylabel('Layer altitude (km)')
+    plt.xlabel('Cn2dh ($m^{1/3}$)')
+    #plt.savefig(root_dir + 'boxandwhisker.png')
+
     plt.show()
-    plt.savefig(root_dir + 'boxandwhisker.png')
-    pdb.set_trace()
+    plt.savefig('whisker+cum.png')
+
 
     return
 
