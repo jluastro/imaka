@@ -882,7 +882,7 @@ def plot_all_profiles(dates, root_dir='/Users/dorafohring/Desktop/imaka/data/'):
     """
     latexParams = {
     'figure.dpi'      :150,
-        'figure.figsize':[3.32,2.49],
+            'figure.figsize':[3.32,2.49],
             'axes.labelsize'  : 10,
             'xtick.labelsize' : 10,
             'ytick.labelsize' : 10,
@@ -941,6 +941,133 @@ def plot_all_profiles(dates, root_dir='/Users/dorafohring/Desktop/imaka/data/'):
     hlis = [0, 0.5, 1, 2, 4, 8, 16]
     plt.figure()
     plt.plot(profave, hlis)
+    plt.xlabel(r'$C_n^2$ dh ($m^{1/3}$)')
+    plt.ylabel(r'h (km)')
+    plt.xlim((0, 8E-13))
+    #plt.savefig(root_dir + 'ave_profile.png')
+    plt.show()
+    
+    ## summing all free layers
+    cnfree = np.sum(mprofs[1:], axis=0)
+    binprof = np.ma.append(mprofs[0],cnfree).reshape(2,len(cnfree))
+
+    ## to deal with masked arrays need to extract non-masked values
+    mprofs = [[y for y in row if y] for row in binprof]
+
+    ## Box and whisker plot
+    plt.figure(2, figsize= (8.3, 4.2))
+    plt.subplot(121)
+    bins = np.arange(0, 1.3, 0.1)*10E-13
+    plt.hist(mprofs[0], bins=bins, normed=1, histtype='step', label='GL', cumulative=1, color='c')
+    plt.hist(mprofs[1], bins=bins, normed=1, histtype='step', label='FA', cumulative=1, color='r')
+    plt.legend(loc=4)
+    plt.xlabel('Cn2dh ($m^{1/3}$)')
+    plt.ylabel('Probability of being less than')
+
+    plt.subplot(122)
+    plt.xlim((0, 1.6E-12))
+    plt.boxplot(mprofs, 0, '', vert=False)
+    plt.yticks([1,2], ['GL','FA'])
+    plt.scatter([9.1571e-14, 2.52333348381e-13], [1,2] )
+    #plt.ylabel('Layer altitude (km)')
+    plt.xlabel('Cn2dh ($m^{1/3}$)')
+    #plt.savefig(root_dir + 'boxandwhisker.png')
+
+    plt.show()
+    plt.savefig('whisker+cum.png')
+
+    return
+
+def telemetry_profiles(dates, root_dir='/Users/dorafohring/Desktop/imaka/data/'):
+    """
+        Make a suite of standard plots for the stats on a given night.
+        Parameters
+        ----------
+        dates : str
+        The date strings for which to plot up the stats (i.e. ['20170113', '20170114']).
+        Optional Parameters
+        -------------------
+        root_dir : str
+        The root directory for the <date> observing run directories. The
+        stats files will be searched for in:
+        <root_dir>/<date>/fli/reduce/stats/
+    """
+    latexParams = {
+    'figure.dpi'      :150,
+            'figure.figsize':[3.32,2.49],
+            'axes.labelsize'  : 10,
+            'xtick.labelsize' : 10,
+            'ytick.labelsize' : 10,
+            'font.family'     : 'serif',
+            'font.serif'      : 'Computer Modern Roman',
+            'text.usetex'     : True,
+            'figure.subplot.top':0.90,
+            'figure.subplot.right':0.95,
+            'figure.subplot.bottom':0.15,
+            'figure.subplot.left':0.15,
+            'lines.linewidth':1.5,
+            'lines.markersize':3
+        }
+    plt.rcParams.update(latexParams)
+
+    savedatadir = '/Users/dorafohring/Desktop/imaka/data/'
+    stats = []
+    
+    for date in dates:
+        dir = root_dir + date + '/fli/reduce/stats/'
+        mdpfiles = [item for item in os.listdir(dir) if item.endswith('mdp_alt.fits')]
+        for file in mdpfiles:
+            st = Table.read(dir + file)
+            stats.append(st)
+
+    altitudes = ['Cn2dh_005', 'Cn2dh_010', 'Cn2dh_020', 'Cn2dh_040', 'Cn2dh_080', 'Cn2dh_160']
+    alths     = ['alt_0', 'alt_60', 'alt_120', 'alt_180', 'alt_240', 'alt_300', 'alt_360', 'alt_420', 'alt_480', 'alt_560', 'alt_4000']
+    
+    ## MASS DIMM FILES
+    allprofs = []
+    for altitude in altitudes:
+        combine = []
+        for ii in range(len(stats)):
+            combine.extend(stats[ii][altitude])
+        allprofs.append(combine)
+    gl = []
+    for jj in range(len(stats)):
+        gl.extend(stats[jj]['DIMM'] - stats[jj]['MASS'])
+    allprofs = np.array(allprofs)
+    
+    ## sets zero and negative numbers to a very small value
+    gl = np.array(gl)
+    gindex = gl < 0.01
+    gl[gindex] = 0.01
+    
+    cngl = (0.98*0.00000055*206265/gl)**(-5/3) / (16.7*(0.00000055)**(-2))
+
+    glprofs = np.zeros([7,len(gl)])
+    glprofs[0,:]  = cngl
+    glprofs[1:,:] = allprofs
+
+    telprofs = []
+    ## Telemetry
+    for alt in alths:
+        combine = []
+        for ii in range(len(stats)):
+            combine.extend(stats[ii][altitude])
+        telprofs.append(combine)
+    #pdb.set_trace()
+
+    mprofs = np.ma.masked_invalid(glprofs)
+
+    #np.savetxt(savedatadir+'allprofs.txt', glprofs)
+
+    profave  = np.mean(mprofs, axis=1)
+    tprofave = np.mean(telprofs, axis=1)
+
+    hlis = [0, 0.5, 1, 2, 4, 8, 16]
+    thlis = [0, 0.6, 1.2, 1.8, 2.4, 3.0, 3.6, 4.2, 4.8, 5.6, 16]
+    pdb.set_trace()
+    plt.figure()
+    plt.plot(profave, hlis)
+    plt.plot(tprofave, thlis)
     plt.xlabel(r'$C_n^2$ dh ($m^{1/3}$)')
     plt.ylabel(r'h (km)')
     plt.xlim((0, 8E-13))
