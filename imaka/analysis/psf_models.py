@@ -47,6 +47,27 @@ def plot_samples(open_file, x_o, y_o, closed_file, x_c, y_c, cutout_size):
     
     return open_cut, closed_cut
 
+  
+def model_fit(model, image, amp, x_wid=5, y_wid=5, angle=0, fignumber=1, title=None):
+
+    cutout_size = np.shape(image)[0]
+    # Open Fit
+    y_o, x_o = np.mgrid[:cutout_size, :cutout_size]
+    z_o = image
+    
+    if model == "Gaussian":
+        p_init_o = models.Gaussian2D(np.amax(z_o), cutout_size/2, cutout_size/2, x_stddev = x_wid, y_stddev=y_wid, theta=angle)
+    elif model == "Moffat":
+        p_init_o = Elliptical_Moffat2D(amplitude=np.amax(z_o), x_0=cutout_size/2, y_0=cutout_size/2, width_x = x_wid, width_y=y_wid)
+    fit_p_o = fitting.LevMarLSQFitter()
+    p_o = fit_p_o(p_init_o, x_o, y_o, z_o)
+    residual_o = np.sum((z_o - p_o(x_o, y_o))**2)
+    PSF_mean = np.mean(z_o)
+    diff = z_o - PSF_mean
+    FUV = residual_o / np.sum((diff)**2)
+
+    return p_o
+
 
 
 def model_plot(model, image, amp, x_wid=5, y_wid=5, angle=0, fignumber=1, title=None):
