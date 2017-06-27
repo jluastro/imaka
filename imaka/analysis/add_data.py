@@ -373,3 +373,43 @@ def read_starlist(starlist_file):
     
     return x_cents, y_cents, fwhm, x_fwhm, y_fwhm, roundness, dist
 
+
+def combine_all_stats():
+    stats_files = ['RUN3/2017_01_10/fli/reduce/stats/stats_closed.fits',
+                   'RUN3/2017_01_10/fli/reduce/stats/stats_open.fits',
+                   'RUN3/2017_01_11/fli/reduce/stats/stats_closed.fits',
+                   'RUN3/2017_01_11/fli/reduce/stats/stats_open.fits',
+                   'RUN3/2017_01_13/fli/reduce/stats/stats_closed1.fits',
+                   'RUN3/2017_01_13/fli/reduce/stats/stats_open1.fits',
+                   'RUN3/2017_01_13/fli/reduce/stats/stats_closed2.fits',
+                   'RUN3/2017_01_13/fli/reduce/stats/stats_open2.fits',
+                   'RUN4/20170214/FLI/reduce/stats/stats_open_mdp_alt.fits',
+                   'RUN4/20170214/FLI/reduce/stats/stats_closed_mdp_alt.fits',
+                   'RUN4/20170215/FLI/reduce/stats/stats_open_mdp_alt.fits',
+                   'RUN4/20170215/FLI/reduce/stats/stats_closed_mdp_alt.fits',
+                   'RUN4/20170216/FLI/reduce/stats/stats_open_mdp_alt.fits',
+                   'RUN4/20170216/FLI/reduce/stats/stats_closeda_mdp_alt.fits',
+                   'RUN4/20170217/FLI/reduce/stats/stats_open_mdp_alt.fits',
+                   'RUN4/20170217/FLI/reduce/stats/stats_closeda_mdp_alt.fits',
+                   'RUN5/20170517/FLI/reduce/stats/stats_open_mdp_alt.fits',
+                   'RUN5/20170518/FLI/reduce/stats/stats_closed_mdp_alt.fits',
+                   'RUN5/20170518/FLI/reduce/stats/stats_open_mdp_alt.fits',
+                   'RUN5/20170519/FLI/reduce/stats/stats_closed_mdp_alt.fits',
+                   'RUN5/20170519/FLI/reduce/stats/stats_open_mdp_alt.fits',
+                   'RUN5/20170520/FLI/reduce/stats/stats_closedA_mdp_alt.fits',
+                   'RUN5/20170520/FLI/reduce/stats/stats_open_mdp_alt.fits',
+                   'RUN5/20170521/FLI/reduce/stats/stats_closed_mdp_alt.fits',
+                   'RUN5/20170521/FLI/reduce/stats/stats_open_mdp_alt.fits',
+                   'RUN5/20170522/FLI/reduce/stats/stats_closedA_mdp_alt.fits',
+#                   'RUN5/20170522/FLI/reduce/stats/stats_closed_mdp_alt.fits',
+#                   'RUN5/20170522/FLI/reduce/stats/stats_open_mdp_alt.fits',
+                   ]
+    
+    for i in range(len()):
+        open_file = data_dir_root+labels[i][0]+stats_dir_end+'stats_open_mdp.fits'
+        closed_file = data_dir_root+labels[i][0]+stats_dir_end+'stats_'+labels[i][1]+'_mdp.fits'
+        open_data = Table.read(open_file)
+        closed_data = Table.read(closed_file)
+
+    
+    
