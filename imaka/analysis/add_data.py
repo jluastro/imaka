@@ -5,36 +5,22 @@ from astropy.table import Table, Column
 from astropy.io import fits
 import datetime
 import os
-
+from astropy import units as u
+from astropy.coordinates import SkyCoord, AltAz
+from astropy.coordinates import EarthLocation
+from astropy.time import Time
 
 
 
 def append_alt_data(stats_file, alt_file, date):  
 
-    #This function takes a stats file and a file of Olivier's altitude seeing data and matches
-    #them, making a new stats file.  There aren't as many altitude data points as frames in stats
-    #files, missing values are zeros
-    
-    #Inputs: 
-        #stats_file: the original stats file
-        #alt_file: altitide data file
-        #date: a string of the UT date in format yyyymmdd, eg '20170112'
-        
-    #outputs: a new fits file with '_alt' added to the original file name
-    
-    #####
-    
-    ## Read in original stats table and altitude data
-
     stats = Table.read(stats_file)
-    new_table = fits.getdata(alt_file) #altitude data
+    new_table = fits.getdata(alt_file)
 
     time = new_table[:,0]
 
-    ##Make some empty columns for new data
-
-    alt_date = np.zeros(len(stats), dtype=str)
-    alt_time = np.zeros(len(stats), dtype=str)
+    alt_date = np.zeros(len(stats), dtype='S15')
+    alt_time = np.zeros(len(stats), dtype='S15')
     int_seeing = np.zeros(len(stats), dtype=float)
     alt_0 = np.zeros(len(stats), dtype=float)
     alt_60 = np.zeros(len(stats), dtype=float)
@@ -48,60 +34,49 @@ def append_alt_data(stats_file, alt_file, date):
     alt_560 = np.zeros(len(stats), dtype=float)
     alt_4000 = np.zeros(len(stats), dtype=float)
 
+    for ii in range(len(stats)):
+        hst_str = stats[ii]['DATE_UTC']+","+stats[ii]['TIME_UTC']
+        time_obj = datetime.datetime.strptime(hst_str, "%Y-%m-%d,%H:%M:%S")
 
-    # Convert times in alititude data list to ut datetime objects to compare to
-    # original stats table times
-
-    for ii in range(len(new_table)):
-        hour = int(time[ii]//1)
-        minute_dec = (time[ii]-hour)*60
-        minute = int(minute_dec//1)
-        second = int(round((minute_dec-minute)*60, 0))
-        if hour >= 24:
-            hour = hour-24
-        if minute == 60:
-            hour = hour + 1
-            minute = 0
-        if second == 60:
-            minute = minute + 1
-            second = 0
-        HST_date_str = date[0:4]+"-"+date[4:6]+"-"+date[6:8]
-        HST_time_str = str(hour)+":"+str(minute)+":"+str(second)
-        comp_time = datetime.datetime.strptime(HST_date_str+","+HST_time_str, '%Y-%m-%d,%H:%M:%S')
-        noon = datetime.time(12, 0, 0)
-        del_day = datetime.timedelta(days=1)
-        if comp_time.time() < noon: #comparison time
-            comp_time += del_day
-
-        ##For one altitude time, look through original stats table and find closest    
         time_diffs = []
-        for jj in range(len(stats)):
-            hst_str = stats[jj]['DATE_HST']+","+stats[jj]['TIME_HST']
-            time_obj = datetime.datetime.strptime(hst_str, "%Y-%m-%d,%H:%M:%S")
-            if time_obj > comp_time:
-                time_diff = time_obj - comp_time
-            else:
-                time_diff = comp_time - time_obj
-            time_diffs.append(time_diff)
+        for jj in range(len(new_table)):
+
+            hour = int(time[jj]//1)
+            minute_dec = (time[jj]-hour)*60
+            minute = int(minute_dec//1)
+            second = int(round((minute_dec-minute)*60, 0))
+            if hour >= 24:
+                hour = hour-24
+            if minute == 60:
+                hour = hour + 1
+                minute = 0
+            if second == 60:
+                minute = minute + 1
+                second = 0
+            HST_date_str = date[0:4]+"-"+date[4:6]+"-"+date[6:8]
+            HST_time_str = str(hour)+":"+str(minute)+":"+str(second)
+            comp_time = datetime.datetime.strptime(HST_date_str+","+HST_time_str, '%Y-%m-%d,%H:%M:%S')
+
+            time_diff = ((time_obj-comp_time)).total_seconds()
+            time_diffs.append(abs(time_diff))
 
         min_index = np.argmin(time_diffs)
 
-        ## Add matching data to new table
-        alt_date[min_index] = HST_date_str
-        alt_time[min_index] = HST_time_str
-        int_seeing[min_index] = new_table[:,1][ii]
-        alt_0[min_index] = new_table[:,2][ii]
-        alt_60[min_index] = new_table[:,3][ii]
-        alt_120[min_index] = new_table[:,4][ii]
-        alt_180[min_index] = new_table[:,5][ii]
-        alt_240[min_index] = new_table[:,6][ii]
-        alt_300[min_index] = new_table[:,7][ii]
-        alt_360[min_index] = new_table[:,8][ii]
-        alt_420[min_index] = new_table[:,9][ii]
-        alt_480[min_index] = new_table[:,10][ii]
-        alt_560[min_index] = new_table[:,11][ii]
-        alt_4000[min_index] = new_table[:,12][ii]
-
+        alt_date[ii] = HST_date_str
+        alt_time[ii] = HST_time_str
+        int_seeing[ii] = new_table[:,1][min_index]
+        alt_0[ii] = new_table[:,2][min_index]
+        alt_60[ii] = new_table[:,3][min_index]
+        alt_120[ii] = new_table[:,4][min_index]
+        alt_180[ii] = new_table[:,5][min_index]
+        alt_240[ii] = new_table[:,6][min_index]
+        alt_300[ii] = new_table[:,7][min_index]
+        alt_360[ii] = new_table[:,8][min_index]
+        alt_420[ii] = new_table[:,9][min_index]
+        alt_480[ii] = new_table[:,10][min_index]
+        alt_560[ii] = new_table[:,11][min_index]
+        alt_4000[ii] = new_table[:,12][min_index]
+        
     ##Make columns to append to table
     col_date = Column(name='alt_HST_date', data=alt_date)
     col_time = Column(name='alt_HST_time', data=alt_time)
@@ -304,12 +279,12 @@ def week_table(data_dir_root, stats_dir_end, labels):
         o_data = np.array(open_data['emp_fwhm'])
         o_binfac = np.array(open_data['BINFAC'])
         o_filt =  plot_stats.filter2wv(np.array(open_data['FILTER']))
-        open_ave[i] = scale * np.mean(o_data * o_binfac * (500/o_filt)**(1/5))
+        open_ave[i] = scale * np.mean(o_data * o_binfac * (500/o_filt)**(-1/5))
         
         c_data = np.array(closed_data['emp_fwhm'])
         c_binfac = np.array(closed_data['BINFAC'])
         c_filt =  plot_stats.filter2wv(np.array(closed_data['FILTER']))
-        closed_ave[i] = scale * np.mean(c_data * c_binfac * (500/c_filt)**(1/5))
+        closed_ave[i] = scale * np.mean(c_data * c_binfac * (500/c_filt)**(-1/5))
         
         MASS_ave[i] = np.mean(np.concatenate((np.array(closed_data['MASS']), np.array(open_data['MASS'])), axis=0))
         DIMM_ave[i] = np.mean(np.concatenate((np.array(closed_data['DIMM']), np.array(open_data['DIMM'])), axis=0))
@@ -372,4 +347,3 @@ def read_starlist(starlist_file):
     dist=(((x_cents-x_cent)**2)+((y_cents-y_cent)**2))**0.5
     
     return x_cents, y_cents, fwhm, x_fwhm, y_fwhm, roundness, dist
-
