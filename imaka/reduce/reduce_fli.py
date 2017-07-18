@@ -1,3 +1,5 @@
+#reduce fli
+
 import os
 import math
 import pylab as plt
@@ -5,7 +7,7 @@ import numpy as np
 from astropy.io import fits
 from astropy import table
 from astropy import units
-#import pdb
+import pdb
 #from astroscrappy import detect_cosmics
 import glob
 import photutils
