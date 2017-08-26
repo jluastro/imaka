@@ -1,8 +1,9 @@
 ### moffat.py - Takes reduced images and existing stats files and conducts moffat fitting, adds data to stats tables and makes model PSFs
 
+import os
 import numpy as np
 from astropy.io import fits
-from astropy import table
+from astropy.table import Table, Column
 from astropy.modeling import models, fitting
 from astropy.modeling.models import custom_model
 
@@ -36,13 +37,14 @@ def Elliptical_Moffat2D(x, y, \
     return N_sky + amplitude / denom 
 
 
-def fit_moffat(img_files, x_guess=5, y_guess=5):
+def fit_moffat(img_files, stats_file, x_guess=5, y_guess=5, ):
     """
     Conduct Moffat fit on data and add outputs to stats tables
     """
-    
+
     # Create arrays for all the final statistics.
     N_files   = len(img_files)
+    mof_stars = np.zeros(N_files, dtype=float) #Number of stars used in medians
     N_sky     = np.zeros(N_files, dtype=float)
     amplitude = np.zeros(N_files, dtype=float)
     phi       = np.zeros(N_files, dtype=float)
@@ -68,7 +70,7 @@ def fit_moffat(img_files, x_guess=5, y_guess=5):
 
         # Load up the corresponding starlist.
         starlist = img_files[ii].replace('.fits', '_stars.txt')
-        stars = table.Table.read(starlist, format='ascii')
+        stars = Table.read(starlist, format='ascii')
         N_stars = len(stars)
 
         # Put the positions into an array 
@@ -134,6 +136,7 @@ def fit_moffat(img_files, x_guess=5, y_guess=5):
 
             final_psf_mof += m(x, y)
 
+        
         # Take median values of parameters and put in intial lists
         N_sky[ii]     = np.median(N_sky_list)
         amplitude[ii] = np.median(amplitude_list)
@@ -153,12 +156,36 @@ def fit_moffat(img_files, x_guess=5, y_guess=5):
         width_x_std[ii]   = np.std(width_x_list)
         width_y_std[ii]   = np.std(width_y_list)
 
+        mof_stars[ii] = int(N_good_stars)
         # Save the average PSF (flux-weighted). Note we are making a slight 
         # mistake here since each PSF has a different sub-pixel position
 
         final_psf_mof /= N_good_stars
         fits.writeto(img_files[ii].replace('.fits', '_psf_mof.fits'), final_psf_mof, hdr, clobber=True)
 
-        # Read in existing stats table and append new data
+    # Read in existing stats table and append new data
+    stats = Table.read(stats_file)
+    
+    col_mof_stars = Column(name='N Stars', data = mof_stars)
+    col_N_sky = Column(name='N Sky', data=N_sky)
+    col_N_sky_std = Column(name='N Sky std', data=N_sky_std)
+    col_amplitude = Column(name='Amplitude', data=amplitude)
+    col_amplitude_std = Column(name='Amplitude std', data=amplitude_std)
+    col_phi = Column(name='Phi', data=phi)
+    col_phi_std = Column(name='Phi std', data=phi_std)
+    col_beta = Column(name='Beta', data = power)
+    col_beta_std = Column(name='Beta std', data=power_std)
+    col_alpha_min = Column(name='Minor Alpha', data = width_x)
+    col_alpha_min_std = Column(name='Minor Alpha std', data = width_x_std)
+    col_alpha_maj = Column(name='Major Alpha', data = width_y)
+    col_alpha_maj_std = Column(name='Major Alpha std', data = width_y_std)
 
+    stats.add_columns([col_mof_stars, col_N_sky, col_N_sky_std, col_amplitude,\
+                           col_amplitude_std, col_phi, col_phi_std, col_beta, \
+                           col_beta_std, col_alpha_min, col_alpha_min_std, \
+                           col_alpha_maj, col_alpha_maj_std])
+
+    stats_file_root, stats_file_ext = os.path.splitext(stats_file)
+    stats.write(stats_file_root.split("_mdp")[0] + stats_file_ext, overwrite=True)
+    
     return
