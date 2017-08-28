@@ -6,7 +6,7 @@ from astropy.io import fits
 from astropy.table import Table, Column
 from astropy.modeling import models, fitting
 from astropy.modeling.models import custom_model
-
+from imaka.analysis import plot_stats
 import matplotlib.pyplot as plt
 @custom_model
 
@@ -37,7 +37,7 @@ def Elliptical_Moffat2D(x, y, \
     return N_sky + amplitude / denom 
 
 
-def fit_moffat(img_files, stats_file, x_guess=5, y_guess=5, ):
+def fit_moffat(img_files, stats_file, x_guess=5, y_guess=5, flux_percent=0.9):
     """
     Conduct Moffat fit on data and add outputs to stats tables
     """
@@ -65,7 +65,7 @@ def fit_moffat(img_files, stats_file, x_guess=5, y_guess=5, ):
     
     for ii in range(N_files):
         # Load up the image to work on.
-        print("Working on image: ", img_files[ii])
+        print("Working on image", ii, "of", N_files, ":", img_files[ii])
         img, hdr = fits.getdata(img_files[ii], header=True)
 
         # Load up the corresponding starlist.
@@ -80,6 +80,8 @@ def fit_moffat(img_files, stats_file, x_guess=5, y_guess=5, ):
         x_cents = []
         y_cents = []
         N_good_stars = 0
+
+        flux_cut = np.sort(stars['flux'])[int(len(np.sort(stars['flux']))*flux_percent)]
         
         for jj in range(N_stars):
             # Trim star sample for edge sources, saturation, and low flux
@@ -89,12 +91,27 @@ def fit_moffat(img_files, stats_file, x_guess=5, y_guess=5, ):
             flux   = np.array(stars['flux'])[jj]
             peak   = np.array(stars['peak'])[jj]
             if y_cent - cut_size/2 > 0 and x_cent - cut_size/2 > 0 and y_cent + cut_size/2 < np.shape(img)[0] and x_cent + cut_size/2<np.shape(img)[1] \
-              and flux > 30 and peak < 20000:
+              and flux > flux_cut and peak < 20000:
                 N_good_stars += 1
                 x_cents.append(x_cent)
                 y_cents.append(y_cent)
-
-        print("Using", N_good_stars, "of", N_stars, "stars in calculation")
+        if N_good_stars < 2: #if there are not enough bright stars, make cutoff more lax
+            print("Less than two bright stars found.  Using all stars.")
+            x_cents = []
+            y_cents = []
+            N_good_stars = 0
+            for jj in range(N_stars):
+                # Trim star sample for edge sources, saturation, and low flux
+                cut_size = 40
+                x_cent = int(round(float(coords[0][jj])))
+                y_cent = int(round(float(coords[1][jj])))
+                flux   = np.array(stars['flux'])[jj]
+                peak   = np.array(stars['peak'])[jj]
+                if y_cent - cut_size/2 > 0 and x_cent - cut_size/2 > 0 and y_cent + cut_size/2 < np.shape(img)[0] and x_cent + cut_size/2<np.shape(img)[1] \
+                  and peak < 20000:
+                    N_good_stars += 1
+                    x_cents.append(x_cent)
+                    y_cents.append(y_cent)
         
         # Create lists for each image's stars' parameters
         N_sky_list     = np.zeros(N_good_stars, dtype=float)
@@ -141,20 +158,20 @@ def fit_moffat(img_files, stats_file, x_guess=5, y_guess=5, ):
         N_sky[ii]     = np.median(N_sky_list)
         amplitude[ii] = np.median(amplitude_list)
         phi[ii]       = np.median(phi_list)
-        power[ii]     = np.median(power_list)
+        power[ii]     = np.median(abs(power_list))
         x_0[ii]       = np.median(x_0_list)
         y_0[ii]       = np.median(y_0_list)
-        width_x[ii]   = np.median(width_x_list)
-        width_y[ii]   = np.median(width_y_list)
+        width_x[ii]   = np.median(abs(width_x_list))
+        width_y[ii]   = np.median(abs(width_y_list))
 
         N_sky_std[ii]     = np.std(N_sky_list)
         amplitude_std[ii] = np.std(amplitude_list)
         phi_std[ii]       = np.std(phi_list)
-        power_std[ii]     = np.std(power_list)
+        power_std[ii]     = np.std(abs(power_list))
         x_0_std[ii]       = np.std(x_0_list)
         y_0_std[ii]       = np.std(y_0_list)
-        width_x_std[ii]   = np.std(width_x_list)
-        width_y_std[ii]   = np.std(width_y_list)
+        width_x_std[ii]   = np.std(abs(width_x_list))
+        width_y_std[ii]   = np.std(abs(width_y_list))
 
         mof_stars[ii] = int(N_good_stars)
         # Save the average PSF (flux-weighted). Note we are making a slight 
@@ -189,3 +206,54 @@ def fit_moffat(img_files, stats_file, x_guess=5, y_guess=5, ):
     stats.write(stats_file_root.split("_mdp")[0] + stats_file_ext, overwrite=True)
     
     return
+
+
+def calc_mof_fwhm(stats_file, filt=False):
+
+    """
+    Takes stats_<type>.fits file and outputs four arrays:
+        minor FWHM
+        minor FWHM uncertainty
+        major FWHM
+        major FWHM uncertainty
+    
+    all in arcsec.
+    
+    If filt=True, data is scaled with filter data to 500 nm
+    """
+    data = Table.read(stats_file)
+    plate_scale = 0.04
+    filters = np.array(data['FILTER'])
+    bin_fac = np.array(data['BINFAC'])
+    N_stars = np.array(data['N Stars'])
+    beta = np.array(data['Beta'])
+    beta_std = np.array(data['Beta std'])
+    alpha_min = np.array(data['Minor Alpha'])
+    alpha_min_std = np.array(data['Minor Alpha std'])
+    alpha_maj = np.array(data['Major Alpha'])
+    alpha_maj_std = np.array(data['Major Alpha std'])
+
+    # Calculate calibration factors
+    calib = plate_scale * bin_fac
+    if filt==True:
+        wvs = plot_stats.filter2wv(filters)
+        calib *= ((wvs/500)**(1/5))
+    
+    FWHM_min = 2 * alpha_min * np.sqrt((2**(1/beta))-1) * calib
+    FWHM_maj = 2 * alpha_maj * np.sqrt((2**(1/beta))-1) * calib
+    
+    # Calculate uncertainties of median parameters
+    sig_alpha_min = (alpha_min_std / np.sqrt(N_stars)) * np.sqrt((np.pi * N_stars) / (2 * (N_stars-1)))
+    sig_alpha_maj = (alpha_maj_std / np.sqrt(N_stars)) * np.sqrt((np.pi * N_stars) / (2 * (N_stars-1)))
+    sig_beta = (beta_std / np.sqrt(N_stars)) * np.sqrt((np.pi * N_stars) / (2 * (N_stars-1)))
+
+    # Calculate partial derivatives for error propogation
+    del_alpha = 2 * np.sqrt((2**(1/beta))-1)
+    del_beta_min = alpha_min * (((2**(1/beta))-1)**(-0.5)) * (-np.log(2)*(2**(1/beta))/(beta**2))
+    del_beta_maj = alpha_maj * (((2**(1/beta))-1)**(-0.5)) * (-np.log(2)*(2**(1/beta))/(beta**2))
+    
+    # Calculate uncertainties of FWHMs
+    sig_FWHM_min = np.sqrt(((del_alpha*sig_alpha_min)**2)+((del_beta_min*sig_beta)**2)) * calib
+    sig_FWHM_maj = np.sqrt(((del_alpha*sig_alpha_maj)**2)+((del_beta_maj*sig_beta)**2)) * calib
+    
+    return FWHM_min, sig_FWHM_min, FWHM_maj, sig_FWHM_maj
