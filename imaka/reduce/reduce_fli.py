@@ -110,11 +110,11 @@ def clean_images(img_files, out_dir, rebin=1, sky_frame=None, flat_frame=None, f
         # Write it out
         file_dir, file_name = os.path.split(img_files[ii])
         out_name = file_name.replace('.fits', '_clean.fits')
-        fits.writeto(out_dir + out_name, img_clean, hdr, clobber=True)
+        fits.writeto(out_dir + out_name, img_clean, hdr, overwrite=True)
 
         if bad_pixels != None:
             mask_name = file_name.replace('.fits', '_mask.fits')
-            fits.writeto(out_dir + mask_name, bad_pixels, hdr, clobber=True)
+            fits.writeto(out_dir + mask_name, bad_pixels, hdr, overwrite=True)
             
     return
 
@@ -162,7 +162,7 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
     
     for ii in range(len(img_files)):
         print("  Working on image: ", img_files[ii])
-        img, hdr = fits.getdata(img_files[ii], header=True)
+        img, hdr = fits.getdata(img_files[ii], header=True, ignore_missing_end=True)
 
         fwhm_curr = fwhm
 
@@ -273,8 +273,8 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
             final_psf_mod /= final_psf_count
             final_psf_obs /= final_psf_obs.sum()
             final_psf_mod /= final_psf_mod.sum()
-            fits.writeto(img_files[ii].replace('.fits', '_psf_obs.fits'), final_psf_obs, hdr, clobber=True)
-            fits.writeto(img_files[ii].replace('.fits', '_psf_mod.fits'), final_psf_mod, hdr, clobber=True)
+            fits.writeto(img_files[ii].replace('.fits', '_psf_obs.fits'), final_psf_obs, hdr, overwrite=True)
+            fits.writeto(img_files[ii].replace('.fits', '_psf_mod.fits'), final_psf_mod, hdr, overwrite=True)
 
             # Drop sources with flux (signifiance) that isn't good enough.
             # Empirically this is <1.2
@@ -300,7 +300,8 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
                        'flux': '%10.6f', 'mag': '%6.2f', 'x_fwhm': '%5.2f', 'y_fwhm': '%5.2f',
                        'theta': '%6.3f'}
         
-            sources.write(img_files[ii].replace('.fits', '_stars.txt'), format='ascii.fixed_width', delimiter=None, bookend=False, formats=formats)
+            sources.write(img_files[ii].replace('.fits', '_stars.txt'), format='ascii.fixed_width',
+                              delimiter=None, bookend=False, formats=formats, overwrite=True)
 
         
     return
@@ -744,7 +745,7 @@ def shift_and_add(img_files, starlists, output_root, method='mean', clip_sigma=N
         final_image = combiner.average_combine()
 
     # Save file (note we are just using the last hdr... not necessarily the best)
-    fits.writeto(output_root + '.fits', final_image, hdr, clobber=True)
+    fits.writeto(output_root + '.fits', final_image, hdr, overwrite=True)
     
     return
     
