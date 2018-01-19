@@ -5,16 +5,17 @@ from astropy.io import fits
 from astropy import table
 from astropy import units
 from astropy.modeling.models import Ellipse2D
+from imaka.analysis import moffat 
 import glob
 from imaka.reduce import reduce_fli
 from imaka.reduce import calib
 import pdb
 import os
-from flystar import match
-import shutil
+#from flystar import match
+#import shutil
 
-imaka_dir = '/Volumes/g/lu/data/imaka/'
-root_dir = imaka_dir + '2017_01_09/fli/'
+imaka_dir = '/g/lu/data/imaka/RUN3/'
+root_dir = imaka_dir + '20170109/FLI/'
 
 def make_sky():
     # Didn't take skies, so just copy over the one from Tuesday night.
@@ -89,14 +90,31 @@ def calc_star_stats():
     stats_dir = root_dir + 'reduce/stats/'
     
     #open loop
-    fnum = np.arrange(57, 67)
-    img_files = ['{0:s}/obj{1:03d}_clean.fits'.format(reduce_dir, ii) for ii in fnum]
+    fnum = np.arange(57, 67)
+    img_files = [reduce_dir + 'obj{0:03d}_clean.fits'.format(ii) for ii in fnum]
     reduce_fli.calc_star_stats(img_files, output_stats='stats_open.fits')
 
     #closed loop
-    fnum = np.arrange(47, 57)
-    img_files = ['obj_o{0:03d}_bin_nobkg.fits'.format(ii) for ii in fnum]
+    fnum = np.arange(47, 57)
+    img_files = [reduce_dir + 'obj{0:03d}_clean.fits'.format(ii) for ii in fnum]
     reduce_fli.calc_star_stats(img_files, output_stats='stats_closed.fits')
+    
+    return
+
+def calc_moffat():
+    
+    reduce_dir = root_dir + 'reduce/pleiades/'
+    stats_dir = root_dir + 'reduce/stats/'
+    
+    #open loop
+    fnum = np.arange(57, 67)
+    img_files = [reduce_dir + 'obj{0:03d}_clean.fits'.format(ii) for ii in fnum]
+    moffat.fit_moffat(img_files, stats_dir + 'stats_open_mdp_alt.fits', x_guess=6, y_guess=8, flux_percent=0.5)
+
+    #closed loop
+    fnum = np.arange(47, 57)
+    img_files = [reduce_dir + 'obj{0:03d}_clean.fits'.format(ii) for ii in fnum]
+    moffat.fit_moffat(img_files, stats_dir + 'stats_closed_mdp_alt.fits', x_guess=3.3, y_guess=3.3, flux_percent=0.5)
     
     return
 
