@@ -140,16 +140,17 @@ def fit_moffat(img_files, stats_file, x_guess=5, y_guess=5, flux_percent=0.9):
                  
             N_sky_list[jj]     = m.N_sky.value
             amplitude_list[jj] = m.amplitude.value
-            phi_list[jj]       = m.phi.value
             power_list[jj]     = m.power.value
             x_0_list[jj]       = m.x_0.value
             y_0_list[jj]       = m.y_0.value
             if m.width_x.value < m.width_y.value:
                 width_x_list[jj]    = m.width_x.value
                 width_y_list[jj]    = m.width_y.value
+                phi_list[jj]       = m.phi.value
             else:
                 width_x_list[jj]    = m.width_y.value
                 width_y_list[jj]    = m.width_x.value
+                phi_list[jj]       = m.phi.value + (np.pi/2)
 
             final_psf_mof += m(x, y)
 
@@ -208,7 +209,7 @@ def fit_moffat(img_files, stats_file, x_guess=5, y_guess=5, flux_percent=0.9):
     return
 
 
-def calc_mof_fwhm(stats_file, filt=False):
+def calc_mof_fwhm(stats_file, filt=1):
 
     """
     Takes stats_<type>.fits file and outputs four arrays:
@@ -237,7 +238,7 @@ def calc_mof_fwhm(stats_file, filt=False):
     calib = plate_scale * bin_fac
     if filt==True:
         wvs = plot_stats.filter2wv(filters)
-        calib *= ((wvs/500)**(1/5))
+        calib *= ((wvs/filt)**(1/5))
     
     FWHM_min = 2 * alpha_min * np.sqrt((2**(1/beta))-1) * calib
     FWHM_maj = 2 * alpha_maj * np.sqrt((2**(1/beta))-1) * calib
