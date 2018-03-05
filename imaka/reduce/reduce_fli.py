@@ -1,5 +1,3 @@
-#NEW COMMIT
-
 import os
 import math
 import pylab as plt
@@ -603,7 +601,7 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
         med_emp_FWHM = np.median(emp_FWHM_list[idx])
         std_emp_FWHM = np.std(emp_FWHM_list[idx])
 
-        band[ii] = hdr['FILTER']
+        band[ii] = "I"#hdr['FILTER']
         binfac[ii] = hdr['BINFAC']
         s_ee25[ii] = ee25_rad
         s_ee50[ii] = ee50_rad
