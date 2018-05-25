@@ -1,6 +1,8 @@
 import numpy as np
 from scipy import ndimage
 import math
+from flystar import transforms
+
 
 def calc_rotation():
     sep = 15.53 # mm in front focal plane
@@ -109,13 +111,13 @@ def two_point_solve(e1, n1, x1, y1, e2, n2, x2, y2):
 # These are numbers reported from get_pa_scale() on 2017-01-17
 camera_angle = {'N':76.33, 'E': -60.0}
 
-def xy_to_en(x, y, camera_pa='E'):
+def xy_to_en(x, y, camera_pa='E', bin=3):
     """
     Calculate the East North offsets for a desired X Y offset.
 
     Note: x and y should be CURRENT - DESIRED
     """
-    scale = 0.127 # arcsec / pixel
+    scale = bin * 0.04 # arcsec / pixel
     angle = camera_angle[camera_pa] # degrees
 
     cosa = np.cos(np.radians(angle))
@@ -211,3 +213,29 @@ def scale_from_fiber_positions():
         print(' {0:6s}  {1:6.2f}  {2:6.1f}'.format(pos[ii], mag[ii], ang[ii]))
     
     
+def scale_from_offset(ra_off, dec_off):
+    '''
+    given ar and dec offsets for each WFS
+    '''
+
+
+    wfs_pos_ra  = [-203.2, 309.5, 239.9, -317.1, 538.2]
+    wfs_pos_dec = [-435, -420.6, 29.9, 420.5, 207.6]
+    wfs_pos_ra.pop(2)
+    wfs_pos_dec.pop(2)
+    wfs_pos_ra = np.array(wfs_pos_ra)
+    wfs_pos_dec=np.array(wfs_pos_dec)
+    #get rid of center WFS, because it is not present
+
+    ra_meas = ra_off + wfs_pos_ra
+    dec_meas = dec_off + wfs_pos_dec
+
+    
+    t = transforms.four_paramNW(ra_meas, dec_meas, wfs_pos_ra, wfs_pos_dec)
+    
+    angle = np.arctan2(t.py[1], t.py[2])
+    scale = (t.px[1]**2+t.px[2]**2)**0.5
+    print('scale ',scale,'rotation', np.rad2deg(angle))
+             
+         
+    print('x trans', t.px[0], 'y trans ', t.py[0])

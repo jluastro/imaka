@@ -12,7 +12,7 @@ from imaka.analysis import moffat
 import os, shutil
 import pdb
 
-root_dir = '//Volumes/DATA4/imaka/20180228/FLI/'
+root_dir = '//Volumes/DATA4/imaka/20180301/FLI/'
 
 sky_dir = root_dir + 'reduce/sky/' 
 data_dir = root_dir + 'Beehive-W/'
@@ -21,8 +21,8 @@ out_dir = root_dir + 'reduce/Beehive-W/'
 stats_dir = root_dir +'reduce/stats/'
 stacks_dir = root_dir + 'reduce/stacks/'
     
-fnum_o = [] #open loop img file numbers
-fnum_c = [] #closed loop img file numbers
+fnum_o = [10, 12, 15] #open loop img file numbers
+fnum_c = [8, 9, 11, 13, 14] #closed loop img file numbers
 
 
     
