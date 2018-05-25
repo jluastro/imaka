@@ -1,7 +1,7 @@
 from datetime import datetime
 import numpy as np
 from imaka.analysis import plot_stats
-from astropy.table import Table, Column
+from astropy.table import Table, Column, vstack, hstack
 from astropy.io import fits
 import datetime
 import os
@@ -9,6 +9,7 @@ from astropy import units as u
 from astropy.coordinates import SkyCoord, AltAz
 from astropy.coordinates import EarthLocation
 from astropy.time import Time
+import pdb
 
 
 
@@ -163,20 +164,21 @@ def append_altaz(stats_file, img_file_dir):
 
 
 def match_cols(open_file, closed_file, comp_col):
+    """
+    time matches colums of data from different stats files, e.g. matches FWHM column from 
+    a given open stats file to those in a closed file from the same night.
     
-    #time matches colums of data from different stats files, e.g. matches FWHM column from 
-    #a given open stats file to those in a closed file from the same night.
-    
-    #inputs:
-        #open_file: the stats file that you are matching to
-        #closed_file: the comparison file to match
-        #comp_col: the column you want (e.g., NEA1, emp_FWHM, etc)
+    inputs:
+        open_file: the stats file that you are matching to
+        closed_file: the comparison file to match
+        comp_col: the column you want (e.g., NEA1, emp_FWHM, etc)
         
-    #outputs:
-        #UTC_TIME: a time average of each two matched data points
-        #UTC_DATE: corresponding date to above time
-        #data_1: the column of whatever comp_col described from the base file
-        #data_2: the column of whatever comp_col described from the comparison file 
+    outputs:
+        UTC_TIME: a time average of each two matched data points
+        UTC_DATE: corresponding date to above time
+        data_1: the column of whatever comp_col described from the base file
+        data_2: the column of whatever comp_col described from the comparison file 
+    """
             
     stats1 = Table.read(open_file)
     stats2 = Table.read(closed_file)
@@ -348,19 +350,20 @@ def read_starlist(starlist_file):
     
     return x_cents, y_cents, fwhm, x_fwhm, y_fwhm, roundness, dist
 
-def combine_all_stats():
-    stats_files = ['RUN3/2017_01_10/fli/reduce/stats/stats_closed.fits',
-                   'RUN3/2017_01_10/fli/reduce/stats/stats_open.fits',
-                   'RUN3/2017_01_11/fli/reduce/stats/stats_closed.fits',
-                   'RUN3/2017_01_11/fli/reduce/stats/stats_open.fits',
-                   'RUN3/2017_01_13/fli/reduce/stats/stats_closed1.fits',
-                   'RUN3/2017_01_13/fli/reduce/stats/stats_open1.fits',
-                   'RUN3/2017_01_13/fli/reduce/stats/stats_closed2.fits',
-                   'RUN3/2017_01_13/fli/reduce/stats/stats_open2.fits',
+def combine_all_stats(data_root='/Users/jlu/data/imaka/'):
+    stats_files = [
+                   'RUN3/20170110/FLI/reduce/stats/stats_closed_mdp_alt.fits',
+                   'RUN3/20170110/FLI/reduce/stats/stats_open_mdp_alt.fits',
+                   'RUN3/20170111/FLI/reduce/stats/stats_closed_mdp_alt.fits',
+                   'RUN3/20170111/FLI/reduce/stats/stats_open_mdp_alt.fits',
+                   'RUN3/20170113/FLI/reduce/stats/stats_closed1_mdp_alt.fits',
+                   'RUN3/20170113/FLI/reduce/stats/stats_open1_mdp_alt.fits',
+                   'RUN3/20170113/FLI/reduce/stats/stats_closed2_mdp_alt.fits',
+                   'RUN3/20170113/FLI/reduce/stats/stats_open2_mdp_alt.fits',
                    'RUN4/20170214/FLI/reduce/stats/stats_open_mdp_alt.fits',
                    'RUN4/20170214/FLI/reduce/stats/stats_closed_mdp_alt.fits',
-                   'RUN4/20170215/FLI/reduce/stats/stats_open_mdp_alt.fits',
-                   'RUN4/20170215/FLI/reduce/stats/stats_closed_mdp_alt.fits',
+                   # 'RUN4/20170215/FLI/reduce/stats/stats_open_mdp_alt.fits',
+                   # 'RUN4/20170215/FLI/reduce/stats/stats_closed_mdp_alt.fits',
                    'RUN4/20170216/FLI/reduce/stats/stats_open_mdp_alt.fits',
                    'RUN4/20170216/FLI/reduce/stats/stats_closeda_mdp_alt.fits',
                    'RUN4/20170217/FLI/reduce/stats/stats_open_mdp_alt.fits',
@@ -373,18 +376,88 @@ def combine_all_stats():
                    'RUN5/20170520/FLI/reduce/stats/stats_closedA_mdp_alt.fits',
                    'RUN5/20170520/FLI/reduce/stats/stats_open_mdp_alt.fits',
                    'RUN5/20170521/FLI/reduce/stats/stats_closed_mdp_alt.fits',
-                   'RUN5/20170521/FLI/reduce/stats/stats_open_mdp_alt.fits',
-                   'RUN5/20170522/FLI/reduce/stats/stats_closedA_mdp_alt.fits',
-#                   'RUN5/20170522/FLI/reduce/stats/stats_closed_mdp_alt.fits',
-#                   'RUN5/20170522/FLI/reduce/stats/stats_open_mdp_alt.fits',
+                   'RUN5/20170521/FLI/reduce/stats/stats_open_mdp_alt.fits'
+                   # 'RUN5/20170522/FLI/reduce/stats/stats_open_mdp_alt.fits',
+                   # 'RUN5/20170522/FLI/reduce/stats/stats_closed_mdp_alt.fits',
                    ]
-    
-    for i in range(len()):
-        open_file = data_dir_root+labels[i][0]+stats_dir_end+'stats_open_mdp.fits'
-        closed_file = data_dir_root+labels[i][0]+stats_dir_end+'stats_'+labels[i][1]+'_mdp.fits'
-        open_data = Table.read(open_file)
-        closed_data = Table.read(closed_file)
 
+    for ii in range(len(stats_files)):
+        print('Appending ', stats_files[ii])
+        _stats = Table.read(data_root + stats_files[ii])
+
+        foo1 = stats_files[ii].index('stats_')
+        foo2 = stats_files[ii].index('_mdp')
+        reconstruct = stats_files[ii][foo1+6:foo2]
+
+        if 'closed' in stats_files[ii]:
+            _stats['loop_status'] = 'closed'
+            _stats['recon'] = reconstruct
+        else:
+            _stats['loop_status'] = 'open'
+            _stats['recon'] = 'open'
+
+        if ii == 0:
+            final_table = _stats
+        else:
+            final_table = vstack([final_table, _stats])
+
+
+    # Also make a matched table for open vs. closed plots.
+    # While we are at it, calculate a few extra columns.
+
+    # Calculate GL seeing from MASS/DIMM
+    gl_see = (final_table['DIMM']**(5.0/3.0) - final_table['MASS']**(5.0/3.0))**(3.0/5.0)
+    final_table['GL_MASSDIMM'] = gl_see
+
+    # Fix BINFAC
+    idx = np.where(final_table['BINFAC'].mask == True)[0]
+    final_table['BINFAC'][idx] = 3.0
+
+    # Fix Filter
+    idx = np.where(final_table['FILTER'].mask == True)[0]
+    print('replacing filter', len(idx))
+    final_table['FILTER'][idx] = 'R'
+    
+    # Convert empirical FWHM measurements to " accounting for binning.
+    scale = 0.04
+    final_table['emp_fwhm'] *= scale * final_table['BINFAC']
+
+    opcl = final_table['loop_status'] == 'open'
+    i_op = np.where(opcl == True)
+    i_cl = np.where(opcl == False)
+    s_op = final_table[i_op]
+    s_cl = final_table[i_cl]
+    
+    # Files to store the open-only and closed-only tables. 
+    op_file = data_root + 'stats_aggregate_open_mdp_alt.fits'
+    cl_file = data_root + 'stats_aggregate_closed_mdp_alt.fits'
+    
+    # Make an index array
+    idx_all = np.arange(len(final_table))
+    idx_op = idx_all[i_op]
+    idx_cl = idx_all[i_cl]
+
+    s_op['Index'] = idx_op
+    s_cl['Index'] = idx_cl
+
+    s_op.write(op_file, overwrite=True)
+    s_cl.write(cl_file, overwrite=True)
+
+    # Matching
+    time, date, idx_op_match, idx_cl_match, err1, err2 = match_cols(op_file, cl_file, 'Index')
+    idx_op_match = idx_op_match.astype('int')
+    idx_cl_match = idx_cl_match.astype('int')
+
+    # Horizontally stack
+    s_op_match = final_table[idx_op_match]
+    s_cl_match = final_table[idx_cl_match]
+
+    s_opcl_match = hstack([s_op_match, s_cl_match], join_type='exact', table_names=['o', 'c'])
+
+    final_table.write(data_root + 'stats_aggregate_mdp_alt.fits', overwrite=True)
+    s_opcl_match.write(data_root + 'stats_aggregate_matched_mdp_alt.fits', overwrite=True)
+
+    return
     
     
 

@@ -1687,3 +1687,144 @@ def compare_seeing(date):
     plt.setp([a.get_xticklabels() for a in f.axes[:-1]], visible=False)
                      
     return
+
+
+def plot_nea(data_root='/Users/jlu/data/imaka/'):
+    # Read the aggeregate stats table.
+    stats = Table.read(data_root + 'stats_aggregate_mdp_alt.fits')
+    stats_m = Table.read(data_root + 'stats_aggregate_matched_mdp_alt.fits')
+
+    opcl = stats['loop_status'] == 'open'
+    i_op = np.where(opcl == True)
+    i_cl = np.where(opcl == False)
+    s_op = stats[i_op]
+    s_cl = stats[i_cl]
+
+    color = np.ones(len(stats), dtype=int)
+    color[i_op] = 2
+    color[i_cl] = 1
+
+    # Rescale MASS/DIMM down to R-band.
+    wave_MD = 0.5 # microns
+    wave = 0.8 # microns
+    stats['MASS'] = stats['MASS'] * (wave / wave_MD)**(-1.0/5.0)
+    stats['DIMM'] = stats['DIMM'] * (wave / wave_MD)**(-1.0/5.0)
+    stats['GL_MASSDIMM'] = stats['GL_MASSDIMM'] * (wave / wave_MD)**(-1.0/5.0)
+
+    stats_m['MASS_o'] = stats_m['MASS_o'] * (wave / wave_MD)**(-1.0/5.0)
+    stats_m['DIMM_o'] = stats_m['DIMM_o'] * (wave / wave_MD)**(-1.0/5.0)
+    stats_m['GL_MASSDIMM_o'] = stats_m['GL_MASSDIMM_o'] * (wave / wave_MD)**(-1.0/5.0)
+
+    stats_m['MASS_c'] = stats_m['MASS_c'] * (wave / wave_MD)**(-1.0/5.0)
+    stats_m['DIMM_c'] = stats_m['DIMM_c'] * (wave / wave_MD)**(-1.0/5.0)
+    stats_m['GL_MASSDIMM_c'] = stats_m['GL_MASSDIMM_c'] * (wave / wave_MD)**(-1.0/5.0)
+    
+    wave_obs = np.zeros(len(stats), dtype=float)
+    idx_I = np.where(stats['FILTER'] == 'I')[0]
+    idx_R = np.where(stats['FILTER'] == 'R')[0]
+    idx_Y = np.where(stats['FILTER'] == '1_micronlp')[0]
+    wave_obs[idx_I] = 0.806
+    wave_obs[idx_R] = 0.658
+    wave_obs[idx_Y] = 1.020
+
+    wave_obs_m_o = np.zeros(len(stats_m), dtype=float)
+    idx_I = np.where(stats_m['FILTER_o'] == 'I')[0]
+    idx_R = np.where(stats_m['FILTER_o'] == 'R')[0]
+    idx_Y = np.where(stats_m['FILTER_o'] == '1_micronlp')[0]
+    wave_obs_m_o[idx_I] = 0.806
+    wave_obs_m_o[idx_R] = 0.658
+    wave_obs_m_o[idx_Y] = 1.020
+
+    wave_obs_m_c = np.zeros(len(stats_m), dtype=float)
+    idx_I = np.where(stats_m['FILTER_c'] == 'I')[0]
+    idx_R = np.where(stats_m['FILTER_c'] == 'R')[0]
+    idx_Y = np.where(stats_m['FILTER_c'] == '1_micronlp')[0]
+    wave_obs_m_c[idx_I] = 0.806
+    wave_obs_m_c[idx_R] = 0.658
+    wave_obs_m_c[idx_Y] = 1.020
+    
+    res_scale = (wave / wave_obs)**(-1.0/5.0)
+    res_scale_m_o = (wave / wave_obs_m_o)**(-1.0/5.0)
+    res_scale_m_c = (wave / wave_obs_m_c)**(-1.0/5.0)
+
+    bins = np.arange(0, 2, 0.05)
+
+
+    plt.figure(1)
+    plt.clf()
+    good_EE50 = np.where((np.isfinite(stats_m['EE50_o']) == True) &
+                         (np.isfinite(stats_m['EE50_c']) == True))[0]
+    plt.hist(stats_m['EE50_o'][good_EE50]*res_scale_m_o[good_EE50],
+                 bins=bins, alpha=0.3, normed=True, label='Open')
+    plt.hist(stats_m['EE50_c'][good_EE50]*res_scale_m_c[good_EE50],
+                 bins=bins, alpha=0.3, normed=True, label='Closed')
+    plt.grid(True)
+    plt.legend()
+    plt.xlabel('EE50 (")')
+
+    plt.figure(2)
+    plt.clf()
+    good_EE25 = np.where((np.isfinite(stats_m['EE25_o']) == True) &
+                         (np.isfinite(stats_m['EE25_c']) == True))[0]
+    plt.hist(stats_m['EE25_o'][good_EE25]*res_scale_m_o[good_EE25],
+                 bins=bins, alpha=0.3, normed=True, label='Open')
+    plt.hist(stats_m['EE25_c'][good_EE25]*res_scale_m_c[good_EE25],
+                 bins=bins, alpha=0.3, normed=True, label='Closed')
+    plt.grid(True)
+    plt.legend()
+    plt.xlabel('EE25 (")')
+    
+    # Calculate improvement in empirical FWHM, NEA, and EE50
+    EE50_ratio = (stats_m['EE50_o']) / (stats_m['EE50_c'])
+    EE50_ratio = EE50_ratio[good_EE50]
+
+    EE25_ratio = (stats_m['EE25_o']) / (stats_m['EE25_c'])
+    EE25_ratio = EE25_ratio[good_EE25]
+    
+    good_NEA = np.where((np.isfinite(stats_m['NEA_o']) == True) &
+                        (np.isfinite(stats_m['NEA_c']) == True))[0]
+    NEA_ratio = (stats_m['NEA_o']) / (stats_m['NEA_c'])
+    NEA_ratio = NEA_ratio[good_NEA]
+
+    good_emp_fwhm = np.where((np.isfinite(stats_m['emp_fwhm_o']) == True) &
+                             (np.isfinite(stats_m['emp_fwhm_c']) == True))[0]
+    emp_fwhm_ratio = (stats_m['emp_fwhm_o']) / (stats_m['emp_fwhm_c'])
+    emp_fwhm_ratio = emp_fwhm_ratio[good_emp_fwhm]
+    
+    
+    
+    plt.figure(3)
+    plt.clf()
+    plt.hist(stats_m['NEA_o'][good_NEA]*res_scale_m_o[good_NEA]**2,
+                 bins=bins, alpha=0.3, label='Open', normed=True)
+    plt.hist(stats_m['NEA_c'][good_NEA]*res_scale_m_c[good_NEA]**2,
+                 bins=bins, alpha=0.3, label='Closed', normed=True)
+    plt.grid(True)
+    plt.legend()
+    plt.xlabel('Noise Equivalent Area ("^2)')
+
+    plt.figure(4)
+    bins = np.arange(0, 4, 0.2)
+    plt.clf()
+    plt.hist(NEA_ratio, bins=bins, label='NEA Ratio', alpha=0.8, normed=True, histtype='step')
+    plt.hist(EE50_ratio, bins=bins, label='EE50 Ratio', alpha=0.8, normed=True, histtype='step')
+    plt.hist(EE25_ratio, bins=bins, label='EE25 Ratio', alpha=0.8, normed=True, histtype='step')
+    plt.hist(emp_fwhm_ratio, bins=bins, label='emp_fwhm Ratio', alpha=0.8, normed=True, histtype='step')
+    plt.xlabel('Improvement in Metric (Open/Close)')
+    plt.legend()
+    plt.grid(True)
+    
+    print('NEA gain: mean = {0:.2f} +/- {1:.2f}  median = {2:.2f}'.format(NEA_ratio.mean(),
+                                                                            NEA_ratio.std(),
+                                                                            np.median(NEA_ratio)))
+    print('EE25 gain: mean = {0:.2f} +/- {1:.2f}  median = {2:.2f}'.format(EE25_ratio.mean(),
+                                                                            EE25_ratio.std(),
+                                                                            np.median(EE25_ratio)))
+    print('EE50 gain: mean = {0:.2f} +/- {1:.2f}  median = {2:.2f}'.format(EE50_ratio.mean(),
+                                                                            EE50_ratio.std(),
+                                                                            np.median(EE50_ratio)))
+    print('emp_fwhm gain: mean = {0:.2f} +/- {1:.2f}  median = {2:.2f}'.format(emp_fwhm_ratio.mean(),
+                                                                            emp_fwhm_ratio.std(),
+                                                                            np.median(emp_fwhm_ratio)))
+    
+    return
