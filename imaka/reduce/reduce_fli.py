@@ -47,8 +47,8 @@ def write_rebin(file, binfac):
     #Rewrites file binned by some factor 
     dat, hdr = fits.getdata(file, header=True)
     rebin_dat = rebin(dat, binfac)
-    fits.writeto(f.split(".")[-1]+"orig.fits", dat, hdr, overwrite=False)
-    fits.writeto(f, rebin_dat, hdr, overwrite=True)
+    #fits.writeto(file.split(".")[0]+"orig.fits", dat, hdr, overwrite=False)
+    fits.writeto(file, rebin_dat, hdr, overwrite=True)
     return
 
 def subtract_dark(image_file, dark_file):
