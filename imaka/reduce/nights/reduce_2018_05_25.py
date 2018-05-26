@@ -30,7 +30,7 @@ fnum_c = [63, 66, 69] #closed loop img file numbers
 
 def make_sky():
     sky_num = np.arange(0, 8+1)
-    sky_frames = ['{0:s}sky_{1:02d}.fits'.format(data_dir, ss) for ss in sky_num]
+    sky_frames = ['{0:s}sky_{1:02d}.fits'.format(sky_dir, ss) for ss in sky_num]
     calib.makedark(sky_frames, sky_dir+'FLD2_sky.fits')
     
     return
