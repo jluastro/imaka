@@ -63,17 +63,33 @@ def reduce_FLD2():
     img_files = [data_dir + 'obj{0:04d}_o.fits'.format(ii) for ii in fnum_o_30]
     reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'FLD2_30_sky.fits', flat_frame=flat_dir+"flat.fits")
 
-    # Closed - 3 WFS Small
+    # Closed - 3 WFS Small - 30s
     img_files = [data_dir + 'obj{0:04d}_threewfs_small_c.fits'.format(ii) for ii in fnum_c_3S_30]
     reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'FLD2_30_sky.fits', flat_frame =flat_dir+"flat.fits")
 
-    # Closed - 3 WFS Large
+    # Closed - 3 WFS Large - 30s
     img_files = [data_dir + 'obj{0:04d}_threeWFS_big_c.fits'.format(ii) for ii in fnum_c_3L_30]
     reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'FLD2_30_sky.fits', flat_frame =flat_dir+"flat.fits")
 
-    # Closed - 4 WFS
+    # Closed - 4 WFS - 30s
     img_files = [data_dir + 'obj{0:04d}_fourWFS_c.fits'.format(ii) for ii in fnum_c_4_30]
     reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'FLD2_30_sky.fits', flat_frame =flat_dir+"flat.fits")
+
+     # Open Loop - 60s
+    img_files = [data_dir + 'obj{0:04d}_o.fits'.format(ii) for ii in fnum_o_60]
+    reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'FLD260_sky.fits', flat_frame=flat_dir+"flat.fits")
+
+    # Closed - 3 WFS Small - 60s
+    img_files = [data_dir + 'obj{0:04d}_threewfs_small_c.fits'.format(ii) for ii in fnum_c_3S_60]
+    reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'FLD2_60_sky.fits', flat_frame =flat_dir+"flat.fits")
+
+    # Closed - 3 WFS Large - 60s
+    img_files = [data_dir + 'obj{0:04d}_threeWFS_big_c.fits'.format(ii) for ii in fnum_c_3L_60]
+    reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'FLD2_60_sky.fits', flat_frame =flat_dir+"flat.fits")
+
+    # Closed - 4 WFS - 60s
+    img_files = [data_dir + 'obj{0:04d}_fourWFS_c.fits'.format(ii) for ii in fnum_c_4_60]
+    reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'FLD2_60_sky.fits', flat_frame =flat_dir+"flat.fits")
 
     return
 
@@ -95,7 +111,23 @@ def find_stars_FLD2():
     #Closed Loop - 4 WFS
     img_files = [out_dir + 'obj{0:04d}_fourWFS_c_clean.fits'.format(ii) for ii in fnum_c]
     reduce_fli.find_stars(img_files, fwhm=6, threshold=6)    
-        
+
+    # Open Loop
+    img_files = [out_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in fnum_o]
+    reduce_fli.find_stars(img_files, fwhm=8, threshold=10)
+
+    #Closed Loop - 3S WFS
+    img_files = [out_dir + 'obj{0:04d}_threewfs_small_c_clean.fits'.format(ii) for ii in fnum_c]
+    reduce_fli.find_stars(img_files, fwhm=6, threshold=6)  
+    
+    #Closed Loop - 3L WFS
+    img_files = [out_dir + 'obj{0:04d}_threeWFS_big_c_clean.fits'.format(ii) for ii in fnum_c]
+    reduce_fli.find_stars(img_files, fwhm=6, threshold=6)  
+
+    #Closed Loop - 4 WFS
+    img_files = [out_dir + 'obj{0:04d}_fourWFS_c_clean.fits'.format(ii) for ii in fnum_c]
+    reduce_fli.find_stars(img_files, fwhm=6, threshold=6)    
+    
     return
 
 
