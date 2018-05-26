@@ -22,8 +22,10 @@ stats_dir = root_dir +'reduce/stats/'
 stacks_dir = root_dir + 'reduce/stacks/'
 twi_dir = root_dir + 'twilight/'
     
-fnum_o = [57, 64, 67] #open loop img file numbers
-fnum_c = [63, 66, 69] #closed loop img file numbers
+fnum_o  = [31, 34, 37, 40, 43, 46, 51, 54, 57, 64, 67, 70, 73, 76] #open loop img file numbers
+fnum_c_3S = [32, 35, 38, 41, 44, 47, 52, 77] # Closed loop, 3 WFS small
+fnum_c_3L = [48, 49, 55, 58, 59, 60, 61, 62, 65, 68, 71, 74] # Closed loop, 3 WFS large
+fnum_c_4  = [26, 27, 28, 29, 30, 33, 36, 39, 42, 45, 50, 53, 56, 63, 66, 69, 72, 75] # Closed loop, 4 WFS
 
 
     
@@ -51,11 +53,19 @@ def reduce_FLD2():
 
     # Open Loop
     img_files = [data_dir + 'obj{0:04d}_o.fits'.format(ii) for ii in fnum_o]
-    reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=data_dir+'../twilight/sky03.fits', flat_frame=None)
+    reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'FLD2_sky.fits', flat_frame=flat_dir+"flat.fits")
 
-    # Closed
-    img_files = [data_dir + 'obj{0:04d}_fourWFS_c.fits'.format(ii) for ii in fnum_c]
-    reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=data_dir + '../twilight/sky03.fits', flat_frame =None)
+    # Closed - 3 WFS Small
+    img_files = [data_dir + 'obj{0:04d}threewfs_small_c.fits'.format(ii) for ii in fnum_c_3S]
+    reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'FLD2_sky.fits', flat_frame =flat_dir+"flat.fits")
+
+    # Closed - 3 WFS Large
+    img_files = [data_dir + 'obj{0:04d}threeWFS_big_c.fits'.format(ii) for ii in fnum_c_3L]
+    reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'FLD2_sky.fits', flat_frame =flat_dir+"flat.fits")
+
+    # Closed - 4 WFS
+    img_files = [data_dir + 'obj{0:04d}_fourWFS_c.fits'.format(ii) for ii in fnum_c_4]
+    reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'FLD2_sky.fits', flat_frame =flat_dir+"flat.fits")
 
     return
 
