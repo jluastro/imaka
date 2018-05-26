@@ -31,8 +31,8 @@ def make_flat():
     util.mkdir(flat_dir)
     
     flat_num = np.arange(10,  24+1)
-    flat_frames = ['{0:s}twi_{1:04d}.fits'.format(twi_dir, ss) for ss in flat_num]
-    dark_frames = ['{0:s}dark_{1:04d}.fits'.format(twi_dir, ss) for ss in flat_num]
+    flat_frames = ['{0:s}twi{1:02d}.fits'.format(twi_dir, ss) for ss in flat_num]
+    dark_frames = ['{0:s}dark{1:02d}.fits'.format(twi_dir, ss) for ss in flat_num]
 
     calib.makeflat(flat_frames, dark_frames, flat_dir + 'flat.fits')
 
