@@ -47,7 +47,7 @@ def write_rebin(file, binfac):
     #Rewrites file binned by some factor 
     dat, hdr = fits.getdata(file, header=True)
     rebin_dat = rebin(dat, binfac)
-    fits.writoto(file.split(".fits")[0]+"orig.fits", dat, hdr, overwrite=False)
+    fits.writeto(file.split(".fits")[0]+"orig.fits", dat, hdr, overwrite=False)
     orig_binfac = hdr['BINFAC']
     new_binfac = orig_binfac * binfac
     hdr['BINFAC'] = new_binfac
