@@ -20,13 +20,24 @@ flat_dir = root_dir + 'reduce/calib/'
 out_dir = root_dir + 'reduce/FLD2/'
 stats_dir = root_dir +'reduce/stats/'
 stacks_dir = root_dir + 'reduce/stacks/'
+twi_dir = root_dir + 'twilight/'
     
 fnum_o = [57, 64, 67] #open loop img file numbers
 fnum_c = [63, 66, 69] #closed loop img file numbers
 
 
     
-#def make_flat():    
+def make_flat():
+    util.mkdir(flat_dir)
+    
+    flat_num = np.arange(10,  24+1)
+    flat_frames = ['{0:s}twi_{1:04d}.fits'.format(twi_dir, ss) for ss in flat_num]
+    dark_frames = ['{0:s}dark_{1:04d}.fits'.format(twi_dir, ss) for ss in flat_num]
+
+    calib.makeflat(flat_frames, dark_frames, flat_dir + 'flat.fits')
+
+    return
+
 
 def make_sky():
     sky_num = np.arange(0, 8+1)
