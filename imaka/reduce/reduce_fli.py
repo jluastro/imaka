@@ -129,13 +129,13 @@ def clean_single_image(img, sky=None, flat=None, rebin=1, fix_bad_pixels=False, 
     if sky is None:
         bkg_box_size = int(round(img.shape[0] / 10.))
         print('  Subtract background with smoothing box size of ', bkg_box_size)
-        blurred = median_filter(img_bin, size=bkg_box_size)
+        blurred = median_filter(img, size=bkg_box_size)
         img = img - blurred.astype(float)
     else:
         img = img - sky
 
     # Flat field.
-    if flat is None:
+    if flat is not None:
         print('  Dividing by flat')
         img = img / flat
 
@@ -158,8 +158,6 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
     """
     print('\nREDUCE_FLI: find_stars()')
 
-    
-    
     for ii in range(len(img_files)):
         print("  Working on image: ", img_files[ii])
         img, hdr = fits.getdata(img_files[ii], header=True, ignore_missing_end=True)
