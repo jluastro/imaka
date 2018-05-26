@@ -74,18 +74,18 @@ def find_stars_FLD2():
 
     # Open Loop
     img_files = [out_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in fnum_o]
-    reduce_fli.find_stars(img_files, fwhm=8, threshold=10)
+    #reduce_fli.find_stars(img_files, fwhm=8, threshold=10)
 
     #Closed Loop - 3S WFS
-    img_files = [out_dir + 'obj{0:04d}_threewfs_small_c_clean.fits'.format(ii) for ii in fnum_c]
+    img_files = [out_dir + 'obj{0:04d}_threewfs_small_c_clean.fits'.format(ii) for ii in fnum_c_3S]
     reduce_fli.find_stars(img_files, fwhm=6, threshold=6)  
     
     #Closed Loop - 3L WFS
-    img_files = [out_dir + 'obj{0:04d}_threeWFS_big_c_clean.fits'.format(ii) for ii in fnum_c]
+    img_files = [out_dir + 'obj{0:04d}_threeWFS_big_c_clean.fits'.format(ii) for ii in fnum_c_3L]
     reduce_fli.find_stars(img_files, fwhm=6, threshold=6)  
 
     #Closed Loop - 4 WFS
-    img_files = [out_dir + 'obj{0:04d}_fourWFS_c_clean.fits'.format(ii) for ii in fnum_c]
+    img_files = [out_dir + 'obj{0:04d}_fourWFS_c_clean.fits'.format(ii) for ii in fnum_c_4]
     reduce_fli.find_stars(img_files, fwhm=6, threshold=6)    
         
     return
