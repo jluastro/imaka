@@ -53,14 +53,14 @@ def reduce_FLD2():
 
     # Open Loop
     img_files = [data_dir + 'obj{0:04d}_o.fits'.format(ii) for ii in fnum_o]
-    reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'FLD2_sky.fits', flat_frame=flat_dir+"flat.fits")
+    #reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'FLD2_sky.fits', flat_frame=flat_dir+"flat.fits")
 
     # Closed - 3 WFS Small
-    img_files = [data_dir + 'obj{0:04d}threewfs_small_c.fits'.format(ii) for ii in fnum_c_3S]
+    img_files = [data_dir + 'obj{0:04d}_threewfs_small_c.fits'.format(ii) for ii in fnum_c_3S]
     reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'FLD2_sky.fits', flat_frame =flat_dir+"flat.fits")
 
     # Closed - 3 WFS Large
-    img_files = [data_dir + 'obj{0:04d}threeWFS_big_c.fits'.format(ii) for ii in fnum_c_3L]
+    img_files = [data_dir + 'obj{0:04d}_threeWFS_big_c.fits'.format(ii) for ii in fnum_c_3L]
     reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'FLD2_sky.fits', flat_frame =flat_dir+"flat.fits")
 
     # Closed - 4 WFS
