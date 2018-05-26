@@ -53,7 +53,7 @@ def reduce_FLD2():
 
     # Open Loop
     img_files = [data_dir + 'obj{0:04d}_o.fits'.format(ii) for ii in fnum_o]
-    #reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'FLD2_sky.fits', flat_frame=flat_dir+"flat.fits")
+    reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=sky_dir + 'FLD2_sky.fits', flat_frame=flat_dir+"flat.fits")
 
     # Closed - 3 WFS Small
     img_files = [data_dir + 'obj{0:04d}_threewfs_small_c.fits'.format(ii) for ii in fnum_c_3S]
@@ -75,8 +75,16 @@ def find_stars_FLD2():
     # Open Loop
     img_files = [out_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in fnum_o]
     reduce_fli.find_stars(img_files, fwhm=8, threshold=10)
+
+    #Closed Loop - 3S WFS
+    img_files = [out_dir + 'obj{0:04d}_threewfs_small_c_clean.fits'.format(ii) for ii in fnum_c]
+    reduce_fli.find_stars(img_files, fwhm=6, threshold=6)  
     
-    #Closed Loop
+    #Closed Loop - 3L WFS
+    img_files = [out_dir + 'obj{0:04d}_threeWFS_big_c_clean.fits'.format(ii) for ii in fnum_c]
+    reduce_fli.find_stars(img_files, fwhm=6, threshold=6)  
+
+    #Closed Loop - 4 WFS
     img_files = [out_dir + 'obj{0:04d}_fourWFS_c_clean.fits'.format(ii) for ii in fnum_c]
     reduce_fli.find_stars(img_files, fwhm=6, threshold=6)    
         
