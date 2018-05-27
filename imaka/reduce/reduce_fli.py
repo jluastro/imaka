@@ -168,7 +168,7 @@ def mask_pix(flat_file, mask_min, mask_max, left_slice=0, right_slice=0, top_sli
     """
 
     # Read in file
-    flat = fits.getdata("flat.fits")
+    flat = fits.getdata(flat_file)
     y, x = np.shape(flat)
 
     # Mask pixels below a defined threshold 'mask_min'
