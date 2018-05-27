@@ -22,7 +22,7 @@ stats_dir = root_dir +'reduce/stats/'
 stacks_dir = root_dir + 'reduce/stacks/'
 twi_dir = root_dir + 'twilight/'
     
-fnum_o_30  = [5, 8, 11, 14, 18, 22, 26, 30, 34, 38, 42, 46] #open loop img file numbers
+fnum_o_30  = [5, 8, 11, 14, 18, 22, 26, 30, 34, 38, 42, 46]
 fnum_c_3S_30 = [6, 9, 12, 15, 20, 24, 28, 32, 36, 40, 44, 48] # Closed loop, 3 WFS small
 fnum_c_3L_30 = [16, 19, 23, 27, 31, 35, 39, 43, 47] # Closed loop, 3 WFS large
 fnum_c_4_30  = [3, 4, 7, 10, 13, 17, 21, 25, 29, 33, 37, 41, 45] # Closed loop, 4 WFS
@@ -97,8 +97,6 @@ def reduce_FLD2():
 def find_stars_FLD2():
 
     # Open Loop
-
-    
     img_files = [out_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in fnum_o_30+fnum_o_60]
     reduce_fli.find_stars(img_files, fwhm=8, threshold=10, N_passes=2, plot_psf_compare=False, \
                               mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
@@ -128,12 +126,20 @@ def find_stars_FLD2():
 def calc_star_stats():
     
     # Open Loop
-    img_files = [data_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in fnum_o]
+    img_files = [out_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in fnum_o_30+fnum_o_60]
     reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_open.fits')
 
-    # Closed Loop
-    img_files = [data_dir + "obj{0:04d}_c_clean.fits".format(ii) for ii in fnum_C]
-    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closed.fits')
+    #Closed Loop - 3S WFS
+    img_files = [out_dir + 'obj{0:04d}_threewfs_small_c_clean.fits'.format(ii) for ii in fnum_c_3S_30+fnum_c_3S_60]
+    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closed_3WFS_S.fits')
+
+    #Closed Loop - 3L WFS
+    #img_files = [out_dir + 'obj{0:04d}_threeWFS_big_c_clean.fits'.format(ii) for ii in fnum_c_3L_30_fnum_c_3L_60]
+    #reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closed_3WFS_L.fits')
+    
+    #Closed Loop - 4 WFS
+    #img_files = [out_dir + 'obj{0:04d}_fourWFS_c_clean.fits'.format(ii) for ii in fnum_c_4_30+fnum_c_4_60]
+    #reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closed_4WFS.fits')
 
     return
 
