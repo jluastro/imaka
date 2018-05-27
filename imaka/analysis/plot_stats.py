@@ -1545,16 +1545,24 @@ def plot_field_var(starlist):
 
 
 def plot_fwhmvt_nomatch(open_file, closed_file, comp_col, title, plots_dir):
+    """
+    Plot FWHM vs. time for both open, closed, MASS, and DIMM
     
-    #open_file and closed_file are the fits stats files
-    #plots fwhm for open and closed and mass/dimm seeing vs time
-    #'comp_col' is what column of data to compare (e.g. 'emp_fwhm')
-    #obs_wav is the wavelength of that observation, to scale it to the 500 nm mass/dimm observations
-    #title: title for generated plot
-    #plots_dir: directory to put generated plot in
+    Inputs
+    ----------
+    open_file and closed_file: str
+        The fits table stats files
+        
+    comp_col: str
+        what column of data to compare (e.g. 'emp_fwhm')
+
+    title: str
+        title for generated plot
+        
+    plots_dir: str
+        directory to put generated plot in
+    """
     
-    #Read in data
-    comp_col = 'emp_fwhm'
     #Read in data
     stats1 = Table.read(open_file)
     stats2 = Table.read(closed_file)
@@ -1562,13 +1570,14 @@ def plot_fwhmvt_nomatch(open_file, closed_file, comp_col, title, plots_dir):
     time1, date1, data1, data2, err1, err2 = add_data.match_cols(open_file, open_file, comp_col)
     time2, date2, data1, data2, err1, err2 = add_data.match_cols(closed_file, closed_file, comp_col)
     
+    calib1 = []
+    calib2 = []
     
-    
-    calib1 = []; calib2=[]
-    
-    #Get mass/dimm data
+    # Get mass/dimm data
     mass = stats2['MASS']
     dimm = stats1['DIMM']
+
+    # Shift to match wavelengths
     for i in range(len(stats1)):
         wvln = filter2wv(stats1['FILTER'][i])
         scale = .04 * stats1['BINFAC'][i]
@@ -1581,11 +1590,18 @@ def plot_fwhmvt_nomatch(open_file, closed_file, comp_col, title, plots_dir):
         factor = ((500/wvln)**0.2) * scale
         calib2.append(factor)
 
+    calib1 = np.array(calib1)
+    calib2 = np.array(calib2)
 
-    open_err = np.array(stats1['emp_fwhm_std']) * np.array(calib1)[:,0]
-    closed_err = np.array(stats2['emp_fwhm_std']) * np.array(calib2)[:,0]
+    comp_col_err = comp_col + '_std'
+    if comp_col_err in stats1.colnames:
+        open_err = stats1[comp_col_err] * calib1
+        closed_err = stats2[comp_col_err] * calib2
+    else:
+        open_err = np.zeros(len(stats1))
+        closed_err = np.zeros(len(stats2))
 
-#Plot fwhm and seeing vs time
+    # Plot fwhm and seeing vs time
     times1 = []
     for i in range(len(time1)):
         string = str(date1[i])+str(time1[i])
@@ -1599,8 +1615,8 @@ def plot_fwhmvt_nomatch(open_file, closed_file, comp_col, title, plots_dir):
         times2.append(dt_obj)
 
     plt.figure(1, figsize=(12, 4))
-    plt.errorbar(times1, np.array(stats1['emp_fwhm'])*np.array(calib1)[:,0], yerr=open_err, fmt='o', label="Open")
-    plt.errorbar(times2, np.array(stats2['emp_fwhm'])*np.array(calib2)[:,0], yerr=closed_err, fmt='ro', label="Closed")
+    plt.errorbar(times1, stats1[comp_col]*calib1, yerr=open_err, fmt='o', label="Open")
+    plt.errorbar(times2, stats2[comp_col]*calib2, yerr=closed_err, fmt='ro', label="Closed")
     plt.plot(times1, dimm, 'b-')
     plt.plot(times2, mass, 'r-')
     plt.ylabel(comp_col)
@@ -1617,8 +1633,11 @@ def plot_fwhmvt_nomatch(open_file, closed_file, comp_col, title, plots_dir):
 
 
 def compare_seeing(date):
-    
-    #compares Olivier's seeing data for integrated seeing and free atmosphere to Mauna Kea's MASS/DIMM measurments.  only date string needed, but assumes organization of files like on onaga, with massdimm and stats files available.
+    """
+    Compares Olivier's seeing data for integrated seeing and free atmosphere to 
+    Mauna Kea's MASS/DIMM measurments.  only date string needed, but assumes 
+    organization of files like on onaga, with massdimm and stats files available.
+    """
     
     if date[5] == "5":
         run = "5"

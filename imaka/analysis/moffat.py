@@ -90,16 +90,21 @@ def fit_moffat(img_files, stats_file, x_guess=5, y_guess=5, flux_percent=0.9):
             y_cent = int(round(float(coords[1][jj])))
             flux   = np.array(stars['flux'])[jj]
             peak   = np.array(stars['peak'])[jj]
-            if y_cent - cut_size/2 > 0 and x_cent - cut_size/2 > 0 and y_cent + cut_size/2 < np.shape(img)[0] and x_cent + cut_size/2<np.shape(img)[1] \
-              and flux > flux_cut and peak < 20000:
+            if ((y_cent - cut_size/2 > 0) and (x_cent - cut_size/2 > 0) and
+                (y_cent + cut_size/2 < np.shape(img)[0]) and
+                (x_cent + cut_size/2<np.shape(img)[1]) and
+                (flux > flux_cut) and (peak < 20000)):
+                
                 N_good_stars += 1
                 x_cents.append(x_cent)
                 y_cents.append(y_cent)
+                
         if N_good_stars < 2: #if there are not enough bright stars, make cutoff more lax
             print("Less than two bright stars found.  Using all stars.")
             x_cents = []
             y_cents = []
             N_good_stars = 0
+            
             for jj in range(N_stars):
                 # Trim star sample for edge sources, saturation, and low flux
                 cut_size = 40
@@ -107,8 +112,12 @@ def fit_moffat(img_files, stats_file, x_guess=5, y_guess=5, flux_percent=0.9):
                 y_cent = int(round(float(coords[1][jj])))
                 flux   = np.array(stars['flux'])[jj]
                 peak   = np.array(stars['peak'])[jj]
-                if y_cent - cut_size/2 > 0 and x_cent - cut_size/2 > 0 and y_cent + cut_size/2 < np.shape(img)[0] and x_cent + cut_size/2<np.shape(img)[1] \
-                  and peak < 20000:
+                
+                if ((y_cent - cut_size/2 > 0) and (x_cent - cut_size/2 > 0) and
+                    (y_cent + cut_size/2 < np.shape(img)[0]) and
+                    (x_cent + cut_size/2<np.shape(img)[1]) and
+                    (peak < 20000)):
+                    
                     N_good_stars += 1
                     x_cents.append(x_cent)
                     y_cents.append(y_cent)
@@ -129,12 +138,15 @@ def fit_moffat(img_files, stats_file, x_guess=5, y_guess=5, flux_percent=0.9):
             # Make image cut for good star
             x_cent = x_cents[jj]
             y_cent = y_cents[jj]
-            image_cut = img[int(y_cent-cut_size*0.5):int(y_cent+cut_size*0.5), int(x_cent-cut_size*0.5):int(x_cent+cut_size*0.5)]
+            image_cut = img[int(y_cent-cut_size*0.5):int(y_cent+cut_size*0.5),
+                            int(x_cent-cut_size*0.5):int(x_cent+cut_size*0.5)]
 
             # Conduct moffat fit
             y, x = np.mgrid[:cut_size, :cut_size]
             z = image_cut
-            m_init = Elliptical_Moffat2D(N_sky = 0, amplitude=np.amax(z),  x_0=cut_size/2, y_0=cut_size/2, width_x = 4.55, width_y=4.17)
+            m_init = Elliptical_Moffat2D(N_sky = 0, amplitude=np.amax(z),
+                                             x_0=cut_size/2, y_0=cut_size/2,
+                                             width_x = 4.55, width_y=4.17)
             fit_m = fitting.LevMarLSQFitter()
             m = fit_m(m_init, x, y, z)
                  
