@@ -127,19 +127,19 @@ def calc_star_stats():
     
     # Open Loop
     img_files = [out_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in fnum_o_30+fnum_o_60]
-    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_open.fits')
+    #reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_open.fits')
 
     #Closed Loop - 3S WFS
     img_files = [out_dir + 'obj{0:04d}_threewfs_small_c_clean.fits'.format(ii) for ii in fnum_c_3S_30+fnum_c_3S_60]
-    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closed_3WFS_S.fits')
+    #reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closed_3WFS_S.fits')
 
     #Closed Loop - 3L WFS
-    #img_files = [out_dir + 'obj{0:04d}_threeWFS_big_c_clean.fits'.format(ii) for ii in fnum_c_3L_30_fnum_c_3L_60]
-    #reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closed_3WFS_L.fits')
+    img_files = [out_dir + 'obj{0:04d}_threeWFS_big_c_clean.fits'.format(ii) for ii in fnum_c_3L_30+fnum_c_3L_60]
+    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closed_3WFS_L.fits')
     
     #Closed Loop - 4 WFS
-    #img_files = [out_dir + 'obj{0:04d}_fourWFS_c_clean.fits'.format(ii) for ii in fnum_c_4_30+fnum_c_4_60]
-    #reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closed_4WFS.fits')
+    img_files = [out_dir + 'obj{0:04d}_fourWFS_c_clean.fits'.format(ii) for ii in fnum_c_4_30+fnum_c_4_60]
+    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closed_4WFS.fits')
 
     return
 
@@ -148,14 +148,23 @@ def calc_mof_stats():
 
     # Open Loop
     stats_file = stats_dir + 'stats_open.fits'
-    img_files = [data_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in fnum_o]
+    img_files = [data_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in fnum_o_30+fnum_o_60]
     moffat.fit_moffat(img_files, stats_file)
 
-    # Closed Loop
-    stats_file = stats_dir + 'stats_closed.fits'
-    img_files = [data_dir + 'obj{0:04d}_c_clean.fits'.format(ii) for ii in fnum_c]
+    # Closed Loop - 3S
+    stats_file = stats_dir + 'stats_closed_3WFS_S.fits'
+    img_files = [data_dir + 'obj{0:04d}_threewfs_small_c_clean.fits'.format(ii) for ii in fnum_c_3S_30+fnum_c_3S_60]
     moffat.fit_moffat(img_files, stats_file)
 
+    # Closed Loop - 3L
+    stats_file = stats_dir + 'stats_closed_3WFS_L.fits'
+    img_files = [data_dir + 'obj{0:04d}_threeWFS_big_c_clean.fits'.format(ii) for ii in fnum_c_3L_30+fnum_c_3L_60]
+    moffat.fit_moffat(img_files, stats_file)
+
+    # Closed Loop - 4
+    stats_file = stats_dir + 'stats_closed_4WFS.fits'
+    img_files = [data_dir + 'obj{0:04d}_fourWFS_c_clean.fits'.format(ii) for ii in fnum_c_4_30+fnum_c_4_60]
+    moffat.fit_moffat(img_files, stats_file)
 
 def stack_FLD2():
 
