@@ -97,21 +97,31 @@ def reduce_FLD2():
 def find_stars_FLD2():
 
     # Open Loop
-    img_files = [out_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in fnum_o_30+fnum_o_60]
-    reduce_fli.find_stars(img_files, fwhm=8, threshold=10)
 
+    
+    img_files = [out_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in fnum_o_30+fnum_o_60]
+    reduce_fli.find_stars(img_files, fwhm=8, threshold=10, N_passes=2, plot_psf_compare=False, \
+                              mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
+                              left_slice =25, right_slice=0, top_slice=20, bottom_slice=0)
+    
     #Closed Loop - 3S WFS
     img_files = [out_dir + 'obj{0:04d}_threewfs_small_c_clean.fits'.format(ii) for ii in fnum_c_3S_30+fnum_c_3S_60]
-    reduce_fli.find_stars(img_files, fwhm=6, threshold=6)  
-    
+    reduce_fli.find_stars(img_files, fwhm=4, threshold=10, N_passes=2, plot_psf_compare=False, \
+                              mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
+                              left_slice =25, right_slice=0, top_slice=20, bottom_slice=0)
+                              
     #Closed Loop - 3L WFS
     img_files = [out_dir + 'obj{0:04d}_threeWFS_big_c_clean.fits'.format(ii) for ii in fnum_c_3L_30_fnum_c_3L_60]
-    reduce_fli.find_stars(img_files, fwhm=6, threshold=6)  
-
+    reduce_fli.find_stars(img_files, fwhm=4, threshold=10, N_passes=2, plot_psf_compare=False, \
+                              mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
+                              left_slice =25, right_slice=0, top_slice=20, bottom_slice=0)
+                              
     #Closed Loop - 4 WFS
     img_files = [out_dir + 'obj{0:04d}_fourWFS_c_clean.fits'.format(ii) for ii in fnum_c_4_30+fnum_c_4_60]
-    reduce_fli.find_stars(img_files, fwhm=6, threshold=6)    
-
+    reduce_fli.find_stars(img_files, fwhm=4, threshold=10, N_passes=2, plot_psf_compare=False, \
+                              mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
+                              left_slice =25, right_slice=0, top_slice=20, bottom_slice=0)
+                              
     return
 
 

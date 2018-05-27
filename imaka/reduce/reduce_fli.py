@@ -92,9 +92,6 @@ def clean_images(img_files, out_dir, rebin=1, sky_frame=None, flat_frame=None, f
     """
     print('\nREDUCE_FLI: clean_images()')
 
-    sky = None
-    flat = None
-
     # If we are doing sky subtraction with a separate sky, then load it up
     if sky_frame != None:
         sky = fits.getdata(sky_frame)
@@ -161,7 +158,38 @@ def clean_single_image(img, sky=None, flat=None, rebin=1, fix_bad_pixels=False, 
     return img, bad_pixels
 
 
-def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=False):
+def mask_pix(flat_file, mask_min, mask_max, left_slice=0, right_slice=0, top_slice=0, bottom_slice=0):
+    """
+    Masks pixels in flat image based on input minimum and maximum values.
+    Also masks edges as specified by 'slice' values. Note that indexing/orientation 
+    is based in python, not fits (0,0 is top left, not bottom left, and starts at 0)
+    
+    Returns boolean mask array
+    """
+
+    # Read in file
+    flat = fits.getdata("flat.fits")
+    y, x = np.shape(flat)
+
+    # Mask pixels below a defined threshold 'mask_min'
+    copy1 = np.copy(flat)
+    copy1[np.where((copy1>mask_min) & (copy1<mask_max))] = 0
+    mask1 = np.ma.make_mask(copy1,copy=True,shrink=True,dtype=np.bool)
+
+    # Mask edge pixels as defined by 'slice' variables 
+    copy2 = np.copy(flat)
+    copy2[top_slice:y-bottom_slice, left_slice:x-right_slice] = 0
+    mask2 = np.ma.make_mask(copy2, copy=True, shrink=True, dtype=np.bool)
+
+    # Combine masks
+    combo_mask = np.ma.mask_or(mask1, mask2)
+    
+    return combo_mask
+
+
+def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=False, mask_flat=None, \
+                   flat_file=None, mask_min=None, mask_max=None, \
+                   left_slice=None, right_slice=None, top_slice=None, bottom_slice=None):
     """
     img_files - a list of image files.
     fwhm - First guess at the FWHM of the PSF for the first pass on the first image.
@@ -169,11 +197,24 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
     N_passes - how many times to find sources, recalc the PSF FWHM, and find sources again. 
     """
     print('\nREDUCE_FLI: find_stars()')
+    
+    # If no mask specified, make empty mask
+    if mask_flat == None:
+        img_shape = np.shape(fits.getdata(img_files[0]))
+        mask = np.zeros(img_shape, dtype=bool)
+
+    # Creates mask from flat if specified - very optional (deals with vignetting, edges)
+    else:
+        mask = mask_pix(mask_flat, mask_min, mask_max, \
+                            left_slice=left_slice, right_slice=right_slice, top_slice=top_slice, bottom_slice=bottom_slice)
+        print("Using mask")
 
     for ii in range(len(img_files)):
         print("  Working on image: ", img_files[ii])
         img, hdr = fits.getdata(img_files[ii], header=True, ignore_missing_end=True)
 
+        img = np.ma.masked_array(img, mask=mask)
+        
         fwhm_curr = fwhm
 
         # Calculate the bacgkround and noise (iteratively)
@@ -207,6 +248,7 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
             print('     Pass {0:d} assuming FWHM = {1:.1f}'.format(nn, fwhm_curr))
             daofind = DAOStarFinder(fwhm=fwhm_curr, threshold = img_threshold, exclude_border=True)
             sources = daofind(img - bkg_mean)
+            print(len(sources), 'sources found')
 
             # Calculate FWHM for each detected star.
             x_fwhm = np.zeros(len(sources), dtype=float)
