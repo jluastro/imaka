@@ -78,9 +78,11 @@ def model_plot(model, image, amp, x_wid=5, y_wid=5, angle=0, fignumber=1, title=
     z_o = image
     
     if model == "Gaussian":
-        p_init_o = models.Gaussian2D(np.amax(z_o), cutout_size/2, cutout_size/2, x_stddev = x_wid, y_stddev=y_wid, theta=angle)
+        p_init_o = models.Gaussian2D(np.amax(z_o), cutout_size/2, cutout_size/2,
+                                         x_stddev = x_wid, y_stddev=y_wid, theta=angle)
     elif model == "Moffat":
-        p_init_o = Elliptical_Moffat2D(amplitude=np.amax(z_o), x_0=cutout_size/2, y_0=cutout_size/2, width_x = x_wid, width_y=y_wid)
+        p_init_o = Elliptical_Moffat2D(amplitude=np.amax(z_o), x_0=cutout_size/2,
+                                           y_0=cutout_size/2, width_x = x_wid, width_y=y_wid)
     fit_p_o = fitting.LevMarLSQFitter()
     p_o = fit_p_o(p_init_o, x_o, y_o, z_o)
     residual_o = np.sum((z_o - p_o(x_o, y_o))**2)
@@ -89,16 +91,25 @@ def model_plot(model, image, amp, x_wid=5, y_wid=5, angle=0, fignumber=1, title=
     FUV = residual_o / np.sum((diff)**2)
     # Plotting
     plt.figure(fignumber, figsize=(12, 2.5)); plt.suptitle(title)
-    plt.subplot(1,3,1); plt.imshow(z_o, origin='lower', interpolation='nearest');plt.colorbar(); plt.title("Data")
-    plt.subplot(1,3,2); plt.imshow(p_o(x_o, y_o), origin='lower', interpolation='nearest');plt.colorbar(); plt.title("Model")
-    plt.subplot(1,3,3); plt.imshow(z_o - p_o(x_o, y_o), origin='lower', interpolation='nearest');plt.colorbar(); plt.title("Residual")
+    plt.subplot(1,3,1)
+    plt.imshow(z_o, origin='lower', interpolation='nearest')
+    plt.colorbar()
+    plt.title("Data")
+    
+    plt.subplot(1,3,2)
+    plt.imshow(p_o(x_o, y_o), origin='lower', interpolation='nearest')
+    plt.colorbar(); plt.title("Model")
+    plt.subplot(1,3,3)
+    plt.imshow(z_o - p_o(x_o, y_o), origin='lower', interpolation='nearest')
+    plt.colorbar(); plt.title("Residual")
     plt.tight_layout()
     print("Least Squares Sum - ", title, ": ",'{:.2e}'.format(residual_o))
     print("FUV - ", title, ": ",'{:.2e}'.format(FUV))
 
     return p_o
 
-def model_plot_double(model, image, amp, x_wid_0=5, y_wid_0=5, x_wid_1=5, y_wid_1=5, angle=0, fignumber=1, title=None):
+def model_plot_double(model, image, amp, x_wid_0=5, y_wid_0=5, x_wid_1=5, y_wid_1=5,
+                          angle=0, fignumber=1, title=None):
 
     cutout_size = np.shape(image)[0]
     # Open Fit
@@ -106,12 +117,16 @@ def model_plot_double(model, image, amp, x_wid_0=5, y_wid_0=5, x_wid_1=5, y_wid_
     z_o = image
     
     if model == "Gaussian":
-        gaus1_o  = models.Gaussian2D(np.amax(z_o), cutout_size/2, cutout_size/2, x_stddev=x_wid_0, y_stddev=y_wid_0, theta=angle)
-        gaus2_o  = models.Gaussian2D(np.amax(z_o), cutout_size/2, cutout_size/2,  x_stddev=x_wid_1, y_stddev=y_wid_1, theta=angle)
+        gaus1_o  = models.Gaussian2D(np.amax(z_o), cutout_size/2, cutout_size/2,
+                                         x_stddev=x_wid_0, y_stddev=y_wid_0, theta=angle)
+        gaus2_o  = models.Gaussian2D(np.amax(z_o), cutout_size/2, cutout_size/2,
+                                         x_stddev=x_wid_1, y_stddev=y_wid_1, theta=angle)
         p_init_o = gaus1_o + gaus2_o
     elif model == "Moffat":
-        mof1_o  = Elliptical_Moffat2D(amplitude=np.amax(z_o), x_0=cutout_size/2, y_0=cutout_size/2, width_x = x_wid_0, width_y=y_wid_0)
-        mof2_o  = Elliptical_Moffat2D(amplitude=np.amax(z_o), x_0=cutout_size/2, y_0=cutout_size/2, width_x = x_wid_1, width_y=y_wid_1)
+        mof1_o  = Elliptical_Moffat2D(amplitude=np.amax(z_o), x_0=cutout_size/2,
+                                          y_0=cutout_size/2, width_x = x_wid_0, width_y=y_wid_0)
+        mof2_o  = Elliptical_Moffat2D(amplitude=np.amax(z_o), x_0=cutout_size/2,
+                                          y_0=cutout_size/2, width_x = x_wid_1, width_y=y_wid_1)
         p_init_o = mof1_o + mof2_o
     fit_p_o = fitting.LevMarLSQFitter()
     p_o = fit_p_o(p_init_o, x_o, y_o, z_o)
@@ -123,9 +138,18 @@ def model_plot_double(model, image, amp, x_wid_0=5, y_wid_0=5, x_wid_1=5, y_wid_
 
     # Plotting
     plt.figure(fignumber, figsize=(12, 2.5)); plt.suptitle(title)
-    plt.subplot(1,3,1); plt.imshow(z_o, origin='lower', interpolation='nearest');plt.colorbar(); plt.title("Data")
-    plt.subplot(1,3,2); plt.imshow(p_o(x_o, y_o), origin='lower', interpolation='nearest');plt.colorbar(); plt.title("Model")
-    plt.subplot(1,3,3); plt.imshow(z_o - p_o(x_o, y_o), origin='lower', interpolation='nearest');plt.colorbar(); plt.title("Residual")
+    plt.subplot(1,3,1)
+    plt.imshow(z_o, origin='lower', interpolation='nearest')
+    plt.colorbar()
+    plt.title("Data")
+    
+    plt.subplot(1,3,2)
+    plt.imshow(p_o(x_o, y_o), origin='lower', interpolation='nearest')
+    plt.colorbar(); plt.title("Model")
+    plt.subplot(1,3,3)
+    plt.imshow(z_o - p_o(x_o, y_o), origin='lower', interpolation='nearest')
+    plt.colorbar(); plt.title("Residual")
+    
     plt.tight_layout()
     print("Least Squares Sum - ", title, ": ",'{:.2e}'.format(residual_o))
     print("FUV - ", title, ": ",'{:.2e}'.format(FUV))
