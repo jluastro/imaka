@@ -201,9 +201,13 @@ def analyze_stacks():
                         stacks_dir + 'FLD2_stack_threeWFS_LS.fits']
     
     #Find stars in image
-    reduce_fli.find_stars(open_img_files, fwhm=8, threshold=40, N_passes=2, plot_psf_compare=False)
-    reduce_fli.find_stars(closed_img_files, fwhm=4, threshold=40, N_passes=2, plot_psf_compare=False)
-    
+    reduce_fli.find_stars(open_img_files, fwhm=9, threshold=20, N_passes=2, plot_psf_compare=False, \
+                              mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
+                              left_slice =25, right_slice=0, top_slice=20, bottom_slice=0)
+    reduce_fli.find_stars(closed_img_files, fwhm=4, threshold=20, N_passes=2, plot_psf_compare=False, \
+                              mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
+                              left_slice =25, right_slice=0, top_slice=20, bottom_slice=0)
+        
     # Calc stats on all the stacked images
     reduce_fli.calc_star_stats(open_img_files+closed_img_files, output_stats= stats_dir + 'stats_stacks.fits')
 
