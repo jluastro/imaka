@@ -11,6 +11,7 @@ from imaka.reduce import util
 from imaka.analysis import moffat
 import os, shutil
 import pdb
+from imaka.reduce import massdimm
 
 root_dir = '//Volumes/DATA5/imaka/20180526/FLI/'
 
@@ -21,6 +22,7 @@ out_dir = root_dir + 'reduce/FLD2/'
 stats_dir = root_dir +'reduce/stats/'
 stacks_dir = root_dir + 'reduce/stacks/'
 twi_dir = root_dir + 'twilight/'
+massdimm_dir = root_dir + 'reduce/massdimm/'
     
 fnum_o_30  = [5, 8, 11, 14, 18, 22, 26, 30, 34, 38, 42, 46]
 fnum_c_3S_30 = [6, 9, 12, 15, 20, 24, 28, 32, 36, 40, 44, 48] # Closed loop, 3 WFS small
@@ -124,6 +126,7 @@ def find_stars_FLD2():
 
 
 def calc_star_stats():
+    util.mkdir(stats_dir)
     
     # Open Loop
     img_files = [out_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in fnum_o_30+fnum_o_60]
@@ -165,6 +168,22 @@ def calc_mof_stats():
     stats_file = stats_dir + 'stats_closed_4WFS.fits'
     img_files = [out_dir + 'obj{0:04d}_fourWFS_c_clean.fits'.format(ii) for ii in fnum_c_4_30+fnum_c_4_60]
     moffat.fit_moffat(img_files, stats_file)
+
+    return
+
+def append_massdimm():
+
+    massdimm.fetch_data('20180527', massdimm_dir)
+    stats_tables = glob.glob(root_dir + 'reduce/stats/stats*.fits')
+
+    for stats in stats_tables:
+        if 'mdp.fits' not in stats:
+            print('Adding MASS/DIMM to ' + stats)
+            massdimm.append_mass_dimm(stats, massdimm_dir)
+        else:
+            print('Skipping ' + stats)
+
+    return
 
 def stack_FLD2():
 

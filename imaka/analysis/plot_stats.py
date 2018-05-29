@@ -15,6 +15,14 @@ import matplotlib
 from imaka.analysis import add_data
 from astropy.io import fits
 from pandas import read_csv
+from imaka.analysis import moffat as mof
+from astropy.io import fits
+from imaka.analysis import moffat
+from astropy.modeling import fitting
+from astropy.stats import sigma_clip
+import scipy.linalg
+from matplotlib import cm
+
 
 
 def fetch_stats_from_onaga(dates, output_root):
@@ -1847,3 +1855,105 @@ def plot_nea(data_root='/Users/jlu/data/imaka/'):
                                                                             np.median(emp_fwhm_ratio)))
     
     return
+
+
+def comp_cdf(files, labels, colors):
+    plt.figure(figsize=(15,4))
+    for ii in range(len(files)):
+        FWHM_min, sig_FWHM_min, FWHM_maj, sig_FWHM_maj =mof.calc_mof_fwhm(files[ii], filt=False);
+
+        plt.subplot(131)
+        plt.hist(FWHM_min, color=colors[ii], linewidth=2, bins = np.arange(0, 1.3, 0.01), cumulative=True, histtype='step', normed=True, label=labels[ii]);
+        plt.xlabel('Minor FWHM (arcsec)', fontsize=16)
+        if ii == 0:
+            plt.xlim(0, np.max(FWHM_maj)+0.1)
+
+        plt.subplot(132)
+        plt.hist(FWHM_maj, color=colors[ii], linewidth=2, bins = np.arange(0, 1.3, 0.01), cumulative=True, histtype='step', normed=True, label=labels[ii]);
+        plt.xlim(0,1.2)
+        plt.xlabel('Major FWHM (arcsec)', fontsize=16)
+        if ii == 0:
+            plt.xlim(0, np.max(FWHM_maj)+0.1)
+
+        plt.subplot(133)
+        elon = FWHM_maj /FWHM_min
+        plt.hist(elon, color=colors[ii], linewidth=2, bins = np.arange(0, 2.1, 0.01), cumulative=True, histtype='step', normed=True, label=labels[ii]);
+        plt.xlabel('Elongation', fontsize=16)
+        plt.legend(loc=4)
+        if ii == 0:
+            plt.xlim(1, np.max(elon)+0.1)
+
+
+        
+    return
+
+
+def plot_var(img_file, starlist, title):
+
+    # Read in stack and starlist
+    img, hdr = fits.getdata(img_file, header=True)
+    stars = Table.read(starlist, format='ascii')
+    N_stars = len(stars)
+
+    x_cents = []
+    y_cents = []
+    mags  = []
+    FWHMs   = []
+
+    # Pick out stars within above a flux, below a saturation limit, and not on edges
+    stars[0]
+    for star in stars:
+        if star['flux'] > 0 and star['peak'] < 20000 and \
+        star['ycentroid']-10 > 0 and star['xcentroid']-10 > 0 and \
+        star['ycentroid']+10<np.shape(img)[0] and star['xcentroid']+10<np.shape(img)[1]:
+            x_cents.append(star['xcentroid'])
+            y_cents.append(star['ycentroid'])
+            mags.append(-2.5 * np.log10(star['flux']))
+
+    # Moffat fit to all sources in above cut        
+    for i in range(len(x_cents)):
+        one_star = img[int(y_cents[i])-10 : int(y_cents[i])+10+1, int(x_cents[i])-10 : int(x_cents[i])+10+1]
+        y, x = np.mgrid[:21, :21]
+        z = one_star
+        m_init = moffat.Elliptical_Moffat2D(N_sky = 0, amplitude=np.amax(z),  x_0=10.5, y_0=10.5, width_x = 4.55, width_y=4.17)
+        fit_m = fitting.LevMarLSQFitter()
+        m = fit_m(m_init, x, y, z)
+        if abs(m.width_x.value) < abs(m.width_y.value):
+            FWHM = 2*abs(m.width_x.value)*np.sqrt((2**(1/m.power.value))-1)*0.08
+        else:
+            FWHM = 2*abs(m.width_y.value)*np.sqrt((2**(1/m.power.value))-1)*0.08
+        FWHMs.append(FWHM)
+
+    #Sigma clip data
+    filt = sigma_clip(FWHMs, sigma=3, iters=5, copy=False)
+    x = np.ma.array(FWHMs, mask=filt.mask)
+    FWHMs_clip = x[~x.mask].data
+    x = np.ma.array(x_cents, mask=filt.mask)
+    xcents_clip = x[~x.mask].data
+    x = np.ma.array(y_cents, mask=filt.mask)
+    ycents_clip = x[~x.mask].data
+
+    plt.figure(1, figsize=(15,6))
+
+    plt.subplot(121)
+    bins = np.arange(0,1, .01)
+    plt.hist(FWHMs, bins=bins, alpha=0.5, label='All Data')
+    plt.hist(FWHMs_clip, bins=bins, alpha=0.5, label='Clipped Data')
+    plt.xticks(fontsize=14); plt.yticks(fontsize=14)
+    plt.xlabel('Minor FWHM (arcsec)', fontsize=16)
+    plt.ylabel('N Sources', fontsize=16)
+    plt.title('FWHM Distribution', fontsize=20)
+    plt.legend()
+
+    plt.subplot(122)
+    plt.scatter(np.array(xcents_clip)*0.08, np.array(ycents_clip)*0.08, c=np.array(FWHMs_clip))#, alpha=0.75)#, vmin=np.mean(FWHMs)-np.std(FWHMs), vmax=np.mean(FWHMs)+np.std(FWHMs))
+    plt.xlabel('x offset (arcsec)', fontsize=16) 
+    plt.ylabel('y offset (arcsec)', fontsize=16)
+    plt.title("Field Variability", fontsize=20)
+    plt.colorbar(label='FWHM (as)')
+    plt.xticks(fontsize=14); plt.yticks(fontsize=14)
+    plt.gca().set_aspect('equal', adjustable='box')
+    
+    plt.suptitle(title, fontsize=22)
+
+    plt.tight_layout()

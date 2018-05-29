@@ -127,79 +127,50 @@ def calc_star_stats():
 
     # Open Loop
     img_files = [out_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in fnum_o]
-    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_open.fits')
+    stats_file = stats_dir + 'stats_open.fits'
+    reduce_fli.calc_star_stats(img_files, output_stats=stats_file)
+    moffat.fit_moffat(img_files, stats_file)
 
     #Closed Loop - threeWFS_LS
     img_files = [out_dir + 'obj{0:04d}_threeWFS_LS_clean.fits'.format(ii) for ii in fnum_threeWFS_LS]
-    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closed_threeWFS_LS.fits')
+    stats_file = stats_dir + 'stats_closed_threeWFS_LS.fits'
+    reduce_fli.calc_star_stats(img_files, output_stats=stats_file)
+    moffat.fit_moffat(img_files, stats_file)
 
     #Closed Loop - threeWFSLS_B2_c
     img_files = [out_dir + 'obj{0:04d}_threeWFSLS_B2_c_clean.fits'.format(ii) for ii in fnum_threeWFSLS_B2_c]
-    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closed_threeWFSLS_B2_c.fits')
-    
+    stats_file = stats_dir + 'stats_closed_threeWFSLS_B2_c.fits'
+    reduce_fli.calc_star_stats(img_files, output_stats=stats_file)
+    moffat.fit_moffat(img_files, stats_file)
+
     #Closed Loop - threeWFSMean_B2_c
     img_files = [out_dir + 'obj{0:04d}_threeWFSMean_B2_c_clean.fits'.format(ii) for ii in fnum_threeWFSMean_B2_c]
-    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closed_threeWFSMean_B2_c.fits')
+    stats_file = stats_dir + 'stats_closed_threeWFSMean_B2_c.fits'
+    reduce_fli.calc_star_stats(img_files, output_stats=stats_file)
+    moffat.fit_moffat(img_files, stats_file)
 
     # Open Loop - 2 filter
     img_files = [out_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in fnum_o_2filt]
-    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_open_2filt.fits')
+    stats_file = stats_dir + 'stats_open_2filt.fits'
+    reduce_fli.calc_star_stats(img_files, output_stats=stats_file)
+    moffat.fit_moffat(img_files, stats_file)
 
     #Closed Loop - threeWFS_LS - 2 filter
     img_files = [out_dir + 'obj{0:04d}_threeWFS_LS_clean.fits'.format(ii) for ii in fnum_threeWFS_LS_2filt]
-    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closed_threeWFS_LS_2filt.fits')
+    stats_file = stats_dir + 'stats_closed_threeWFS_LS_2filt.fits'
+    reduce_fli.calc_star_stats(img_files, output_stats=stats_file)
+    moffat.fit_moffat(img_files, stats_file)
 
     #Closed Loop - threeWFSLS_B2_c - 2 filter
     img_files = [out_dir + 'obj{0:04d}_threeWFSLS_B2_c_clean.fits'.format(ii) for ii in fnum_threeWFSLS_B2_c_2filt]
-    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closed_threeWFSLS_B2_c_2filt.fits')
-    
+    stats_file = stats_dir + 'stats_closed_threeWFSLS_B2_c_2filt.fits'
+    reduce_fli.calc_star_stats(img_files, output_stats=stats_file)
+    moffat.fit_moffat(img_files, stats_file)
+
     #Closed Loop - threeWFSMean_B2_c - 2 filter
     img_files = [out_dir + 'obj{0:04d}_threeWFSMean_B2_c_clean.fits'.format(ii) for ii in fnum_threeWFSMean_B2_c_2filt]
-    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closed_threeWFSMean_B2_c_2filt.fits')
-
-    return
-
-
-def calc_mof_stats():
-
-    # Open Loop
-    stats_file = stats_dir + 'stats_open.fits'
-    img_files = [out_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in fnum_o]
-    moffat.fit_moffat(img_files, stats_file)
-
-    # Closed Loop - threeWFS_LS
-    stats_file = stats_dir + 'stats_closed_threeWFS_LS.fits'
-    img_files = [out_dir + 'obj{0:04d}_threeWFS_LS_clean.fits'.format(ii) for ii in fnum_threeWFS_LS]
-    moffat.fit_moffat(img_files, stats_file)
-
-    # Closed Loop - threeWFSLS_B2_c
-    stats_file = stats_dir + 'stats_closed_threeWFSLS_B2_c.fits'
-    img_files = [out_dir + 'obj{0:04d}_threeWFSLS_B2_c_clean.fits'.format(ii) for ii in fnum_threeWFSLS_B2_c]
-    moffat.fit_moffat(img_files, stats_file)
-
-    # Closed Loop - threeWFSMean_B2_c
-    stats_file = stats_dir + 'stats_closed_threeWFSMean_B2_c.fits'
-    img_files = [out_dir + 'obj{0:04d}_threeWFSMean_B2_c_clean.fits'.format(ii) for ii in fnum_threeWFSMean_B2_c]
-    moffat.fit_moffat(img_files, stats_file)
-
-    # Open Loop - 2 filter
-    stats_file = stats_dir + 'stats_open_2filt.fits'
-    img_files = [out_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in fnum_o_2filt]
-    moffat.fit_moffat(img_files, stats_file)
-
-    # Closed Loop - threeWFS_LS  - 2 filter
-    stats_file = stats_dir + 'stats_closed_threeWFS_LS_2filt.fits'
-    img_files = [out_dir + 'obj{0:04d}_threeWFS_LS_clean.fits'.format(ii) for ii in fnum_threeWFS_LS_2filt]
-    moffat.fit_moffat(img_files, stats_file)
-
-    # Closed Loop - 3LthreeWFSLS_B2_c - 2 filter
-    stats_file = stats_dir + 'stats_closed_threeWFSLS_B2_c_2filt.fits'
-    img_files = [out_dir + 'obj{0:04d}_threeWFSLS_B2_c_clean.fits'.format(ii) for ii in fnum_threeWFSLS_B2_c_2filt]
-    moffat.fit_moffat(img_files, stats_file)
-
-    # Closed Loop - threeWFSMean_B2_c - 2 filter
     stats_file = stats_dir + 'stats_closed_threeWFSMean_B2_c_2filt.fits'
-    img_files = [out_dir + 'obj{0:04d}_threeWFSMean_B2_c_clean.fits'.format(ii) for ii in fnum_threeWFSMean_B2_c_2filt]
+    reduce_fli.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
 
     return
