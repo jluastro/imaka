@@ -36,6 +36,7 @@ from astropy.table import Table
 from skimage.measure import block_reduce
 from datetime import datetime
 import pytz
+from imaka.reduce import reduce_fli
 
 def treat_overscan(files):
     """
@@ -367,7 +368,7 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
     stats['emp_fwhm'].format = '7.3f'
     stats['emp_fwhm_std'].format = '7.3f'
 
-    add_frame_number_column(stats)
+    reduce_fli.add_frame_number_column(stats)
     
     stats.write(output_stats, overwrite=True)
     #stats.write(output_stats.replace('.fits', '.csv'), format='csv') # Auto overwrites
