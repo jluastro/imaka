@@ -3,7 +3,7 @@ from astropy import units as u
 from astropy.nddata import CCDData
 from astropy.io import fits
 from astropy.modeling import models
-import ccdproc
+#import ccdproc
 
 
 def treat_overscan(files):
