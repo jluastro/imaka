@@ -1,3 +1,4 @@
+import pickle
 import os
 import math
 import pylab as plt
@@ -16,7 +17,7 @@ from photutils import CircularAperture
 from photutils import CircularAnnulus
 from photutils import aperture_photometry
 from astropy.stats import gaussian_fwhm_to_sigma
-from astropy.stats import sigma_clipped_stats
+from astropy.stats import sigma_clipped_stats, sigma_clip
 from astropy.modeling import models, fitting
 from flystar import match
 from flystar import align
@@ -172,12 +173,18 @@ def find_stars(img_file, fwhm=5, threshold=4, N_passes=2, plot=False):
     """
     print('\nREDUCE_FLI: find_stars()')
 
-    # Unbinned plate scale
-    ps = 0.04 # arcsecs / pix
 
     img, hdr = fits.getdata(img_file, header=True)
-    binfac = hdr['BINFAC']
-    ps = ps * binfac
+
+
+    # Unbinned plate scale
+    if 'BINFAC' in hdr: 
+        # FLI CAMERA
+        ps = 0.04 # arcsecs / pix
+        binfac = hdr['BINFAC']
+        ps = ps * binfac
+    else:
+        ps = 0.12
 
     fwhm_curr = fwhm
     N = 0
@@ -288,13 +295,16 @@ def find_stars(img_file, fwhm=5, threshold=4, N_passes=2, plot=False):
 
         fwhm_curr = np.mean([min_fwhm_med, maj_fwhm_med])
 
-        
+
     if plot == True:
         plt.figure(figsize=(8,6))
         plt.clf()
         plt.subplots_adjust(left=0.13)
         vmin = (min_fwhm_med - 3*min_fwhm_std) * ps
         vmax = (min_fwhm_med + 3*min_fwhm_std) * ps
+
+        vmin = 0.23
+        vmax = 0.58
         print(vmin, vmax)
 
         # Drop outliers:
@@ -309,5 +319,129 @@ def find_stars(img_file, fwhm=5, threshold=4, N_passes=2, plot=False):
         plt.axis('equal')
         
 
+    # Save to a pickle file:
+    _out = open(img_file.replace('.fits', '_fwhm.pickle'), 'wb')
+    pickle.dump(sources, _out)
+    pickle.dump(min_fwhm, _out)
+    pickle.dump(maj_fwhm, _out)
+    pickle.dump(elon, _out)
+    pickle.dump(phi, _out)
+    _out.close()
+        
     return min_fwhm_med*ps, min_fwhm_std*ps, maj_fwhm_med*ps, maj_fwhm_std*ps, elon_med*ps, elon_std*ps
+    
+
+def plot_stars_fit_plane(img_file, vmin=None, vmax=None, fignum=None):
+    img, hdr = fits.getdata(img_file, header=True)
+    if 'BINFAC' in hdr: 
+        # FLI CAMERA
+        ps = 0.04 # arcsecs / pix
+        binfac = hdr['BINFAC']
+        ps = ps * binfac
+    else:
+        ps = 0.12
+
+    _in = open(img_file.replace('.fits', '_fwhm.pickle'), 'rb')
+
+    sources = pickle.load(_in)
+    min_fwhm = pickle.load(_in)
+    maj_fwhm = pickle.load(_in)
+    elon = pickle.load(_in)
+    phi = pickle.load(_in)
+    _in.close()
+    
+    # Only use the brightest sources for calculating the mean. This is just for printing.
+    min_fwhm_mean, min_fwhm_med, min_fwhm_std = sigma_clipped_stats(min_fwhm)
+    maj_fwhm_mean, maj_fwhm_med, maj_fwhm_std = sigma_clipped_stats(maj_fwhm)
+    elon_mean, elon_med, elon_std = sigma_clipped_stats(elon)
+    phi_mean, phi_med, phi_std = sigma_clipped_stats(phi)
+    
+    print('        Number of sources = ', len(sources))
+    print('        Minor fwhm = {0:.2f} +/- {1:.2f} arcsec'.format(min_fwhm_med*ps,
+                                                                   min_fwhm_std*ps))
+    print('        Major fwhm = {0:.2f} +/- {1:.2f} arcsec'.format(maj_fwhm_med*ps,
+                                                                    maj_fwhm_std*ps))
+    print('        Elongation = {0:.2f} +/- {1:.2f}'.format(elon_med, elon_std))
+    print('        Pos. Angle = {0:.2f} +/- {1:.2f} rad'.format(phi_med, phi_std))
+
+    x = sources['xcentroid']
+    y = sources['ycentroid']
+    z = min_fwhm * ps
+
+    def plot_plane(xdat, ydat, zdat, title, vmin, vmax, image=False):
+        plt.clf()
+        plt.subplots_adjust(left=0.13)
+        if image == False:
+            plt.scatter(xdat, ydat, c=zdat, s=50, edgecolor='none', vmin=vmin, vmax=vmax,
+                            cmap='plasma')
+        else:
+            plt.imshow(zdat, vmin=vmin, vmax=vmax, origin='lower', cmap='plasma')
+            
+        plt.xlabel('X (pixels)')
+        plt.ylabel('Y (pixels)')
+        plt.title(title)
+        plt.colorbar(label='FWHM (")')
+        plt.axis('equal')
+        
+    
+    ##########
+    # Fit the data to a plane.
+    ##########
+    if (len(sources) > 10):
+        p_init = models.Polynomial2D(degree=1)
+        fitter1 = fitting.LevMarLSQFitter()
+        fitter2 = fitting.FittingWithOutlierRemoval(fitter1, sigma_clip, niter=3, sigma=3)
+
+        z_good, fit2_model = fitter2(p_init, x, y, z)
+
+        n_tot = len(z_good)
+        n_good = z_good.count()
+        n_bad = n_tot - n_good
+        print('Keeping {0:d} of {1:d}, {2:d} outliers'.format(n_good, n_tot, n_bad))
+
+        y_grid, x_grid = np.mgrid[:int(y.max()), :int(x.max())]
+        plane2 = fit2_model(x_grid, y_grid)
+
+    else:
+        z_good = z
+        plane2 = None
+    
+
+    ##########
+    # Plotting
+    ##########
+    if vmin is None:
+        vmin = z_good.min()
+    if vmax is None:
+        vmax = z_good.max()
+
+    if plane2 is not None:
+        plt.figure(1, figsize=(8,6))
+        plt.clf()
+        plot_plane(x_grid, y_grid, plane2, 'Plane 2', vmin, vmax, image=True)
+        
+    if fignum is None:
+        plt.figure(figsize=(8,6))
+    else:
+        plt.figure(fignum, figsize=(8,6))
+        plt.clf()
+
+    plot_plane(x, y, z, img_file, vmin, vmax, image=False)
+    plt.plot(x[z_good.mask == True], y[z_good.mask == True], 'kx', ms=10, linestyle='none')
+
+    print('Maximum Tilt Range in Model Plane is: {0:.2f}" - {1:.2f}"'.format(plane2.min(), plane2.max()))
+    print('Maximum Tilt Delta in Model Plane is: {0:.2f}"'.format(plane2.max() - plane2.min()))
+    return
+
+def read_fwhm_pickle(img_file):
+    _in = open(img_file.replace('.fits', '_fwhm.pickle'), 'rb')
+
+    sources = pickle.load(_in)
+    min_fwhm = pickle.load(_in)
+    maj_fwhm = pickle.load(_in)
+    elon = pickle.load(_in)
+    phi = pickle.load(_in)
+    _in.close()
+
+    return sources, min_fwhm, maj_fwhm, elon, phi
     
