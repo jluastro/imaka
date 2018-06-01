@@ -1946,7 +1946,8 @@ def plot_var(img_file, starlist, title):
     plt.legend()
 
     plt.subplot(122)
-    plt.scatter(np.array(xcents_clip)*0.08, np.array(ycents_clip)*0.08, c=np.array(FWHMs_clip))#, alpha=0.75)#, vmin=np.mean(FWHMs)-np.std(FWHMs), vmax=np.mean(FWHMs)+np.std(FWHMs))
+    #plt.scatter(np.array(xcents_clip)*0.08, np.array(ycents_clip)*0.08, c=np.array(FWHMs_clip))#, alpha=0.75)#, vmin=np.mean(FWHMs)-np.std(FWHMs), vmax=np.mean(FWHMs)+np.std(FWHMs))
+    plt.scatter(np.array(x_cents)*0.08, np.array(y_cents)*0.08, c=np.array(FWHMs))#, alpha=0.75)#, vmin=np.mean(FWHMs)-np.std(FWHMs), vmax=np.mean(FWHMs)+np.std(FWHMs))
     plt.xlabel('x offset (arcsec)', fontsize=16) 
     plt.ylabel('y offset (arcsec)', fontsize=16)
     plt.title("Field Variability", fontsize=20)

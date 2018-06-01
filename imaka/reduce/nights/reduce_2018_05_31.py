@@ -127,25 +127,25 @@ def calc_star_stats():
     # Open Loop
     img_files = [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in fnum_o]
     stats_file = stats_dir + 'stats_open.fits'
-    reduce_fli.calc_star_stats(img_files, output_stats=stats_file)
+    reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
 
     #Closed Loop - threeWFS_LS
     img_files = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean.fits'.format(ii) for ii in fnum_threeWFS_LS_c]
     stats_file = stats_dir + 'stats_closed_threeWFS_LS_c.fits'
-    reduce_fli.calc_star_stats(img_files, output_stats=stats_file)
+    reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
 
     #Closed Loop - threeWFSLS_B2_c
     img_files = [out_dir + 'obj{0:03d}threeWFSLS_B2_c_scan_clean.fits'.format(ii) for ii in fnum_threeWFSLS_B2_c]
     stats_file = stats_dir + 'stats_closed_threeWFSLS_B2_c.fits'
-    reduce_fli.calc_star_stats(img_files, output_stats=stats_file)
+    reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
 
     #Closed Loop - threeWFSMean_B2_c
     img_files = [out_dir + 'obj{0:03d}threeWFSMean_B2_c_scan_clean.fits'.format(ii) for ii in fnum_threeWFSMean_B2_c]
     stats_file = stats_dir + 'stats_closed_threeWFSMean_B2_c.fits'
-    reduce_fli.calc_star_stats(img_files, output_stats=stats_file)
+    reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
 
   
@@ -154,7 +154,7 @@ def calc_star_stats():
 
 def append_massdimm():
 
-    massdimm.fetch_data('20180528', massdimm_dir)
+    massdimm.fetch_data('20180531', massdimm_dir)
     stats_tables = glob.glob(root_dir + 'reduce/stats/stats*.fits')
 
     for stats in stats_tables:
@@ -172,79 +172,50 @@ def stack_FLD2():
     util.mkdir(stacks_dir)
 
     # Open Loop
-    open_images = [out_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in fnum_o]
-    open_starlists = [out_dir + 'obj{0:04d}_o_clean_stars.txt'.format(ii) for ii in fnum_o]
+    open_images = [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in fnum_o]
+    open_starlists = [out_dir + 'obj{0:03d}_o_scan_clean_stars.txt'.format(ii) for ii in fnum_o]
     open_output_root = stacks_dir + 'FLD2_stack_open'
     reduce_fli.shift_and_add(open_images, open_starlists, open_output_root, method='mean')
     
     # Closed Loop - threeWFS_LS
-    closed_images = [out_dir + 'obj{0:04d}_threeWFS_LS_clean.fits'.format(ii) for ii in fnum_threeWFS_LS]
-    closed_starlists = [out_dir + 'obj{0:04d}_threeWFS_LS_clean_stars.txt'.format(ii) for ii in fnum_threeWFS_LS]
-    closed_output_root = stacks_dir + 'FLD2_stack_threeWFS_LS'
+    closed_images = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean.fits'.format(ii) for ii in fnum_threeWFS_LS_c]
+    closed_starlists = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean_stars.txt'.format(ii) for ii in fnum_threeWFS_LS_c]
+    closed_output_root = stacks_dir + 'FLD2_stack_threeWFS_LS_c'
     reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
 
     # Closed Loop - threeWFSLS_B2_c
-    closed_images = [out_dir + 'obj{0:04d}_threeWFSLS_B2_c_clean.fits'.format(ii) for ii in fnum_threeWFSLS_B2_c]
-    closed_starlists = [out_dir + 'obj{0:04d}_threeWFSLS_B2_c_clean_stars.txt'.format(ii) for ii in fnum_threeWFSLS_B2_c]
+    closed_images = [out_dir + 'obj{0:03d}threeWFSLS_B2_c_scan_clean.fits'.format(ii) for ii in fnum_threeWFSLS_B2_c]
+    closed_starlists = [out_dir + 'obj{0:03d}threeWFSLS_B2_c_scan_clean_stars.txt'.format(ii) for ii in fnum_threeWFSLS_B2_c]
     closed_output_root = stacks_dir + 'FLD2_stack_threeWFSLS_B2_c'
     reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
 
     # Closed Loop - threeWFSMean_B2_c
-    closed_images = [out_dir + 'obj{0:04d}_threeWFSMean_B2_c_clean.fits'.format(ii) for ii in fnum_threeWFSMean_B2_c]
-    closed_starlists = [out_dir + 'obj{0:04d}_threeWFSMean_B2_c_clean_stars.txt'.format(ii) for ii in fnum_threeWFSMean_B2_c]
+    closed_images = [out_dir + 'obj{0:03d}threeWFSMean_B2_c_scan_clean.fits'.format(ii) for ii in fnum_threeWFSMean_B2_c]
+    closed_starlists = [out_dir + 'obj{0:03d}threeWFSMean_B2_c_scan_clean_stars.txt'.format(ii) for ii in fnum_threeWFSMean_B2_c]
     closed_output_root = stacks_dir + 'FLD2_stack_threeWFSMean_B2_c'
     reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
 
-    # Open Loop - 2 filter
-    open_images = [out_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in fnum_o_2filt]
-    open_starlists = [out_dir + 'obj{0:04d}_o_clean_stars.txt'.format(ii) for ii in fnum_o_2filt]
-    open_output_root = stacks_dir + 'FLD2_stack_open_2filt'
-    reduce_fli.shift_and_add(open_images, open_starlists, open_output_root, method='mean')
-    
-    # Closed Loop - threeWFS_LS - 2 filter
-    closed_images = [out_dir + 'obj{0:04d}_threeWFS_LS_clean.fits'.format(ii) for ii in fnum_threeWFS_LS_2filt]
-    closed_starlists = [out_dir + 'obj{0:04d}_threeWFS_LS_clean_stars.txt'.format(ii) for ii in fnum_threeWFS_LS_2filt]
-    closed_output_root = stacks_dir + 'FLD2_stack_threeWFS_LS_2filt'
-    reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
-
-    # Closed Loop - threeWFSLS_B2_c - 2 filter
-    closed_images = [out_dir + 'obj{0:04d}_threeWFSLS_B2_c_clean.fits'.format(ii) for ii in fnum_threeWFSLS_B2_c_2filt]
-    closed_starlists = [out_dir + 'obj{0:04d}_threeWFSLS_B2_c_clean_stars.txt'.format(ii) for ii in fnum_threeWFSLS_B2_c_2filt]
-    closed_output_root = stacks_dir + 'FLD2_stack_threeWFSLS_B2_c_2filt'
-    reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
-
-    # Closed Loop - threeWFSMean_B2_c - 2 filter
-    closed_images = [out_dir + 'obj{0:04d}_threeWFSMean_B2_c_clean.fits'.format(ii) for ii in fnum_threeWFSMean_B2_c_2filt]
-    closed_starlists = [out_dir + 'obj{0:04d}_threeWFSMean_B2_c_clean_stars.txt'.format(ii) for ii in fnum_threeWFSMean_B2_c_2filt]
-    closed_output_root = stacks_dir + 'FLD2_stack_threeWFSMean_B2_c_2filt'
-    reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
-
-    
     return
 
 
 def analyze_stacks():
 
-    open_img_files = [stacks_dir + 'FLD2_stack_open.fits',
-                      stacks_dir + 'FLD2_stack_open_2filt.fits']
+    open_img_files = [stacks_dir + 'FLD2_stack_open.fits']
 
     closed_img_files = [stacks_dir + 'FLD2_stack_threeWFSLS_B2_c.fits',
                         stacks_dir + 'FLD2_stack_threeWFSMean_B2_c.fits',
-                        stacks_dir + 'FLD2_stack_threeWFS_LS.fits',
-                        stacks_dir + 'FLD2_stack_threeWFSLS_B2_c_2filt.fits',
-                        stacks_dir + 'FLD2_stack_threeWFSMean_B2_c_2filt.fits',
-                        stacks_dir + 'FLD2_stack_threeWFS_LS_2filt.fits']
+                        stacks_dir + 'FLD2_stack_threeWFS_LS_c.fits']
     
     #Find stars in image
     #reduce_fli.find_stars(open_img_files, fwhm=9, threshold=20, N_passes=2, plot_psf_compare=False, \
                               #mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
                               #left_slice =25, right_slice=0, top_slice=20, bottom_slice=0)
-    reduce_fli.find_stars(closed_img_files, fwhm=4, threshold=20, N_passes=2, plot_psf_compare=False, \
+    reduce_fli.find_stars(closed_img_files, fwhm=7, threshold=10, N_passes=2, plot_psf_compare=False, \
                               mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
                               left_slice =25, right_slice=0, top_slice=20, bottom_slice=0)
         
     # Calc stats on all the stacked images
-    reduce_fli.calc_star_stats(open_img_files+closed_img_files, output_stats= stats_dir + 'stats_stacks.fits')
+    #reduce_fli.calc_star_stats(open_img_files+closed_img_files, output_stats= stats_dir + 'stats_stacks.fits')
 
     return
     

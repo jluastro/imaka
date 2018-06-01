@@ -194,8 +194,13 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
         # Make dates and times in UT and HST
         s_time_hst[ii] = hdr['SYS-TIME']
         s_date_hst[ii] = hdr['SYS-DATE']
-        s_time_utc[ii] = hdr['DATE-OBS']
-        s_date_utc[ii] = hdr['UT']
+        s_date_utc[ii] = hdr['DATE-OBS']
+
+        time = hdr['UT']
+        h, m, s = time.split(':')
+        new_time = h+":"+m+":"+s[:2]
+        s_time_utc[ii] = new_time
+        
 
         # Get the bin fraction from the header
         bin_factor = hdr['CCDBIN1']
