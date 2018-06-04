@@ -54,7 +54,7 @@ def makedark(dark_files, output):
     
     return
 
-def makeflat(flat_files, dark_files, output_file):
+def makeflat(flat_files, dark_files, output_file, darks=True):
     """
     Make a dark-subtracted flat field image from a stack of flats
     and a stack of darks.
@@ -75,10 +75,10 @@ def makeflat(flat_files, dark_files, output_file):
     """
     print('\nREDUCE_FLI: makeflat():')
 
-    
-    # Catch if there are no files sent in.
-    if (len(flat_files) == 0) or (len(dark_files) == 0):
-        raise RuntimeError('No files passed into makeflat')
+    if darks=True:
+        # Catch if there are no files sent in.
+        if (len(flat_files) == 0) or (len(dark_files) == 0):
+            raise RuntimeError('No files passed into makeflat')
 
     # Output File Names
     _out = output_file
@@ -87,7 +87,8 @@ def makeflat(flat_files, dark_files, output_file):
 
     # Read in the dark images
     print('  Reading in dark files...')
-    darks = np.array([fits.getdata(dark) for dark in dark_files])
+    if darks=True:
+        darks = np.array([fits.getdata(dark) for dark in dark_files])
 
     # Read in the flat images
     print('  Reading in flat files...')
@@ -96,16 +97,22 @@ def makeflat(flat_files, dark_files, output_file):
     # Print out useful info.
     _lis = open(_outlis, 'w')
     _lis.write('#   Flat    Dark\n')
-    for ff in range(len(dark_files)):
-        filedir1, filename1 = os.path.split(dark_files[ff])
-        filedir2, filename2 = os.path.split(flat_files[ff])
-        print('  Flat: ' + filename2 + '  Dark: ' + filename1)
-        _lis.write('{0:s}  {1:s}\n'.format(filename1, filename2))
-    _lis.close()
-        
+
+    if darks=True:
+        for ff in range(len(flat_files)):
+            filedir1, filename1 = os.path.split(dark_files[ff])
+            filedir2, filename2 = os.path.split(flat_files[ff])
+            print('  Flat: ' + filename2 + '  Dark: ' + filename1)
+            _lis.write('{0:s}  {1:s}\n'.format(filename1, filename2))
+            _lis.close()
+
+
     #Dark subtraction
     print('  Subtracting darks from flats...')
-    flat_ds = flats - darks 
+    if darks=True:
+        flat_ds = flats - darks
+    else:
+        flat_ds = flats
 
     #Normalize each of the flats:
     print('  Normalizing each flat...')
