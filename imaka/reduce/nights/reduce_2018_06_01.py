@@ -23,24 +23,26 @@ flat_dir = root_dir + 'reduce/calib/'
 out_dir = root_dir + 'reduce/FLD2/'
 stats_dir = root_dir +'reduce/stats/'
 stacks_dir = root_dir + 'reduce/stacks/'
-twi_dir = root_dir + 'twilight/'
+twi_dir = root_dir + 'twilights/'
 massdimm_dir = root_dir + 'reduce/massdimm/'
 
-fnum_o  = [57, 60, 62, 66, 70, 73, 77, 81, 85, 89, 93, 97,\
-           101, 105, 109, 113, 117, 121, 125, 126, 129, 133]
-fnum_threeWFS_LS_c = [55,56, 61, 65, 69, 72, 76, 80, 84, 88, 92,\
-                      96, 100, 104, 108, 112, 116, 120, 124, 128, 132] 
-fnum_threeWFSLS_B2_c = [58, 67, 74, 78, 82, 86, 90, 94, 98, 102, 106,\
-                            110, 114, 118, 122, 130, 134] 
-fnum_threeWFSMean_B2_c  = [54, 59, 68, 75, 79, 83, 87, 91, 95, 99, 103, \
-                               107, 111, 115, 119, 123, 127, 131]
+fnum_o = [23, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, \
+              58, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, \
+              90, 92, 94, 96, 98, 100, 102, 104, 106, 108, 110, 112, 114, 116,\
+              118, 120, 122, 124, 126, 128, 130, 132, 134, 136, 138, 140, 142,\
+              144, 146, 148, 150, 152, 154, 156, 158, 160]
+fnum_c = [22, 24, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53, \
+              55, 57, 59, 61, 63, 65, 67, 69, 71, 73, 75, 77, 79, 81, 83, 85, \
+              87, 89, 91, 93, 95, 97, 99, 101, 103, 105, 107, 111, 113, 115,  \
+              117, 119, 121, 123, 125, 127, 129, 131, 133, 135, 137, 139, 141,\
+              143, 145, 147, 149, 151, 153, 155, 157, 159]
 
 
 def make_flat(): 
 
     util.mkdir(flat_dir)
     
-    flat_num = np.arange(146,  153+1)
+    flat_num = np.arange(171,  182+1)
     flat_frames = ['{0:s}twi_{1:03d}.fits'.format(twi_dir, ss) for ss in flat_num]
     reduce_STA.treat_overscan(flat_frames)
     scan_flat_frames = ['{0:s}twi_{1:03d}_scan.fits'.format(twi_dir, ss) for ss in flat_num]
@@ -53,7 +55,7 @@ def make_sky():
 
     util.mkdir(sky_dir)
 
-    sky_num = np.arange(137, 145+1)
+    sky_num = np.arange(161, 170+1)
     sky_frames = ['{0:s}sky_{1:03d}_o.fits'.format(data_dir, ss) for ss in sky_num]
     reduce_STA.treat_overscan(sky_frames)
     scan_sky_frames = ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num]
@@ -72,22 +74,11 @@ def reduce_FLD2():
     reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'FLD2_sky.fits', flat_frame=flat_dir+"flat.fits")
 
     # Closed - threeWFS_LS
-    img_files = [data_dir + 'obj{0:03d}threeWFS_LS_c.fits'.format(ii) for ii in fnum_threeWFS_LS_c]
+    img_files = [data_dir + 'obj{0:03d}threeWFS_LS_c.fits'.format(ii) for ii in fnum_c]
     reduce_STA.treat_overscan(img_files)
-    scan_img_files = [data_dir + 'obj{0:03d}threeWFS_LS_c_scan.fits'.format(ii) for ii in fnum_threeWFS_LS_c]
+    scan_img_files = [data_dir + 'obj{0:03d}threeWFS_LS_c_scan.fits'.format(ii) for ii in fnum_c]
     reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'FLD2_sky.fits', flat_frame =flat_dir+"flat.fits")
 
-    # Closed - threeWFSLS_B2
-    img_files = [data_dir + 'obj{0:03d}threeWFSLS_B2_c.fits'.format(ii) for ii in fnum_threeWFSLS_B2_c]
-    reduce_STA.treat_overscan(img_files)
-    scan_img_files = [data_dir + 'obj{0:03d}threeWFSLS_B2_c_scan.fits'.format(ii) for ii in fnum_threeWFSLS_B2_c]
-    reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'FLD2_sky.fits', flat_frame =flat_dir+"flat.fits")
-
-    # Closed - threeWFSMean_B2_
-    img_files = [data_dir + 'obj{0:03d}threeWFSMean_B2_c.fits'.format(ii) for ii in fnum_threeWFSMean_B2_c ]
-    reduce_STA.treat_overscan(img_files)
-    scan_img_files = [data_dir + 'obj{0:03d}threeWFSMean_B2_c_scan.fits'.format(ii) for ii in fnum_threeWFSMean_B2_c]
-    reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'FLD2_sky.fits', flat_frame =flat_dir+"flat.fits")
 
     return
 
@@ -101,23 +92,11 @@ def find_stars_FLD2():
                               left_slice =25, right_slice=0, top_slice=25, bottom_slice=0)
     
     #Closed Loop - threeWFS_LS
-    img_files = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean.fits'.format(ii) for ii in fnum_threeWFS_LS_c]
+    img_files = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean.fits'.format(ii) for ii in fnum_c]
     reduce_fli.find_stars(img_files, fwhm=7, threshold=30, N_passes=2, plot_psf_compare=False, \
                               mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
                               left_slice =25, right_slice=0, top_slice=25, bottom_slice=25)
-                              
-    #Closed Loop - threeWFSLS_B2_c
-    img_files = [out_dir + 'obj{0:03d}threeWFSLS_B2_c_scan_clean.fits'.format(ii) for ii in fnum_threeWFSLS_B2_c]
-    reduce_fli.find_stars(img_files, fwhm=7, threshold=10, N_passes=2, plot_psf_compare=False, \
-                              mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
-                              left_slice =25, right_slice=0, top_slice=25, bottom_slice=0)
-                              
-    #Closed Loop - threeWFSMean_B2_c
-    img_files = [out_dir + 'obj{0:03d}threeWFSMean_B2_c_scan_clean.fits'.format(ii) for ii in fnum_threeWFSMean_B2_c]
-    reduce_fli.find_stars(img_files, fwhm=7, threshold=10, N_passes=2, plot_psf_compare=False, \
-                              mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
-                              left_slice =25, right_slice=0, top_slice=25, bottom_slice=25)
-
+                          
     return
 
 
@@ -131,30 +110,17 @@ def calc_star_stats():
     moffat.fit_moffat(img_files, stats_file)
 
     #Closed Loop - threeWFS_LS
-    img_files = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean.fits'.format(ii) for ii in fnum_threeWFS_LS_c]
+    img_files = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean.fits'.format(ii) for ii in fnum_c]
     stats_file = stats_dir + 'stats_closed_threeWFS_LS_c.fits'
     reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
 
-    #Closed Loop - threeWFSLS_B2_c
-    img_files = [out_dir + 'obj{0:03d}threeWFSLS_B2_c_scan_clean.fits'.format(ii) for ii in fnum_threeWFSLS_B2_c]
-    stats_file = stats_dir + 'stats_closed_threeWFSLS_B2_c.fits'
-    reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
-    moffat.fit_moffat(img_files, stats_file)
-
-    #Closed Loop - threeWFSMean_B2_c
-    img_files = [out_dir + 'obj{0:03d}threeWFSMean_B2_c_scan_clean.fits'.format(ii) for ii in fnum_threeWFSMean_B2_c]
-    stats_file = stats_dir + 'stats_closed_threeWFSMean_B2_c.fits'
-    reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
-    moffat.fit_moffat(img_files, stats_file)
-
-  
     return
 
 
 def append_massdimm():
 
-    massdimm.fetch_data('20180531', massdimm_dir)
+    massdimm.fetch_data('20180601', massdimm_dir)
     stats_tables = glob.glob(root_dir + 'reduce/stats/stats*.fits')
 
     for stats in stats_tables:
