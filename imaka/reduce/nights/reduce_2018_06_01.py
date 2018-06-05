@@ -15,7 +15,7 @@ from imaka.reduce import massdimm
 from imaka.reduce import reduce_STA
 
 
-root_dir = '//Volumes/DATA5/imaka/20180531/sta/'
+root_dir = '//Volumes/DATA5/imaka/20180601/sta/'
 
 sky_dir = root_dir + 'reduce/sky/' 
 data_dir = root_dir + 'FLD2/'
