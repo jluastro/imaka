@@ -75,7 +75,7 @@ def makeflat(flat_files, dark_files, output_file, darks=True):
     """
     print('\nREDUCE_FLI: makeflat():')
 
-    if darks=True:
+    if darks==True:
         # Catch if there are no files sent in.
         if (len(flat_files) == 0) or (len(dark_files) == 0):
             raise RuntimeError('No files passed into makeflat')
@@ -87,7 +87,7 @@ def makeflat(flat_files, dark_files, output_file, darks=True):
 
     # Read in the dark images
     print('  Reading in dark files...')
-    if darks=True:
+    if darks==True:
         darks = np.array([fits.getdata(dark) for dark in dark_files])
 
     # Read in the flat images
@@ -98,7 +98,7 @@ def makeflat(flat_files, dark_files, output_file, darks=True):
     _lis = open(_outlis, 'w')
     _lis.write('#   Flat    Dark\n')
 
-    if darks=True:
+    if darks==True:
         for ff in range(len(flat_files)):
             filedir1, filename1 = os.path.split(dark_files[ff])
             filedir2, filename2 = os.path.split(flat_files[ff])
@@ -109,7 +109,7 @@ def makeflat(flat_files, dark_files, output_file, darks=True):
 
     #Dark subtraction
     print('  Subtracting darks from flats...')
-    if darks=True:
+    if darks==True:
         flat_ds = flats - darks
     else:
         flat_ds = flats
