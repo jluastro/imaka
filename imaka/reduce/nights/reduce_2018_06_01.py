@@ -1,4 +1,3 @@
-import pylab as plt
 import numpy as np
 from astropy.io import fits
 from astropy import table
@@ -13,7 +12,8 @@ import os, shutil
 import pdb
 from imaka.reduce import massdimm
 from imaka.reduce import reduce_STA
-
+import matplotlib
+matplotlib.use('Agg')
 
 root_dir = '//Volumes/DATA5/imaka/20180601/sta/'
 
@@ -192,41 +192,41 @@ def calc_star_stats_fourfilt():
 
     # R
     stats_file = stats_dir + 'stats_open_R.fits'
-    reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='R')
-    moffat.fit_moffat(img_files, stats_file)
+    #reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='R')
+    #moffat.fit_moffat(img_files, stats_file)
 
     # V
     stats_file = stats_dir + 'stats_open_V.fits'
-    reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='V')
-    moffat.fit_moffat(img_files, stats_file)
+    #reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='V')
+    #moffat.fit_moffat(img_files, stats_file)
 
     # B
     stats_file = stats_dir + 'stats_open_B.fits'
-    reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='B')
-    moffat.fit_moffat(img_files, stats_file)
+    #reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='B')
+    #moffat.fit_moffat(img_files, stats_file)
 
     # I
     stats_file = stats_dir + 'stats_open_I.fits'
-    reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='I')
-    moffat.fit_moffat(img_files, stats_file)
+    #reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='I')
+    #moffat.fit_moffat(img_files, stats_file)
 
     #Closed Loop - threeWFS_LS
     img_files = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean.fits'.format(ii) for ii in fnum_c]
 
     # R
     stats_file = stats_dir + 'stats_closed_R.fits'
-    reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='R')
-    moffat.fit_moffat(img_files, stats_file)
+    #reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='R')
+    #moffat.fit_moffat(img_files, stats_file)
 
     # V
     stats_file = stats_dir + 'stats_closed_V.fits'
-    reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='V')
-    moffat.fit_moffat(img_files, stats_file)
+    #reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='V')
+    #moffat.fit_moffat(img_files, stats_file)
     
     # B
     stats_file = stats_dir + 'stats_closed_B.fits'
-    reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='B')
-    moffat.fit_moffat(img_files, stats_file)
+    #reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='B')
+    #moffat.fit_moffat(img_files, stats_file)
     
     # I
     stats_file = stats_dir + 'stats_closed_I.fits'
