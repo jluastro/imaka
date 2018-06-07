@@ -174,12 +174,12 @@ def split_filt():
 
     # Open Loop
     img_files = [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in fnum_o]
-    starlists = [out_dir + 'obj{0:03d}_o_scan_clean_stars.text'.format(ii) for ii in fnum_o]
+    starlists = [out_dir + 'obj{0:03d}_o_scan_clean_stars.txt'.format(ii) for ii in fnum_o]
     reduce_STA.fourfilt(img_files, starlists)
 
     #Closed Loop - threeWFS_LS
     img_files = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean.fits'.format(ii) for ii in fnum_c]
-    starlists = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean_stars.text'.format(ii) for ii in fnum_c]
-    reduce_STA.calc_star_stats(img_files, starlists)
+    starlists = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean_stars.txt'.format(ii) for ii in fnum_c]
+    reduce_STA.fourfilt(img_files, starlists)
 
     return

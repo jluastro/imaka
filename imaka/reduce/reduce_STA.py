@@ -394,7 +394,7 @@ def fourfilt(img_files, starlists):
 
     N = len(img_files)
     for ii in range(N):
-        print("Working on file", ii, "of", N)
+        print("Working on file", ii+1, "of", N)
     
         # Read in image and starlists
         img, hdr = fits.getdata(img_files[ii], header=True)
@@ -411,7 +411,7 @@ def fourfilt(img_files, starlists):
         indB = np.where((x>img_half) & (y<img_half))
     
         # Write new files
-        list_root = starlist.split('stars.txt')[0]
+        list_root = starlists[ii].split('stars.txt')[0]
         stars[indR].write(list_root + 'R_stars.txt', format='ascii', overwrite=True)
         stars[indI].write(list_root + 'I_stars.txt', format='ascii', overwrite=True)
         stars[indV].write(list_root + 'V_stars.txt', format='ascii', overwrite=True)
