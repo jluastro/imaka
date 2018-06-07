@@ -158,7 +158,7 @@ def analyze_stacks():
     closed_img_files = [stacks_dir + 'FLD2_stack_threeWFS_LS_c.fits']
     
     #Find stars in image
-    reduce_fli.find_stars(open_img_files, fwhm=10, threshold=50, N_passes=2, plot_psf_compare=False, \
+    reduce_fli.find_stars(open_img_files, fwhm=10, threshold=100, N_passes=2, plot_psf_compare=False, \
                               mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
                               left_slice =25, right_slice=0, top_slice=25, bottom_slice=0)
     reduce_fli.find_stars(closed_img_files, fwhm=7, threshold=30, N_passes=2, plot_psf_compare=False, \
@@ -170,3 +170,16 @@ def analyze_stacks():
 
     return
     
+def split_filt():
+
+    # Open Loop
+    img_files = [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in fnum_o]
+    starlists = [out_dir + 'obj{0:03d}_o_scan_clean_stars.text'.format(ii) for ii in fnum_o]
+    reduce_STA.fourfilt(img_files, starlists)
+
+    #Closed Loop - threeWFS_LS
+    img_files = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean.fits'.format(ii) for ii in fnum_c]
+    starlists = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean_stars.text'.format(ii) for ii in fnum_c]
+    reduce_STA.calc_star_stats(img_files, starlists)
+
+    return

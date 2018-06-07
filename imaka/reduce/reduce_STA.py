@@ -380,7 +380,7 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
                         
     return
 
-def fourfilt(img_file, starlist):
+def fourfilt(img_files, starlists):
     
     """
     For STA camera with four filters.
@@ -392,25 +392,29 @@ def fourfilt(img_file, starlist):
             R_stars.txt' for R filter
     """
 
-    # Read in image and starlists
-    img, hdr = fits.getdata(img_file, header=True)
-    stars = reduce_fli.read_starlist(starlist)
-    x = stars['x']
-    y = stars['y']
-
-    # Define quadrants with indicies
-    img_half = np.shape(img)[0] / 2
-
-    indR = np.where((x>img_half) & (y>img_half))
-    indI = np.where((x<img_half) & (y>img_half))
-    indV = np.where((x<img_half) & (y<img_half))
-    indB = np.where((x>img_half) & (y<img_half))
+    N = len(img_files)
+    for ii in range(N):
+        print("Working on file", ii, "of", N)
     
-    # Write new files
-    list_root = starlist.split('stars.txt')[0]
-    stars[indR].write(list_root + 'R_stars.txt', format='ascii', overwrite=True)
-    stars[indI].write(list_root + 'I_stars.txt', format='ascii', overwrite=True)
-    stars[indV].write(list_root + 'V_stars.txt', format='ascii', overwrite=True)
-    stars[indB].write(list_root + 'B_stars.txt', format='ascii', overwrite=True)
+        # Read in image and starlists
+        img, hdr = fits.getdata(img_files[ii], header=True)
+        stars = reduce_fli.read_starlist(starlists[ii])
+        x = stars['x']
+        y = stars['y']
+
+        # Define quadrants with indicies
+        img_half = np.shape(img)[0] / 2
+
+        indR = np.where((x>img_half) & (y>img_half))
+        indI = np.where((x<img_half) & (y>img_half))
+        indV = np.where((x<img_half) & (y<img_half))
+        indB = np.where((x>img_half) & (y<img_half))
+    
+        # Write new files
+        list_root = starlist.split('stars.txt')[0]
+        stars[indR].write(list_root + 'R_stars.txt', format='ascii', overwrite=True)
+        stars[indI].write(list_root + 'I_stars.txt', format='ascii', overwrite=True)
+        stars[indV].write(list_root + 'V_stars.txt', format='ascii', overwrite=True)
+        stars[indB].write(list_root + 'B_stars.txt', format='ascii', overwrite=True)
     
     return
