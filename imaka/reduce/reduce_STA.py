@@ -401,7 +401,7 @@ def fourfilt(img_files, starlists):
     
         # Read in image and starlists
         img, hdr = fits.getdata(img_files[ii], header=True)
-        stars = reduce_fli.read_starlist(starlists[ii])
+        stars = table.Table.read(starlists[ii], format='ascii')
         x = stars['x']
         y = stars['y']
 
