@@ -155,11 +155,11 @@ def create_bias(bias_files):
     return
 
 
-def calc_star_stats(img_files, output_stats='image_stats.fits'):
+def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None):
     """
     Calculate statistics for the Data Metrics table.
     """
-    plate_scale_orig = 0.04 # " / pixel
+    plate_scale_orig = 0.016 # " / pixel
 
     # radial bins for the EE curves
     max_radius = 3.0
@@ -204,11 +204,14 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
 
         # Get the bin fraction from the header
         bin_factor = hdr['CCDBIN1']
-        plate_scale_orig = 0.04
+        plate_scale_orig = 0.016
         plate_scale = plate_scale_orig * bin_factor
 
         # Load up the corresponding starlist.
-        starlist = img_files[ii].replace('.fits', '_stars.txt')
+        if filt==None:
+            starlist = img_files[ii].replace('.fits', '_stars.txt')
+        else:
+            starlist = img_files[ii].replace('.fits', '_'+filt+'_stars.txt')
         stars = table.Table.read(starlist, format='ascii')
         N_stars = len(stars)
 
