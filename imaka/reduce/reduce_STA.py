@@ -37,6 +37,8 @@ from skimage.measure import block_reduce
 from datetime import datetime
 import pytz
 from imaka.reduce import reduce_fli
+from astropy.table import Column
+
 
 def treat_overscan(files):
     """
@@ -378,4 +380,24 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
     stats.write(output_stats, overwrite=True)
     #stats.write(output_stats.replace('.fits', '.csv'), format='csv') # Auto overwrites
                         
+    return
+
+def add_focus(stats_files):
+    """
+    Retrieves focus value from image headers for
+    each frame in a stats_file, and creates a 
+    new column with these values.  For STA camera.
+    """
+    for file in stats_files:
+        tab = Table.read(file)
+        N_frames = len(tab)
+        focci = []
+        for ii in range(N_frames:)
+            frame_file = dat['Image']
+            hdr = fits.getheader(frame_file)
+            focus = hdr['FOCUS']
+            foc_col.append(focus)
+        col_focus = Colum(name='Focus', data=focci)
+        tab.add_column(col_focus)
+        stats.write(file_c_B, overwrite=True)
     return
