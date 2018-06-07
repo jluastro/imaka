@@ -402,8 +402,8 @@ def fourfilt(img_files, starlists):
         # Read in image and starlists
         img, hdr = fits.getdata(img_files[ii], header=True)
         stars = table.Table.read(starlists[ii], format='ascii')
-        x = stars['x']
-        y = stars['y']
+        x = stars['xcentroid']
+        y = stars['ycentroid']
 
         # Define quadrants with indicies
         img_half = np.shape(img)[0] / 2
