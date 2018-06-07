@@ -157,11 +157,11 @@ def create_bias(bias_files):
     return
 
 
-def calc_star_stats(img_files, output_stats='image_stats.fits'):
+def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None):
     """
     Calculate statistics for the Data Metrics table.
     """
-    plate_scale_orig = 0.04 # " / pixel
+    plate_scale_orig = 0.016 # " / pixel
 
     # radial bins for the EE curves
     max_radius = 3.0
@@ -206,11 +206,14 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
 
         # Get the bin fraction from the header
         bin_factor = hdr['CCDBIN1']
-        plate_scale_orig = 0.04
+        plate_scale_orig = 0.016
         plate_scale = plate_scale_orig * bin_factor
 
         # Load up the corresponding starlist.
-        starlist = img_files[ii].replace('.fits', '_stars.txt')
+        if filt==None:
+            starlist = img_files[ii].replace('.fits', '_stars.txt')
+        else:
+            starlist = img_files[ii].replace('.fits', '_'+filt+'_stars.txt')
         stars = table.Table.read(starlist, format='ascii')
         N_stars = len(stars)
 
@@ -382,6 +385,7 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
                         
     return
 
+<<<<<<< HEAD
 def add_focus(stats_files):
     """
     Retrieves focus value from image headers for
@@ -400,4 +404,43 @@ def add_focus(stats_files):
         col_focus = Colum(name='Focus', data=focci)
         tab.add_column(col_focus)
         stats.write(file_c_B, overwrite=True)
+=======
+def fourfilt(img_files, starlists):
+    
+    """
+    For STA camera with four filters.
+    Splits starlist into four starlists,
+    each corresponding to one quadrant/filter
+    Inputs: Reduced (square) STA image file
+            Starlists corresponding to image
+    Output: Four new starlists with ending:
+            R_stars.txt' for R filter
+    """
+
+    N = len(img_files)
+    for ii in range(N):
+        print("Working on file", ii+1, "of", N)
+    
+        # Read in image and starlists
+        img, hdr = fits.getdata(img_files[ii], header=True)
+        stars = table.Table.read(starlists[ii], format='ascii')
+        x = stars['x']
+        y = stars['y']
+
+        # Define quadrants with indicies
+        img_half = np.shape(img)[0] / 2
+
+        indR = np.where((x>img_half) & (y>img_half))
+        indI = np.where((x<img_half) & (y>img_half))
+        indV = np.where((x<img_half) & (y<img_half))
+        indB = np.where((x>img_half) & (y<img_half))
+    
+        # Write new files
+        list_root = starlists[ii].split('stars.txt')[0]
+        stars[indR].write(list_root + 'R_stars.txt', format='ascii', overwrite=True)
+        stars[indI].write(list_root + 'I_stars.txt', format='ascii', overwrite=True)
+        stars[indV].write(list_root + 'V_stars.txt', format='ascii', overwrite=True)
+        stars[indB].write(list_root + 'B_stars.txt', format='ascii', overwrite=True)
+    
+>>>>>>> 73f1c1436515cd1473deb28eac6b806951958d75
     return

@@ -433,6 +433,54 @@ def plot_stars_fit_plane(img_file, vmin=None, vmax=None, fignum=None):
     print('Maximum Tilt Delta in Model Plane is: {0:.2f}"'.format(plane2.max() - plane2.min()))
     return
 
+def calc_fwhms_4filt(img_file, vmin=None, vmax=None, fignum=None):
+    img, hdr = fits.getdata(img_file, header=True)
+    if 'BINFAC' in hdr: 
+        # FLI CAMERA
+        ps = 0.04 # arcsecs / pix
+        binfac = hdr['BINFAC']
+        ps = ps * binfac
+    else:
+        ps = 0.12
+
+    _in = open(img_file.replace('.fits', '_fwhm.pickle'), 'rb')
+
+    sources = pickle.load(_in)
+    min_fwhm = pickle.load(_in)
+    maj_fwhm = pickle.load(_in)
+    elon = pickle.load(_in)
+    phi = pickle.load(_in)
+    _in.close()
+    
+    # Only use the brightest sources for calculating the mean. This is just for printing.
+    filts = ['B', 'V', 'R', 'I']
+    x_filt = {'V': [0,3040], 'I':[0,3040], 'R':[3040,6000], 'B':[3040,6000]}
+    y_filt = {'V': [0,2640], 'I':[2640,5289], 'R':[2640,5279], 'B':[0,2640]}
+
+    for ff in filts:
+        idx = np.where((sources['xcentroid'] > x_filt[ff][0]) & (sources['xcentroid'] <= x_filt[ff][1]) &
+                       (sources['ycentroid'] > y_filt[ff][0]) & (sources['ycentroid'] <= y_filt[ff][1]))
+
+        min_fwhm_mean, min_fwhm_med, min_fwhm_std = sigma_clipped_stats(min_fwhm[idx])
+        maj_fwhm_mean, maj_fwhm_med, maj_fwhm_std = sigma_clipped_stats(maj_fwhm[idx])
+        elon_mean, elon_med, elon_std = sigma_clipped_stats(elon[idx])
+        phi_mean, phi_med, phi_std = sigma_clipped_stats(phi[idx])
+
+        print('    FILTER: ' + ff)
+        print('        Number of sources = ', len(idx[0]))
+        print('        Minor fwhm = {0:.2f} +/- {1:.2f} arcsec'.format(min_fwhm_med*ps,
+                                                                       min_fwhm_std*ps))
+        print('        Major fwhm = {0:.2f} +/- {1:.2f} arcsec'.format(maj_fwhm_med*ps,
+                                                                       maj_fwhm_std*ps))
+        print('        Elongation = {0:.2f} +/- {1:.2f}'.format(elon_med, elon_std))
+        print('        Pos. Angle = {0:.2f} +/- {1:.2f} rad'.format(phi_med, phi_std))
+
+        x = sources['xcentroid']
+        y = sources['ycentroid']
+        z = min_fwhm * ps
+
+    return
+
 def read_fwhm_pickle(img_file):
     _in = open(img_file.replace('.fits', '_fwhm.pickle'), 'rb')
 
