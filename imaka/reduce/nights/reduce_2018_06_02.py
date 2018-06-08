@@ -4,6 +4,8 @@ from astropy import table
 from astropy import units
 import scipy
 import glob
+import matplotlib
+matplotlib.use('Agg')
 from imaka.reduce import reduce_fli
 from imaka.reduce import calib
 from imaka.reduce import util
@@ -13,7 +15,6 @@ import pdb
 from imaka.reduce import massdimm
 from imaka.reduce import reduce_STA
 import matplotlib
-matplotlib.use('Agg')
 
 ################################################################
 
