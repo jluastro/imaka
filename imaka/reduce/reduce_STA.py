@@ -385,7 +385,7 @@ def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None):
                         
     return
 
-<<<<<<< HEAD
+
 def add_focus(stats_files):
     """
     Retrieves focus value from image headers for
@@ -396,15 +396,18 @@ def add_focus(stats_files):
         tab = Table.read(file)
         N_frames = len(tab)
         focci = []
-        for ii in range(N_frames:)
-            frame_file = dat['Image']
+        for ii in range(N_frames):
+            frame_file = tab['Image'][ii]
             hdr = fits.getheader(frame_file)
             focus = hdr['FOCUS']
-            foc_col.append(focus)
-        col_focus = Colum(name='Focus', data=focci)
+            focci.append(focus)
+        col_focus = Column(name='Focus', data=focci)
         tab.add_column(col_focus)
-        stats.write(file_c_B, overwrite=True)
-=======
+        tab.write(file, overwrite=True)
+
+    return 
+
+
 def fourfilt(img_files, starlists):
     
     """
@@ -442,5 +445,4 @@ def fourfilt(img_files, starlists):
         stars[indV].write(list_root + 'V_stars.txt', format='ascii', overwrite=True)
         stars[indB].write(list_root + 'B_stars.txt', format='ascii', overwrite=True)
     
->>>>>>> 73f1c1436515cd1473deb28eac6b806951958d75
     return
