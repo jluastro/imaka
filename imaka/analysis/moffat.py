@@ -274,3 +274,21 @@ def calc_mof_fwhm(stats_file, filt=1):
     sig_FWHM_maj = np.sqrt(((del_alpha*sig_alpha_maj)**2)+((del_beta_maj*sig_beta)**2)) * calib
     
     return FWHM_min, sig_FWHM_min, FWHM_maj, sig_FWHM_maj
+
+
+def rm_mof(stats_files):
+    """
+    Removes moffat fit columns from stats files
+    Input: List of stats files
+    Output: overwrites same file in same location w/o moffat cols
+    """
+    for file in stats_files:
+        dat = Table.read(file)
+        cols = dat.colnames
+        if 'N Stars' in cols:
+            dat.remove_columns(['N Stars', 'N Sky', 'N Sky std', 'Amplitude', 'Amplitude std', 'Phi', 'Phi std', \
+                            'Beta', 'Beta std', 'Minor Alpha', 'Minor Alpha std', 'Major Alpha', 'Major Alpha std'])
+            dat.write(file, overwrite=True)
+        else:
+            pass
+    returnn
