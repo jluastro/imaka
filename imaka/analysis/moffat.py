@@ -37,7 +37,7 @@ def Elliptical_Moffat2D(x, y, \
     return N_sky + amplitude / denom 
 
 
-def fit_moffat(img_files, stats_file, x_guess=5, y_guess=5, flux_percent=0.9):
+def fit_moffat(img_files, stats_file, x_guess=5, y_guess=5, flux_percent=0.9, starlists=None):
     """
     Conduct Moffat fit on data and add outputs to stats tables
     """
@@ -69,7 +69,11 @@ def fit_moffat(img_files, stats_file, x_guess=5, y_guess=5, flux_percent=0.9):
         img, hdr = fits.getdata(img_files[ii], header=True)
 
         # Load up the corresponding starlist.
-        starlist = img_files[ii].replace('.fits', '_stars.txt')
+        if starlists==None:
+            starlist = img_files[ii].replace('.fits', '_stars.txt')
+        else:
+            starlist = starlists[ii]
+            
         stars = Table.read(starlist, format='ascii')
         N_stars = len(stars)
 
@@ -235,7 +239,7 @@ def calc_mof_fwhm(stats_file, filt=1):
     If filt=True, data is scaled with filter data to 500 nm
     """
     data = Table.read(stats_file)
-    plate_scale = 0.04
+    plate_scale = 0.016
     filters = np.array(data['FILTER'])
     bin_fac = np.array(data['BINFAC'])
     N_stars = np.array(data['N Stars'])
