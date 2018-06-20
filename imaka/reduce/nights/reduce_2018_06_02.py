@@ -186,25 +186,25 @@ def calc_star_stats():
     # Open Loop
     img_files = [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in fnum_o]
     stats_file = stats_dir + 'stats_open.fits'
-    reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
-    moffat.fit_moffat(img_files, stats_file)
+    #reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
+    #moffat.fit_moffat(img_files, stats_file)
 
     # EXPERIMENT 1:
     
     # Closed - LS_c
-    img_files = [data_dir + 'obj{0:03d}threeWFS_LS_c_scan.fits'.format(ii) for ii in fnum_LS_c]
+    img_files = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean.fits'.format(ii) for ii in fnum_LS_c]
     stats_file = stats_dir + 'stats_closed_LS.fits'
     reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
 
     # Closed - LS_B2_c
-    img_files = [data_dir + 'obj{0:03d}threeWFSLS_B2_c_scan.fits'.format(ii) for ii in fnum_LS_B2_c]
+    img_files = [out_dir + 'obj{0:03d}threeWFSLS_B2_c_scan_clean.fits'.format(ii) for ii in fnum_LS_B2_c]
     stats_file = stats_dir + 'stats_closed_LS_B2.fits'
     reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
     
     # Closed - Mean_B2_c
-    img_files = [data_dir + 'obj{0:03d}threeWFSMean_B2_c_scan.fits'.format(ii) for ii in fnum_Mean_B2_c]
+    img_files = [out_dir + 'obj{0:03d}threeWFSMean_B2_c_scan_clean.fits'.format(ii) for ii in fnum_Mean_B2_c]
     stats_file = stats_dir + 'stats_closed_Mean_B2.fits'
     reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
@@ -212,19 +212,19 @@ def calc_star_stats():
     # EXPERIMENT 2
 
     # Closed - nrej1
-    img_files = [data_dir + 'obj{0:03d}threeWFSLS_nrej1_c_scan.fits'.format(ii) for ii in fnum_nrej1]
+    img_files = [out_dir + 'obj{0:03d}threeWFSLS_nrej1_c_scan_clean.fits'.format(ii) for ii in fnum_nrej1]
     stats_file = stats_dir + 'stats_closed_nrej1.fits'
     reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
     
     # Closed - nrej4
-    img_files = [data_dir + 'obj{0:03d}threeWFSLS_nrej4_c_scan.fits'.format(ii) for ii in fnum_nrej4]
+    img_files = [out_dir + 'obj{0:03d}threeWFSLS_nrej4_c_scan_clean.fits'.format(ii) for ii in fnum_nrej4]
     stats_file = stats_dir + 'stats_closed_nrej4.fits'
     reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
     
     # Closed - nrej7
-    img_files = [data_dir + 'obj{0:03d}threeWFS_LS_c_scan.fits'.format(ii) for ii in fnum_nrej7]
+    img_files = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean.fits'.format(ii) for ii in fnum_nrej7]
     stats_file = stats_dir + 'stats_closed_nrej7.fits'
     reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)

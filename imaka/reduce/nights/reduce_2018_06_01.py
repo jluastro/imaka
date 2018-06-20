@@ -194,25 +194,25 @@ def calc_star_stats_fourfilt():
     # R
     stats_file = stats_dir + 'stats_open_R.fits'
     starlists = [out_dir + 'obj{0:03d}_o_scan_clean_R_stars.txt'.format(ii) for ii in fnum_o]
-    #reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='R')
+    reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='R')
     moffat.fit_moffat(img_files, stats_file, starlists=starlists)
 
     # V
     stats_file = stats_dir + 'stats_open_V.fits'
     starlists = [out_dir + 'obj{0:03d}_o_scan_clean_V_stars.txt'.format(ii) for ii in fnum_o]
-    #reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='V')
+    reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='V')
     moffat.fit_moffat(img_files, stats_file, starlists=starlists)
 
     # B
     stats_file = stats_dir + 'stats_open_B.fits'
     starlists = [out_dir + 'obj{0:03d}_o_scan_clean_B_stars.txt'.format(ii) for ii in fnum_o]
-    #reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='B')
+    reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='B')
     moffat.fit_moffat(img_files, stats_file, starlists=starlists)
 
     # I
     stats_file = stats_dir + 'stats_open_I.fits'
     starlists = [out_dir + 'obj{0:03d}_o_scan_clean_I_stars.txt'.format(ii) for ii in fnum_o]
-    #reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='I')
+    reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='I')
     moffat.fit_moffat(img_files, stats_file, starlists=starlists)
 
     #Closed Loop - threeWFS_LS
@@ -220,26 +220,26 @@ def calc_star_stats_fourfilt():
 
     # R
     stats_file = stats_dir + 'stats_closed_R.fits'
-    starlists = [out_dir + 'obj{0:03d}_o_scan_clean_R_stars.txt'.format(ii) for ii in fnum_o]
-    #reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='R')
+    starlists = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean_R_stars.txt'.format(ii) for ii in fnum_c]
+    reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='R')
     moffat.fit_moffat(img_files, stats_file, starlists=starlists)
 
     # V
     stats_file = stats_dir + 'stats_closed_V.fits'
-    starlists = [out_dir + 'obj{0:03d}_o_scan_clean_V_stars.txt'.format(ii) for ii in fnum_o]
-    #reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='V')
+    starlists = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean_V_stars.txt'.format(ii) for ii in fnum_c]
+    reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='V')
     moffat.fit_moffat(img_files, stats_file, starlists=starlists)
     
     # B
     stats_file = stats_dir + 'stats_closed_B.fits'
-    starlists = [out_dir + 'obj{0:03d}_o_scan_clean_B_stars.txt'.format(ii) for ii in fnum_o]
-    #reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='B')
+    starlists = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean_B_stars.txt'.format(ii) for ii in fnum_c]
+    reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='B')
     moffat.fit_moffat(img_files, stats_file, starlists=starlists)
     
     # I
     stats_file = stats_dir + 'stats_closed_I.fits'
-    starlists = [out_dir + 'obj{0:03d}_o_scan_clean_I_stars.txt'.format(ii) for ii in fnum_o]
-    #reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='I')
+    starlists = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean_I_stars.txt'.format(ii) for ii in fnum_c]
+    reduce_STA.calc_star_stats(img_files, output_stats=stats_file, filt='I')
     moffat.fit_moffat(img_files, stats_file, starlists=starlists)
 
     return

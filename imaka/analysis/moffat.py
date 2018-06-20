@@ -225,7 +225,7 @@ def fit_moffat(img_files, stats_file, x_guess=5, y_guess=5, flux_percent=0.9, st
     return
 
 
-def calc_mof_fwhm(stats_file, filt=1):
+def calc_mof_fwhm(stats_file, filt=False):
 
     """
     Takes stats_<type>.fits file and outputs four arrays:
@@ -251,13 +251,15 @@ def calc_mof_fwhm(stats_file, filt=1):
     alpha_maj_std = np.array(data['Major Alpha std'])
 
     # Calculate calibration factors
-    calib = plate_scale * bin_fac
+    calib = plate_scale #* bin_fac
+
     if filt==True:
         wvs = plot_stats.filter2wv(filters)
         calib *= ((wvs/filt)**(1/5))
-    
-    FWHM_min = 2 * alpha_min * np.sqrt((2**(1/beta))-1) * calib
-    FWHM_maj = 2 * alpha_maj * np.sqrt((2**(1/beta))-1) * calib
+
+    #TEMPORARILY REMOVED BIN AN PLATE SCALE CALIB
+    FWHM_min = 2 * alpha_min * np.sqrt((2**(1/beta))-1) #* calib
+    FWHM_maj = 2 * alpha_maj * np.sqrt((2**(1/beta))-1) #* calib
     
     # Calculate uncertainties of median parameters
     sig_alpha_min = (alpha_min_std / np.sqrt(N_stars)) * np.sqrt((np.pi * N_stars) / (2 * (N_stars-1)))
