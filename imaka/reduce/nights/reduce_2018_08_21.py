@@ -31,20 +31,20 @@ massdimm_dir = root_dir + 'reduce/massdimm/'
 ################################################################
 
 # Pre-shimming
-fnum_LS_nrej7  = [31, 35, 39, 43, 47, 51, 55, 59, 63, 67, 71,\
+fnum_LS_nrej7_1  = [31, 35, 39, 43, 47, 51, 55, 59, 63, 67, 71,\
                   75, 79, 83, 87, 91, 95, 99, 103, 107, 111]
-fnum_o         = [32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72, \
+fnum_o_1         = [32, 36, 40, 44, 48, 52, 56, 60, 64, 68, 72, \
                   76, 80, 84, 88, 92, 96, 100, 104, 108, 112]
-fnum_LS_bin2   = [33, 37, 41, 45, 49, 53, 57, 61, 65, 69, 73, \
+fnum_LS_bin2_1   = [33, 37, 41, 45, 49, 53, 57, 61, 65, 69, 73, \
                   77, 81, 85, 89, 93, 97, 101, 105, 109, 113]
-fnum_Mean_bin2 = [34, 38, 42, 46, 50, 54, 58, 62, 66, 70, 74, \
+fnum_Mean_bin2_1 = [34, 38, 42, 46, 50, 54, 58, 62, 66, 70, 74, \
                   78, 82, 86, 90, 94, 98, 102, 106, 110, 114]
 
 # Post-shimming
-fnum_LS_nrej7  = [115, 119, 123, 136, 140, 144, 148, 152, 156, 160]
-fnum_o         = [116, 120, 124, 137, 141, 145, 149, 153, 157, 161]
-fnum_LS_bin2   = [117, 121, 125, 138, 142, 146, 150, 154, 158, 162]
-fnum_Mean_bin2 = [118, 122, 126, 139, 143, 147, 151, 155, 159, 163]
+fnum_LS_nrej7_2  = [115, 119, 123, 136, 140, 144, 148, 152, 156, 160]
+fnum_o_2         = [116, 120, 124, 137, 141, 145, 149, 153, 157, 161]
+fnum_LS_bin2_2   = [117, 121, 125, 138, 142, 146, 150, 154, 158, 162]
+fnum_Mean_bin2_2 = [118, 122, 126, 139, 143, 147, 151, 155, 159, 163]
 
 ################################################################
 
@@ -73,65 +73,76 @@ def make_sky():
 
 
 def reduce_FLD2():
+
     util.mkdir(out_dir)
 
-    # Open Loop
-    img_files = [data_dir + 'obj{0:03d}_o.fits'.format(ii) for ii in fnum_o]
-    reduce_STA.treat_overscan(img_files)
-    scan_img_files = [data_dir + 'obj{0:03d}_o_scan.fits'.format(ii) for ii in fnum_o]
-    reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, \
-                sky_frame=sky_dir + 'FLD2_sky.fits', flat_frame=flat_dir+"flat.fits")
-
-    #EXPERIMENT 1:
+    #Pre-shimming:
     
-    # Closed - LS_c
-    img_files = [data_dir + 'obj{0:03d}threeWFS_LS_c.fits'.format(ii) for ii in fnum_LS_c]
+    # Closed - LS_nrej7
+    img_files = [data_dir + 'obj{0:03d}threeWFS_LS_c.fits'.format(ii) for ii in fnum_LS_nrej7_1]
     reduce_STA.treat_overscan(img_files)
-    scan_img_files = [data_dir + 'obj{0:03d}threeWFS_LS_c_scan.fits'.format(ii) for ii in fnum_LS_c]
+    scan_img_files = [data_dir + 'obj{0:03d}threeWFS_LS_c_scan.fits'.format(ii) for ii in fnum_LS_nrej7_1]
     reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, \
                 sky_frame=sky_dir + 'FLD2_sky.fits', flat_frame =flat_dir+"flat.fits")
 
-    # Closed - LS_B2_c
-    img_files = [data_dir + 'obj{0:03d}threeWFSLS_B2_c.fits'.format(ii) for ii in fnum_LS_B2_c]
+    # Open 
+    img_files = [data_dir + 'obj{0:03d}_o.fits'.format(ii) for ii in fnum_o_1]
     reduce_STA.treat_overscan(img_files)
-    scan_img_files = [data_dir + 'obj{0:03d}threeWFSLS_B2_c_scan.fits'.format(ii) for ii in fnum_LS_B2_c]
+    scan_img_files = [data_dir + 'obj{0:03d}_o_scan.fits'.format(ii) for ii in fnum_o_1]
+    reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, \
+                sky_frame=sky_dir + 'FLD2_sky.fits', flat_frame=flat_dir+"flat.fits")
+                
+    # Closed - LS_bin2
+    img_files = [data_dir + 'obj{0:03d}threeWFSLS_B2_c.fits'.format(ii) for ii in fnum_LS_bin2_1]
+    reduce_STA.treat_overscan(img_files)
+    scan_img_files = [data_dir + 'obj{0:03d}threeWFSLS_B2_c_scan.fits'.format(ii) for ii in fnum_LS_bin2_1]
     reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, \
                 sky_frame=sky_dir + 'FLD2_sky.fits', flat_frame =flat_dir+"flat.fits")
                 
-    # Closed - Mean_B2_c
-    img_files = [data_dir + 'obj{0:03d}threeWFSMean_B2_c.fits'.format(ii) for ii in fnum_Mean_B2_c]
+    # Closed - Mean_bin2
+    img_files = [data_dir + 'obj{0:03d}threeWFSMean_B2_c.fits'.format(ii) for ii in fnum_Mean_bin2_1]
     reduce_STA.treat_overscan(img_files)
-    scan_img_files = [data_dir + 'obj{0:03d}threeWFSMean_B2_c_scan.fits'.format(ii) for ii in fnum_Mean_B2_c]
+    scan_img_files = [data_dir + 'obj{0:03d}threeWFSMean_B2_c_scan.fits'.format(ii) for ii in fnum_Mean_bin2_1]
     reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, \
                 sky_frame=sky_dir + 'FLD2_sky.fits', flat_frame =flat_dir+"flat.fits")
 
-    #EXPERIMENT 2:
-
-    # Closed - nrej1
-    img_files = [data_dir + 'obj{0:03d}threeWFSLS_nrej1_c.fits'.format(ii) for ii in fnum_nrej1]
+    #Post-shimming:
+    
+    # Closed - LS_nrej7
+    img_files = [data_dir + 'obj{0:03d}threeWFS_LS_c.fits'.format(ii) for ii in fnum_LS_nrej7_2]
     reduce_STA.treat_overscan(img_files)
-    scan_img_files = [data_dir + 'obj{0:03d}threeWFSLS_nrej1_c_scan.fits'.format(ii) for ii in fnum_nrej1]
+    scan_img_files = [data_dir + 'obj{0:03d}threeWFS_LS_c_scan.fits'.format(ii) for ii in fnum_LS_nrej7_2]
     reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, \
                 sky_frame=sky_dir + 'FLD2_sky.fits', flat_frame =flat_dir+"flat.fits")
 
-    # Closed - nrej4
-    img_files = [data_dir + 'obj{0:03d}threeWFSLS_nrej4_c.fits'.format(ii) for ii in fnum_nrej4]
+    # Open 
+    img_files = [data_dir + 'obj{0:03d}_o.fits'.format(ii) for ii in fnum_o_2]
     reduce_STA.treat_overscan(img_files)
-    scan_img_files = [data_dir + 'obj{0:03d}threeWFSLS_nrej4_c_scan.fits'.format(ii) for ii in fnum_nrej4]
+    scan_img_files = [data_dir + 'obj{0:03d}_o_scan.fits'.format(ii) for ii in fnum_o_2]
+    reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, \
+                sky_frame=sky_dir + 'FLD2_sky.fits', flat_frame=flat_dir+"flat.fits")
+                
+    # Closed - LS_bin2
+    img_files = [data_dir + 'obj{0:03d}threeWFSLS_B2_c.fits'.format(ii) for ii in fnum_LS_bin2_2]
+    reduce_STA.treat_overscan(img_files)
+    scan_img_files = [data_dir + 'obj{0:03d}threeWFSLS_B2_c_scan.fits'.format(ii) for ii in fnum_LS_bin2_2]
     reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, \
                 sky_frame=sky_dir + 'FLD2_sky.fits', flat_frame =flat_dir+"flat.fits")
-
-    # Closed - nrej7
-    img_files = [data_dir + 'obj{0:03d}threeWFS_LS_c.fits'.format(ii) for ii in fnum_nrej7]
+                
+    # Closed - Mean_bin2
+    img_files = [data_dir + 'obj{0:03d}threeWFSMean_B2_c.fits'.format(ii) for ii in fnum_Mean_bin2_2]
     reduce_STA.treat_overscan(img_files)
-    scan_img_files = [data_dir + 'obj{0:03d}threeWFS_LS_c_scan.fits'.format(ii) for ii in fnum_nrej7]
+    scan_img_files = [data_dir + 'obj{0:03d}threeWFSMean_B2_c_scan.fits'.format(ii) for ii in fnum_Mean_bin2_2]
     reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, \
                 sky_frame=sky_dir + 'FLD2_sky.fits', flat_frame =flat_dir+"flat.fits")
+                
     return
 
 
 
 def find_stars_FLD2():
+
+    # Pre-shimming
 
     # Open Loop
     img_files = [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in fnum_o]
@@ -139,13 +150,12 @@ def find_stars_FLD2():
                               mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
                               left_slice =25, right_slice=0, top_slice=25, bottom_slice=0)
 
-    # EXPERIMENT 1
-                              
     # Closed - LS_c
     img_files = [data_dir + 'obj{0:03d}threeWFS_LS_c_scan.fits'.format(ii) for ii in fnum_LS_c]
     reduce_fli.find_stars(img_files, fwhm=7, threshold=30, N_passes=2, plot_psf_compare=False, \
                               mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
                               left_slice =25, right_slice=0, top_slice=25, bottom_slice=25)
+
     # Closed - LS_B2_c
     img_files = [data_dir + 'obj{0:03d}threeWFSLS_B2_c_scan.fits'.format(ii) for ii in fnum_LS_B2_c]
     reduce_fli.find_stars(img_files, fwhm=7, threshold=30, N_passes=2, plot_psf_compare=False, \
@@ -158,7 +168,7 @@ def find_stars_FLD2():
                               mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
                               left_slice =25, right_slice=0, top_slice=25, bottom_slice=25)
 
-    # EXPERIMENT 2
+    # Post-shimming
 
     # Closed - nrej1
     img_files = [data_dir + 'obj{0:03d}threeWFSLS_nrej1_c_scan.fits'.format(ii) for ii in fnum_nrej1]
