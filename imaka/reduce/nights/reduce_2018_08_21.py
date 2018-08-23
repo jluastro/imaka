@@ -145,48 +145,48 @@ def find_stars_FLD2():
     # Pre-shimming
 
     # Closed - LS_nrej7
-    #img_files = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean.fits'.format(ii) for ii in fnum_LS_nrej7_1]
-    #reduce_fli.find_stars(img_files, fwhm=7, threshold=30, N_passes=2, plot_psf_compare=False, \
+    img_files = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean.fits'.format(ii) for ii in fnum_LS_nrej7_1]
+    reduce_fli.find_stars(img_files, fwhm=7, threshold=30, N_passes=2, plot_psf_compare=False, \
                               mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
                                left_slice =20, right_slice=20, top_slice=30, bottom_slice=30)
 
     # Open 
-    #img_files = [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in fnum_o_1]
-    #reduce_fli.find_stars(img_files, fwhm=10, threshold=20, N_passes=2, plot_psf_compare=False, \
-    #                          mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
-    #                          left_slice =20, right_slice=20, top_slice=30, bottom_slice=30)
+    img_files = [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in fnum_o_1]
+    reduce_fli.find_stars(img_files, fwhm=10, threshold=20, N_passes=2, plot_psf_compare=False, \
+                              mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
+                              left_slice =20, right_slice=20, top_slice=30, bottom_slice=30)
 
     # Closed - LS_bin2
-    #img_files = [out_dir + 'obj{0:03d}threeWFSLS_B2_c_scan_clean.fits'.format(ii) for ii in fnum_LS_bin2_1]
-    #reduce_fli.find_stars(img_files, fwhm=7, threshold=30, N_passes=2, plot_psf_compare=False, \
-    #                          mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
-    #                           left_slice =20, right_slice=20, top_slice=30, bottom_slice=30)
+    img_files = [out_dir + 'obj{0:03d}threeWFSLS_B2_c_scan_clean.fits'.format(ii) for ii in fnum_LS_bin2_1]
+    reduce_fli.find_stars(img_files, fwhm=7, threshold=30, N_passes=2, plot_psf_compare=False, \
+                              mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
+                               left_slice =20, right_slice=20, top_slice=30, bottom_slice=30)
 
     # Closed - Mean_bin2
-    #img_files = [out_dir + 'obj{0:03d}threeWFSMean_B2_c_scan_clean.fits'.format(ii) for ii in fnum_Mean_bin2_1]
-    #reduce_fli.find_stars(img_files, fwhm=7, threshold=30, N_passes=2, plot_psf_compare=False, \
-    #                          mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
-    #                           left_slice =20, right_slice=20, top_slice=30, bottom_slice=30)
+    img_files = [out_dir + 'obj{0:03d}threeWFSMean_B2_c_scan_clean.fits'.format(ii) for ii in fnum_Mean_bin2_1]
+    reduce_fli.find_stars(img_files, fwhm=7, threshold=30, N_passes=2, plot_psf_compare=False, \
+                              mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
+                               left_slice =20, right_slice=20, top_slice=30, bottom_slice=30)
 
     # Post-shimming
 
     # Closed - LS_nrej7
-    #img_files = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean.fits'.format(ii) for ii in fnum_LS_nrej7_2]
-    #reduce_fli.find_stars(img_files, fwhm=7, threshold=30, N_passes=2, plot_psf_compare=False, \
-    #                          mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
-    #                           left_slice =20, right_slice=20, top_slice=30, bottom_slice=30)
+    img_files = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean.fits'.format(ii) for ii in fnum_LS_nrej7_2]
+    reduce_fli.find_stars(img_files, fwhm=7, threshold=30, N_passes=2, plot_psf_compare=False, \
+                              mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
+                              left_slice =20, right_slice=20, top_slice=30, bottom_slice=30)
 
     # Open 
-    #img_files = [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in fnum_o_2]
-    #reduce_fli.find_stars(img_files, fwhm=10, threshold=20, N_passes=2, plot_psf_compare=False, \
-    #                          mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
-    #                           left_slice =20, right_slice=20, top_slice=30, bottom_slice=30)
+    img_files = [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in fnum_o_2]
+    reduce_fli.find_stars(img_files, fwhm=10, threshold=20, N_passes=2, plot_psf_compare=False, \
+                              mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
+                               left_slice =20, right_slice=20, top_slice=30, bottom_slice=30)
 
     # Closed - LS_bin2
-    #img_files = [out_dir + 'obj{0:03d}threeWFSLS_B2_c_scan_clean.fits'.format(ii) for ii in fnum_LS_bin2_2]
-    #reduce_fli.find_stars(img_files, fwhm=7, threshold=30, N_passes=2, plot_psf_compare=False, \
-    #                          mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
-    #                           left_slice =20, right_slice=20, top_slice=30, bottom_slice=30)
+    img_files = [out_dir + 'obj{0:03d}threeWFSLS_B2_c_scan_clean.fits'.format(ii) for ii in fnum_LS_bin2_2]
+    reduce_fli.find_stars(img_files, fwhm=7, threshold=30, N_passes=2, plot_psf_compare=False, \
+                              mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
+                               left_slice =20, right_slice=20, top_slice=30, bottom_slice=30)
 
     # Closed - Mean_bin2
     img_files = [out_dir + 'obj{0:03d}threeWFSMean_B2_c_scan_clean.fits'.format(ii) for ii in fnum_Mean_bin2_2]
@@ -200,49 +200,57 @@ def find_stars_FLD2():
 def calc_star_stats():
     util.mkdir(stats_dir)
 
-    # Open Loop
-    img_files = [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in fnum_o]
-    stats_file = stats_dir + 'stats_open.fits'
-    #reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
-    #moffat.fit_moffat(img_files, stats_file)
 
-    # EXPERIMENT 1:
+
+    # Pre-shimming:
     
-    # Closed - LS_c
-    img_files = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean.fits'.format(ii) for ii in fnum_LS_c]
-    stats_file = stats_dir + 'stats_closed_LS.fits'
+    # Closed - LS_nrej7
+    img_files = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean.fits'.format(ii) for ii in fnum_LS_nrej7_1]
+    stats_file = stats_dir + 'stats_threeWFS_LS_c.fits'
     reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
 
-    # Closed - LS_B2_c
-    img_files = [out_dir + 'obj{0:03d}threeWFSLS_B2_c_scan_clean.fits'.format(ii) for ii in fnum_LS_B2_c]
-    stats_file = stats_dir + 'stats_closed_LS_B2.fits'
+    # Open Loop
+    img_files = [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in fnum_o_1]
+    stats_file = stats_dir + 'stats_o.fits'
+    reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
+    moffat.fit_moffat(img_files, stats_file)
+
+    # Closed - LS_bin2
+    img_files = [out_dir + 'obj{0:03d}threeWFSLS_B2_c_scan_clean.fits'.format(ii) for ii in fnum_LS_bin2_1]
+    stats_file = stats_dir + 'stats_threeWFSLS_B2_c.fits'
     reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
     
     # Closed - Mean_B2_c
-    img_files = [out_dir + 'obj{0:03d}threeWFSMean_B2_c_scan_clean.fits'.format(ii) for ii in fnum_Mean_B2_c]
-    stats_file = stats_dir + 'stats_closed_Mean_B2.fits'
+    img_files = [out_dir + 'obj{0:03d}threeWFSMean_B2_c_scan_clean.fits'.format(ii) for ii in fnum_Mean_bin2_1]
+    stats_file = stats_dir + 'stats_threeWFSMean_B2_c.fits'
     reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
     
-    # EXPERIMENT 2
+    # Post-shimming:
 
-    # Closed - nrej1
-    img_files = [out_dir + 'obj{0:03d}threeWFSLS_nrej1_c_scan_clean.fits'.format(ii) for ii in fnum_nrej1]
-    stats_file = stats_dir + 'stats_closed_nrej1.fits'
+    # Closed - LS_nrej7
+    img_files = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean.fits'.format(ii) for ii in fnum_LS_nrej7_2]
+    stats_file = stats_dir + 'stats_threeWFS_LS_c.fits'
+    reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
+    moffat.fit_moffat(img_files, stats_file)
+
+    # Open Loop
+    img_files = [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in fnum_o_2]
+    stats_file = stats_dir + 'stats_o.fits'
+    reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
+    moffat.fit_moffat(img_files, stats_file)
+
+    # Closed - LS_bin2
+    img_files = [out_dir + 'obj{0:03d}threeWFSLS_B2_c_scan_clean.fits'.format(ii) for ii in fnum_LS_bin2_2]
+    stats_file = stats_dir + 'stats_threeWFSLS_B2_c.fits'
     reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
     
-    # Closed - nrej4
-    img_files = [out_dir + 'obj{0:03d}threeWFSLS_nrej4_c_scan_clean.fits'.format(ii) for ii in fnum_nrej4]
-    stats_file = stats_dir + 'stats_closed_nrej4.fits'
-    reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
-    moffat.fit_moffat(img_files, stats_file)
-    
-    # Closed - nrej7
-    img_files = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean.fits'.format(ii) for ii in fnum_nrej7]
-    stats_file = stats_dir + 'stats_closed_nrej7.fits'
+    # Closed - Mean_B2_c
+    img_files = [out_dir + 'obj{0:03d}threeWFSMean_B2_c_scan_clean.fits'.format(ii) for ii in fnum_Mean_bin2_2]
+    stats_file = stats_dir + 'stats_threeWFSMean_B2_c.fits'
     reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
     
