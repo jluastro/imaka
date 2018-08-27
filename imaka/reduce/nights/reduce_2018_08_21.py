@@ -206,25 +206,25 @@ def calc_star_stats():
     
     # Closed - LS_nrej7
     img_files = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean.fits'.format(ii) for ii in fnum_LS_nrej7_1]
-    stats_file = stats_dir + 'stats_threeWFS_LS_c.fits'
+    stats_file = stats_dir + 'stats_threeWFS_LS_c_1.fits'
     reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
 
     # Open Loop
     img_files = [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in fnum_o_1]
-    stats_file = stats_dir + 'stats_o.fits'
+    stats_file = stats_dir + 'stats_o_1.fits'
     reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
 
     # Closed - LS_bin2
     img_files = [out_dir + 'obj{0:03d}threeWFSLS_B2_c_scan_clean.fits'.format(ii) for ii in fnum_LS_bin2_1]
-    stats_file = stats_dir + 'stats_threeWFSLS_B2_c.fits'
+    stats_file = stats_dir + 'stats_threeWFSLS_B2_c_1.fits'
     reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
     
     # Closed - Mean_B2_c
     img_files = [out_dir + 'obj{0:03d}threeWFSMean_B2_c_scan_clean.fits'.format(ii) for ii in fnum_Mean_bin2_1]
-    stats_file = stats_dir + 'stats_threeWFSMean_B2_c.fits'
+    stats_file = stats_dir + 'stats_threeWFSMean_B2_c_1.fits'
     reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
     
@@ -232,25 +232,25 @@ def calc_star_stats():
 
     # Closed - LS_nrej7
     img_files = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean.fits'.format(ii) for ii in fnum_LS_nrej7_2]
-    stats_file = stats_dir + 'stats_threeWFS_LS_c.fits'
+    stats_file = stats_dir + 'stats_threeWFS_LS_c_2.fits'
     reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
 
     # Open Loop
     img_files = [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in fnum_o_2]
-    stats_file = stats_dir + 'stats_o.fits'
+    stats_file = stats_dir + 'stats_o_2.fits'
     reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
 
     # Closed - LS_bin2
     img_files = [out_dir + 'obj{0:03d}threeWFSLS_B2_c_scan_clean.fits'.format(ii) for ii in fnum_LS_bin2_2]
-    stats_file = stats_dir + 'stats_threeWFSLS_B2_c.fits'
+    stats_file = stats_dir + 'stats_threeWFSLS_B2_c_2.fits'
     reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
     
     # Closed - Mean_B2_c
     img_files = [out_dir + 'obj{0:03d}threeWFSMean_B2_c_scan_clean.fits'.format(ii) for ii in fnum_Mean_bin2_2]
-    stats_file = stats_dir + 'stats_threeWFSMean_B2_c.fits'
+    stats_file = stats_dir + 'stats_threeWFSMean_B2_c_2.fits'
     reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
     
@@ -276,19 +276,19 @@ def stack_FLD2():
 
     util.mkdir(stacks_dir)
 
+    # Pre-shimming
+
+    # Closed - LS_c
+    img_files = [data_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean.fits'.format(ii) for ii in fnum_LS_nrej7_1]
+    starlists = [out_dir  + 'obj{0:03d}threeWFS_LS_c_scan_clean_stars.txt'.format(ii) for ii in fnum_LS_nrej7_1]
+    output_root = stacks_dir + 'FLD2_stack_closed_LS'
+    reduce_fli.shift_and_add(img_files, starlists, output_root, method='mean')
+    
     # Open Loop
     open_images = [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in fnum_o]
     open_starlists = [out_dir + 'obj{0:03d}_o_scan_clean_stars.txt'.format(ii) for ii in fnum_o]
     open_output_root = stacks_dir + 'FLD2_stack_open'
     reduce_fli.shift_and_add(open_images, open_starlists, open_output_root, method='mean')
-
-    # EXPERIMENT 1
-
-    # Closed - LS_c
-    img_files = [data_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean.fits'.format(ii) for ii in fnum_LS_c]
-    starlists = [out_dir  + 'obj{0:03d}threeWFS_LS_c_scan_clean_stars.txt'.format(ii) for ii in fnum_LS_c]
-    output_root = stacks_dir + 'FLD2_stack_closed_LS'
-    reduce_fli.shift_and_add(img_files, starlists, output_root, method='mean')
 
     # Closed - LS_B2_c
     img_files = [data_dir + 'obj{0:03d}threeWFSLS_B2_c_scan_clean.fits'.format(ii) for ii in fnum_LS_B2_c]
