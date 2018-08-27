@@ -281,57 +281,66 @@ def stack_FLD2():
     # Closed - LS_c
     img_files = [data_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean.fits'.format(ii) for ii in fnum_LS_nrej7_1]
     starlists = [out_dir  + 'obj{0:03d}threeWFS_LS_c_scan_clean_stars.txt'.format(ii) for ii in fnum_LS_nrej7_1]
-    output_root = stacks_dir + 'FLD2_stack_closed_LS'
+    output_root = stacks_dir + 'stack_threeWFS_LS_c_1'
     reduce_fli.shift_and_add(img_files, starlists, output_root, method='mean')
     
     # Open Loop
-    open_images = [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in fnum_o]
-    open_starlists = [out_dir + 'obj{0:03d}_o_scan_clean_stars.txt'.format(ii) for ii in fnum_o]
-    open_output_root = stacks_dir + 'FLD2_stack_open'
+    open_images = [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in fnum_o_1]
+    open_starlists = [out_dir + 'obj{0:03d}_o_scan_clean_stars.txt'.format(ii) for ii in fnum_o_1]
+    open_output_root = stacks_dir + 'stack_o_1'
     reduce_fli.shift_and_add(open_images, open_starlists, open_output_root, method='mean')
 
     # Closed - LS_B2_c
-    img_files = [data_dir + 'obj{0:03d}threeWFSLS_B2_c_scan_clean.fits'.format(ii) for ii in fnum_LS_B2_c]
-    starlists = [out_dir  + 'obj{0:03d}threeWFSLS_B2_c_scan_clean_stars.txt'.format(ii) for ii in fnum_LS_c]
-    output_root = stacks_dir + 'FLD2_stack_closed_LS_B2'
+    img_files = [data_dir + 'obj{0:03d}threeWFSLS_B2_c_scan_clean.fits'.format(ii) for ii in fnum_LS_bin2_1]
+    starlists = [out_dir  + 'obj{0:03d}threeWFSLS_B2_c_scan_clean_stars.txt'.format(ii) for ii in fnum_LS_bin2_1]
+    output_root = stacks_dir + 'stack_threeWFSLS_B2_c_1'
     reduce_fli.shift_and_add(img_files, starlists, output_root, method='mean')
 
     # Closed - Mean_B2_c
-    img_files = [data_dir + 'obj{0:03d}threeWFSMean_B2_c_scan_clean.fits'.format(ii) for ii in fnum_Mean_B2_c]
-    starlists = [out_dir  + 'obj{0:03d}threeWFSMean_B2_c_scan_clean_stars.txt'.format(ii) for ii in fnum_Mean_B2_c]
-    output_root = stacks_dir + 'FLD2_stack_closed_Mean_B2'
+    img_files = [data_dir + 'obj{0:03d}threeWFSMean_B2_c_scan_clean.fits'.format(ii) for ii in fnum_Mean_bin2_1]
+    starlists = [out_dir  + 'obj{0:03d}threeWFSMean_B2_c_scan_clean_stars.txt'.format(ii) for ii in fnum_Mean_bin2_1]
+    output_root = stacks_dir + 'stack_threeWFSMean_B2_c_1'
     reduce_fli.shift_and_add(img_files, starlists, output_root, method='mean')
 
-    # EXPERIMENT 2
+    # Post-shimming
 
-    # Closed - nrej1
-    img_files = [data_dir + 'obj{0:03d}threeWFSLS_nrej1_c_scan_clean.fits'.format(ii) for ii in fnum_nrej1]
-    starlists = [out_dir  + 'obj{0:03d}threeWFSLS_nrej1_c_scan_clean_stars.txt'.format(ii) for ii in fnum_nrej1]
-    output_root = stacks_dir + 'FLD2_stack_closed_nrej1'
+    # Closed - LS_c
+    img_files = [data_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean.fits'.format(ii) for ii in fnum_LS_nrej7_2]
+    starlists = [out_dir  + 'obj{0:03d}threeWFS_LS_c_scan_clean_stars.txt'.format(ii) for ii in fnum_LS_nrej7_2]
+    output_root = stacks_dir + 'stack_threeWFS_LS_c_2'
+    reduce_fli.shift_and_add(img_files, starlists, output_root, method='mean')
+    
+    # Open Loop
+    open_images = [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in fnum_o_2]
+    open_starlists = [out_dir + 'obj{0:03d}_o_scan_clean_stars.txt'.format(ii) for ii in fnum_o_2]
+    open_output_root = stacks_dir + 'stack_o_2'
+    reduce_fli.shift_and_add(open_images, open_starlists, open_output_root, method='mean')
+
+    # Closed - LS_B2_c
+    img_files = [data_dir + 'obj{0:03d}threeWFSLS_B2_c_scan_clean.fits'.format(ii) for ii in fnum_LS_bin2_2]
+    starlists = [out_dir  + 'obj{0:03d}threeWFSLS_B2_c_scan_clean_stars.txt'.format(ii) for ii in fnum_LS_bin2_2]
+    output_root = stacks_dir + 'stack_threeWFSLS_B2_c_2'
     reduce_fli.shift_and_add(img_files, starlists, output_root, method='mean')
 
-    # Closed - nrej4
-    img_files = [data_dir + 'obj{0:03d}threeWFSLS_nrej4_c_scan_clean.fits'.format(ii) for ii in fnum_nrej4]
-    starlists = [out_dir  + 'obj{0:03d}threeWFSLS_nrej4_c_scan_clean_stars.txt'.format(ii) for ii in fnum_nrej4]
-    output_root = stacks_dir + 'FLD2_stack_closed_nrej4'
+    # Closed - Mean_B2_c
+    img_files = [data_dir + 'obj{0:03d}threeWFSMean_B2_c_scan_clean.fits'.format(ii) for ii in fnum_Mean_bin2_2]
+    starlists = [out_dir  + 'obj{0:03d}threeWFSMean_B2_c_scan_clean_stars.txt'.format(ii) for ii in fnum_Mean_bin2_2]
+    output_root = stacks_dir + 'stack_threeWFSMean_B2_c_2'
     reduce_fli.shift_and_add(img_files, starlists, output_root, method='mean')
 
-    # Closed - nrej7
-    img_files = [data_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean.fits'.format(ii) for ii in fnum_nrej7]
-    starlists = [out_dir  + 'obj{0:03d}threeWFS_LS_c_scan_clean_stars.txt'.format(ii) for ii in fnum_nrej7]
-    output_root = stacks_dir + 'FLD2_stack_closed_nrej7'
-    reduce_fli.shift_and_add(img_files, starlists, output_root, method='mean')
+    return
 
 def analyze_stacks():
 
-    open_img_files = [stacks_dir + 'FLD2_stack_open.fits']
+    open_img_files = [stacks_dir + 'stack_o_1.fits', \
+                      stacks_dir + 'stack_o_2.fits']
 
-    closed_img_files = [stacks_dir + 'FLD2_stack_closed_LS.fits', \
-                        stacks_dir + 'FLD2_stack_closed_LS_B2.fits', \
-                        stacks_dir + 'FLD2_stack_closed_Mean_B2.fits', \
-                        stacks_dir + 'FLD2_stack_closed_nrej1.fits', \
-                        stacks_dir + 'FLD2_stack_closed_nrej4.fits', \
-                        stacks_dir + 'FLD2_stack_closed_nrej7.fits']
+    closed_img_files = [stacks_dir + 'stack_threeWFS_LS_c_1.fits', \
+                        stacks_dir + 'stack_threeWFS_LS_c_2.fits', \
+                        stacks_dir + 'stack_threeWFSLS_B2_c_1.fits', \
+                        stacks_dir + 'stack_threeWFSLS_B2_c_2.fits', \
+                        stacks_dir + 'stack_threeWFSMean_B2_c_1.fits', \
+                        stacks_dir + 'stack_threeWFSMean_B2_c_2.fits']
     
     #Find stars in image
     reduce_fli.find_stars(open_img_files, fwhm=10, threshold=100, N_passes=2, plot_psf_compare=False, \
