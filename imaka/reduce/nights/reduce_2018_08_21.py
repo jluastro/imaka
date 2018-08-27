@@ -259,7 +259,7 @@ def calc_star_stats():
 
 def append_massdimm():
 
-    massdimm.fetch_data('20180602', massdimm_dir)
+    massdimm.fetch_data('20180821', massdimm_dir)
     stats_tables = glob.glob(root_dir + 'reduce/stats/stats*.fits')
 
     for stats in stats_tables:
