@@ -1857,33 +1857,36 @@ def plot_nea(data_root='/Users/jlu/data/imaka/'):
     return
 
 
-def comp_cdf(files, labels, colors):
+def comp_cdf(files, labels, colors, ps=1):
     plt.figure(figsize=(15,4))
     for ii in range(len(files)):
         FWHM_min, sig_FWHM_min, FWHM_maj, sig_FWHM_maj =mof.calc_mof_fwhm(files[ii], filt=False);
 
         plt.subplot(131)
-        plt.hist(FWHM_min, color=colors[ii], linewidth=2, bins = np.arange(0, 1.3, 0.01), cumulative=True, histtype='step', normed=True, label=labels[ii]);
+        plt.hist(FWHM_min*ps, color=colors[ii], linewidth=2, bins = np.arange(0, 1.3, 0.01), cumulative=True, histtype='step', normed=True, label=labels[ii]);
         plt.xlabel('Minor FWHM (arcsec)', fontsize=16)
         if ii == 0:
-            plt.xlim(0, np.max(FWHM_maj)+0.1)
+            plt.xlim(0, np.max(FWHM_min*ps)+0.1)
 
         plt.subplot(132)
-        plt.hist(FWHM_maj, color=colors[ii], linewidth=2, bins = np.arange(0, 1.3, 0.01), cumulative=True, histtype='step', normed=True, label=labels[ii]);
+        plt.hist(FWHM_maj*ps, color=colors[ii], linewidth=2, bins = np.arange(0, 1.3, 0.01), cumulative=True, histtype='step', normed=True, label=labels[ii]);
         plt.xlim(0,1.2)
         plt.xlabel('Major FWHM (arcsec)', fontsize=16)
         if ii == 0:
-            plt.xlim(0, np.max(FWHM_maj)+0.1)
+            plt.xlim(0, np.max(FWHM_maj*ps)+0.1)
 
         plt.subplot(133)
-        elon = FWHM_maj /FWHM_min
+        elon = []
+        for i in range(len(FWHM_min)):
+            if FWHM_maj[i]>FWHM_min[i]:
+                elon.append(FWHM_min[i]/FWHM_maj[i])
+            if FWHM_maj[i]<FWHM_min[i]:
+                elon.append(FWHM_maj[i]/FWHM_min[i])
         plt.hist(elon, color=colors[ii], linewidth=2, bins = np.arange(0, 2.1, 0.01), cumulative=True, histtype='step', normed=True, label=labels[ii]);
         plt.xlabel('Elongation', fontsize=16)
-        plt.legend(loc=4)
+        plt.legend(loc=2)
         if ii == 0:
-            plt.xlim(1, np.max(elon)+0.1)
-
-
+            plt.xlim(0, 1)
         
     return
 
@@ -1958,3 +1961,18 @@ def plot_var(img_file, starlist, title):
     plt.suptitle(title, fontsize=22)
 
     plt.tight_layout()
+
+
+def plot_frames(stats_files, labels, colors, ps=1):
+    for i in range(4):
+        min_f, min_f_err, maj_f, maj_f_err = mof.calc_mof_fwhm(stats_files[i], filt=False)
+        frames = []
+        dat = Table.read(stats_files[i]) 
+        for line in dat:
+            frames.append(int(line['Image'].split('obj')[1][:3]))
+        plt.errorbar(frames, min_f*ps, yerr=min_f_err*ps, fmt='s', color=colors[i], label=labels[i])
+    plt.xlabel('Frame Number', fontsize=14)
+    plt.ylabel('Image Quality (arcsec)', fontsize=14)
+    plt.legend()
+    
+    return
