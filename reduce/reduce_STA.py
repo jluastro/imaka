@@ -23,17 +23,17 @@ from photutils import aperture_photometry
 from astropy.stats import gaussian_fwhm_to_sigma
 from astropy.stats import sigma_clipped_stats
 from astropy.modeling import models, fitting
-from flystar import match
-from flystar import align
-from flystar import transforms
+#from flystar import match
+#from flystar import align
+#from flystar import transforms
 from imaka.reduce import calib
 from imaka.reduce import util
 #import ccdproc
-from scipy.ndimage import interpolation
-from scipy.ndimage import median_filter
-import scipy.ndimage
+#from scipy.ndimage import interpolation
+#from scipy.ndimage import median_filter
+#import scipy.ndimage
 from astropy.table import Table
-from skimage.measure import block_reduce
+#from skimage.measure import block_reduce
 from datetime import datetime
 import pytz
 from imaka.reduce import reduce_fli
@@ -286,15 +286,15 @@ def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None):
         # Calculate the NEA in a different way.
         nea = 1.0 / (np.diff(enc_energy_final)**2 / (2.0 * math.pi * radii[1:] * np.diff(radii))).sum()
 
-        plt.clf()
-        plt.plot(radii, enc_energy_final, 'k-')
-        plt.axvline(ee50_rad, color='r', linestyle='--', label='r(50% EE)')
-        plt.axvline(ee80_rad, color='g', linestyle='--', label='r(80% EE)')
-        plt.xlabel('Radius (arcsec)')
-        plt.ylabel('Encircled Energy')
-        plt.legend(loc='lower right')
-        plt.pause(0.05)
-        plt.savefig(ee_dir + img_file_name.replace('.fits', '_ee.png'))
+        #plt.clf()
+        #plt.plot(radii, enc_energy_final, 'k-')
+        #plt.axvline(ee50_rad, color='r', linestyle='--', label='r(50% EE)')
+        #plt.axvline(ee80_rad, color='g', linestyle='--', label='r(80% EE)')
+        #plt.xlabel('Radius (arcsec)')
+        #plt.ylabel('Encircled Energy')
+        #plt.legend(loc='lower right')
+        #plt.pause(0.05)
+        #plt.savefig(ee_dir + img_file_name.replace('.fits', '_ee.png'))
 
         # Calculate the average FWHM.
         xfwhm = stars['x_fwhm'][idx].mean()
