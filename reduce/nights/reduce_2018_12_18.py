@@ -46,7 +46,7 @@ def make_flat():
     flat_frames = ['{0:s}twi_{1:03d}.fits'.format(twi_dir, ss) for ss in flat_num]
     reduce_STA.treat_overscan(flat_frames)
     scan_flat_frames = ['{0:s}twi_{1:03d}_scan.fits'.format(twi_dir, ss) for ss in flat_num]
-    calib.makedark(scan_flat_frames, flat_dir + 'flat.fits')
+    calib.makeflat(scan_flat_frames, [], flat_dir + 'flat.fits', darks=False)
 
     return
 
