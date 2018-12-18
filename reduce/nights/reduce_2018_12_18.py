@@ -56,7 +56,7 @@ def make_sky():
     return
 
 
-def reduce_FLD2():
+def reduce_orion():
     util.mkdir(out_dir)
 
     # Open Loop
