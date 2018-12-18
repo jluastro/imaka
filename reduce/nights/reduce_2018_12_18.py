@@ -27,7 +27,9 @@ twi_dir = root_dir + 'twilights/'
 massdimm_dir = root_dir + 'reduce/massdimm/'
 
 fnum_o = [36, 38]
+fnum_o = [41, 43, 45]
 fnum_c = [35, 37]
+fnum_c = [40, 42, 44]
 
 
 def make_flat(): 
