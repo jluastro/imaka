@@ -18,24 +18,16 @@ matplotlib.use('Agg')
 root_dir = '//Volumes/DATA5/imaka/20181218/sta/'
 
 sky_dir = root_dir + 'reduce/sky/' 
-data_dir = root_dir + 'FLD2/'
+data_dir = root_dir + 'Orion/'
 flat_dir = root_dir + 'reduce/calib/'
-out_dir = root_dir + 'reduce/FLD2/'
+out_dir = root_dir + 'reduce/Orion/'
 stats_dir = root_dir +'reduce/stats/'
 stacks_dir = root_dir + 'reduce/stacks/'
 twi_dir = root_dir + 'twilights/'
 massdimm_dir = root_dir + 'reduce/massdimm/'
 
-fnum_o = [23, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, \
-              58, 60, 62, 64, 66, 68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, \
-              90, 92, 94, 96, 98, 100, 102, 104, 106, 108, 110, 112, 114, 116,\
-              118, 120, 122, 124, 126, 128, 130, 132, 134, 136, 138, 140, 144,\
-              146, 148, 150, 152, 154, 156, 158, 160]
-fnum_c = [22, 24, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49, 51, 53, \
-              55, 57, 59, 61, 63, 65, 67, 69, 71, 73, 75, 77, 79, 81, 83, 85, \
-              87, 89, 91, 93, 95, 97, 99, 101, 103, 105, 107, 111, 113, 115,  \
-              117, 119, 121, 123, 125, 127, 129, 131, 133, 135, 137, 139, 141,\
-              143, 145, 147, 149, 151, 153, 155, 157, 159]
+fnum_o = [36, 38]
+fnum_c = [35, 37]
 
 
 def make_flat(): 
@@ -55,7 +47,7 @@ def make_sky():
 
     util.mkdir(sky_dir)
 
-    sky_num = np.arange(161, 170+1)
+    sky_num = np.arange(x, x+1)
     sky_frames = ['{0:s}sky_{1:03d}_o.fits'.format(data_dir, ss) for ss in sky_num]
     reduce_STA.treat_overscan(sky_frames)
     scan_sky_frames = ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num]
@@ -74,8 +66,7 @@ def reduce_FLD2():
     reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'FLD2_sky.fits', flat_frame=flat_dir+"flat.fits")
 
     # Closed - threeWFS_LS
-    img_files = [data_dir + 'obj{0:03d}threeWFS_LS_c.fits'.format(ii) for ii in fnum_c]
-    reduce_STA.treat_overscan(img_files)
+    img_files = [data_dir + 'obj{0:03d}LS_c.fits'.format(ii) for ii in fnum_c]
     scan_img_files = [data_dir + 'obj{0:03d}threeWFS_LS_c_scan.fits'.format(ii) for ii in fnum_c]
     reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'FLD2_sky.fits', flat_frame =flat_dir+"flat.fits")
 
