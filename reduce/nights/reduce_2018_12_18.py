@@ -63,12 +63,13 @@ def reduce_orion():
     img_files = [data_dir + 'obj{0:03d}_o.fits'.format(ii) for ii in fnum_o]
     reduce_STA.treat_overscan(img_files)
     scan_img_files = [data_dir + 'obj{0:03d}_o_scan.fits'.format(ii) for ii in fnum_o]
-    reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'FLD2_sky.fits', flat_frame=flat_dir+"flat.fits")
+    reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'Orion_sky.fits', flat_frame=flat_dir+"flat.fits")
 
-    # Closed - threeWFS_LS
+    # Closed Loop
     img_files = [data_dir + 'obj{0:03d}LS_c.fits'.format(ii) for ii in fnum_c]
-    scan_img_files = [data_dir + 'obj{0:03d}threeWFS_LS_c_scan.fits'.format(ii) for ii in fnum_c]
-    reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'FLD2_sky.fits', flat_frame =flat_dir+"flat.fits")
+    reduce_STA.treat_overscan(img_files)
+    scan_img_files = [data_dir + 'obj{0:03d}LS_c_scan.fits'.format(ii) for ii in fnum_c]
+    reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'Orion_sky.fits', flat_frame =flat_dir+"flat.fits")
 
 
     return
