@@ -293,20 +293,20 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
                 final_psf_mod += g2d_image
 
                 if plot_psf_compare == True:
-                    plt.figure(4)
-                    plt.clf()
-                    plt.imshow(cutouts[ss])
-                    plt.pause(0.05)
+                    #plt.figure(4)
+                    #plt.clf()
+                    #plt.imshow(cutouts[ss])
+                    #plt.pause(0.05)
                 
-                    plt.figure(5)
-                    plt.clf()
-                    plt.imshow(g2d_image)
-                    plt.pause(0.05)
+                    #plt.figure(5)
+                    #plt.clf()
+                    #plt.imshow(g2d_image)
+                    #plt.pause(0.05)
                 
-                    plt.figure(6)
-                    plt.clf()
-                    plt.imshow(cutouts[ss] - g2d_image)
-                    plt.pause(0.05)
+                    #plt.figure(6)
+                    #plt.clf()
+                    #plt.imshow(cutouts[ss] - g2d_image)
+                    #plt.pause(0.05)
                 
                     pdb.set_trace()
 
