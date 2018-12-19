@@ -2,7 +2,7 @@ import numpy as np
 from astropy.io import fits
 from astropy import table
 from astropy import units
-import scipy
+#import scipy
 import glob
 from imaka.reduce import reduce_fli
 from imaka.reduce import calib
