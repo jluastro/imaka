@@ -26,10 +26,8 @@ stacks_dir = root_dir + 'reduce/stacks/'
 twi_dir = root_dir + 'twilights/'
 massdimm_dir = root_dir + 'reduce/massdimm/'
 
-fnum_o = [36, 38]
-fnum_o = [41, 43, 45]
-fnum_c = [35, 37]
-fnum_c = [40, 42, 44]
+fnum_o = [36, 38, 41, 43, 45, 47, 49, 55, 58, 61, 64, 67]
+fnum_c = [35, 37, 40, 42, 44, 46, 48, 53, 56, 59, 62, 65, 68]
 
 
 def make_flat(): 
@@ -81,15 +79,15 @@ def find_stars_FLD2():
 
     # Open Loop
     img_files = [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in fnum_o]
-    reduce_fli.find_stars(img_files, fwhm=10, threshold=20, N_passes=2, plot_psf_compare=False, \
-                              mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
-                              left_slice =25, right_slice=0, top_slice=25, bottom_slice=0)
+    reduce_fli.find_stars(img_files, fwhm=8, threshold=20, N_passes=2, plot_psf_compare=False, \
+                              mask_flat=flat_dir+"flat.fits", mask_min=0.8, mask_max=1.4, \
+                              left_slice =20, right_slice=20, top_slice=25, bottom_slice=25)
     
     #Closed Loop - threeWFS_LS
-    img_files = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean.fits'.format(ii) for ii in fnum_c]
+    img_files = [out_dir + 'obj{0:03d}LS_c_scan_clean.fits'.format(ii) for ii in fnum_c]
     reduce_fli.find_stars(img_files, fwhm=7, threshold=30, N_passes=2, plot_psf_compare=False, \
-                              mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
-                              left_slice =25, right_slice=0, top_slice=25, bottom_slice=25)
+                              mask_flat=flat_dir+"flat.fits", mask_min=0.8, mask_max=1.4, \
+                              left_slice =20, right_slice=20, top_slice=25, bottom_slice=25)
                           
     return
 
@@ -104,8 +102,8 @@ def calc_star_stats():
     moffat.fit_moffat(img_files, stats_file)
 
     #Closed Loop - threeWFS_LS
-    img_files = [out_dir + 'obj{0:03d}threeWFS_LS_c_scan_clean.fits'.format(ii) for ii in fnum_c]
-    stats_file = stats_dir + 'stats_closed_threeWFS_LS_c.fits'
+    img_files = [out_dir + 'obj{0:03d}LS_c_scan_clean.fits'.format(ii) for ii in fnum_c]
+    stats_file = stats_dir + 'stats_closed_LS.fits'
     reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
 
