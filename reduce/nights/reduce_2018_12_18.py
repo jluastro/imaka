@@ -26,7 +26,8 @@ stacks_dir = root_dir + 'reduce/stacks/'
 twi_dir = root_dir + 'twilights/'
 massdimm_dir = root_dir + 'reduce/massdimm/'
 
-fnum_o = [36, 38, 41, 43, 45, 47, 49, 55, 58, 61, 64, 67, 73, 77, 80, 83, 86, 89, 92, 96, 99, 101, 103, 106]
+fnum_o = [36, 38, 41, 43, 45, 47, 49, 55, 58, 61, 64, 67, 73, 77, 80, 83, 86, 89]
+fnum_o = [92, 96, 99, 101, 103, 106]
 fnum_c_LS = [35, 37, 40, 42, 44, 46, 48, 53, 56, 59, 62, 65, 68, 71, 74, 78, 81, 84, 87, 90, 94, 97]
 fnum_c_b2 = [52, 54, 57, 60, 63, 66, 69, 70, 72, 75, 79, 82, 85, 88, 91, 93, 95, 98, 100, 105, 107]
 
@@ -59,12 +60,6 @@ def make_sky():
 
 def reduce_orion():
     util.mkdir(out_dir)
-
-    #initial batch for star finder tuner purposes (delete later)
-    img_files = [data_dir + 'obj062LS_c.fits', data_dir + 'obj063LS_Bin2_c.fits', data_dir + 'obj064_o.fits']
-    reduce_STA.treat_overscan(img_files)
-    scan_img_files = [data_dir + 'obj062LS_c_scan.fits', data_dir + 'obj063LS_Bin2_c_scan.fits', data_dir + 'obj064_o_scan.fits']
-    reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'orion_sky.fits', flat_frame=flat_dir+"flat.fits")
 
     # Open Loop
     img_files = [data_dir + 'obj{0:03d}_o.fits'.format(ii) for ii in fnum_o]
