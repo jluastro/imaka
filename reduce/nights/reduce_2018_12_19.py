@@ -15,7 +15,7 @@ from imaka.reduce import reduce_STA
 import matplotlib
 matplotlib.use('Agg')
 
-root_dir = '//Volumes/DATA5/imaka/20181218/sta/'
+root_dir = '//Volumes/DATA5/imaka/20181219/sta/'
 
 sky_dir = root_dir + 'reduce/sky/' 
 data_dir = root_dir + 'Orion/'
@@ -27,8 +27,8 @@ twi_dir = root_dir + 'twilights/'
 massdimm_dir = root_dir + 'reduce/massdimm/'
 
 fnum_o = [36, 38, 41, 43, 45, 47, 49, 55, 58, 61, 64, 67, 73, 77, 80, 83, 86, 89, 96, 99, 101, 103, 106]
-fnum_c_LS = [35, 37, 40, 42, 44, 46, 48, 53, 56, 59, 62, 65, 68, 71, 74, 78, 81, 84, 87, 90, 94, 97]
-fnum_c_B2 = [52, 54, 57, 60, 63, 66, 69, 70, 72, 75, 79, 82, 85, 88, 91, 93, 95, 98, 100, 105, 107]
+fnum_c_B2 = [35, 37, 40, 42, 44, 46, 48, 53, 56, 59, 62, 65, 68, 71, 74, 78, 81, 84, 87, 90, 94, 97]
+fnum_c_n7 = [52, 54, 57, 60, 63, 66, 69, 70, 72, 75, 79, 82, 85, 88, 91, 93, 95, 98, 100, 105, 107]
 
 
 def make_flat(): 
@@ -58,6 +58,7 @@ def make_sky():
 
 
 def reduce_orion():
+
     util.mkdir(out_dir)
 
     # Open Loop
@@ -66,16 +67,16 @@ def reduce_orion():
     scan_img_files = [data_dir + 'obj{0:03d}_o_scan.fits'.format(ii) for ii in fnum_o]
     areduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'orion_sky.fits', flat_frame=flat_dir+"flat.fits")
 
-    # Closed Loop - LS
-    img_files = [data_dir + 'obj{0:03d}LS_c.fits'.format(ii) for ii in fnum_c_LS]
+    # Closed Loop - B2
+    img_files = [data_dir + 'obj{0:03d}LS_B2_c.fits'.format(ii) for ii in fnum_c_B2]
     reduce_STA.treat_overscan(img_files)
-    scan_img_files = [data_dir + 'obj{0:03d}LS_c_scan.fits'.format(ii) for ii in fnum_c_LS]
+    scan_img_files = [data_dir + 'obj{0:03d}LS_B2_c_scan.fits'.format(ii) for ii in fnum_c_B2]
     reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'orion_sky.fits', flat_frame =flat_dir+"flat.fits")
 
-    # Closed Loop - LS
-    img_files = [data_dir + 'obj{0:03d}LS_Bin2_c.fits'.format(ii) for ii in fnum_c_B2]
+    # Closed Loop - n7
+    img_files = [data_dir + 'obj{0:03d}LS_Bin2_c.fits'.format(ii) for ii in fnum_c_n7]
     reduce_STA.treat_overscan(img_files)
-    scan_img_files = [data_dir + 'obj{0:03d}LS_Bin2_c_scan.fits'.format(ii) for ii in fnum_c_B2]
+    scan_img_files = [data_dir + 'obj{0:03d}LS_Bin2_c_scan.fits'.format(ii) for ii in fnum_c_n7]
     reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'orion_sky.fits', flat_frame =flat_dir+"flat.fits")
 
     return
