@@ -74,9 +74,9 @@ def reduce_orion():
     reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'orion_sky.fits', flat_frame =flat_dir+"flat.fits")
 
     # Closed Loop - n7
-    img_files = [data_dir + 'obj{0:03d}LS_Bin2_c.fits'.format(ii) for ii in fnum_c_n7]
+    img_files = [data_dir + 'obj{0:03d}LSnrej7_Bin2_zc11_c.fits'.format(ii) for ii in fnum_c_n7]
     reduce_STA.treat_overscan(img_files)
-    scan_img_files = [data_dir + 'obj{0:03d}LS_Bin2_c_scan.fits'.format(ii) for ii in fnum_c_n7]
+    scan_img_files = [data_dir + 'obj{0:03d}LS_Bin2_zc11_c_scan.fits'.format(ii) for ii in fnum_c_n7]
     reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'orion_sky.fits', flat_frame =flat_dir+"flat.fits")
 
     return
