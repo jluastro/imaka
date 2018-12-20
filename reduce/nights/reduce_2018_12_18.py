@@ -165,7 +165,7 @@ def stack_orion():
     # Closed Loop - B2
     closed_images = [out_dir + 'obj{0:03d}LS_Bin2_c_scan_clean.fits'.format(ii) for ii in fnum_c_B2]
     closed_starlists = [out_dir + 'obj{0:03d}LS_Bin2_c_scan_clean_stars.txt'.format(ii) for ii in fnum_c_B2]
-    closed_output_root = stacks_dir + 'orion_stack_closed_BS'
+    closed_output_root = stacks_dir + 'orion_stack_closed_B2'
     reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
     
     return
@@ -173,20 +173,21 @@ def stack_orion():
 
 def analyze_stacks():
 
-    open_img_files = [stacks_dir + 'FLD2_stack_open.fits']
+    open_img_files = [stacks_dir + 'orion_stack_open.fits']
 
-    closed_img_files = [stacks_dir + 'FLD2_stack_threeWFS_LS_c.fits']
+    closed_img_files = [stacks_dir + 'orion_stack_closed_LS.fits', \
+                        stacks_dir + 'orion_stack_closed_B2.fits']
     
     #Find stars in image
-    reduce_fli.find_stars(open_img_files, fwhm=10, threshold=100, N_passes=2, plot_psf_compare=False, \
-                              mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
-                              left_slice =25, right_slice=0, top_slice=25, bottom_slice=0)
-    reduce_fli.find_stars(closed_img_files, fwhm=7, threshold=30, N_passes=2, plot_psf_compare=False, \
-                              mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
-                              left_slice =25, right_slice=0, top_slice=25, bottom_slice=0)
+    reduce_fli.find_stars(open_img_files, fwhm=10, threshold=3, N_passes=2, plot_psf_compare=False, \
+                              mask_flat=flat_dir+"flat.fits", mask_min=0.8, mask_max=1.4, \
+                              left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
+    reduce_fli.find_stars(closed_img_files, fwhm=7, threshold=3, N_passes=2, plot_psf_compare=False, \
+                              mask_flat=flat_dir+"flat.fits", mask_min=0.8, mask_max=1.4, \
+                              left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
         
     # Calc stats on all the stacked images
-    #reduce_fli.calc_star_stats(open_img_files+closed_img_files, output_stats= stats_dir + 'stats_stacks.fits')
+    reduce_fli.calc_star_stats(open_img_files+closed_img_files, output_stats= stats_dir + 'stats_stacks.fits')
 
     return
     
