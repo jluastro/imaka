@@ -26,10 +26,9 @@ stacks_dir = root_dir + 'reduce/stacks/'
 twi_dir = root_dir + 'twilights/'
 massdimm_dir = root_dir + 'reduce/massdimm/'
 
-fnum_o = [36, 38, 41, 43, 45, 47, 49, 55, 58, 61, 64, 67, 73, 77, 80, 83, 86, 89]
-fnum_o = [92, 96, 99, 101, 103, 106]
+fnum_o = [36, 38, 41, 43, 45, 47, 49, 55, 58, 61, 64, 67, 73, 77, 80, 83, 86, 89, 96, 99, 101, 103, 106]
 fnum_c_LS = [35, 37, 40, 42, 44, 46, 48, 53, 56, 59, 62, 65, 68, 71, 74, 78, 81, 84, 87, 90, 94, 97]
-fnum_c_b2 = [52, 54, 57, 60, 63, 66, 69, 70, 72, 75, 79, 82, 85, 88, 91, 93, 95, 98, 100, 105, 107]
+fnum_c_B2 = [52, 54, 57, 60, 63, 66, 69, 70, 72, 75, 79, 82, 85, 88, 91, 93, 95, 98, 100, 105, 107]
 
 
 def make_flat(): 
@@ -65,7 +64,7 @@ def reduce_orion():
     img_files = [data_dir + 'obj{0:03d}_o.fits'.format(ii) for ii in fnum_o]
     reduce_STA.treat_overscan(img_files)
     scan_img_files = [data_dir + 'obj{0:03d}_o_scan.fits'.format(ii) for ii in fnum_o]
-    reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'orion_sky.fits', flat_frame=flat_dir+"flat.fits")
+    areduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'orion_sky.fits', flat_frame=flat_dir+"flat.fits")
 
     # Closed Loop - LS
     img_files = [data_dir + 'obj{0:03d}LS_c.fits'.format(ii) for ii in fnum_c_LS]
@@ -86,19 +85,22 @@ def find_stars_orion():
 
     # Open Loop
     img_files = [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in fnum_o]
-    reduce_fli.find_stars(img_files, fwhm=8, threshold=20, N_passes=2, plot_psf_compare=False, \
+    #img_files = [out_dir + 'obj064_o_scan_clean.fits']
+    reduce_fli.find_stars(img_files, fwhm=10, threshold=3, N_passes=2, plot_psf_compare=False, \
                               mask_flat=flat_dir+"flat.fits", mask_min=0.8, mask_max=1.4, \
                               left_slice =20, right_slice=20, top_slice=25, bottom_slice=25)
     
     #Closed Loop - LS
-    img_files = [out_dir + 'obj{0:03d}LS_c_scan_clean.fits'.format(ii) for ii in fnum_c_LS]
-    reduce_fli.find_stars(img_files, fwhm=7, threshold=30, N_passes=2, plot_psf_compare=False, \
+    img_files = [out_dir + 'obj{0:03d}LS_Bin2_c_scan_clean.fits'.format(ii) for ii in fnum_c_B2]
+    #img_files = [out_dir + 'obj062LS_c_scan_clean.fits']
+    reduce_fli.find_stars(img_files, fwhm=7, threshold=3, N_passes=2, plot_psf_compare=False, \
                               mask_flat=flat_dir+"flat.fits", mask_min=0.8, mask_max=1.4, \
                               left_slice =20, right_slice=20, top_slice=25, bottom_slice=25)
 
     #Closed Loop - B2
-    img_files = [out_dir + 'obj{0:03d}LS_Bin2_c_scan_clean.fits'.format(ii) for ii in fnum_c_B2]
-    reduce_fli.find_stars(img_files, fwhm=7, threshold=30, N_passes=2, plot_psf_compare=False, \
+    img_files = [out_dir + 'obj{0:03d}LS_c_scan_clean.fits'.format(ii) for ii in fnum_c_LS]
+    #img_files = [out_dir + 'obj063LS_Bin2_c_scan_clean.fits']
+    reduce_fli.find_stars(img_files, fwhm=7, threshold=3, N_passes=2, plot_psf_compare=False, \
                               mask_flat=flat_dir+"flat.fits", mask_min=0.8, mask_max=1.4, \
                               left_slice =20, right_slice=20, top_slice=25, bottom_slice=25)
                           
@@ -144,7 +146,7 @@ def append_massdimm():
     return
 
 
-def stack_FLD2():
+def stack_orion():
 
     util.mkdir(stacks_dir)
 
@@ -152,7 +154,7 @@ def stack_FLD2():
     open_images = [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in fnum_o]
     open_starlists = [out_dir + 'obj{0:03d}_o_scan_clean_stars.txt'.format(ii) for ii in fnum_o]
     open_output_root = stacks_dir + 'orion_stack_open'
-    reduce_fli.shift_and_add(open_images, open_starlists, open_output_root, method='mean')
+    #reduce_fli.shift_and_add(open_images, open_starlists, open_output_root, method='mean')
     
     # Closed Loop - LS
     closed_images = [out_dir + 'obj{0:03d}LS_c_scan_clean.fits'.format(ii) for ii in fnum_c_LS]
