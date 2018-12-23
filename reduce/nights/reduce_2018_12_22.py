@@ -15,7 +15,8 @@ from imaka.reduce import reduce_STA
 import matplotlib
 matplotlib.use('Agg')
 
-root_dir = '//Volumes/DATA5/imaka/20181221/sta/'
+root_dir = '//Volumes/DATA5/imaka/20181222/sta/'
+root_dir = '//g/lu/data/imaka/onaga/20181222/sta/'
 
 sky_dir = root_dir + 'reduce/sky/' 
 data_dir = root_dir + 'Orion/'
@@ -26,22 +27,25 @@ stacks_dir = root_dir + 'reduce/stacks/'
 twi_dir = root_dir + 'twilights/'
 massdimm_dir = root_dir + 'reduce/massdimm/'
 
-fnum_o = [34, 38, 45, 52, 56, 60, 64, 68, 72, 78, 90, 93, 96, 99, 102, 105, 108, 111, 114]
-fnum_o=[117, 120, 123, 126, 129, 132, 135, 138, 141, 144, 147, 150, 153, 156, 159, 162, 165, 168, 171, 181, 184, 187, 190]
-fnum_c_B2 = [43, 48, 50, 54, 58, 62, 66, 70, 76, 88, 91, 94, 97, 100, 103, 106, 109, 112, 115]
-fnum_c_B2=[118, 121, 124, 127, 130, 133, 136, 139, 142,145, 148, 151, 154, 157, 160, 163, 166, 169, 179, 182, 185, 188]
-fnum_c_n1 = [33, 44, 51, 55, 59, 63, 67, 71, 77, 89] 
-fnum_c_n7 = [92, 95, 98, 101, 104, 107, 110, 113, 116]
-fnum_c_n7=[119, 122, 125, 128, 131, 134, 137, 140, 143, 146, 149, 152, 155, 158, 161, 164, 167, 170, 180, 183, 186, 189]
+fnum_o = [215, 219, 223, 227, 231, 235, 239, 243, 247, 251, 255, 259, 263, 267, 271, 276]
+fnum_o = [64, 68, 72, 76, 82, 87, 91, 98, 102, 106, 110, 114, 118, 122, 126, 130, 135, 139, 143, 147, 151, 155, 159, 163, 167, 171, 175, 179, 183, 187, 191, 195, 199, 203, 207, 211]
+
+fnum_c_4W = [212, 216, 220, 224, 228, 232, 236, 240, 244, 248, 252, 256, 260, 264, 268, 273]
+fnum_c_4W = [63, 65, 69, 73, 77, 79, 83, 88, 92, 95, 99, 103, 107, 111, 115, 119, 123, 127, 131, 132, 136, 140, 144, 148, 152, 156, 160, 164, 168, 172, 176, 180, 184, 188, 192, 196, 200, 204, 208]
+
+fnum_c_B2 = [213, 217, 221, 225, 229, 233, 237, 241, 245, 249, 254, 257, 261, 265, 269, 274]
+fnum_c_B2 = [66, 70, 74, 80, 85, 89, 93, 96, 100, 104, 108, 112, 116, 120, 124, 128, 133, 137, 141, 145, 149, 153, 157, 161, 165, 169, 173, 177, 181, 185, 189, 193, 197, 201, 205, 209]
+
+fnum_c_zc = [214, 218, 222, 226, 230, 234, 238, 242, 246, 250, 254, 258, 262, 266, 279, 275]
+fnum_c_zc = [67, 71, 75,  81, 86, 90, 97, 101, 105, 109, 113, 117, 121, 125, 129, 134, 138, 142, 146, 150, 154, 158, 162, 166, 170, 174, 178, 182, 186, 190, 194, 198, 202, 206, 210]
 
 
 def make_flat(): 
 
     util.mkdir(flat_dir)
     
-    flat_num = np.arange(13, 28+1)
-    flat_num_scan = np.arange(13, 15+1)
-    flat_frames = ['{0:s}twi_{1:03d}.fits'.format(twi_dir, ss) for ss in flat_num_scan]
+    flat_num = np.arange(0, 10+1)
+    flat_frames = ['{0:s}twi_{1:03d}.fits'.format(twi_dir, ss) for ss in flat_num]
     reduce_STA.treat_overscan(flat_frames)
     scan_flat_frames = ['{0:s}twi_{1:03d}_scan.fits'.format(twi_dir, ss) for ss in flat_num]
     calib.makeflat(scan_flat_frames, [], flat_dir + 'flat.fits', darks=False)
@@ -53,7 +57,7 @@ def make_sky():
 
     util.mkdir(sky_dir)
 
-    sky_num = np.arange(79, 85+1)
+    sky_num = np.arange(51, 60+1)
     sky_frames = ['{0:s}sky_{1:03d}_o.fits'.format(data_dir, ss) for ss in sky_num]
     reduce_STA.treat_overscan(sky_frames)
     scan_sky_frames = ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num]
@@ -68,24 +72,26 @@ def reduce_orion():
 
     # Open Loop
     img_files = [data_dir + 'obj{0:03d}_o.fits'.format(ii) for ii in fnum_o]
-    reduce_STA.treat_overscan(img_files)
+    #reduce_STA.treat_overscan(img_files)
     scan_img_files = [data_dir + 'obj{0:03d}_o_scan.fits'.format(ii) for ii in fnum_o]
     reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'orion_sky.fits', flat_frame=flat_dir+"flat.fits")
 
-    # Closed Loop - B2
-    img_files = [data_dir + 'obj{0:03d}LS_B2_c.fits'.format(ii) for ii in fnum_c_B2]
+    # Closed Loop - 4W
+    img_files = [data_dir + 'obj{0:03d}LS4WFS_c.fits'.format(ii) for ii in fnum_c_4W]
     reduce_STA.treat_overscan(img_files)
-    scan_img_files = [data_dir + 'obj{0:03d}LS_B2_c_scan.fits'.format(ii) for ii in fnum_c_B2]
+    scan_img_files = [data_dir + 'obj{0:03d}LS4WFS_c_scan.fits'.format(ii) for ii in fnum_c_4W]
     reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'orion_sky.fits', flat_frame =flat_dir+"flat.fits")
 
-    # Closed Loop - n7
-    img_files = [data_dir + 'obj{0:03d}LSnrej7_zc21_c.fits'.format(ii) for ii in fnum_c_n7]  reduce_STA.treat_overscan(img_files)
-    scan_img_files = [data_dir + 'obj{0:03d}LSnrej7_zc21_c_scan.fits'.format(ii) for ii in fnum_c_n7]
+    # Closed Loop - B2
+    img_files = [data_dir + 'obj{0:03d}LS4WFS_B2_c.fits'.format(ii) for ii in fnum_c_B2]
+    reduce_STA.treat_overscan(img_files)
+    scan_img_files = [data_dir + 'obj{0:03d}LS4WFS_B2_c_scan.fits'.format(ii) for ii in fnum_c_B2]
     reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'orion_sky.fits', flat_frame =flat_dir+"flat.fits")
     
-    # Closed Loop - n1
-    img_files = [data_dir + 'obj{0:03d}LSnrej1_zc21_c.fits'.format(ii) for ii in fnum_c_n1]  reduce_STA.treat_overscan(img_files)
-    scan_img_files = [data_dir + 'obj{0:03d}LSnrej1_zc21_c_scan.fits'.format(ii) for ii in fnum_c_n1]
+    # Closed Loop - zc
+    img_files = [data_dir + 'obj{0:03d}LS4WFS_zc21_c.fits'.format(ii) for ii in fnum_c_zc]
+    reduce_STA.treat_overscan(img_files)
+    scan_img_files = [data_dir + 'obj{0:03d}LS4WFS_zc21_c_scan.fits'.format(ii) for ii in fnum_c_zc]
     reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'orion_sky.fits', flat_frame =flat_dir+"flat.fits")
 
     return
@@ -99,20 +105,20 @@ def find_stars_orion():
                               mask_flat=flat_dir+"flat.fits", mask_min=0.8, mask_max=1.4, \
                               left_slice =20, right_slice=20, top_slice=25, bottom_slice=25)
     
+    #Closed Loop - 4W
+    img_files = [out_dir + 'obj{0:03dLS4WFS_scan_clean.fits'.format(ii) for ii in fnum_c_4W]
+    reduce_fli.find_stars(img_files, fwhm=7, threshold=10, N_passes=2, plot_psf_compare=False, \
+                              mask_flat=flat_dir+"flat.fits", mask_min=0.8, mask_max=1.4, \
+                              left_slice =20, right_slice=20, top_slice=25, bottom_slice=25)
+
     #Closed Loop - B2
-    img_files = [out_dir + 'obj{0:03d}LS_B2_c_scan_clean.fits'.format(ii) for ii in fnum_c_B2]
+    img_files = [out_dir + 'obj{0:03d}LS4WFS_B2_c_scan_clean.fits'.format(ii) for ii in fnum_c_B2]
     reduce_fli.find_stars(img_files, fwhm=7, threshold=10, N_passes=2, plot_psf_compare=False, \
                               mask_flat=flat_dir+"flat.fits", mask_min=0.8, mask_max=1.4, \
                               left_slice =20, right_slice=20, top_slice=25, bottom_slice=25)
 
-    #Closed Loop - n7
-    img_files = [out_dir + 'obj{0:03d}LSnrej7_zc21_c_scan_clean.fits'.format(ii) for ii in fnum_c_n7]
-    reduce_fli.find_stars(img_files, fwhm=7, threshold=10, N_passes=2, plot_psf_compare=False, \
-                              mask_flat=flat_dir+"flat.fits", mask_min=0.8, mask_max=1.4, \
-                              left_slice =20, right_slice=20, top_slice=25, bottom_slice=25)
-
-    #Closed Loop - n1
-    img_files = [out_dir + 'obj{0:03d}LSnrej1_zc21_c_scan_clean.fits'.format(ii) for ii in fnum_c_n1]
+    #Closed Loop - zc
+    img_files = [out_dir + 'obj{0:03d}LS4WFS_zc21_c_scan_clean.fits'.format(ii) for ii in fnum_c_zc]
     reduce_fli.find_stars(img_files, fwhm=7, threshold=10, N_passes=2, plot_psf_compare=False, \
                               mask_flat=flat_dir+"flat.fits", mask_min=0.8, mask_max=1.4, \
                               left_slice =20, right_slice=20, top_slice=25, bottom_slice=25)
