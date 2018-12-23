@@ -29,9 +29,9 @@ from astropy.modeling import models, fitting
 from imaka.reduce import calib
 from imaka.reduce import util
 #import ccdproc
-#from scipy.ndimage import interpolation
-#from scipy.ndimage import median_filter
-#import scipy.ndimage
+from scipy.ndimage import interpolation
+from scipy.ndimage import median_filter
+import scipy.ndimage
 from astropy.table import Table
 #from skimage.measure import block_reduce
 from datetime import datetime

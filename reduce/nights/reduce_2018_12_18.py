@@ -86,7 +86,7 @@ def find_stars_orion():
     # Open Loop
     img_files = [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in fnum_o]
     #img_files = [out_dir + 'obj064_o_scan_clean.fits']
-    reduce_fli.find_stars(img_files, fwhm=10, threshold=3, N_passes=2, plot_psf_compare=False, \
+    reduce_fli.find_stars(img_files, fwhm=10, threshold=10, N_passes=2, plot_psf_compare=False, \
                               mask_flat=flat_dir+"flat.fits", mask_min=0.8, mask_max=1.4, \
                               left_slice =20, right_slice=20, top_slice=25, bottom_slice=25)
     
@@ -179,9 +179,9 @@ def analyze_stacks():
                         stacks_dir + 'orion_stack_closed_B2.fits']
     
     #Find stars in image
-    reduce_fli.find_stars(open_img_files, fwhm=10, threshold=3, N_passes=2, plot_psf_compare=False, \
-                              mask_flat=flat_dir+"flat.fits", mask_min=0.8, mask_max=1.4, \
-                              left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
+    #reduce_fli.find_stars(open_img_files, fwhm=10, threshold=3, N_passes=2, plot_psf_compare=False, \
+    #                          mask_flat=flat_dir+"flat.fits", mask_min=0.8, mask_max=1.4, \
+    #                          left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
     reduce_fli.find_stars(closed_img_files, fwhm=7, threshold=3, N_passes=2, plot_psf_compare=False, \
                               mask_flat=flat_dir+"flat.fits", mask_min=0.8, mask_max=1.4, \
                               left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)

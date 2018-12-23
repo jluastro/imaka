@@ -453,9 +453,9 @@ def calc_fwhms_4filt(img_file, vmin=None, vmax=None, fignum=None):
     _in.close()
     
     # Only use the brightest sources for calculating the mean. This is just for printing.
-    filts = ['B', 'V', 'R', 'I']
-    x_filt = {'V': [0,3040], 'I':[0,3040], 'R':[3040,6000], 'B':[3040,6000]}
-    y_filt = {'V': [0,2640], 'I':[2640,5289], 'R':[2640,5279], 'B':[0,2640]}
+    filts =  ['LoLeft', 'LoRight', 'UpLeft', 'UpRight']
+    x_filt = {'LoLeft': [0,3040], 'UpLeft':[0,3040], 'UpRight':[3040,6000], 'LoRight':[3040,6000]}
+    y_filt = {'LoLeft': [0,2640], 'UpLeft':[2640,5289], 'UpRight':[2640,5279], 'LoRight':[0,2640]}
 
     for ff in filts:
         idx = np.where((sources['xcentroid'] > x_filt[ff][0]) & (sources['xcentroid'] <= x_filt[ff][1]) &
@@ -493,3 +493,58 @@ def read_fwhm_pickle(img_file):
 
     return sources, min_fwhm, maj_fwhm, elon, phi
     
+
+def plot_all_fwhm():
+    _files = glob.glob('*_fwhm.pickle')
+
+    recon = np.zeros(len(_files), dtype=int)
+    fwhm_min = np.zeros(len(_files), dtype=float)
+    fwhm_min_e = np.zeros(len(_files), dtype=float)
+    frame_no = np.zeros(len(_files), dtype=int)
+
+    ps = 0.12
+
+    for ff in range(len(_files)):
+        # Read in the data
+        _in = open(_files[ff], 'rb')
+        sources = pickle.load(_in)
+        min_fwhm = pickle.load(_in)
+        _in.close()
+
+        # Get the frame number from the filename.
+        frame_no[ff] = _files[ff][3:6]
+        
+        recon_str = _files[ff][6:]
+        if recon_str.startswith('_o'):
+            recon[ff] = 0
+        if recon_str.startswith('LS4WFS_c'):
+            recon[ff] = 1
+        if recon_str.startswith('LS4WFS_B2_c'):
+            recon[ff] = 2
+        if recon_str.startswith('LS4WFS_zc21_c'):
+            recon[ff] = 3
+
+        min_fwhm_mean, min_fwhm_med, min_fwhm_std = sigma_clipped_stats(min_fwhm)
+        fwhm_min[ff] = min_fwhm_med*ps
+        fwhm_min_e[ff] = min_fwhm_std*ps
+
+
+    plt.clf()
+
+    idx_0 = np.where(recon == 0)[0]  # open
+    idx_1 = np.where(recon == 1)[0]  # open
+    idx_2 = np.where(recon == 2)[0]  # open
+    idx_3 = np.where(recon == 3)[0]  # open
+
+    plt.errorbar(frame_no[idx_0], fwhm_min[idx_0], yerr=fwhm_min_e[idx_0]/len(idx_0)**0.5, linestyle='none', label='Open')
+    plt.errorbar(frame_no[idx_1], fwhm_min[idx_1], yerr=fwhm_min_e[idx_1]/len(idx_1)**0.5, linestyle='none', label='LS')
+    plt.errorbar(frame_no[idx_2], fwhm_min[idx_2], yerr=fwhm_min_e[idx_2]/len(idx_2)**0.5, linestyle='none', label='LS_B2')
+    plt.errorbar(frame_no[idx_3], fwhm_min[idx_3], yerr=fwhm_min_e[idx_3]/len(idx_3)**0.5, linestyle='none', label='LS_zc21')
+    plt.legend(loc='lower right')
+    plt.xlabel('Frame number')
+    plt.ylabel("Min FWHM ('')")
+
+    return
+
+
+        
