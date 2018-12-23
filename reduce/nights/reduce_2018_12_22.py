@@ -31,9 +31,9 @@ fnum_o = [64, 68, 72, 76, 82, 87, 91, 98, 102, 106, 110, 114, 118, 122, 126, 130
 
 fnum_c_4W = [63, 65, 69, 73, 77, 79, 83, 88, 92, 95, 99, 103, 107, 111, 115, 119, 123, 127, 131, 132, 136, 140, 144, 148, 152, 156, 160, 164, 168, 172, 176, 180, 184, 188, 192, 196, 200, 204, 208, 212, 216, 220, 224, 228, 232, 236, 240, 244, 248, 252, 256, 260, 264, 268, 273]
 
-fnum_c_B2 = [43, 48, 50, 54, 58, 62, 66, 70, 76, 88, 91, 94, 97, 100, 103, 106, 109, 112, 115]
-fnum_c_n1 = [33, 44, 51, 55, 59, 63, 67, 71, 77, 89] 
-fnum_c_n7=[119, 122, 125, 128, 131, 134, 137, 140, 143, 146, 149, 152, 155, 158, 161, 164, 167, 170, 180, 183, 186, 189]
+fnum_c_B2 = [66, 70, 74, 80, 85, 89, 93, 96, 100, 104, 108, 112, 116, 120, 124, 128, 133, 137, 141, 145, 149, 153, 157, 161, 165, 169, 173, 177, 181, 185, 189, 193, 197, 201, 205, 209, 213, 217, 221, 225, 229, 233, 237, 241, 245, 249, 254, 257, 261, 265, 269, 274]
+
+fnum_c_zc = [67, 71, 75,  81, 86, 90, 97, 101, 105, 109, 113, 117, 121, 125, 129, 134, 138, 142, 146, 150, 154, 158, 162, 166, 170, 174, 178, 182, 186, 190, 194, 198, 202, 206, 210, 214, 218, 222, 226, 230, 234, 238, 242, 246, 250, 254, 258, 262, 266, 279, 275
 
 
 def make_flat(): 
@@ -72,22 +72,22 @@ def reduce_orion():
     scan_img_files = [data_dir + 'obj{0:03d}_o_scan.fits'.format(ii) for ii in fnum_o]
     reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'orion_sky.fits', flat_frame=flat_dir+"flat.fits")
 
-    # Closed Loop - B2
-    img_files = [data_dir + 'obj{0:03d}LS_B2_c.fits'.format(ii) for ii in fnum_c_B2]
+    # Closed Loop - 4W
+    img_files = [data_dir + 'obj{0:03d}LS4WFS_c.fits'.format(ii) for ii in fnum_c_4W]
     reduce_STA.treat_overscan(img_files)
-    scan_img_files = [data_dir + 'obj{0:03d}LS_B2_c_scan.fits'.format(ii) for ii in fnum_c_B2]
+    scan_img_files = [data_dir + 'obj{0:03d}LS4WFS_c_scan.fits'.format(ii) for ii in fnum_c_4W]
     reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'orion_sky.fits', flat_frame =flat_dir+"flat.fits")
 
-    # Closed Loop - n7
-    img_files = [data_dir + 'obj{0:03d}LSnrej7_zc21_c.fits'.format(ii) for ii in fnum_c_n7]
+    # Closed Loop - B2
+    img_files = [data_dir + 'obj{0:03d}LS4WFS_B2_c.fits'.format(ii) for ii in fnum_c_B2]
     reduce_STA.treat_overscan(img_files)
-    scan_img_files = [data_dir + 'obj{0:03d}LSnrej7_zc21_c_scan.fits'.format(ii) for ii in fnum_c_n7]
+    scan_img_files = [data_dir + 'obj{0:03d}LS4WFS_B2_c_scan.fits'.format(ii) for ii in fnum_c_B2]
     reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'orion_sky.fits', flat_frame =flat_dir+"flat.fits")
     
-    # Closed Loop - n1
-    img_files = [data_dir + 'obj{0:03d}LSnrej1_zc21_c.fits'.format(ii) for ii in fnum_c_n1]
+    # Closed Loop - zc
+    img_files = [data_dir + 'obj{0:03d}LS4WFS_zc21_c.fits'.format(ii) for ii in fnum_c_zc]
     reduce_STA.treat_overscan(img_files)
-    scan_img_files = [data_dir + 'obj{0:03d}LSnrej1_zc21_c_scan.fits'.format(ii) for ii in fnum_c_n1]
+    scan_img_files = [data_dir + 'obj{0:03d}LS4WFS_zc21_c_scan.fits'.format(ii) for ii in fnum_c_zc]
     reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'orion_sky.fits', flat_frame =flat_dir+"flat.fits")
 
     return
