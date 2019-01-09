@@ -16,7 +16,7 @@ import matplotlib
 matplotlib.use('Agg')
 
 root_dir = '//Volumes/DATA5/imaka/20181223/sta/'
-root_dir = '//g/lu/data/imaka/onaga/20181223/sta/'
+#root_dir = '//g/lu/data/imaka/onaga/20181223/sta/'
 
 sky_dir = root_dir + 'reduce/sky/' 
 data_dir = root_dir + 'Orion/'
@@ -70,32 +70,32 @@ def reduce_orion():
 
     # Open Loop
     img_files = [data_dir + 'obj{0:03d}_o.fits'.format(ii) for ii in fnum_o]
-    reduce_STA.treat_overscan(img_files)
+    #reduce_STA.treat_overscan(img_files)
     scan_img_files = [data_dir + 'obj{0:03d}_o_scan.fits'.format(ii) for ii in fnum_o]
-    reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'orion_sky.fits', flat_frame=flat_dir+"flat.fits")
+    #reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'orion_sky.fits', flat_frame=flat_dir+"flat.fits")
 
     # Closed Loop - 4W
     img_files = [data_dir + 'obj{0:03d}LS4WFS_c.fits'.format(ii) for ii in fnum_c_4W]
-    reduce_STA.treat_overscan(img_files)
+    #reduce_STA.treat_overscan(img_files)
     scan_img_files = [data_dir + 'obj{0:03d}LS4WFS_c_scan.fits'.format(ii) for ii in fnum_c_4W]
-    reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'orion_sky.fits', flat_frame =flat_dir+"flat.fits")
+    #reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'orion_sky.fits', flat_frame =flat_dir+"flat.fits")
 
     # Closed Loop - B2
     img_files = [data_dir + 'obj{0:03d}LS4WFS_B2_c.fits'.format(ii) for ii in fnum_c_B2]
-    reduce_STA.treat_overscan(img_files)
+    #reduce_STA.treat_overscan(img_files)
     scan_img_files = [data_dir + 'obj{0:03d}LS4WFS_B2_c_scan.fits'.format(ii) for ii in fnum_c_B2]
-    reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'orion_sky.fits', flat_frame =flat_dir+"flat.fits")
+    #reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'orion_sky.fits', flat_frame =flat_dir+"flat.fits")
     
     # Closed Loop - zc
     img_files = [data_dir + 'obj{0:03d}LS4WFS_zc11_c.fits'.format(ii) for ii in fnum_c_zc]
-    reduce_STA.treat_overscan(img_files)
+    #reduce_STA.treat_overscan(img_files)
     scan_img_files = [data_dir + 'obj{0:03d}LS4WFS_zc11_c_scan.fits'.format(ii) for ii in fnum_c_zc]
-    reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'orion_sky.fits', flat_frame =flat_dir+"flat.fits")
+    #reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'orion_sky.fits', flat_frame =flat_dir+"flat.fits")
 
     # Tip tilt
-    img_files = [data_dir + 'obj{0:03d}tip_tilt.fits'.format(ii) for ii in fnum_c_tt]
+    img_files = [data_dir + 'obj{0:03d}tip_tilt.fits'.format(ii) for ii in fnum_tt]
     reduce_STA.treat_overscan(img_files)
-    scan_img_files = [data_dir + 'obj{0:03d}tip_tilt_scan.fits'.format(ii) for ii in fnum_c_tt]
+    scan_img_files = [data_dir + 'obj{0:03d}tip_tilt_scan.fits'.format(ii) for ii in fnum_tt]
     reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'orion_sky.fits', flat_frame =flat_dir+"flat.fits")
 
     return
