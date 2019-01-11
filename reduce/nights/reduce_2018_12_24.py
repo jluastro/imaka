@@ -114,37 +114,37 @@ def find_stars_orion():
 
     # Open Loop
     img_files = [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in fnum_o]
-    reduce_fli.find_stars(img_files, fwhm=8, threshold=5, N_passes=2, plot_psf_compare=False, \
-                              mask_flat=flat_dir+"flat.fits", mask_min=0.8, mask_max=1.4, \
-                              left_slice =20, right_slice=20, top_slice=25, bottom_slice=25)
+    #reduce_fli.find_stars(img_files, fwhm=8, threshold=8, N_passes=2, plot_psf_compare=False, \
+    #                          mask_flat=flat_dir+"flat.fits", mask_min=0.8, mask_max=1.4, \
+    #                          left_slice =20, right_slice=20, top_slice=25, bottom_slice=25)
     
     #Closed Loop - 4W
     img_files = [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean.fits'.format(ii) for ii in fnum_c_4W]
-    reduce_fli.find_stars(img_files, fwhm=7, threshold=5, N_passes=2, plot_psf_compare=False, \
-                              mask_flat=flat_dir+"flat.fits", mask_min=0.8, mask_max=1.4, \
-                              left_slice =20, right_slice=20, top_slice=25, bottom_slice=25)
+    #reduce_fli.find_stars(img_files, fwhm=7, threshold=8, N_passes=2, plot_psf_compare=False, \
+    #                          mask_flat=flat_dir+"flat.fits", mask_min=0.8, mask_max=1.4, \
+    #                          left_slice =20, right_slice=20, top_slice=25, bottom_slice=25)
 
     #Closed Loop - B2
     img_files = [out_dir + 'obj{0:03d}LS4WFS_B2_c_scan_clean.fits'.format(ii) for ii in fnum_c_B2]
-    reduce_fli.find_stars(img_files, fwhm=7, threshold=5, N_passes=2, plot_psf_compare=False, \
-                              mask_flat=flat_dir+"flat.fits", mask_min=0.8, mask_max=1.4, \
-                              left_slice =20, right_slice=20, top_slice=25, bottom_slice=25)
+    #reduce_fli.find_stars(img_files, fwhm=7, threshold=8, N_passes=2, plot_psf_compare=False, \
+    #                          mask_flat=flat_dir+"flat.fits", mask_min=0.8, mask_max=1.4, \
+    #                          left_slice =20, right_slice=20, top_slice=25, bottom_slice=25)
 
     #Closed Loop - zc 11
     img_files = [out_dir + 'obj{0:03d}LS4WFS_zc11_c_scan_clean.fits'.format(ii) for ii in fnum_c_z1]
-    reduce_fli.find_stars(img_files, fwhm=7, threshold=5, N_passes=2, plot_psf_compare=False, \
-                              mask_flat=flat_dir+"flat.fits", mask_min=0.8, mask_max=1.4, \
-                              left_slice =20, right_slice=20, top_slice=25, bottom_slice=25)
+    #reduce_fli.find_stars(img_files, fwhm=7, threshold=8, N_passes=2, plot_psf_compare=False, \
+    #                          mask_flat=flat_dir+"flat.fits", mask_min=0.8, mask_max=1.4, \
+    #                          left_slice =20, right_slice=20, top_slice=25, bottom_slice=25)
 
         #Closed Loop - zc 21
     img_files = [out_dir + 'obj{0:03d}LS4WFS_zc21_c_scan_clean.fits'.format(ii) for ii in fnum_c_z2]
-    reduce_fli.find_stars(img_files, fwhm=7, threshold=5, N_passes=2, plot_psf_compare=False, \
-                              mask_flat=flat_dir+"flat.fits", mask_min=0.8, mask_max=1.4, \
-                              left_slice =20, right_slice=20, top_slice=25, bottom_slice=25)
+    #reduce_fli.find_stars(img_files, fwhm=7, threshold=8, N_passes=2, plot_psf_compare=False, \
+    #                          mask_flat=flat_dir+"flat.fits", mask_min=0.8, mask_max=1.4, \
+    #                          left_slice =20, right_slice=20, top_slice=25, bottom_slice=25)
 
     #Tip tilt
-    img_files = [out_dir + 'obj{0:03d}tip_tilt_scan_clean.fits'.format(ii) for ii in fnum_c_tt]
-    reduce_fli.find_stars(img_files, fwhm=7, threshold=5, N_passes=2, plot_psf_compare=False, \
+    img_files = [out_dir + 'obj{0:03d}tip_tilt_scan_clean.fits'.format(ii) for ii in fnum_tt]
+    reduce_fli.find_stars(img_files, fwhm=7, threshold=8, N_passes=2, plot_psf_compare=False, \
                               mask_flat=flat_dir+"flat.fits", mask_min=0.8, mask_max=1.4, \
                               left_slice =20, right_slice=20, top_slice=25, bottom_slice=25)
                           
@@ -157,26 +157,42 @@ def calc_star_stats():
     # Open Loop
     img_files = [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in fnum_o]
     stats_file = stats_dir + 'stats_open.fits'
-    reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
-    moffat.fit_moffat(img_files, stats_file)
+    #reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
+    #moffat.fit_moffat(img_files, stats_file)
 
     #Closed Loop - B2
-    img_files = [out_dir + 'obj{0:03d}LS_B2_c_scan_clean.fits'.format(ii) for ii in fnum_c_B2]
+    img_files = [out_dir + 'obj{0:03d}LS4WFS_B2_c_scan_clean.fits'.format(ii) for ii in fnum_c_B2]
     stats_file = stats_dir + 'stats_closed_B2.fits'
     reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
 
-    #Closed Loop - n7
-    img_files = [out_dir + 'obj{0:03d}LSnrej7_zc21_c_scan_clean.fits'.format(ii) for ii in fnum_c_n7]
-    stats_file = stats_dir + 'stats_closed_n7.fits'
+    #Closed Loop - 4W
+    img_files = [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean.fits'.format(ii) for ii in fnum_c_4W]
+    stats_file = stats_dir + 'stats_closed_4W.fits'
     reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
 
-    #Closed Loop - n1
-    img_files = [out_dir + 'obj{0:03d}LSnrej1_zc21_c_scan_clean.fits'.format(ii) for ii in fnum_c_n1]
-    stats_file = stats_dir + 'stats_closed_n1.fits'
+    #Closed Loop - z1
+    img_files = [out_dir + 'obj{0:03d}LS4WFS_zc11_c_scan_clean.fits'.format(ii) for ii in fnum_c_z1]
+    stats_file = stats_dir + 'stats_closed_z1.fits'
     reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
+
+    #Closed Loop - z2                                                          
+    img_files = [out_dir + 'obj{0:03d}LS4WFS_zc21_c_scan_clean.fits'.format(ii)\
+ for ii in fnum_c_z2]
+    stats_file = stats_dir + 'stats_closed_z2.fits'
+    reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
+    moffat.fit_moffat(img_files, stats_file)
+
+    #tiptilt                                                           
+    img_files = [out_dir + 'obj{0:03d}tip_tilt_scan_clean.fits'.format(ii)\
+ for ii in fnum_tt]
+    stats_file = stats_dir + 'stats_tiptilt.fits'
+    reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
+    moffat.fit_moffat(img_files, stats_file)
+
+
 
     return
 
