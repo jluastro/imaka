@@ -259,9 +259,11 @@ def analyze_stacks():
 
     open_img_files = [stacks_dir + 'orion_stack_open.fits']
 
-    closed_img_files = [stacks_dir + 'orion_stack_closed_B2.fits', \
-                        stacks_dir + 'orion_stack_closed_n7.fits', \
-                        stacks_dir + 'orion_stack_closed_n1.fits']
+    closed_img_files = [stacks_dir + 'orion_stack_closed_4W.fits', \
+                        stacks_dir + 'orion_stack_closed_B2.fits', \
+                        stacks_dir + 'orion_stack_closed_z1.fits', \
+                        stacks_dir + 'orion_stack_closed_z2.fits', \
+                        stacks_dir + 'orion_stack_tiptilt.fits']
     
     #Find stars in image
     reduce_fli.find_stars(open_img_files, fwhm=10, threshold=10, N_passes=2, plot_psf_compare=False, \
