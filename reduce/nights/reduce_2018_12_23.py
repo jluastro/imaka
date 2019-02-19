@@ -247,4 +247,45 @@ def analyze_stacks():
     #reduce_fli.calc_star_stats(open_img_files+closed_img_files, output_stats= stats_dir + 'stats_stacks.fits')
 
     return
+
+    #### FOUR FILTER REDUCTION ####
     
+def split_filters():
+
+    # Rotation 1: open
+    rot_1_o = []
+    starlists = [out_dir + 'obj{0:03d}_o_scan_clean_stars.txt'.format(ii) for ii in rot_1_o]
+    reduce_STA.four_filt_split(starlists, 'BVIR')
+    
+    # Rotation 2: open
+    rot_1_o = []
+    starlists = [out_dir + 'obj{0:03d}_o_scan_clean_stars.txt'.format(ii) for ii in rot_2_o]
+    reduce_STA.four_filt_split(starlists, 'VIRB')
+
+    # Rotation 3: open
+    rot_1_o = []
+    starlists = [out_dir + 'obj{0:03d}_o_scan_clean_stars.txt'.format(ii) for ii in rot_3_o]
+    reduce_STA.four_filt_split(starlists, 'IRBV')
+
+    # Rotation 1: closed
+    rot_1_c = [55, 58, 61, 64, 67, 70, 73]
+    rot_1_c += [76, 79] # CHECK THAT THIS SET IS IN FACT THE SAME!
+    starlists = [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean_stars.txt'.format(ii) for ii in rot_1_c]
+    reduce_STA.four_filt_split(starlists, 'BVIR')
+    
+    # Rotation 2: closed
+    rot_2_c = []
+    starlists = [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean_stars.txt'.format(ii) for ii in rot_2_c]
+    reduce_STA.four_filt_split(starlists, 'VIRB')
+
+    # Rotation 3: closed
+    rot_3_c = []
+    starlists = [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean_stars.txt'.format(ii) for ii in rot_3_c]
+    reduce_STA.four_filt_split(starlists, 'IRBV')
+    
+
+   16: B (NW), V(NE), R(SW), I(SE)
+   49: V (NW), B(SW), I(NE), R(SE)
+   75: B (NW), V(NE), R(SW), I(SE)
+   81: B (SE), V(SW), R(NE), I(NW)
+   99: switched filter to I band 
