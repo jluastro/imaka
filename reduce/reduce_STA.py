@@ -157,7 +157,7 @@ def create_bias(bias_files):
     return
 
 
-def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None):
+def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None, fourfilt=False, starlists=None):
     """
     Calculate statistics for the Data Metrics table.
     """
@@ -187,6 +187,10 @@ def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None):
     s_NEA2 = np.zeros(N_files, dtype=float)
     s_emp_fwhm = np.zeros(N_files, dtype=float)
     s_emp_fwhm_std = np.zeros(N_files, dtype=float)
+
+    if fourfilt==True:
+        # Make a column to designate filter position in four filter images
+        quadrant = np.zeros(N_files, dtype='S15')
     
     for ii in range(N_files):
         # Load up the image to work on.
@@ -209,14 +213,34 @@ def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None):
         plate_scale_orig = 0.016
         plate_scale = plate_scale_orig * bin_factor
 
-        # Load up the corresponding starlist.
-        if filt==None:
-            starlist = img_files[ii].replace('.fits', '_stars.txt')
-        else:
-            starlist = img_files[ii].replace('.fits', '_'+filt+'_stars.txt')
+        if starlists == None:
+            # Load up the corresponding starlist.
+            if filt==None:
+                starlist = img_files[ii].replace('.fits', '_stars.txt')
+            else:
+                starlist = img_files[ii].replace('.fits', '_'+filt+'_stars.txt')
+        elif starlists != None:
+            starlist = starlists[ii]
         stars = table.Table.read(starlist, format='ascii')
         N_stars = len(stars)
 
+        if fourfilt==True:
+            # Get filter position in case of four filter data
+            name_strings = starlist.split("_")
+            filt_name    = name_strings[-3]
+            filt_order   = name_strings[-2]
+
+            if filt_name == filt_order[0]:
+                quad = 'NW'
+            elif filt_name == filt_order[1]:
+                quad = 'NE'
+            elif filt_name == filt_order[2]:
+                quad = 'SE'
+            elif filt_name == filt_order[3]:
+                quad = 'SW'
+
+            quadrant[ii] = quad
+            
         # Put the positions into an array for photutils work.
         coords = np.array([stars['xcentroid'], stars['ycentroid']])
 
@@ -364,6 +388,10 @@ def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None):
                                         'FWHM', 'FWHM_std', 'EE25', 'EE50', 'EE80',
                                         'NEA', 'NEA2', 'xFWHM', 'yFWHM', 'theta', 'emp_fwhm', 'emp_fwhm_std'),
                             meta={'name':'Stats Table'})
+
+    if fourfilt==True:
+        quad_col = Column(quadrant, name='quadrant')
+        stats.add_column(quad_col)
     
     stats['FWHM'].format = '7.3f'
     stats['FWHM_std'].format = '7.3f'

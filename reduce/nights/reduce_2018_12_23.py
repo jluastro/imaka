@@ -15,8 +15,8 @@ from imaka.reduce import reduce_STA
 import matplotlib
 matplotlib.use('Agg')
 
-root_dir = '//Volumes/DATA5/imaka/20181223/sta/'
-#root_dir = '//g/lu/data/imaka/onaga/20181223/sta/'
+#root_dir = '//Volumes/DATA5/imaka/20181223/sta/'
+root_dir = '//g/lu/data/imaka/onaga/20181223/sta/'
 
 sky_dir = root_dir + 'reduce/sky/' 
 data_dir = root_dir + 'Orion/'
@@ -248,44 +248,134 @@ def analyze_stacks():
 
     return
 
-    #### FOUR FILTER REDUCTION ####
+#### FOUR FILTER REDUCTION ####
     
-def split_filters():
+"""
+Notes on rotation from log:
+at frame 16: B (NW), V(NE), R(SW), I(SE)
+at frame 49: V (NW), B(SW), I(NE), R(SE)
+at frame 75: B (NW), V(NE), R(SW), I(SE)
+at frame 81: B (SE), V(SW), R(NE), I(NW)
+at frame 99: switched filter to I band 
+"""
+    
+rot_1_o = [30, 31, 32, 34, 36, 38, 40, 42, 44, 46, 48]
+rot_1_o += [77, 80]
+rot_2_o = [52, 53, 57, 59, 62, 65, 68, 71, 74]
+rot_3_o = [83, 86, 89, 92, 95, 98]
 
+rot_1_c = [33, 35, 37, 39, 41, 43, 45, 47] 
+rot_1_c += [76, 79]
+rot_2_c = [55, 58, 61, 64, 67, 70, 73] 
+rot_3_c = [82, 85, 88, 91, 94, 97]
+
+rot_o_4 = rot_1_o + rot_2_o + rot_3_o
+rot_c_4 = rot_1_c + rot_2_c + rot_3_c
+
+
+def split_filters():
+   
     # Rotation 1: open
-    rot_1_o = []
     starlists = [out_dir + 'obj{0:03d}_o_scan_clean_stars.txt'.format(ii) for ii in rot_1_o]
     reduce_STA.four_filt_split(starlists, 'BVIR')
     
     # Rotation 2: open
-    rot_1_o = []
     starlists = [out_dir + 'obj{0:03d}_o_scan_clean_stars.txt'.format(ii) for ii in rot_2_o]
     reduce_STA.four_filt_split(starlists, 'VIRB')
 
     # Rotation 3: open
-    rot_1_o = []
     starlists = [out_dir + 'obj{0:03d}_o_scan_clean_stars.txt'.format(ii) for ii in rot_3_o]
     reduce_STA.four_filt_split(starlists, 'IRBV')
 
     # Rotation 1: closed
-    rot_1_c = [55, 58, 61, 64, 67, 70, 73]
-    rot_1_c += [76, 79] # CHECK THAT THIS SET IS IN FACT THE SAME!
     starlists = [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean_stars.txt'.format(ii) for ii in rot_1_c]
     reduce_STA.four_filt_split(starlists, 'BVIR')
     
     # Rotation 2: closed
-    rot_2_c = []
     starlists = [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean_stars.txt'.format(ii) for ii in rot_2_c]
     reduce_STA.four_filt_split(starlists, 'VIRB')
 
     # Rotation 3: closed
-    rot_3_c = []
     starlists = [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean_stars.txt'.format(ii) for ii in rot_3_c]
     reduce_STA.four_filt_split(starlists, 'IRBV')
     
+    return
+    
 
-   16: B (NW), V(NE), R(SW), I(SE)
-   49: V (NW), B(SW), I(NE), R(SE)
-   75: B (NW), V(NE), R(SW), I(SE)
-   81: B (SE), V(SW), R(NE), I(NW)
-   99: switched filter to I band 
+def calc_fourfilt_stats():
+    
+    # Open Loop - B
+    img_files =  [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in rot_o_4]
+    starlists =  [out_dir + 'obj{0:03d}_o_scan_clean_B_BVIR_stars.txt'.format(ii) for ii in rot_1_o]
+    starlists += [out_dir + 'obj{0:03d}_o_scan_clean_B_VIRB_stars.txt'.format(ii) for ii in rot_2_o]
+    starlists += [out_dir + 'obj{0:03d}_o_scan_clean_B_IRBV_stars.txt'.format(ii) for ii in rot_3_o]
+    stats_file = stats_dir + 'stats_open_B.fits'
+    reduce_STA.calc_star_stats(img_files, output_stats=stats_file, starlists=starlists, fourfilt=True)
+    moffat.fit_moffat(img_files, stats_file, starlists=starlists)
+
+    # Open Loop - V
+    img_files =  [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in rot_o_4]
+    starlists =  [out_dir + 'obj{0:03d}_o_scan_clean_V_BVIR_stars.txt'.format(ii) for ii in rot_1_o]
+    starlists += [out_dir + 'obj{0:03d}_o_scan_clean_V_VIRB_stars.txt'.format(ii) for ii in rot_2_o]
+    starlists += [out_dir + 'obj{0:03d}_o_scan_clean_V_IRBV_stars.txt'.format(ii) for ii in rot_3_o]
+    stats_file = stats_dir + 'stats_open_V.fits'
+    reduce_STA.calc_star_stats(img_files, output_stats=stats_file, starlists=starlists, fourfilt=True)
+    moffat.fit_moffat(img_files, stats_file, starlists=starlists)
+
+    # Open Loop - R
+    img_files =  [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in rot_o_4]
+    starlists =  [out_dir + 'obj{0:03d}_o_scan_clean_R_BVIR_stars.txt'.format(ii) for ii in rot_1_o]
+    starlists += [out_dir + 'obj{0:03d}_o_scan_clean_R_VIRB_stars.txt'.format(ii) for ii in rot_2_o]
+    starlists += [out_dir + 'obj{0:03d}_o_scan_clean_R_IRBV_stars.txt'.format(ii) for ii in rot_3_o]
+    stats_file = stats_dir + 'stats_open_R.fits'
+    reduce_STA.calc_star_stats(img_files, output_stats=stats_file, starlists=starlists, fourfilt=True)
+    moffat.fit_moffat(img_files, stats_file, starlists=starlists)
+
+    # Open Loop - I
+    img_files =  [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in rot_o_4]
+    starlists =  [out_dir + 'obj{0:03d}_o_scan_clean_I_BVIR_stars.txt'.format(ii) for ii in rot_1_o]
+    starlists += [out_dir + 'obj{0:03d}_o_scan_clean_I_VIRB_stars.txt'.format(ii) for ii in rot_2_o]
+    starlists += [out_dir + 'obj{0:03d}_o_scan_clean_I_IRBV_stars.txt'.format(ii) for ii in rot_3_o]
+    stats_file = stats_dir + 'stats_open_I.fits'
+    reduce_STA.calc_star_stats(img_files, output_stats=stats_file, starlists=starlists, fourfilt=True)
+    moffat.fit_moffat(img_files, stats_file, starlists=starlists)
+    
+    # Closed Loop - B
+    img_files =  [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean.fits'.format(ii) for ii in rot_c_4]
+    starlists =  [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean_B_BVIR_stars.txt'.format(ii) for ii in rot_1_c]
+    starlists += [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean_B_VIRB_stars.txt'.format(ii) for ii in rot_2_c]
+    starlists += [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean_B_IRBV_stars.txt'.format(ii) for ii in rot_3_c]
+    stats_file = stats_dir + 'stats_closed_B.fits'
+    reduce_STA.calc_star_stats(img_files, output_stats=stats_file, starlists=starlists, fourfilt=True)
+    moffat.fit_moffat(img_files, stats_file, starlists=starlists)
+
+    # Closed Loop - V
+    img_files =  [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean.fits'.format(ii) for ii in rot_c_4]
+    starlists =  [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean_V_BVIR_stars.txt'.format(ii) for ii in rot_1_c]
+    starlists += [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean_V_VIRB_stars.txt'.format(ii) for ii in rot_2_c]
+    starlists += [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean_V_IRBV_stars.txt'.format(ii) for ii in rot_3_c]
+    stats_file = stats_dir + 'stats_closed_V.fits'
+    reduce_STA.calc_star_stats(img_files, output_stats=stats_file, starlists=starlists, fourfilt=True)
+    moffat.fit_moffat(img_files, stats_file, starlists=starlists)
+
+    # Closed Loop - R
+    img_files =  [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean.fits'.format(ii) for ii in rot_c_4]
+    starlists =  [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean_R_BVIR_stars.txt'.format(ii) for ii in rot_1_c]
+    starlists += [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean_R_VIRB_stars.txt'.format(ii) for ii in rot_2_c]
+    starlists += [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean_R_IRBV_stars.txt'.format(ii) for ii in rot_3_c]
+    stats_file = stats_dir + 'stats_closed_R.fits'
+    reduce_STA.calc_star_stats(img_files, output_stats=stats_file, starlists=starlists, fourfilt=True)
+    moffat.fit_moffat(img_files, stats_file, starlists=starlists)
+    
+    # Closed Loop - I
+    img_files =  [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean.fits'.format(ii) for ii in rot_c_4]
+    starlists =  [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean_I_BVIR_stars.txt'.format(ii) for ii in rot_1_c]
+    starlists += [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean_I_VIRB_stars.txt'.format(ii) for ii in rot_2_c]
+    starlists += [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean_I_IRBV_stars.txt'.format(ii) for ii in rot_3_c]
+    stats_file = stats_dir + 'stats_closed_I.fits'
+    reduce_STA.calc_star_stats(img_files, output_stats=stats_file, starlists=starlists, fourfilt=True)
+    moffat.fit_moffat(img_files, stats_file, starlists=starlists)
+
+    return
+
+
