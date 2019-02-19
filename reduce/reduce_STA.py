@@ -408,41 +408,50 @@ def add_focus(stats_files):
     return 
 
 
-def fourfilt(img_files, starlists):
+def four_filt_split(starlists, filt_order):
     
     """
     For STA camera with four filters.
     Splits starlist into four starlists,
     each corresponding to one quadrant/filter
-    Inputs: Reduced (square) STA image file
-            Starlists corresponding to image
-    Output: Four new starlists with ending:
-            R_stars.txt' for R filter
+    Inputs: starlists: array of STA camera starlists;
+            filt_order: a four character string
+            giving filter labels from in order:
+            NW, NE, SE, SW, eg: 'BVIR'
+    Output: Four new starlists for each input
+            starlist given with ending:
+            R_BVIR_stars.txt' for R filter and
+            filter order 'BVIR'
     """
 
-    N = len(img_files)
+    filt_1 = filt_order[0]
+    filt_2 = filt_order[1]
+    filt_3 = filt_order[2]
+    filt_4 = filt_order[3]
+
+    N = len(starlists)
     for ii in range(N):
-        print("Working on file", ii+1, "of", N)
-    
+        print("Splitting file", ii+1, "of", N)
+        print("\t", starlists[ii])
+
         # Read in image and starlists
-        img, hdr = fits.getdata(img_files[ii], header=True)
         stars = table.Table.read(starlists[ii], format='ascii')
         x = stars['xcentroid']
         y = stars['ycentroid']
 
         # Define quadrants with indicies
-        img_half = np.shape(img)[0] / 2
+        img_half = 5280 / 2
 
-        indR = np.where((x>img_half) & (y>img_half))
-        indI = np.where((x<img_half) & (y>img_half))
-        indV = np.where((x<img_half) & (y<img_half))
-        indB = np.where((x>img_half) & (y<img_half))
+        ind_1 = np.where((x>img_half) & (y<img_half))
+        ind_2 = np.where((x<img_half) & (y<img_half))
+        ind_3 = np.where((x<img_half) & (y>img_half))
+        ind_4 = np.where((x>img_half) & (y>img_half))
     
         # Write new files
         list_root = starlists[ii].split('stars.txt')[0]
-        stars[indR].write(list_root + 'R_stars.txt', format='ascii', overwrite=True)
-        stars[indI].write(list_root + 'I_stars.txt', format='ascii', overwrite=True)
-        stars[indV].write(list_root + 'V_stars.txt', format='ascii', overwrite=True)
-        stars[indB].write(list_root + 'B_stars.txt', format='ascii', overwrite=True)
+        stars[ind_1].write(list_root + filt_1 + '_' + filt_order + '_stars.txt', format='ascii', overwrite=True)
+        stars[ind_2].write(list_root + filt_2 + '_' + filt_order + '_stars.txt', format='ascii', overwrite=True)
+        stars[ind_3].write(list_root + filt_3 + '_' + filt_order + '_stars.txt', format='ascii', overwrite=True)
+        stars[ind_4].write(list_root + filt_4 + '_' + filt_order + '_stars.txt', format='ascii', overwrite=True)
     
     return
