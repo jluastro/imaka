@@ -37,6 +37,10 @@ fnum_c_zc = [102, 106, 117, 121, 125, 129, 133, 137, 141, 145, 149, 153, 157, 16
 
 fnum_tt = [51, 56, 60, 63, 66, 69, 72, 75, 78, 81, 84, 87, 90, 93, 96, 99, 110, 114, 118, 122, 126, 130, 134, 138, 142, 146, 150, 154, 158, 162, 166, 170, 174, 178, 182, 186, 190, 194, 198, 202]
 
+fnum_o_I = [103, 107, 111, 115, 119, 123, 127, 131, 135, 139, 144, 147, 151, 155, 159, 163, 167, 171, 175, 179, 183, 187, 191, 195, 199, 203]
+
+fnum_c_I = [100, 104, 108, 112, 120, 124, 128, 132, 136, 140, 144, 148, 152, 156, 160, 164, 168, 172, 176, 180, 184, 188, 192, 196, 200]
+
 
 def make_flat(): 
 
@@ -203,26 +207,26 @@ def stack_orion():
     closed_images = [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean.fits'.format(ii) for ii in fnum_c_4W]
     closed_starlists = [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean_stars.txt'.format(ii) for ii in fnum_c_4W]
     closed_output_root = stacks_dir + 'orion_stack_closed_4W'
-    reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
+    #reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
 
     # Closed Loop - B2
     closed_images = [out_dir + 'obj{0:03d}LS4WFS_B2_c_scan_clean.fits'.format(ii) for ii in fnum_c_B2]
     closed_starlists = [out_dir + 'obj{0:03d}LS4WFS_B2_c_scan_clean_stars.txt'.format(ii) for ii in fnum_c_B2]
     closed_output_root = stacks_dir + 'orion_stack_closed_B2'
-    reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
+    #reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
 
     #Closed Loop - zc
     closed_images = [out_dir + 'obj{0:03d}LS4WFS_zc11_c_scan_clean.fits'.format(ii) for ii in fnum_c_zc]
     closed_starlists = [out_dir + 'obj{0:03d}LS4WFS_zc11_c_scan_clean_stars.txt'.format(ii) for ii in fnum_c_zc]
     closed_output_root = stacks_dir + 'orion_stack_closed_zc'
-    reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
+    #reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
 
     #tt
     closed_images = [out_dir + 'obj{0:03d}tip_tilt_scan_clean.fits'.format(ii) for ii in fnum_tt]
     closed_starlists = [out_dir + 'obj{0:03d}tip_tilt_scan_clean_stars.txt'.format(ii) for ii in fnum_tt]
     closed_output_root = stacks_dir + 'orion_stack_tiptilt'
-    reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
-    
+    #reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
+
     return
 
 
@@ -380,4 +384,18 @@ def calc_fourfilt_stats():
 
     return
 
+def stack_orion_I():
 
+    # I Band - open
+    images = [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in fnum_o_I]
+    starlists = [out_dir + 'obj{0:03d}_o_scan_clean_stars.txt'.format(ii) for ii in fnum_o_I]
+    output_root = stacks_dir + 'orion_stack_open_I'
+    reduce_fli.shift_and_add(images, starlists, output_root, method='mean')
+
+    # I Band - closed
+    images = [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean.fits'.format(ii) for ii in fnum_c_I]
+    starlists = [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean_stars.txt'.format(ii) for ii in fnum_c_I]
+    output_root = stacks_dir + 'orion_stack_closed_I'
+    reduce_fli.shift_and_add(images, starlists, output_root, method='mean')
+
+    return
