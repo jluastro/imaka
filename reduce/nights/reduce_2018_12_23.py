@@ -248,8 +248,10 @@ def analyze_stacks():
 
     return
 
-#### FOUR FILTER REDUCTION ####
-    
+###############################################
+############ FOUR FILTER REDUCTION ############
+###############################################
+
 """
 Notes on rotation from log:
 at frame 16: B (NW), V(NE), R(SW), I(SE)
