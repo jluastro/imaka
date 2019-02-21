@@ -15,8 +15,8 @@ from imaka.reduce import reduce_STA
 import matplotlib
 matplotlib.use('Agg')
 
-#root_dir = '//Volumes/DATA5/imaka/20181223/sta/'
-root_dir = '//g/lu/data/imaka/onaga/20181223/sta/'
+root_dir = '//Volumes/DATA5/imaka/20181223/sta/'
+#root_dir = '//g/lu/data/imaka/onaga/20181223/sta/'
 
 sky_dir = root_dir + 'reduce/sky/' 
 data_dir = root_dir + 'Orion/'
