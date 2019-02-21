@@ -16,7 +16,7 @@ import matplotlib
 matplotlib.use('Agg')
 
 root_dir = '//Volumes/DATA5/imaka/20181222/sta/'
-root_dir = '//g/lu/data/imaka/onaga/20181222/sta/'
+#root_dir = '//g/lu/data/imaka/onaga/20181222/sta/'
 
 sky_dir = root_dir + 'reduce/sky/' 
 data_dir = root_dir + 'Orion/'
@@ -31,9 +31,9 @@ fnum_o = [64, 68, 72, 76, 82, 87, 91, 98, 102, 106, 110, 114, 118, 122, 126, 130
 
 fnum_c_4W = [63, 65, 69, 73, 77, 79, 83, 88, 92, 95, 99, 103, 107, 111, 115, 119, 123, 127, 131, 132, 136, 140, 144, 148, 152, 156, 160, 164, 168, 172, 176, 180, 184, 188, 192, 196, 200, 204, 208, 212, 216, 220, 224, 228, 232, 236, 240, 244, 248, 252, 256, 260, 264, 268, 273]
 
-fnum_c_B2 = [66, 70, 74, 80, 85, 89, 93, 96, 100, 104, 108, 112, 116, 120, 124, 128, 133, 137, 141, 145, 149, 153, 157, 161, 165, 169, 173, 177, 181, 185, 189, 193, 197, 201, 205, 209, 213, 217, 221, 225, 229, 233, 237, 241, 245, 249, 254, 257, 261, 265, 269, 274]
+fnum_c_B2 = [66, 70, 74, 80, 85, 89, 93, 96, 100, 104, 108, 112, 116, 120, 124, 128, 133, 137, 141, 145, 149, 153, 157, 161, 165, 169, 173, 177, 181, 185, 189, 193, 197, 201, 205, 209, 213, 217, 221, 225, 229, 233, 237, 241, 245, 249, 253, 257, 261, 265, 269, 274]
 
-fnum_c_zc = [67, 71, 75,  81, 86, 90, 97, 101, 105, 109, 113, 117, 121, 125, 129, 134, 138, 142, 146, 150, 154, 158, 162, 166, 170, 174, 178, 182, 186, 190, 194, 198, 202, 206, 210, 214, 218, 222, 226, 230, 234, 238, 242, 246, 250, 254, 258, 262, 266, 279, 275]
+fnum_c_zc = [67, 71, 75,  81, 86, 90, 97, 101, 105, 109, 113, 117, 121, 125, 129, 134, 138, 142, 146, 150, 154, 158, 162, 166, 170, 174, 178, 182, 186, 190, 194, 198, 202, 206, 210, 214, 218, 222, 226, 230, 234, 238, 242, 246, 250, 254, 258, 262, 266, 275]
 
 
 def make_flat(): 
@@ -132,7 +132,7 @@ def calc_star_stats():
     moffat.fit_moffat(img_files, stats_file)
 
     #Closed Loop - 4W
-    img_files = [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean.fits'.format(ii) for ii in fnum_c_4@]
+    img_files = [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean.fits'.format(ii) for ii in fnum_c_4W]
     stats_file = stats_dir + 'stats_closed_4W.fits'
     reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
@@ -175,13 +175,13 @@ def stack_orion():
     open_images = [out_dir + 'obj{0:03d}_o_scan_clean.fits'.format(ii) for ii in fnum_o]
     open_starlists = [out_dir + 'obj{0:03d}_o_scan_clean_stars.txt'.format(ii) for ii in fnum_o]
     open_output_root = stacks_dir + 'orion_stack_open'
-    reduce_fli.shift_and_add(open_images, open_starlists, open_output_root, method='mean')
+    #reduce_fli.shift_and_add(open_images, open_starlists, open_output_root, method='mean')
     
     # Closed Loop - 4W
     closed_images = [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean.fits'.format(ii) for ii in fnum_c_4W]
     closed_starlists = [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean_stars.txt'.format(ii) for ii in fnum_c_4W]
     closed_output_root = stacks_dir + 'orion_stack_closed_4W'
-    reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
+    #reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
 
     # Closed Loop - B2
     closed_images = [out_dir + 'obj{0:03d}LS4WFS_B2_c_scan_clean.fits'.format(ii) for ii in fnum_c_B2]
@@ -192,7 +192,7 @@ def stack_orion():
     closed_images = [out_dir + 'obj{0:03d}LS4WFS_zc21_c_scan_clean.fits'.format(ii) for ii in fnum_c_zc]
     closed_starlists = [out_dir + 'obj{0:03d}LS4WFS_zc21_c_scan_clean_stars.txt'.format(ii) for ii in fnum_c_zc]
     closed_output_root = stacks_dir + 'orion_stack_closed_zc'
-    reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
+    #reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
     
     return
 
@@ -202,14 +202,14 @@ def analyze_stacks():
     open_img_files = [stacks_dir + 'orion_stack_open.fits']
 
     closed_img_files = [stacks_dir + 'orion_stack_closed_4W.fits', \
-                        stacks_dir + 'orion_stack_closed_B2.fits', \
-                        stacks_dir + 'orion_stack_closed_zc.fits']
+                        stacks_dir + 'orion_stack_closed_zc.fits']#, \
+                        #stacks_dir + 'orion_stack_closed_B2.fits']
     
     #Find stars in image
-    reduce_fli.find_stars(open_img_files, fwhm=10, threshold=10, N_passes=2, plot_psf_compare=False, \
-                              mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
-                              left_slice =25, right_slice=0, top_slice=25, bottom_slice=0)
-    reduce_fli.find_stars(closed_img_files, fwhm=7, threshold=10, N_passes=2, plot_psf_compare=False, \
+    #reduce_fli.find_stars(open_img_files, fwhm=10, threshold=10, N_passes=2, plot_psf_compare=False, \
+    #                          mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
+    #                          left_slice =25, right_slice=0, top_slice=25, bottom_slice=0)
+    reduce_fli.find_stars(closed_img_files, fwhm=8, threshold=20, N_passes=2, plot_psf_compare=False, \
                               mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
                               left_slice =25, right_slice=0, top_slice=25, bottom_slice=0)
         

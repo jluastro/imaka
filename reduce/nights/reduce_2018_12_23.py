@@ -230,15 +230,15 @@ def analyze_stacks():
 
     open_img_files = [stacks_dir + 'orion_stack_open.fits']
 
-    closed_img_files = [stacks_dir + 'orion_stack_closed_4W.fits', \
+    closed_img_files = [#stacks_dir + 'orion_stack_closed_4W.fits', \
                         stacks_dir + 'orion_stack_closed_B2.fits', \
                         stacks_dir + 'orion_stack_closed_zc.fits', \
                         stacks_dir + 'orion_stack_tiptilt.fits']
     
     #Find stars in image
-    reduce_fli.find_stars(open_img_files, fwhm=10, threshold=10, N_passes=2, plot_psf_compare=False, \
-                              mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
-                              left_slice =25, right_slice=0, top_slice=25, bottom_slice=0)
+    #reduce_fli.find_stars(open_img_files, fwhm=10, threshold=10, N_passes=2, plot_psf_compare=False, \
+    #                          mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
+    #                          left_slice =25, right_slice=0, top_slice=25, bottom_slice=0)
     reduce_fli.find_stars(closed_img_files, fwhm=7, threshold=10, N_passes=2, plot_psf_compare=False, \
                               mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
                               left_slice =25, right_slice=0, top_slice=25, bottom_slice=0)
