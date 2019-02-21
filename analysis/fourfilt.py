@@ -365,3 +365,108 @@ def power_model(files_o, files_c):
     plt.yticks(fontsize=14);
     
     return
+
+
+
+def plot_set(dat_set_o, dat_set_c, quadrant=None, fig=1):
+
+    wvls = [445, 551, 658, 806]
+
+    plt.figure(fig, figsize=(15,4))
+    for ii in range(4):
+
+        if quadrant==None:
+            dat_o = dat_set_o[ii]
+            dat_c = dat_set_c[ii]
+        else:
+            ind_o = np.where(dat_set_o[ii]['quadrant'] == quadrant)
+            ind_c = np.where(dat_set_c[ii]['quadrant'] == quadrant)
+            dat_o = dat_set_o[ii][ind_o]
+            dat_c = dat_set_c[ii][ind_c]
+
+        FWHM_min_o = np.mean(dat_o['FWHM_min'])
+        FWHM_min_e_o = np.std(dat_o['FWHM_min']) / np.sqrt(len(dat_o))
+        FWHM_maj_o = np.mean(dat_o['FWHM_maj']) 
+        FWHM_maj_e_o = np.std(dat_o['FWHM_maj']) / np.sqrt(len(dat_o))
+
+        FWHM_min_c = np.mean(dat_c['FWHM_min']) 
+        FWHM_min_e_c = np.std(dat_c['FWHM_min']) / np.sqrt(len(dat_c))
+        FWHM_maj_c = np.mean(dat_c['FWHM_maj'])
+        FWHM_maj_e_c = np.std(dat_c['FWHM_maj']) / np.sqrt(len(dat_c))
+
+        FWHM_min_corr = FWHM_min_o / FWHM_min_c
+        FWHM_maj_corr = FWHM_maj_o / FWHM_maj_c
+
+        elon_o = FWHM_maj_o / FWHM_min_o
+        elon_c = FWHM_maj_c / FWHM_min_c
+
+        plt.subplot(131)
+        plt.errorbar(wvls[ii], FWHM_min_o, yerr=FWHM_min_e_o, fmt='bo')
+        plt.errorbar(wvls[ii], FWHM_maj_o, yerr=FWHM_maj_e_o, fmt='bs')
+        plt.errorbar(wvls[ii], FWHM_min_c, yerr=FWHM_min_e_c, fmt='ro')
+        plt.errorbar(wvls[ii], FWHM_maj_c, yerr=FWHM_maj_e_c, fmt='rs')
+        plt.xlabel('Wavelength (nm)')
+        plt.ylabel('FWHM (as)')
+        plt.xlim(430, 820)
+
+        plt.subplot(132)
+        plt.plot(wvls[ii], FWHM_min_corr, 'ko')
+        plt.plot(wvls[ii], FWHM_maj_corr, 'ks')
+        plt.xlabel('Wavelength (nm)')
+        plt.ylabel('Correction Factor')
+        plt.xlim(430, 820)
+        
+        plt.subplot(133)
+        plt.plot(wvls[ii], elon_o, 'bo')
+        plt.plot(wvls[ii], elon_c, 'ro')
+        plt.xlabel('Wavelength (nm)')
+        plt.ylabel('Elongation')
+        plt.xlim(430, 820)
+
+    plt.tight_layout()
+    
+    return
+
+
+def sort_rot(dat_set_o, dat_set_c, rot):
+    """
+    specifically configured for 20181223
+    """
+    N_o = len(dat_set_o[0])
+    N_c = len(dat_set_c[0])
+
+    fNum_o = np.zeros(N_o)
+    fNum_c = np.zeros(N_c)
+    
+    for ii in range(N_o):
+        fNum_o[ii] = int(dat_set_o[0]['Image'][ii].split('obj')[1][:3]) 
+    for ii in range(N_c):
+        fNum_c[ii] = int(dat_set_c[0]['Image'][ii].split('obj')[1][:3]) 
+
+    if rot == 1:
+        ind_rot_o = np.where((fNum_o>=16)&(fNum_o<=48))
+        ind_rot_c = np.where((fNum_c>=16)&(fNum_c<=48))
+    if rot == 2:
+        ind_rot_o = np.where((fNum_o>=49)&(fNum_o<=74))
+        ind_rot_c = np.where((fNum_c>=49)&(fNum_c<=74))
+    if rot == 3:
+        ind_rot_o = np.where((fNum_o>=75)&(fNum_o<=80))
+        ind_rot_c = np.where((fNum_c>=75)&(fNum_c<=80))
+    if rot == 4:
+        ind_rot_o = np.where((fNum_o>=81)&(fNum_o<=98))    
+        ind_rot_c = np.where((fNum_c>=81)&(fNum_c<=98))
+
+    dat_o_B_rot = dat_set_o[0][ind_rot_o]
+    dat_o_V_rot = dat_set_o[1][ind_rot_o]
+    dat_o_R_rot = dat_set_o[2][ind_rot_o]
+    dat_o_I_rot = dat_set_o[3][ind_rot_o]
+
+    dat_c_B_rot = dat_set_c[0][ind_rot_c]
+    dat_c_V_rot = dat_set_c[1][ind_rot_c]
+    dat_c_R_rot = dat_set_c[2][ind_rot_c]
+    dat_c_I_rot = dat_set_c[3][ind_rot_c]
+
+    dat_set_o_rot = [dat_o_B_rot, dat_o_V_rot, dat_o_R_rot, dat_o_I_rot]
+    dat_set_c_rot = [dat_c_B_rot, dat_c_V_rot, dat_c_R_rot, dat_c_I_rot]
+
+    return dat_set_o_rot, dat_set_c_rot
