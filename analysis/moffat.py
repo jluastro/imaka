@@ -251,15 +251,15 @@ def calc_mof_fwhm(stats_file, filt=False):
     alpha_maj_std = np.array(data['Major Alpha std'])
 
     # Calculate calibration factors
-    calib = plate_scale #* bin_fac
+    calib = plate_scale * bin_fac
 
     if filt==True:
         wvs = plot_stats.filter2wv(filters)
         calib *= ((wvs/filt)**(1/5))
 
     #TEMPORARILY REMOVED BIN AN PLATE SCALE CALIB
-    FWHM_min = 2 * alpha_min * np.sqrt((2**(1/beta))-1) #* calib
-    FWHM_maj = 2 * alpha_maj * np.sqrt((2**(1/beta))-1) #* calib
+    FWHM_min = 2 * alpha_min * np.sqrt((2**(1/beta))-1) * calib
+    FWHM_maj = 2 * alpha_maj * np.sqrt((2**(1/beta))-1) * calib
     
     # Calculate uncertainties of median parameters
     sig_alpha_min = (alpha_min_std / np.sqrt(N_stars)) * np.sqrt((np.pi * N_stars) / (2 * (N_stars-1)))
@@ -294,3 +294,16 @@ def rm_mof(stats_files):
         else:
             pass
     returnn
+
+
+def combine_table(stats_file):
+    '''
+    given stats_file with moffat parameters, calculates
+    and adds minor and major moffat FWHM and errors
+    '''
+    
+    dat = Table.read(stats_file)
+    FWHM_min, sig_FWHM_min, FWHM_maj, sig_FWHM_maj = calc_mof_fwhm(stats_file)
+    dat.add_columns([Column(FWHM_min), Column(sig_FWHM_min), Column(FWHM_maj), Column(sig_FWHM_maj)], \
+                   names=['FWHM_min', 'sig_FWHM_min', 'FWHM_maj', 'sig_FWHM_maj'])
+    return dat
