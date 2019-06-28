@@ -1,11 +1,40 @@
-from astropy.table import Table
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy.io import fits
-from astropy.table import Column
+from astropy.table import Column, Table
+from astropy import table
 import matplotlib.patches as patches
 from imaka.analysis import moffat
 from astropy.modeling import models, fitting
+
+def stack_all(table_list, open_close_list, filter_list):
+    """
+    General utility that will stack a bunch of stats tables
+    and add columns for the wavelength, open/close status, and rotation
+    angle on the sky. 
+    """
+    # For each table, add properties first.
+    for ii in range(len(table_list)):
+        N_frames = len(table_list[ii])
+        table_list[ii].add_column(Column(np.repeat(open_close_list[ii], N_frames), name='loop_stat'))
+        table_list[ii].add_column(Column(np.repeat(filter_list[ii], N_frames), name='filter'))
+
+        wave = 0
+        if filter_list[ii] == 'B':
+            wave = 445
+        if filter_list[ii] == 'V':
+            wave = 551
+        if filter_list[ii] == 'R':
+            wave = 658
+        if filter_list[ii] == 'I':
+            wave = 806
+            
+        table_list[ii].add_column(Column(np.repeat(wave, N_frames), name='wavelength'))
+
+    
+    all_stats = table.vstack(table_list)
+
+    return all_stats
 
 
 def plot_stability(files_o, files_c):
@@ -400,28 +429,59 @@ def plot_set(dat_set_o, dat_set_c, quadrant=None, fig=1):
         elon_o = FWHM_maj_o / FWHM_min_o
         elon_c = FWHM_maj_c / FWHM_min_c
 
+        leg_label_op_mi = ''
+        leg_label_op_ma = ''
+        leg_label_cl_mi = ''
+        leg_label_cl_ma = ''
+        leg_label_mi = ''
+        leg_label_ma = ''
+        leg_label_op = ''
+        leg_label_cl = ''
+        
+        if ii == 0:
+            leg_label_op_mi = 'Opened Minor'
+            leg_label_op_ma = 'Opened Major'
+            leg_label_cl_mi = 'Closed Minor'
+            leg_label_cl_ma = 'Closed Major'
+            leg_label_mi = 'Minor'
+            leg_label_ma = 'Major'
+            leg_label_op = 'Opened'
+            leg_label_cl = 'Closed'
+
+        
         plt.subplot(131)
-        plt.errorbar(wvls[ii], FWHM_min_o, yerr=FWHM_min_e_o, fmt='bo')
-        plt.errorbar(wvls[ii], FWHM_maj_o, yerr=FWHM_maj_e_o, fmt='bs')
-        plt.errorbar(wvls[ii], FWHM_min_c, yerr=FWHM_min_e_c, fmt='ro')
-        plt.errorbar(wvls[ii], FWHM_maj_c, yerr=FWHM_maj_e_c, fmt='rs')
+        plt.errorbar(wvls[ii], FWHM_min_o, yerr=FWHM_min_e_o, fmt='bo', label=leg_label_op_mi)
+        plt.errorbar(wvls[ii], FWHM_maj_o, yerr=FWHM_maj_e_o, fmt='bs', label=leg_label_op_ma)
+        plt.errorbar(wvls[ii], FWHM_min_c, yerr=FWHM_min_e_c, fmt='ro', label=leg_label_cl_mi)
+        plt.errorbar(wvls[ii], FWHM_maj_c, yerr=FWHM_maj_e_c, fmt='rs', label=leg_label_cl_ma)
         plt.xlabel('Wavelength (nm)')
         plt.ylabel('FWHM (as)')
         plt.xlim(430, 820)
+        plt.ylim(0, 2.0)
+        plt.legend(fontsize=10)
 
         plt.subplot(132)
-        plt.plot(wvls[ii], FWHM_min_corr, 'ko')
-        plt.plot(wvls[ii], FWHM_maj_corr, 'ks')
+        plt.plot(wvls[ii], FWHM_min_corr, 'ko', label=leg_label_mi)
+        plt.plot(wvls[ii], FWHM_maj_corr, 'ks', label=leg_label_ma)
         plt.xlabel('Wavelength (nm)')
         plt.ylabel('Correction Factor')
         plt.xlim(430, 820)
+        plt.ylim(1, 2.5)
+        plt.legend(fontsize=10)
+        if quadrant == None:
+            quad_str = 'All'
+        else:
+            quad_str = quadrant
+        plt.title('Quadrant: ' + quad_str)
         
         plt.subplot(133)
-        plt.plot(wvls[ii], elon_o, 'bo')
-        plt.plot(wvls[ii], elon_c, 'ro')
+        plt.plot(wvls[ii], elon_o, 'bo', label=leg_label_op)
+        plt.plot(wvls[ii], elon_c, 'ro', label=leg_label_cl)
         plt.xlabel('Wavelength (nm)')
         plt.ylabel('Elongation')
         plt.xlim(430, 820)
+        plt.ylim(1, 2)
+        plt.legend(fontsize=10)
 
     plt.tight_layout()
     
@@ -470,3 +530,29 @@ def sort_rot(dat_set_o, dat_set_c, rot):
     dat_set_c_rot = [dat_c_B_rot, dat_c_V_rot, dat_c_R_rot, dat_c_I_rot]
 
     return dat_set_o_rot, dat_set_c_rot
+
+def assign_rot_20181223(data_set):
+    N_img = len(data_set)
+    
+    file_num = np.zeros(N_img)
+    rot_ang = np.zeros(N_img)
+    
+    for ii in range(N_img):
+        file_num[ii] = int(data_set['Image'][ii].split('obj')[1][:3]) 
+
+    idx1 = np.where( (file_num >= 16) & (file_num <= 48) )[0]
+    idx2 = np.where( (file_num >= 49) & (file_num <= 74) )[0]
+    idx3 = np.where( (file_num >= 75) & (file_num <= 80) )[0]
+    idx4 = np.where( (file_num >= 81) & (file_num <= 98) )[0]
+
+    rot_ang[idx1] = 1
+    rot_ang[idx2] = 2
+    rot_ang[idx3] = 3
+    rot_ang[idx4] = 4
+
+    data_set.add_column(Column(rot_ang, name='pos_angle'))
+    data_set.add_column(Column(file_num, name='file_num'))
+
+    return
+
+

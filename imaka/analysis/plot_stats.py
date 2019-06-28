@@ -1640,21 +1640,16 @@ def plot_fwhmvt_nomatch(open_file, closed_file, comp_col, title, plots_dir):
 
 
 
-def compare_seeing(date):
+def compare_seeing(date, data_root='/g/lu/data/imaka/onaga/'):
     """
     Compares Olivier's seeing data for integrated seeing and free atmosphere to 
     Mauna Kea's MASS/DIMM measurments.  only date string needed, but assumes 
     organization of files like on onaga, with massdimm and stats files available.
     """
+
+    stat_dir = data_root + date + "/FLI/reduce/stats/"
+    md_dir = data_root + date + "/FLI/reduce/massdimm/"
     
-    if date[5] == "5":
-        run = "5"
-    elif date[5] == "2":
-        run = "4"
-    elif date[5] == "1":
-        run = "3"
-    stat_dir = "/Users/fatimaabdurrahman/Desktop/Research/RUN"+run+"/"+date+"/FLI/reduce/stats/"
-    md_dir = "/Users/fatimaabdurrahman/Desktop/Research/RUN"+run+"/"+date+"/FLI/reduce/massdimm/"
     alt_file = stat_dir + "profile-data_"+date+"-noTT.fits"
     dimm_file = md_dir +date+".dimm.dat"
     mass_file = md_dir +date+".mass.dat"

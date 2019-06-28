@@ -3,6 +3,7 @@ __pycache__/
 *.pyc
 *.pyd
 *$py.class
+*cpython*
 
 *.ipynb_checkpoints
 

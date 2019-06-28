@@ -225,7 +225,7 @@ def fit_moffat(img_files, stats_file, x_guess=5, y_guess=5, flux_percent=0.9, st
     return
 
 
-def calc_mof_fwhm(stats_file, filt=False):
+def calc_mof_fwhm(stats_file, filt=False, plate_scale=0.016):
 
     """
     Takes stats_<type>.fits file and outputs four arrays:
@@ -237,9 +237,22 @@ def calc_mof_fwhm(stats_file, filt=False):
     all in arcsec.
     
     If filt=True, data is scaled with filter data to 500 nm
+
+    Input
+    ----------
+    stats_file : str
+        Name of the stats FITS table to read.
+
+    filt : boolean
+        Rescale the values to 500 nm
+
+    plate_scale : float
+        The plate scale used to convert from pixels to arcsec (units = ''/pix).
+        Note that this will be modified by the BINFAC keyword at the top of
+        the stats table. 
     """
     data = Table.read(stats_file)
-    plate_scale = 0.016
+
     filters = np.array(data['FILTER'])
     bin_fac = np.array(data['BINFAC'])
     N_stars = np.array(data['N Stars'])
@@ -296,14 +309,14 @@ def rm_mof(stats_files):
     returnn
 
 
-def combine_table(stats_file):
+def combine_table(stats_file, filt=False, plate_scale=0.016):
     '''
     given stats_file with moffat parameters, calculates
     and adds minor and major moffat FWHM and errors
     '''
     
     dat = Table.read(stats_file)
-    FWHM_min, sig_FWHM_min, FWHM_maj, sig_FWHM_maj = calc_mof_fwhm(stats_file)
+    FWHM_min, sig_FWHM_min, FWHM_maj, sig_FWHM_maj = calc_mof_fwhm(stats_file, filt=filt, plate_scale=plate_scale)
     dat.add_columns([Column(FWHM_min), Column(sig_FWHM_min), Column(FWHM_maj), Column(sig_FWHM_maj)], \
                    names=['FWHM_min', 'sig_FWHM_min', 'FWHM_maj', 'sig_FWHM_maj'])
     return dat

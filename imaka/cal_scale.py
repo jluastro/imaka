@@ -1,8 +1,7 @@
 import numpy as np
 from astropy.table import Table
 from jlu.astrometry import Transform2D as T2D
-
-
+ 
 def calc_pos():
 
     #star positions in arcminutes (RA, Dec) from Zemax 
