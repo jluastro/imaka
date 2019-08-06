@@ -12,12 +12,11 @@ from matplotlib import ticker
 import glob
 import matplotlib.pyplot as plt
 import matplotlib
-from imaka.analysis import add_data
+import add_data
 from astropy.io import fits
 from pandas import read_csv
-from imaka.analysis import moffat as mof
 from astropy.io import fits
-from imaka.analysis import moffat
+import moffat
 from astropy.modeling import fitting
 from astropy.stats import sigma_clip
 import scipy.linalg
@@ -1402,7 +1401,7 @@ def plot_week_fwhm(labels, data_dir_root, stats_dir_end, title):
     plt.figure(1, figsize=(8, 8))
     scale = 0.04
     for day in labels:
-        open_file = data_dir_root+day[0]+stats_dir_end + "stats_open_mdp.fits"
+        open_file = data_dir_root+day[0]+stats_dir_end + "stats_open.fits"
         open_data = Table.read(open_file)
         o_data = np.array(open_data['emp_fwhm'])
         o_binfac = np.array(open_data['BINFAC'])
@@ -1410,7 +1409,7 @@ def plot_week_fwhm(labels, data_dir_root, stats_dir_end, title):
         open_fin = o_data * scale* o_binfac * (500/o_filt)**(1/5)
         DIMM = np.array(open_data['DIMM'])
         
-        closed_file = data_dir_root +day[0]+stats_dir_end + "stats_"+day[1]+"_mdp.fits"
+        closed_file = data_dir_root +day[0]+stats_dir_end + "stats_"+day[1]+".fits"
         closed_data = Table.read(closed_file)
         c_data = np.array(closed_data['emp_fwhm'])
         c_binfac = np.array(closed_data['BINFAC'])

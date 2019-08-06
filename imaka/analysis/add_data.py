@@ -1,9 +1,8 @@
 from datetime import datetime
 import numpy as np
-from imaka.analysis import plot_stats
+import plot_stats
 from astropy.table import Table, Column, vstack, hstack
 from astropy.io import fits
-import datetime
 import os
 from astropy import units as u
 from astropy.coordinates import SkyCoord, AltAz
@@ -271,10 +270,14 @@ def week_table(data_dir_root, stats_dir_end, labels):
     MASS_ave = np.zeros(len(labels), dtype=float)
 
     for i in range(len(labels)):
-        open_file = data_dir_root+labels[i][0]+stats_dir_end+'stats_open_mdp.fits'
-        closed_file = data_dir_root+labels[i][0]+stats_dir_end+'stats_'+labels[i][1]+'_mdp.fits'
+        open_file = data_dir_root+labels[i][0]+stats_dir_end+'stats_open.fits'
+        print("Open File: ", open_file)
+        closed_file = data_dir_root+labels[i][0]+stats_dir_end+'stats_'+labels[i][1]+'.fits'
+        print("Closed File: ", closed_file)
         open_data = Table.read(open_file)
         closed_data = Table.read(closed_file)
+        print(open_data)
+        print(closed_data)
 
         scale = 0.04
 
