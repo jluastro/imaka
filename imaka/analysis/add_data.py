@@ -1,6 +1,6 @@
 from datetime import datetime
 import numpy as np
-import plot_stats
+from imaka.analysis import plot_stats
 from astropy.table import Table, Column, vstack, hstack
 from astropy.io import fits
 import os

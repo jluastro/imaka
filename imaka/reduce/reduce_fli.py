@@ -98,11 +98,14 @@ def clean_images(img_files, out_dir, rebin=1, sky_frame=None, flat_frame=None, f
 
         if rebin != 1:
             sky = block_reduce(sky, (rebin, rebin), func=np.sum)
+    else:
+        sky = sky_frame
 
     # If we are doing flat fielding, then load it up
     if flat_frame != None:
         flat = fits.getdata(flat_frame)
-        
+    else:
+        flat = flat_frame
 
     #####
     # Loop through the image stack
@@ -112,11 +115,14 @@ def clean_images(img_files, out_dir, rebin=1, sky_frame=None, flat_frame=None, f
 
         # Read image in
         img, hdr = fits.getdata(img_files[ii], header=True)
-
+        
         # Clean it
+        print('\nCleaning image\n')
         img_clean, bad_pixels = clean_single_image(img, sky=sky, flat=flat, rebin=rebin, fix_bad_pixels=fix_bad_pixels)
+        
 
         # Write it out
+        print('\nWriting image\n')
         file_dir, file_name = os.path.split(img_files[ii])
         out_name = file_name.replace('.fits', '_clean.fits')
         fits.writeto(out_dir + out_name, img_clean, hdr, overwrite=True)
@@ -124,6 +130,7 @@ def clean_images(img_files, out_dir, rebin=1, sky_frame=None, flat_frame=None, f
         if bad_pixels != None:
             mask_name = file_name.replace('.fits', '_mask.fits')
             fits.writeto(out_dir + mask_name, bad_pixels, hdr, overwrite=True)
+        print('\nImage stored: {}/{}'.format(file_dir, out_name))
             
     return
 
@@ -216,6 +223,7 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
         img = np.ma.masked_array(img, mask=mask)
         
         fwhm_curr = fwhm
+        
 
         # Calculate the bacgkround and noise (iteratively)
         print("    Calculating background")
@@ -251,9 +259,9 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
             print(len(sources), 'sources found')
 
             # Calculate FWHM for each detected star.
-            x_fwhm = np.zeros(len(sources), dtype=float)
-            y_fwhm = np.zeros(len(sources), dtype=float)
-            theta = np.zeros(len(sources), dtype=float)
+            x_fwhm = np.zeros(len(sources), dtype=int)
+            y_fwhm = np.zeros(len(sources), dtype=int)
+            theta = np.zeros(len(sources), dtype=int)
         
             cutout_half_size = int(round(fwhm_curr * 3))
             cutout_size = 2 * cutout_half_size
@@ -269,6 +277,7 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
                                               bounds={'x_stddev':[0, 20], 'y_stddev':[0, 20]})
             g2d_fitter = fitting.LevMarLSQFitter()
             cut_y, cut_x = np.mgrid[:cutout_size, :cutout_size]
+            print('fwhm_type = \n',type(fwhm_curr))
             
             for ss in range(len(sources)):
                 x_lo = int(round(sources[ss]['xcentroid'] - cutout_half_size))
@@ -345,6 +354,7 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
                                                                      sources['y_fwhm'].std()))
 
             fwhm_curr = np.mean([x_fwhm_med, y_fwhm_med])
+            print('fwhm_type = \n',type(fwhm_curr))
 
 
             formats = {'xcentroid': '%8.3f', 'ycentroid': '%8.3f', 'sharpness': '%.2f',

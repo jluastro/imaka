@@ -12,7 +12,7 @@ from imaka.analysis import moffat
 import os, shutil
 import pdb
 
-root_dir = '//Volumes/DATA4/imaka/20180301/FLI/'
+root_dir = '/g/lu/data/imaka/onaga/20180302/FLI/'
 
 sky_dir = root_dir + 'reduce/sky/' 
 data_dir = root_dir + 'Beehive-W/'
@@ -21,8 +21,8 @@ out_dir = root_dir + 'reduce/Beehive-W/'
 stats_dir = root_dir +'reduce/stats/'
 stacks_dir = root_dir + 'reduce/stacks/'
     
-fnum_o = [10, 12, 15] #open loop img file numbers
-fnum_c = [8, 9, 11, 13, 14] #closed loop img file numbers
+fnum_o = [127, 168, 170,173,174,175,176] #open loop img file numbers
+fnum_c = [167,169,171] #closed loop img file numbers
 
 
     
@@ -50,11 +50,11 @@ def reduce_FLD2():
 def find_stars_FLD2():
 
     # Open Loop
-    img_files = [data_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in fnum_o]
+    img_files = [out_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in fnum_o]
     reduce_fli.find_stars(img_files, fwhm=8, threshold=10)
     
     #Closed Loop
-    img_files = [data_dir + 'obj{0:04d}_c_clean.fits'.format(ii) for ii in fnum_c]
+    img_files = [out_dir + 'obj{0:04d}_c_clean.fits'.format(ii) for ii in fnum_c]
     reduce_fli.find_stars(img_files, fwhm=6, threshold=6)    
         
     return
@@ -73,7 +73,7 @@ def calc_star_stats():
     return
 
 
-def calc_mof_stats()
+def calc_mof_stats():
 
     # Open Loop
     stats_file = stats_dir + 'stats_open.fits'

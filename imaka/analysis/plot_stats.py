@@ -12,11 +12,11 @@ from matplotlib import ticker
 import glob
 import matplotlib.pyplot as plt
 import matplotlib
-import add_data
+from imaka.analysis import add_data
 from astropy.io import fits
 from pandas import read_csv
 from astropy.io import fits
-import moffat
+from imaka.analysis import moffat
 from astropy.modeling import fitting
 from astropy.stats import sigma_clip
 import scipy.linalg
