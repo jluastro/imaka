@@ -965,8 +965,8 @@ def plot_all_profiles(dates, root_dir='/Users/dorafohring/Desktop/imaka/data/'):
     plt.figure(2, figsize= (8.3, 4.2))
     plt.subplot(121)
     bins = np.arange(0, 1.3, 0.1)*10E-13
-    plt.hist(mprofs[0], bins=bins, normed=1, histtype='step', label='GL', cumulative=1, color='c')
-    plt.hist(mprofs[1], bins=bins, normed=1, histtype='step', label='FA', cumulative=1, color='r')
+    plt.hist(mprofs[0], bins=bins, density=1, histtype='step', label='GL', cumulative=1, color='c')
+    plt.hist(mprofs[1], bins=bins, density=1, histtype='step', label='FA', cumulative=1, color='r')
     plt.legend(loc=4)
     plt.xlabel('Cn2dh ($m^{1/3}$)')
     plt.ylabel('Probability of being less than')
@@ -1092,8 +1092,8 @@ def telemetry_profiles(dates, root_dir='/Users/dorafohring/Desktop/imaka/data/')
     plt.figure(2, figsize= (8.3, 4.2))
     plt.subplot(121)
     bins = np.arange(0, 1.3, 0.1)*10E-13
-    plt.hist(mprofs[0], bins=bins, normed=1, histtype='step', label='GL', cumulative=1, color='c')
-    plt.hist(mprofs[1], bins=bins, normed=1, histtype='step', label='FA', cumulative=1, color='r')
+    plt.hist(mprofs[0], bins=bins, density=1, histtype='step', label='GL', cumulative=1, color='c')
+    plt.hist(mprofs[1], bins=bins, density=1, histtype='step', label='FA', cumulative=1, color='r')
     plt.legend(loc=4)
     plt.xlabel('Cn2dh ($m^{1/3}$)')
     plt.ylabel('Probability of being less than')
@@ -1776,9 +1776,9 @@ def plot_nea(data_root='/Users/jlu/data/imaka/'):
     good_EE50 = np.where((np.isfinite(stats_m['EE50_o']) == True) &
                          (np.isfinite(stats_m['EE50_c']) == True))[0]
     plt.hist(stats_m['EE50_o'][good_EE50]*res_scale_m_o[good_EE50],
-                 bins=bins, alpha=0.3, normed=True, label='Open')
+                 bins=bins, alpha=0.3, density=True, label='Open')
     plt.hist(stats_m['EE50_c'][good_EE50]*res_scale_m_c[good_EE50],
-                 bins=bins, alpha=0.3, normed=True, label='Closed')
+                 bins=bins, alpha=0.3, density=True, label='Closed')
     plt.grid(True)
     plt.legend()
     plt.xlabel('EE50 (")')
@@ -1788,9 +1788,9 @@ def plot_nea(data_root='/Users/jlu/data/imaka/'):
     good_EE25 = np.where((np.isfinite(stats_m['EE25_o']) == True) &
                          (np.isfinite(stats_m['EE25_c']) == True))[0]
     plt.hist(stats_m['EE25_o'][good_EE25]*res_scale_m_o[good_EE25],
-                 bins=bins, alpha=0.3, normed=True, label='Open')
+                 bins=bins, alpha=0.3, density=True, label='Open')
     plt.hist(stats_m['EE25_c'][good_EE25]*res_scale_m_c[good_EE25],
-                 bins=bins, alpha=0.3, normed=True, label='Closed')
+                 bins=bins, alpha=0.3, density=True, label='Closed')
     plt.grid(True)
     plt.legend()
     plt.xlabel('EE25 (")')
@@ -1817,9 +1817,9 @@ def plot_nea(data_root='/Users/jlu/data/imaka/'):
     plt.figure(3)
     plt.clf()
     plt.hist(stats_m['NEA_o'][good_NEA]*res_scale_m_o[good_NEA]**2,
-                 bins=bins, alpha=0.3, label='Open', normed=True)
+                 bins=bins, alpha=0.3, label='Open', density=True)
     plt.hist(stats_m['NEA_c'][good_NEA]*res_scale_m_c[good_NEA]**2,
-                 bins=bins, alpha=0.3, label='Closed', normed=True)
+                 bins=bins, alpha=0.3, label='Closed', density=True)
     plt.grid(True)
     plt.legend()
     plt.xlabel('Noise Equivalent Area ("^2)')
@@ -1827,10 +1827,10 @@ def plot_nea(data_root='/Users/jlu/data/imaka/'):
     plt.figure(4)
     bins = np.arange(0, 4, 0.2)
     plt.clf()
-    plt.hist(NEA_ratio, bins=bins, label='NEA Ratio', alpha=0.8, normed=True, histtype='step')
-    plt.hist(EE50_ratio, bins=bins, label='EE50 Ratio', alpha=0.8, normed=True, histtype='step')
-    plt.hist(EE25_ratio, bins=bins, label='EE25 Ratio', alpha=0.8, normed=True, histtype='step')
-    plt.hist(emp_fwhm_ratio, bins=bins, label='emp_fwhm Ratio', alpha=0.8, normed=True, histtype='step')
+    plt.hist(NEA_ratio, bins=bins, label='NEA Ratio', alpha=0.8, density=True, histtype='step')
+    plt.hist(EE50_ratio, bins=bins, label='EE50 Ratio', alpha=0.8, density=True, histtype='step')
+    plt.hist(EE25_ratio, bins=bins, label='EE25 Ratio', alpha=0.8, density=True, histtype='step')
+    plt.hist(emp_fwhm_ratio, bins=bins, label='emp_fwhm Ratio', alpha=0.8, density=True, histtype='step')
     plt.xlabel('Improvement in Metric (Open/Close)')
     plt.legend()
     plt.grid(True)
@@ -1852,26 +1852,28 @@ def plot_nea(data_root='/Users/jlu/data/imaka/'):
 
 
 def comp_cdf(files, labels, colors):
-    plt.figure(figsize=(15,4))
+    plt.figure(figsize=(15,5))
     for ii in range(len(files)):
-        FWHM_min, sig_FWHM_min, FWHM_maj, sig_FWHM_maj =mof.calc_mof_fwhm(files[ii], filt=False);
+        FWHM_min, sig_FWHM_min, FWHM_maj, sig_FWHM_maj =moffat.calc_mof_fwhm(files[ii], filt=False);
 
         plt.subplot(131)
-        plt.hist(FWHM_min, color=colors[ii], linewidth=2, bins = np.arange(0, 1.3, 0.01), cumulative=True, histtype='step', normed=True, label=labels[ii]);
+        plt.hist(FWHM_min, color=colors[ii], linewidth=2, bins = np.arange(0, 1.3, 0.01), cumulative=True, histtype='step', density=True, label=labels[ii]);
         plt.xlabel('Minor FWHM (arcsec)', fontsize=16)
+        plt.legend(loc=4)
         if ii == 0:
             plt.xlim(0, np.max(FWHM_maj)+0.1)
 
         plt.subplot(132)
-        plt.hist(FWHM_maj, color=colors[ii], linewidth=2, bins = np.arange(0, 1.3, 0.01), cumulative=True, histtype='step', normed=True, label=labels[ii]);
+        plt.hist(FWHM_maj, color=colors[ii], linewidth=2, bins = np.arange(0, 1.3, 0.01), cumulative=True, histtype='step', density=True, label=labels[ii]);
         plt.xlim(0,1.2)
         plt.xlabel('Major FWHM (arcsec)', fontsize=16)
+        plt.legend(loc=4)
         if ii == 0:
             plt.xlim(0, np.max(FWHM_maj)+0.1)
 
         plt.subplot(133)
         elon = FWHM_maj /FWHM_min
-        plt.hist(elon, color=colors[ii], linewidth=2, bins = np.arange(0, 2.1, 0.01), cumulative=True, histtype='step', normed=True, label=labels[ii]);
+        plt.hist(elon, color=colors[ii], linewidth=2, bins = np.arange(0, 2.1, 0.01), cumulative=True, histtype='step', density=True, label=labels[ii]);
         plt.xlabel('Elongation', fontsize=16)
         plt.legend(loc=4)
         if ii == 0:
@@ -1919,7 +1921,7 @@ def plot_var(img_file, starlist, title):
         FWHMs.append(FWHM)
 
     #Sigma clip data
-    filt = sigma_clip(FWHMs, sigma=3, iters=5, copy=False)
+    filt = sigma_clip(FWHMs, sigma=3, maxiters=5, copy=False)
     x = np.ma.array(FWHMs, mask=filt.mask)
     FWHMs_clip = x[~x.mask].data
     x = np.ma.array(x_cents, mask=filt.mask)
@@ -1945,6 +1947,7 @@ def plot_var(img_file, starlist, title):
     plt.xlabel('x offset (arcsec)', fontsize=16) 
     plt.ylabel('y offset (arcsec)', fontsize=16)
     plt.title("Field Variability", fontsize=20)
+    plt.clim(0.1, 1.2)
     plt.colorbar(label='FWHM (as)')
     plt.xticks(fontsize=14); plt.yticks(fontsize=14)
     plt.gca().set_aspect('equal', adjustable='box')

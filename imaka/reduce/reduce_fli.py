@@ -264,6 +264,7 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
             theta = np.zeros(len(sources), dtype=int)
         
             cutout_half_size = int(round(fwhm_curr * 3))
+            
             cutout_size = 2 * cutout_half_size
 
             final_psf_obs = np.zeros((cutout_size, cutout_size), dtype=float)
@@ -277,7 +278,7 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
                                               bounds={'x_stddev':[0, 20], 'y_stddev':[0, 20]})
             g2d_fitter = fitting.LevMarLSQFitter()
             cut_y, cut_x = np.mgrid[:cutout_size, :cutout_size]
-            print('fwhm_type = \n',type(fwhm_curr))
+            
             
             for ss in range(len(sources)):
                 x_lo = int(round(sources[ss]['xcentroid'] - cutout_half_size))
@@ -354,7 +355,7 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
                                                                      sources['y_fwhm'].std()))
 
             fwhm_curr = np.mean([x_fwhm_med, y_fwhm_med])
-            print('fwhm_type = \n',type(fwhm_curr))
+            
 
 
             formats = {'xcentroid': '%8.3f', 'ycentroid': '%8.3f', 'sharpness': '%.2f',

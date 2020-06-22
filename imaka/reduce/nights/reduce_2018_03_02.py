@@ -20,9 +20,16 @@ flat_dir = root_dir + 'reduce/calib/'
 out_dir = root_dir + 'reduce/Beehive-W/'
 stats_dir = root_dir +'reduce/stats/'
 stacks_dir = root_dir + 'reduce/stacks/'
-    
-fnum_o = [127, 168, 170,173,174,175,176] #open loop img file numbers
-fnum_c = [167,169,171] #closed loop img file numbers
+
+#open loop img file numbers
+fnum_o = [170,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,196,197,216,217,218,219,220] 
+
+#closed loop img file numbers
+fnum_c = [167,169,171] 
+fnum_cA = [172]
+fnum_cD = [223]
+fnum_cE = [224]
+
 
 
     
@@ -43,7 +50,15 @@ def reduce_FLD2():
     # Closed
     img_files = [data_dir + 'obj{0:04d}_c.fits'.format(ii) for ii in fnum_c]
     reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=None, flat_frame =None)
-
+    
+    # Closed Loops for cA, cD, cE
+    img_files = [data_dir + 'obj{0:04d}_cA.fits'.format(ii) for ii in fnum_cA]
+    reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=None, flat_frame = None)
+    img_files = [data_dir + 'obj{0:04d}_cD.fits'.format(ii) for ii in fnum_cD]
+    reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=None, flat_frame = None)
+    img_files = [data_dir + 'obj{0:04d}_cE.fits'.format(ii) for ii in fnum_cE]
+    reduce_fli.clean_images(img_files, out_dir, rebin=1, sky_frame=None, flat_frame = None)
+    
     return
 
 
@@ -56,18 +71,36 @@ def find_stars_FLD2():
     #Closed Loop
     img_files = [out_dir + 'obj{0:04d}_c_clean.fits'.format(ii) for ii in fnum_c]
     reduce_fli.find_stars(img_files, fwhm=6, threshold=6)    
-        
+    
+    # Closed Loops for cA, cD, cE
+    img_files = [out_dir + 'obj{0:04d}_cA_clean.fits'.format(ii) for ii in fnum_cA]
+    reduce_fli.find_stars(img_files, fwhm=6, threshold=6) 
+    
+    img_files = [out_dir + 'obj{0:04d}_cD_clean.fits'.format(ii) for ii in fnum_cD]
+    reduce_fli.find_stars(img_files, fwhm=6, threshold=6)
+    
+    img_files = [out_dir + 'obj{0:04d}_cE_clean.fits'.format(ii) for ii in fnum_cE]
+    reduce_fli.find_stars(img_files, fwhm=6, threshold=6)
+    
     return
 
 
 def calc_star_stats():
     
     # Open Loop
-    img_files = [data_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in fnum_o]
+    img_files = [out_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in fnum_o]
     reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_open.fits')
 
     # Closed Loop
-    img_files = [data_dir + "obj{0:04d}_c_clean.fits".format(ii) for ii in fnum_C]
+    img_files = [out_dir + "obj{0:04d}_c_clean.fits".format(ii) for ii in fnum_c]
+    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closed.fits')
+    
+    # Closed Loops for cA, cD, cE
+    img_files = [out_dir + "obj{0:04d}_cA_clean.fits".format(ii) for ii in fnum_cA]
+    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closed.fits')
+    img_files = [out_dir + "obj{0:04d}_cD_clean.fits".format(ii) for ii in fnum_cD]
+    reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closed.fits')
+    img_files = [out_dir + "obj{0:04d}_cE_clean.fits".format(ii) for ii in fnum_cE]
     reduce_fli.calc_star_stats(img_files, output_stats=stats_dir + 'stats_closed.fits')
 
     return
@@ -77,13 +110,23 @@ def calc_mof_stats():
 
     # Open Loop
     stats_file = stats_dir + 'stats_open.fits'
-    img_files = [data_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in fnum_o]
+    img_files = [out_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in fnum_o]
     moffat.fit_moffat(img_files, stats_file)
 
     # Closed Loop
     stats_file = stats_dir + 'stats_closed.fits'
     img_files = [data_dir + 'obj{0:04d}_c_clean.fits'.format(ii) for ii in fnum_c]
     moffat.fit_moffat(img_files, stats_file)
+    
+    # Closed Loops for cA, cD, cE
+    stats_file = stats_dir + 'stats_closed.fits'
+    img_files = [out_dir + 'obj{0:04d}_cA_clean.fits'.format(ii) for ii in fnum_cA]
+    moffat.fit_moffat(img_files, stats_file)
+    img_files = [out_dir + 'obj{0:04d}_cD_clean.fits'.format(ii) for ii in fnum_cD]
+    moffat.fit_moffat(img_files, stats_file)
+    img_files = [out_dir + 'obj{0:04d}_cE_clean.fits'.format(ii) for ii in fnum_cE]
+    moffat.fit_moffat(img_files, stats_file)
+    
 
 
 def stack_FLD2():
@@ -91,17 +134,33 @@ def stack_FLD2():
     util.mkdir(stacks_dir)
 
     # Open Loop
-    open_images = [data_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in fnum_o]
-    open_starlists = [data_dir + 'obj{0:04d}_o_clean_stars.txt'.format(ii) for ii in fnum_o]
+    open_images = [out_dir + 'obj{0:04d}_o_clean.fits'.format(ii) for ii in fnum_o]
+    open_starlists = [out_dir + 'obj{0:04d}_o_clean_stars.txt'.format(ii) for ii in fnum_o]
     open_output_root = stacks_dir + 'Beehive-W_stack_open'
     reduce_fli.shift_and_add(open_images, open_starlists, open_output_root, method='mean')
     
     # Closed Loop
-    closed_images = [data_dir + 'obj{0:04d}_c_clean.fits'.format(ii) for ii in fnum_c]
-    closed_starlists = [data_dir + 'obj{0:04d}_c_clean_stars.txt'.format(ii) for ii in fnum_c]
+    closed_images = [out_dir + 'obj{0:04d}_c_clean.fits'.format(ii) for ii in fnum_c]
+    closed_starlists = [out_dir + 'obj{0:04d}_c_clean_stars.txt'.format(ii) for ii in fnum_c]
     closed_output_root = stacks_dir + 'Beehive-w_stack_closed'
     reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
     
+    # Closed Loops for cA, cD, cE
+    closed_images = [out_dir + 'obj{0:04d}_cA_clean.fits'.format(ii) for ii in fnum_cA]
+    closed_starlists = [out_dir + 'obj{0:04d}_cA_clean_stars.txt'.format(ii) for ii in fnum_cA]
+    closed_output_root = stacks_dir + 'Beehive-w_stack_closed'
+    reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
+    
+    closed_images = [out_dir + 'obj{0:04d}_cD_clean.fits'.format(ii) for ii in fnum_cD]
+    closed_starlists = [out_dir + 'obj{0:04d}_cD_clean_stars.txt'.format(ii) for ii in fnum_cD]
+    closed_output_root = stacks_dir + 'Beehive-w_stack_closed'
+    reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
+    
+    closed_images = [out_dir + 'obj{0:04d}_cE_clean.fits'.format(ii) for ii in fnum_cA]
+    closed_starlists = [out_dir + 'obj{0:04d}_cE_clean_stars.txt'.format(ii) for ii in fnum_cE]
+    closed_output_root = stacks_dir + 'Beehive-w_stack_closed'
+    reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
+
     return
 
 
@@ -120,5 +179,5 @@ def stack_FLD2():
     # Calc stats on all the stacked images
 #    reduce_fli.calc_star_stats(img_files, output_stats= stats_dir + 'stats_stacks.fits')
 
-    return
+#    return
     
