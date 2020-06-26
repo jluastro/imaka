@@ -477,6 +477,8 @@ class DataPipe:
         return out_file
     
     ####################### Graphing ACOR #######################
+    
+    
     def plot_title_gen(self, title_type, med_sub, avg_sub, avg_len):
         title = self.name + title_type +" tmax="+ str(self.tmax) 
         if med_sub:
