@@ -1,7 +1,8 @@
 ## Eden McEwen
-## June 15th 2020
+## Created: June 15th 2020
+## Edited: June 25th 2020
 ## UH REU
-# This file takes in a list of dates, finds them on ehu, and then returns correlation outputs
+# This file takes in a text file of dates, finds them on ehu, and then returns correlation outputs
 import os
 import sys
 import fnmatch

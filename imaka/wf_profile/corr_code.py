@@ -25,7 +25,15 @@ def mask_data(mat):
 # Takes out the time averaged slopes from data
 def sub_data_avg(mat):
     # incoming data expected as: (t, x, y)
-    return mat - np.average(mat, 0) 
+    return mat - np.average(mat, 0)
+
+# Takes out the time averaged slopes from data
+def sub_data_t_avg(mat):
+    # incoming data expected as: (t, x, y)
+    t_list = np.average(mat, axis=(1,2))
+    t_list = np.reshape(t_list, (len(t_list), 1, 1))
+    return mat - t_list
+
 
 # Two Matrix cross Correlation
 def mat_c_corr(mat_1, mat_2, mask):
