@@ -1,8 +1,7 @@
+# Wavefront Profiling Demo
 Created by Eden McEwen <emcewen@berkeley.edu> <br>
 Summer 2020 REU, [IfA at the University of Hawaii](https://student.ifa.hawaii.edu/reu/) <br>
 Mentor: Mark Chun
-
-# Wavefront Profiling Demo
 
 ## Overview
 Files included in the wf_profile (wavefront profiling) project:
