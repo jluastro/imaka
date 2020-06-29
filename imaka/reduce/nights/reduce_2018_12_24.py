@@ -199,7 +199,7 @@ def calc_star_stats():
 
 def append_massdimm():
 
-    massdimm.fetch_data('20181221', massdimm_dir)
+    massdimm.fetch_data('20181224', massdimm_dir)
     stats_tables = glob.glob(root_dir + 'reduce/stats/stats*.fits')
 
     for stats in stats_tables:
@@ -266,9 +266,9 @@ def analyze_stacks():
                         stacks_dir + 'orion_stack_tiptilt.fits']
     
     #Find stars in image
-    reduce_fli.find_stars(open_img_files, fwhm=10, threshold=10, N_passes=2, plot_psf_compare=False, \
-                              mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
-                              left_slice =25, right_slice=0, top_slice=25, bottom_slice=0)
+    #reduce_fli.find_stars(open_img_files, fwhm=10, threshold=10, N_passes=2, plot_psf_compare=False, \
+    #                          mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
+    #                          left_slice =25, right_slice=0, top_slice=25, bottom_slice=0)
     reduce_fli.find_stars(closed_img_files, fwhm=7, threshold=10, N_passes=2, plot_psf_compare=False, \
                               mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
                               left_slice =25, right_slice=0, top_slice=25, bottom_slice=0)
