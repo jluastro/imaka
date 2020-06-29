@@ -14,9 +14,9 @@ Files included in the wf_profile (wavefront profiling) project:
 This has the main peice of xecutable code for reading out files and creating fits and plot products from it.
 Each file will be searched, verified as existing, and then cross correlations and graphs will be generated from it. <br>
 **An example call:** <br>
-`$ python3 wfp_pipeline.py -d /home/emcewen/data/runs/RUN7.txt`
+`$ python3 wfp_pipeline.py -d example_files/ex_RUN.txt`
 - `-d` indicates that the file only contains dates in the form YYYYMMDD
-- `RUN7.txt` contains files seperated by new lines, which are fed into the pipline
+- `ex_RUN.txt` contains files seperated by new lines, which are fed into the pipline
 
 ### [data_pipeline.py](https://github.com/jluastro/imaka/blob/wfp_demo/imaka/wf_profile/data_pipeline.py)
 This program creates a DataPipe object (pedning better name), that takes in a name, datafile, outdirectory, and tmax
