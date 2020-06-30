@@ -833,7 +833,7 @@ def get_transforms_from_starlists(starlists):
         for ii in range(len(starlists)):
             # Load up the corresponding starlist.
             stars = read_starlist(starlists[ii])
-
+            pdb.set_trace()
             t = align.initial_align(stars, stars_ref, briteN=N_brite, transformModel=transforms.Shift, req_match=3)
 
             idx1, idx2 = align.transform_and_match(stars, stars_ref, t, dr_tol=5, dm_tol=None)

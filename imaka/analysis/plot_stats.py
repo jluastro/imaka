@@ -21,8 +21,9 @@ from astropy.modeling import fitting
 from astropy.stats import sigma_clip
 import scipy.linalg
 from matplotlib import cm
+from pandas.plotting import register_matplotlib_converters
 
-
+register_matplotlib_converters()
 
 def fetch_stats_from_onaga(dates, output_root):
     """
@@ -1570,6 +1571,9 @@ def plot_fwhmvt_nomatch(open_file, closed_file, comp_col, title, plots_dir):
         directory to put generated plot in
     """
     
+    #Make data directory
+    util.mkdir(plots_dir)
+    
     #Read in data
     stats1 = Table.read(open_file)
     stats2 = Table.read(closed_file)
@@ -1624,8 +1628,8 @@ def plot_fwhmvt_nomatch(open_file, closed_file, comp_col, title, plots_dir):
     plt.figure(1, figsize=(12, 4))
     plt.errorbar(times1, stats1[comp_col]*calib1, yerr=open_err, fmt='o', label="Open")
     plt.errorbar(times2, stats2[comp_col]*calib2, yerr=closed_err, fmt='ro', label="Closed")
-    plt.plot(times1, dimm, 'b-')
-    plt.plot(times2, mass, 'r-')
+    plt.plot(times1, dimm, 'b-',label='Total Seeing')
+    plt.plot(times2, mass, 'r-',label='GL Seeing')
     plt.ylabel(comp_col)
     plt.xlabel("UTC Time")
     plt.xticks(rotation=35)

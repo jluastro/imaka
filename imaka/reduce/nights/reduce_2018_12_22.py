@@ -15,8 +15,8 @@ from imaka.reduce import reduce_STA
 import matplotlib
 matplotlib.use('Agg')
 
-root_dir = '//Volumes/DATA5/imaka/20181222/sta/'
-#root_dir = '//g/lu/data/imaka/onaga/20181222/sta/'
+#root_dir = '//Volumes/DATA5/imaka/20181222/sta/'
+root_dir = '//g/lu/data/imaka/onaga/20181222/sta/'
 
 sky_dir = root_dir + 'reduce/sky/' 
 data_dir = root_dir + 'Orion/'
@@ -31,21 +31,9 @@ fnum_o = [64, 68, 72, 76, 82, 87, 91, 98, 102, 106, 110, 114, 118, 122, 126, 130
 
 fnum_c_4W = [63, 65, 69, 73, 77, 79, 83, 88, 92, 95, 99, 103, 107, 111, 115, 119, 123, 127, 131, 132, 136, 140, 144, 148, 152, 156, 160, 164, 168, 172, 176, 180, 184, 188, 192, 196, 200, 204, 208, 212, 216, 220, 224, 228, 232, 236, 240, 244, 248, 252, 256, 260, 264, 268, 273]
 
-<<<<<<< HEAD
 fnum_c_B2 = [66, 70, 74, 80, 85, 89, 93, 96, 100, 104, 108, 112, 116, 120, 124, 128, 133, 137, 141, 145, 149, 153, 157, 161, 165, 169, 173, 177, 181, 185, 189, 193, 197, 201, 205, 209, 213, 217, 221, 225, 229, 233, 237, 241, 245, 249, 253, 257, 261, 265, 269, 274]
 
 fnum_c_zc = [67, 71, 75,  81, 86, 90, 97, 101, 105, 109, 113, 117, 121, 125, 129, 134, 138, 142, 146, 150, 154, 158, 162, 166, 170, 174, 178, 182, 186, 190, 194, 198, 202, 206, 210, 214, 218, 222, 226, 230, 234, 238, 242, 246, 250, 254, 258, 262, 266, 275]
-=======
-<<<<<<< HEAD
-fnum_c_B2 = [66, 70, 74, 80, 85, 89, 93, 96, 100, 104, 108, 112, 116, 120, 124, 128, 133, 137, 141, 145, 149, 153, 157, 161, 165, 169, 173, 177, 181, 185, 189, 193, 197, 201, 205, 209, 213, 217, 221, 225, 229, 233, 237, 241, 245, 249, 253, 257, 261, 265, 269, 274]
-
-fnum_c_zc = [67, 71, 75,  81, 86, 90, 97, 101, 105, 109, 113, 117, 121, 125, 129, 134, 138, 142, 146, 150, 154, 158, 162, 166, 170, 174, 178, 182, 186, 190, 194, 198, 202, 206, 210, 214, 218, 222, 226, 230, 234, 238, 242, 246, 250, 254, 258, 262, 266, 270, 275]
-=======
-fnum_c_B2 = [66, 70, 74, 80, 85, 89, 93, 96, 100, 104, 108, 112, 116, 120, 124, 128, 133, 137, 141, 145, 149, 153, 157, 161, 165, 169, 173, 177, 181, 185, 189, 193, 197, 201, 205, 209, 213, 217, 221, 225, 229, 233, 237, 241, 245, 249, 254, 257, 261, 265, 269, 274]
-
-fnum_c_zc = [67, 71, 75,  81, 86, 90, 97, 101, 105, 109, 113, 117, 121, 125, 129, 134, 138, 142, 146, 150, 154, 158, 162, 166, 170, 174, 178, 182, 186, 190, 194, 198, 202, 206, 210, 214, 218, 222, 226, 230, 234, 238, 242, 246, 250, 254, 258, 262, 266, 279, 275]
->>>>>>> 9d0fe2dfc407d195227cb24b248c5a5cff886914
->>>>>>> 89ee2c675e89b7f849298b2cbbd5d3a37068a09f
 
 
 def make_flat(): 
@@ -116,11 +104,7 @@ def find_stars_orion():
     
     #Closed Loop - 4W
     img_files = [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean.fits'.format(ii) for ii in fnum_c_4W]
-<<<<<<< HEAD
-    reduce_fli.find_stars(img_files, fwhm=7, threshold=15, N_passes=2, plot_psf_compare=False, \
-=======
     reduce_fli.find_stars(img_files, fwhm=7, threshold=10, N_passes=2, plot_psf_compare=False, \
->>>>>>> 9d0fe2dfc407d195227cb24b248c5a5cff886914
                               mask_flat=flat_dir+"flat.fits", mask_min=0.8, mask_max=1.4, \
                               left_slice =20, right_slice=20, top_slice=25, bottom_slice=25)
 
@@ -149,15 +133,7 @@ def calc_star_stats():
     moffat.fit_moffat(img_files, stats_file)
 
     #Closed Loop - 4W
-<<<<<<< HEAD
     img_files = [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean.fits'.format(ii) for ii in fnum_c_4W]
-=======
-<<<<<<< HEAD
-    img_files = [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean.fits'.format(ii) for ii in fnum_c_4W]
-=======
-    img_files = [out_dir + 'obj{0:03d}LS4WFS_c_scan_clean.fits'.format(ii) for ii in fnum_c_4@]
->>>>>>> 9d0fe2dfc407d195227cb24b248c5a5cff886914
->>>>>>> 89ee2c675e89b7f849298b2cbbd5d3a37068a09f
     stats_file = stats_dir + 'stats_closed_4W.fits'
     reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
@@ -168,25 +144,21 @@ def calc_star_stats():
     reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
 
-<<<<<<< HEAD
     #Closed Loop - zc
-=======
-    #Closed Loop - n1
->>>>>>> 9d0fe2dfc407d195227cb24b248c5a5cff886914
     img_files = [out_dir + 'obj{0:03d}LS4WFS_zc21_c_scan_clean.fits'.format(ii) for ii in fnum_c_zc]
     stats_file = stats_dir + 'stats_closed_zc.fits'
     reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
     moffat.fit_moffat(img_files, stats_file)
 
+    #Closed Loop - n1
+    
     return
 
 
 def append_massdimm():
-<<<<<<< HEAD
-    util.mkdir(massdimm_dir)
-=======
 
->>>>>>> 9d0fe2dfc407d195227cb24b248c5a5cff886914
+    util.mkdir(massdimm_dir)
+
     massdimm.fetch_data('20181222', massdimm_dir)
     stats_tables = glob.glob(root_dir + 'reduce/stats/stats*.fits')
 
@@ -222,12 +194,9 @@ def stack_orion():
     closed_output_root = stacks_dir + 'orion_stack_closed_B2'
     reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
 
-<<<<<<< HEAD
+    
     # Closed Loop - zc
-    closed_images = [out_dir + 'obj{0:03dLS4WFS_zc21_c_scan_clean.fits'.format(ii) for ii in fnum_c_zc]
-=======
     closed_images = [out_dir + 'obj{0:03d}LS4WFS_zc21_c_scan_clean.fits'.format(ii) for ii in fnum_c_zc]
->>>>>>> 9d0fe2dfc407d195227cb24b248c5a5cff886914
     closed_starlists = [out_dir + 'obj{0:03d}LS4WFS_zc21_c_scan_clean_stars.txt'.format(ii) for ii in fnum_c_zc]
     closed_output_root = stacks_dir + 'orion_stack_closed_zc'
     #reduce_fli.shift_and_add(closed_images, closed_starlists, closed_output_root, method='mean')
@@ -239,20 +208,11 @@ def analyze_stacks():
 
     open_img_files = [stacks_dir + 'orion_stack_open.fits']
 
-<<<<<<< HEAD
     closed_img_files = [stacks_dir + 'orion_stack_closed_B2.fits', \
                         stacks_dir + 'orion_stack_closed_4W.fits', \
-=======
-    closed_img_files = [stacks_dir + 'orion_stack_closed_4W.fits', \
-<<<<<<< HEAD
-                        stacks_dir + 'orion_stack_closed_zc.fits']#, \
-                        #stacks_dir + 'orion_stack_closed_B2.fits']
-=======
-                        stacks_dir + 'orion_stack_closed_B2.fits', \
->>>>>>> 9d0fe2dfc407d195227cb24b248c5a5cff886914
                         stacks_dir + 'orion_stack_closed_zc.fits']
->>>>>>> 89ee2c675e89b7f849298b2cbbd5d3a37068a09f
-    
+
+        
     #Find stars in image
     #reduce_fli.find_stars(open_img_files, fwhm=10, threshold=10, N_passes=2, plot_psf_compare=False, \
     #                          mask_flat=flat_dir+"flat.fits", mask_min=0.7, mask_max=1.4, \
