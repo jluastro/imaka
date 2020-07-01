@@ -72,7 +72,6 @@ def graph_3_mat(mat_1, mat_2, mat_3, title = None, label_1=None, label_2=None, l
     ax2.set_xticklabels([])
     ax3.set_yticklabels([])
     ax3.set_xticklabels([])
-    
     fig.colorbar(im, cax=cax)
     return plt
 
@@ -127,11 +126,12 @@ def graph_3_rows_t_mat(mat_cube_1, mat_cube_2, mat_cube_3, t_list, title = None,
     for i in range(n_len):
         for j in range(n_width):
             ax = axes[i][j]
+            t = t_list[j]
             try:
-                im = ax.matshow(mat_list[i][j])
+                im = ax.matshow(mat_list[i][t])
             except:
                 print("error")
-            ax.set_xlabel(label_list[i] + " t = " + str(t_list[j]))  
+            ax.set_xlabel(label_list[i] + " t = " + str(t))  
             ax.set_xticklabels([])
             ax.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
             if i !=0 or j != 0:
@@ -244,6 +244,7 @@ def gif_3_mat(mat_1, mat_2, mat_3, tmax, title = None, out_file='out.gif', label
         ax.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
         ax2.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
         ax3.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
+        ax.text(0.5,-0.5," t = " + str(t), transform=ax.transAxes)
         fig.colorbar(im, cax=cax)
         camera.snap()
     
@@ -277,7 +278,9 @@ def gif_3_mat_vmin(mat_1, mat_2, mat_3, tmax, title = None, out_file='out.gif', 
         ax.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
         ax2.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
         ax3.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
-        #fig.colorbar(im, cax=cax)
+        ax3.text(0.5,-0.5," t = " + str(t), transform=ax.transAxes)
+        cax.cla()
+        fig.colorbar(im, cax=cax)
         camera.snap()
     
     animation = camera.animate()  
@@ -310,7 +313,7 @@ def gif_3_rows_mat(mat_list_1, mat_list_2, mat_list_3, tmax, title = None, out_f
                 ax = axes[i][j]
                 im = ax.matshow(mat_list[i][j][t], vmin = min_val[t], vmax=max_val[t])
                 ax.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
-        ax.text(-0.5,-0.5," t = " + str(t), transform=ax.transAxes)
+        ax.text(0.5,-0.5," t = " + str(t), transform=ax.transAxes)
         camera.snap()
     animation = camera.animate()  
     animation.save(out_file, writer = 'imagemagick') 
