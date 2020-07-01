@@ -1,5 +1,5 @@
 # Eden McEwen
-# June 18th 2019
+# June 18th 2020
 # A class for holding all the functions for processing data in the wind profiling pipeline
 
 import math
@@ -77,7 +77,7 @@ class DataPipe:
             return: T/F 
         """
         if os.path.isfile(file): 
-            print("file found: %s" % file)
+            #print("file found: %s" % file)
             return True
         print("WARNING! file not found: %s" % file)
         return False 
@@ -157,7 +157,7 @@ class DataPipe:
             self.acor = False
             self.ccor = False
             self.fits_file = None
-            self.data_valid = self.get_slopes()
+            self.data_valid = self.slopes_gen()
             return True
         
     def set_ttsub(self, tt_sub):
@@ -168,7 +168,7 @@ class DataPipe:
             args: tt_sub (Boolean, T/F)
             return: T/F (whether or not tt_sub val changed)
         """
-        if s_sub == self.s_sub:
+        if tt_sub == self.tt_sub:
             print("Tip-tilt Subtraction remains: ", tt_sub)
             return False
         else: 
@@ -177,7 +177,7 @@ class DataPipe:
             self.acor = False
             self.ccor = False
             self.fits_file = None
-            self.data_valid = self.get_slopes()
+            self.data_valid = self.slopes_gen()
             return True
             
     def set_target(self, file):
@@ -320,13 +320,13 @@ class DataPipe:
             return: T/F (whether or not function completes)
         """
         try:
-            print("Generating auto corr from ccor tmax = %s" % tmax)
+            print("Generating auto corr from ccor tmax = %s" % self.tmax)
             self.acor_x = np.array([ci[i] for i, ci in enumerate(ccorx)]) 
             self.acor_y = np.array([ci[i] for i, ci in enumerate(ccory)])
             self.acor = True
             return True
-        except e: 
-            print("Error in acor_from_ccor: ", e)
+        except: 
+            print("Error in acor_from_ccor")
             return False
     
     
@@ -348,8 +348,8 @@ class DataPipe:
             x_slopes = np.array([sub_data_avg(mat) for mat in self.x_slopes])
             y_slopes = np.array([sub_data_avg(mat) for mat in self.y_slopes])
             return x_slopes, y_slopes
-        except e:
-            print("Error with get_statics_sub: ", e)
+        except:
+            print("Error with get_statics_sub")
         return False, False
     
     def get_tiptilt_sub(self):
@@ -362,8 +362,8 @@ class DataPipe:
             x_slopes = np.array([sub_data_t_avg(mat) for mat in self.x_slopes])
             y_slopes = np.array([sub_data_t_avg(mat) for mat in self.y_slopes])
             return x_slopes, y_slopes
-        except e:
-            print("Error with get_tiptilt_sub: ", e)
+        except:
+            print("Error with get_tiptilt_sub")
         return False, False
     
     
@@ -451,11 +451,11 @@ class DataPipe:
             args: none
             returns: string (fits file)
         """
-        out_file = self.out_dir + self.name + "_corr_tmax" + str(self.tmax)
-        if self.tt_sub:
-            out_file = out_file + "_ttsub"
+        out_file = self.out_dir + self.name + "_tmax" + str(self.tmax) +"_corr"
         if self.s_sub:
             out_file = out_file + "_ssub"
+        if self.tt_sub:
+            out_file = out_file + "_ttsub"
         out_file = out_file +".fits"
         return out_file
     
@@ -517,6 +517,7 @@ class DataPipe:
             return -1
         ### define file name
         self.fits_file = self.fits_name_gen()
+        out_file = self.fits_file
         ### opening data fits file
         hdulist = fits.open(self.data_file)
         # general breakdown of what's in fits
@@ -532,7 +533,7 @@ class DataPipe:
         hdr['DATETIME'] = (loop_state.header['DATETIME'], loop_state.header.comments['DATETIME'])
         hdr['OBSDATE'] = (loop_state.header['OBSDATE'], loop_state.header.comments['OBSDATE'])
         hdr['TARGET'] = (self.target, "Target field name")
-        hdr['TFILE'] = (self.target_file, "Target field file")
+        hdr['TFILE'] = self.target_file
         hdr['NWFS'] = (self.n_wfs, "WFS used in correction")
         hdr['TMAX'] = (self.tmax, 'Max time taken in temporal correlations')
         hdr['SSUB'] = (self.s_sub, "If static slope subtracted before comp")
@@ -609,12 +610,11 @@ class DataPipe:
             args: title_type (varies by plot func), Graphing specifications
             retuns: title (nicely spaced string)
         """
-        title = self.name + title_type
-        if self.tt_sub:
-            title = title + ", tt_sub"
+        title = self.name + ", tmax="+ str(self.tmax) + ", " + title_type 
         if self.s_sub:
             title = title + ", s_sub"
-        title = title + ", tmax="+ str(self.tmax)  
+        if self.tt_sub:
+            title = title + ", tt_sub"
         if med_sub:
             title = title + ", med sub, avg_len "+ str(avg_len)
         elif avg_sub:
@@ -628,11 +628,11 @@ class DataPipe:
             retuns: out_file (descriptive string)
         """
         out_file_base = self.out_dir + self.name
-        if self.tt_sub:
-            out_file_base = out_file_base + "_ttsub"
+        out_file_base = out_file_base + "_tmax" + str(self.tmax) + plot_type 
         if self.s_sub:
             out_file_base = out_file_base + "_ssub"
-        out_file_base = out_file_base + plot_type +"_tmax" + str(self.tmax)
+        if self.tt_sub:
+            out_file_base = out_file_base + "_ttsub"
         # Specify for graphs specs
         if med_sub:
             out_file_base = out_file_base + "_medsub"+ str(avg_len)
@@ -657,16 +657,16 @@ class DataPipe:
                 t_list = np.arange(max_t)
             else:
                 # want an even distribution of t's
-                cuts = max_t/(max_len-1)
-                t_list = [i*cuts for i in range(max_length)]
+                cuts = max_t//(max_len-1)
+                t_list = [i*cuts for i in range(max_len)]
         # Checking existing
         else:
             if len(t_list) > max_len:
                 t_list = tlist[:max_len]
             valid_values = sum([ x < max_t for x in t_list ])
-            if valid_values > max_len//2:
+            if valid_values > 2*max_len//3:
                 #there are enough valid values to use
-                t_list = [t if t < max_t else max_t for t in t_list]
+                t_list = [t if t < max_t else max_t - 1 for t in t_list]
             else:
                 #should just regenerate the list
                 t_list = self.check_t_list([], max_t, max_len)
@@ -693,11 +693,13 @@ class DataPipe:
             print("Error: Data not available")
             return -1             
         # figure out what to graph (mean_sub or avg_sub)
-        data_x, data_y = self.data_get_ac(med_sub, avg_sub, avg_len)      
+        data_x, data_y = self.data_get_ac(med_sub, avg_sub, avg_len)
         # masking data, taking average over wfs axis
         x_out = np.average(data_x, axis = 0)
         y_out = np.average(data_y, axis = 0)
-        #generate names
+        # checking tmax
+        t_list = self.check_t_list(t_list, x_out.shape[0])
+        # generate names
         title = self.plot_title_gen(" Auto Corr, WFS avg", med_sub, avg_sub, avg_len)
         out_file = self.plot_file_gen("_acor_avg", "png", med_sub, avg_sub, avg_len)
         # graph
@@ -739,7 +741,7 @@ class DataPipe:
         # graph
         label_1, label_2, label_3 = "Sx acor", "Sy acor", "Avg acor"
         try:
-            print("Graphing: gif_3_mat_vmin")
+            print("Graphing: gif_3_rows_mat")
             gif_3_rows_mat(data_x, data_y, (data_x + data_y)/2, 
                   tmax, title, out_file, label_1, label_2, label_3)
             plt.close("all")
@@ -774,7 +776,7 @@ class DataPipe:
         # graph
         label_1, label_2, label_3 = "Sx acor", "Sy acor", "Avg acor"
         try:
-            print("Graphing:  gif_3_mat_vmin")
+            print("Graphing: gif_3_mat_vmin")
             gif_3_mat_vmin(x_out, y_out, (x_out + y_out)/2, 
                   tmax, title, out_file, label_1, label_2, label_3)
             plt.close("all")
@@ -805,6 +807,8 @@ class DataPipe:
         if wfs_a > wfs_b: wfs_a, wfs_b = wfs_b, wfs_a
         # retrieve data for graphing
         data_cx, data_cy = self.data_get_cc(wfs_a, wfs_b, med_sub, avg_sub, avg_len)      
+        # checking tmax
+        t_list = self.check_t_list(t_list, data_cx.shape[0])
         # Plot title and file
         title = self.plot_title_gen("Cross Corr, WFS"  + str(wfs_a) + " WFS"+ str(wfs_b), med_sub, avg_sub, avg_len)
         out_file = self.plot_file_gen("_ccor_wfs" + str(wfs_a) + str(wfs_b), "png", med_sub, avg_sub, avg_len)
@@ -850,7 +854,7 @@ class DataPipe:
             print("Error in graphing: graph_5_5_ccor")
             return False
         
-    def ccor_animate(self, wfs_a, wfs_b, t_max):
+    def ccor_animate(self, wfs_a, wfs_b, t_max, med_sub=False, avg_sub=False, avg_len=10):
         """
         Static plot of wfs_a and wfs_b, their a, y, and xy-average slope cross corr, given timeslices in list t
             args: graphing preferences
