@@ -1,5 +1,8 @@
 # Eden McEwen
 # June 18th 2020
+# Major edit July 10th
+# removed target support
+# deleted set_target
 # A class for holding all the functions for processing data in the wind profiling pipeline
 
 import math
@@ -36,7 +39,7 @@ mask_8_8_center = [[0,0,1,1,1,1,0,0],
            [0,0,1,1,1,1,0,0]]
 
 class DataPipe:
-    def __init__(self, name, data_f, out_d, tmax=200, s_sub=False, tt_sub=False,):
+    def __init__(self, name, data_f, out_d, tmax=200, s_sub=False, tt_sub=False):
         self.name = name
         self.out_dir = out_d
         self.data_file = data_f
@@ -50,13 +53,6 @@ class DataPipe:
         self.y_slopes = None
         self.data_valid = self.slopes_gen()
         self.tmax = tmax
-        # Target dependent vars
-        self.target = None
-        self.target_file = None
-        self.active_wfs = [True]*self.n_wfs
-        self.wfs_ra = [None]*self.n_wfs
-        self.wfs_dec = [None]*self.n_wfs
-        self.wfs_mag = [None]*self.n_wfs
         # Set container for autocorr
         self.acor = False
         self.acor_x = np.zeros(self.n_wfs)
@@ -65,6 +61,8 @@ class DataPipe:
         self.ccor = False
         self.ccor_x = np.zeros((self.n_wfs,self.n_wfs))
         self.ccor_y = np.zeros((self.n_wfs,self.n_wfs))
+        # if there is a fits file, use it
+        if self.fits_check(): self.fits_pull()
 
     ####################### Checking files #######################
     ### These files work with os.path functions to check for a files existence
@@ -114,7 +112,9 @@ class DataPipe:
         out = os.path.isfile(out_file)
         if out:
             self.fits_file = out_file
-            print("Found fits file: ", out_file)
+            print("fits found: ", out_file)
+        else:
+            print("fits not found: ", out_file)
         return out
     
     ####################### Setting Data #######################
@@ -186,27 +186,8 @@ class DataPipe:
             args: file (in specified format)
             return: T/F (whether or not target was updated)
         """
-        if self.data_check(file):
-            self.target_file = file
-            with open(file,'r') as i:
-                entries = i.readlines()
-                entries = [e.replace('\n', '') for e in entries]
-            self.target = entries[0]      
-            wfs_used = int(entries[1])
-            active_wfs = [False]*self.n_wfs
-            for w in range(wfs_used):
-                wfs_i = entries[w+2].split()
-                wfs_index = int(wfs_i[0])
-                if wfs_index < self.n_wfs:
-                    active_wfs[wfs_index] = True
-                    self.wfs_ra[wfs_index] = float(wfs_i[1])
-                    self.wfs_dec[wfs_index] = float(wfs_i[2])
-                    self.wfs_mag[wfs_index] = float(wfs_i[3])
-            self.active_wfs = active_wfs
-            return True
-        else:
-            print("Target file not found")
-            return False
+        print("set_target depricated. Nothing updated")
+        return False
 
     
     ####################### Generating computations #######################
@@ -459,48 +440,47 @@ class DataPipe:
         out_file = out_file +".fits"
         return out_file
     
-    def fits_pull(self, fits_file):
+    def fits_pull(self, fits_file=None):
         """
         Takes a fits file, checks to see if format, pulls information into object.
             args: fits_file (string path to file)
             returns: Boolean (if pull was successful)
         """
-        if self.data_check(fits_file):
-            self.fits_file = fits_file
-            hdulist = fits.open(self.data_file)
+        if fits_file and fits_file != self.fits_file:
+            if self.data_check(fits_file):
+                self.fits_file = fits_file
+        if self.fits_file:
+            hdulist = fits.open(self.fits_file)
             hdr = hdulist[0].header
-            self.name = hdr['DATANAME']
-            self.data_file = hdr['DATAFILE']
-            self.out_dir = hdr['OUTPATH'] 
-            self.target = hdr['TARGET']
-            self.target_file = hdr['TFILE']
-            self.n_wfs = hdr['NWFS']
-            self.tmax = hdr['TMAX']
-            self.s_sub = hdr['SSUB']
-            self.tt_sub = hdr['TTSUB']
+            self.name = hdr.get('DATANAME')
+            self.data_file = hdr.get('DATAFILE')
+            self.out_dir = hdr.get('OUTPATH')
+            self.n_wfs = hdr.get('NWFS')
+            self.tmax = hdr.get('TMAX')
+            self.s_sub = hdr.get('SSUB')
+            self.tt_sub = hdr.get('TTSUB')
             #Retrieve info from all wfs
-            self.ccor = hdr["CCOR"] 
-            self.acor = hdr["ACOR"]
-            x_cor = []
-            y_cor = []
+            self.ccor = hdr.get("CCOR") 
+            self.acor = hdr.get("ACOR")
+
+            x_cor = np.array([])
+            y_cor = np.array([])
             for i in range(self.n_wfs):
                 hdr_i = hdulist[i+1].header
-                self.wfs_ra[i] = hdr_i['RA']
-                self.wfs_dec[i] = hdr_i['DEC']
-                self.wfs_mag[i] = hdr_i['MAG']
-                self.active_wfs[i] = hdr_i['WFSVALID']
-                if self.ccor or self.acor:
-                    np.append(x_cor, hdulist[i+1].data[0])
-                    np.append(y_cor, hdulist[i+1].data[1])
+                self.active_wfs[i] = hdr_i.get('WFSVALID')
+            if self.ccor or self.acor:
+                x_cor = [hdulist[i+1].data[0] for i in range(self.n_wfs)]
+                y_cor = [hdulist[i+1].data[1] for i in range(self.n_wfs)]
+                print(np.array(x_cor).shape)
+                print(np.array(y_cor).shape)   
             if self.ccor:
                 self.ccor_x = np.array(x_cor)
                 self.ccor_y = np.array(y_cor)
-                acor_from_ccor(self, self.ccor_x, self.ccor_y)
+                self.acor_from_ccor(self.ccor_x, self.ccor_y)
             elif self.acor:
                 self.acor_x = np.array(x_cor)
                 self.acor_y = np.array(y_cor)
-            self.slopes_get()
-            self.set_target(self.target_file)
+            self.data_valid = self.slopes_gen()
             return True
         else:
             return False
@@ -532,8 +512,6 @@ class DataPipe:
         hdr['OUTPATH'] = (self.out_dir, 'out path')
         hdr['DATETIME'] = (loop_state.header['DATETIME'], loop_state.header.comments['DATETIME'])
         hdr['OBSDATE'] = (loop_state.header['OBSDATE'], loop_state.header.comments['OBSDATE'])
-        hdr['TARGET'] = (self.target, "Target field name")
-        hdr['TFILE'] = self.target_file
         hdr['NWFS'] = (self.n_wfs, "WFS used in correction")
         hdr['TMAX'] = (self.tmax, 'Max time taken in temporal correlations')
         hdr['SSUB'] = (self.s_sub, "If static slope subtracted before comp")
@@ -554,11 +532,6 @@ class DataPipe:
             hdr['TEXP'] = (wfs_h['TEXP'+ str(i)],  wfs_c['TEXP'+ str(i)])
             hdr['EMGAIN'] = (wfs_h['EMGAIN'+ str(i)], wfs_c['EMGAIN'+ str(i)])
             hdr['WFSVALID'] = (True if hdr['TSAMPLE']!=0 else False, "If WFS useable, based on TSAMPLE")
-            hdr['RA'] = (self.wfs_ra[i], "WFS GS right ascension")
-            hdr['DEC'] = (self.wfs_dec[i], "WFS GS declination")
-            hdr['MAG'] = (self.wfs_mag[i], "WFS GS MAG")
-            #if self.target:
-            #    hdr['WFSVALID'] = (self.active_wfs[i], "If WFS useable, based on TARGETFILE")
             image_hdu = fits.ImageHDU(header=hdr)
             hdl_list.append(image_hdu)
         ### take list of headers, write to outfile
