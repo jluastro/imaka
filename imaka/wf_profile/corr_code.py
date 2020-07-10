@@ -16,6 +16,15 @@ from astropy.table import Table
 from astropy.stats import sigma_clip
 from astropy.io import fits
 
+mask_8_8_center = [[0,0,1,1,1,1,0,0],
+           [0,1,1,1,1,1,1,0],
+           [1,1,1,1,1,1,1,1],
+           [1,1,1,0,0,1,1,1],
+           [1,1,1,0,0,1,1,1],
+           [1,1,1,1,1,1,1,1],
+           [0,1,1,1,1,1,1,0],
+           [0,0,1,1,1,1,0,0]]
+
 # Multiplies on data matrix
 # TODO: Make more robust to the wrong size matrix
 # TODO: Make more options for inputs?

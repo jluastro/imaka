@@ -51,7 +51,6 @@ def data_proc(name, data_f, out_d, target_f, s_sub=False, tt_sub = False):
         print("ran into error")
         
 
-
 def param_dict(param_f):
     #TODO
     if not os.path.isfile(param_f):
