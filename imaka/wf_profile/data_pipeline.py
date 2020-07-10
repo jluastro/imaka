@@ -1,9 +1,11 @@
 # Eden McEwen
 # June 18th 2020
-# Major edit July 10th
-# removed target support
-# deleted set_target
 # A class for holding all the functions for processing data in the wind profiling pipeline
+# Major edit July 10th
+# - removed target support
+#    deleted set_target
+# - set_ssub and set_ttsub changed to set_pre_subs
+# - added optional loud arg if want some set up functions ot be quiet
 
 import math
 import imageio
@@ -39,20 +41,24 @@ mask_8_8_center = [[0,0,1,1,1,1,0,0],
            [0,0,1,1,1,1,0,0]]
 
 class DataPipe:
-    def __init__(self, name, data_f, out_d, tmax=200, s_sub=False, tt_sub=False):
+    def __init__(self, name, data_f, out_d, f_file=None, tmax=200, s_sub=False, tt_sub=False):
+        # Filepath setups
         self.name = name
+        self.date = None
         self.out_dir = out_d
         self.data_file = data_f
         self.fits_file = None
-        self.path_valid = self.path_check(out_d)
-        self.n_wfs = 5
-        # TODO: modularize this?
+        self.fits_check(f_file, loud=True)
+        self.path_valid = self.path_check(out_d, loud=True)
+        # Variables in corr generation
         self.s_sub = s_sub
         self.tt_sub = tt_sub
+        self.tmax = tmax
+        self.n_wfs = 5
+        # Data inputs
         self.x_slopes = None 
         self.y_slopes = None
         self.data_valid = self.slopes_gen()
-        self.tmax = tmax
         # Set container for autocorr
         self.acor = False
         self.acor_x = np.zeros(self.n_wfs)
@@ -68,61 +74,135 @@ class DataPipe:
     ### These files work with os.path functions to check for a files existence
     ### retunr based on if the request was successful or not
     
-    def data_check(self, file):
+    def data_check(self, file, loud=True):
         """
         Tries to find file
             args: file (string)
             return: T/F 
         """
         if os.path.isfile(file): 
-            #print("file found: %s" % file)
+            if loud: print("file found: %s" % file)
             return True
-        print("WARNING! file not found: %s" % file)
+        if loud: print("WARNING! file not found: %s" % file)
         return False 
 
-    def path_check(self, path):
+    def path_check(self, path, loud=True):
         """
         Tries to find path, if not found, attempts to create 
             args: path (string)
             return: T/F (whether path is found/created)
         """
         if os.path.isdir(path):
-            print("path found: %s" % path)
+            if loud: print("path found: %s" % path)
             return True
         else:
             try:
                 os.mkdir(path)
-                print("path created: %s" % path)
+                if loud: print("path created: %s" % path)
                 return True
             except:
-                print("WARNING! Out dir creation error")
+                if loud: print("WARNING! Out dir creation error")
                 return False
     
-    def fits_check(self):
+    def fits_check(self, f_file, loud=True):
         """
         Tries to find either the fits file given, if one stored in class
         Or tries to find the one this function would have been named
             args: path (string)
             return: T/F (whether fits file is found)
         """
-        if self.fits_file:
+        # Decide on f_file name
+        if f_file:
+            outfile = f_file
+        elif self.fits_file:
             out_file = self.fits_file
         else:
             out_file = self.fits_name_gen()
+        #check if we can find the given fits file
         out = os.path.isfile(out_file)
+        # if found
         if out:
             self.fits_file = out_file
-            print("fits found: ", out_file)
+            if loud: print("fits found: ", out_file)
         else:
-            print("fits not found: ", out_file)
+            if loud: print("fits not found: ", out_file)
         return out
+    
+    
+    ####################### Naming files #######################
+    ### This defines how we'll save things as we run thruough a pipeline
+    ### Very important in terms of defining structure
+    
+    def fits_name_gen(self):
+        """
+        Gives back the fits file name associated with parameters
+            args: none
+            returns: string (fits file)
+        """
+        out_dir = self.out_dir + "fits/"
+        out_file = self.name 
+        # generating file structure more finely
+        if self.s_sub and self.tt_sub:
+            out_dir = out_dir + "s_tt_sub/"
+            out_file = out_file + "_stt"
+        elif self.tt_sub:
+            out_dir = out_dir + "tt_sub/"
+            out_file = out_file + "_tt"
+        elif self.s_sub:
+            out_dir = out_dir + "s_tt_sub/"
+            out_file = out_file + "_s"
+        else:
+            out_dir = out_dir + "raw/"
+            out_file = out_file + "_stt"
+        out_file = out_file + ".fits"
+        #checking to make sure this location exists
+        path = self.path_check(out_dir, loud=False)
+        if path:    
+            return out_dir + out_file
+        else:
+            print("ERROR: fits path not created")
+            return outfile
+
+    
+    def plot_file_gen(self, plot_dir, plot_type, file_type, med_sub=False, avg_sub=False, avg_len=0):
+        """
+        Generates a file name for a plot, renumbers if name already taken
+            args: plot_type (varies by plot func), file_type ("png" or "gif"), Graphing specifications
+            retuns: out_file (descriptive string)
+        """
+        out_dir = self.out_dir + "plots/" + plot_dir
+        out_file = self.name 
+        # generating file structure more finely
+        if self.s_sub and self.tt_sub:
+            out_dir = out_dir + "s_tt_sub/"
+            out_file = out_file + "_stt"
+        elif self.tt_sub:
+            out_dir = out_dir + "tt_sub/"
+            out_file = out_file + "_tt"
+        elif self.s_sub:
+            out_dir = out_dir + "s_tt_sub/"
+            out_file = out_file + "_s"
+        else:
+            out_dir = out_dir + "raw/"
+            out_file = out_file + "_stt"
+        out_file = out_file + plot_type
+        #check if path exists
+        path = self.path_check(out_dir, loud=False)
+        # Renumber if repeats 
+        out_base = out_dir + out_file
+        i = 0
+        while os.path.exists(out_base + "_%s.%s" % (i, file_type)):
+            i += 1
+        out = out_base + "_%s.%s" % (i, file_type)
+        return out
+    
     
     ####################### Setting Data #######################
     ### Changing variables defined on input
     ### These functions will flush computations, be careful
     ### return True if a change was made, False if value was the same
             
-    def set_tmax(self, tmax):
+    def set_tmax(self, tmax, loud=True):
         """
         Changes tmax if the requested state is new
         This flushes the old acor and ccor as they no longer reflect the tmax val
@@ -130,55 +210,50 @@ class DataPipe:
             return: T/F (whether or not tmax val changed)
         """
         if tmax == self.tmax:
-            print("Tmax remains: %s"%tmax)
+            if loud: print("Tmax remains: %s"%tmax)
             return False
         else:
-            print("Tmax now: %s" % tmax)
+            if loud: print("Tmax now: %s" % tmax)
             self.tmax = tmax
             self.acor = False
             self.ccor = False
             self.fits_file = None
             return True
             
-    def set_ssub(self, s_sub):
+    def set_pre_subs(self, s_sub = -1, tt_sub = -1, loud=True):
         """
-        Changes s_sub if the requested state is new
+        Changes s_sub and or t_sub if the requested state is new
         This flushes the old acor and ccor as they no longer reflect the s_sub state
         Be careful!!!
-            args: s_sub (Boolean, T/F)
+            args: s_sub (Boolean, T/F) tt_sub (Boolean, T/F)
             return: T/F (whether or not s_sub val changed)
         """
-        if s_sub == self.s_sub:
-            print("Static Subtraction remains: ", s_sub)
-            return False
-        else: 
-            print("Static Subtraction now: ", s_sub)
+        # Unused inputs
+        if s_sub == -1: s_sub = self.s_sub
+        if tt_sub == -1: tt_sub = self.tt_sub
+        # Seeing who is changing
+        change_s = s_sub != self.s_sub
+        change_tt = tt_sub != self.tt_sub
+        # Confirm changes:
+        if change_s:
+            if loud: print("Static Subtraction now: ", s_sub)
             self.s_sub = s_sub
-            self.acor = False
-            self.ccor = False
-            self.fits_file = None
-            self.data_valid = self.slopes_gen()
-            return True
-        
-    def set_ttsub(self, tt_sub):
-        """
-        Changes tt_sub if the requested state is new
-        This flushes the old acor and ccor as they no longer reflect the s_sub state
-        Be careful!!!
-            args: tt_sub (Boolean, T/F)
-            return: T/F (whether or not tt_sub val changed)
-        """
-        if tt_sub == self.tt_sub:
-            print("Tip-tilt Subtraction remains: ", tt_sub)
-            return False
-        else: 
-            print("Tip-tilt Subtraction now: ", tt_sub)
+        else:
+            if loud: print("Static Subtraction remains: ", s_sub)
+        if change_tt:
+            if loud: print("Tip-tilt Subtraction now: ", tt_sub)
             self.tt_sub = tt_sub
+        else:
+            if loud: print("Tip-tilt Subtraction remains: ", tt_sub)
+        # Making changes
+        if change_tt or change_s:
             self.acor = False
             self.ccor = False
             self.fits_file = None
             self.data_valid = self.slopes_gen()
             return True
+        else: 
+            return False
             
     def set_target(self, file):
         """
@@ -214,6 +289,7 @@ class DataPipe:
                 x_wfs_slopes = np.array([np.array(WFS_data.data[:,wfs, :half_slopes]).reshape(WFS_shape) for wfs in WFS_list])
                 y_wfs_slopes = np.array([np.array(WFS_data.data[:,wfs, half_slopes:]).reshape(WFS_shape) for wfs in WFS_list])
                 self.n_wfs = hdulist[0].header['NWFS'] 
+                self.date = hdulist[0].header['OBSDATE']
                 self.x_slopes = x_wfs_slopes 
                 self.y_slopes = y_wfs_slopes
                 # extra steps if subtracting tiptilt / statics
@@ -274,7 +350,7 @@ class DataPipe:
                     if i == j and self.acor:
                         x_corr_i.append(self.acor_x[i])
                         y_corr_i.append(self.acor_y[i])
-                    if i > j:
+                    elif i > j:
                         x_corr_i.append(x_ccor[j][i])
                         y_corr_i.append(y_ccor[j][i])
                     else:
@@ -318,7 +394,6 @@ class DataPipe:
     ## avg_sub = takes out image average
     ## avg_len = total number of images averaged over, taken half from timesteps before t, half from after
         
-    
     def get_statics_sub(self):
         """
         returns slopes with the average static slope subtracted
@@ -425,20 +500,6 @@ class DataPipe:
     
     
     ####################### FITS files #######################
-    
-    def fits_name_gen(self):
-        """
-        Gives back the fits file name associated with parameters
-            args: none
-            returns: string (fits file)
-        """
-        out_file = self.out_dir + self.name + "_tmax" + str(self.tmax) +"_corr"
-        if self.s_sub:
-            out_file = out_file + "_ssub"
-        if self.tt_sub:
-            out_file = out_file + "_ttsub"
-        out_file = out_file +".fits"
-        return out_file
     
     def fits_pull(self, fits_file=None):
         """
@@ -583,40 +644,16 @@ class DataPipe:
             args: title_type (varies by plot func), Graphing specifications
             retuns: title (nicely spaced string)
         """
-        title = self.name + ", tmax="+ str(self.tmax) + ", " + title_type 
+        title = self.name + ", " + title_type + "\ntmax="+ str(self.tmax)
         if self.s_sub:
             title = title + ", s_sub"
         if self.tt_sub:
             title = title + ", tt_sub"
         if med_sub:
-            title = title + ", med sub, avg_len "+ str(avg_len)
+            title = title + ", med sub len "+ str(avg_len)
         elif avg_sub:
-            title = title + ", avg sub, avg_len "+ str(avg_len) 
+            title = title + ", avg sub len "+ str(avg_len) 
         return title
-    
-    def plot_file_gen(self, plot_type, file_type, med_sub, avg_sub, avg_len):
-        """
-        Generates a file name for a plot, renumbers if name already taken
-            args: plot_type (varies by plot func), file_type ("png" or "gif"), Graphing specifications
-            retuns: out_file (descriptive string)
-        """
-        out_file_base = self.out_dir + self.name
-        out_file_base = out_file_base + "_tmax" + str(self.tmax) + plot_type 
-        if self.s_sub:
-            out_file_base = out_file_base + "_ssub"
-        if self.tt_sub:
-            out_file_base = out_file_base + "_ttsub"
-        # Specify for graphs specs
-        if med_sub:
-            out_file_base = out_file_base + "_medsub"+ str(avg_len)
-        elif avg_sub:
-            out_file_base = out_file_base + "_avgsub" + str(avg_len)
-        # Renumber if repeats 
-        i = 0
-        while os.path.exists(out_file_base + "_%s.%s" % (i, file_type)):
-            i += 1
-        out_file = out_file_base + "_%s.%s" % (i, file_type)  
-        return out_file
     
     def check_t_list(self, t_list, max_t, max_len=5):
         """
@@ -674,7 +711,7 @@ class DataPipe:
         t_list = self.check_t_list(t_list, x_out.shape[0])
         # generate names
         title = self.plot_title_gen(" Auto Corr, WFS avg", med_sub, avg_sub, avg_len)
-        out_file = self.plot_file_gen("_acor_avg", "png", med_sub, avg_sub, avg_len)
+        out_file = self.plot_file_gen("acor_png/", "_acor_avg", "png", med_sub, avg_sub, avg_len)
         # graph
         mat_cube_1 = x_out
         mat_cube_2 = y_out
@@ -710,7 +747,7 @@ class DataPipe:
         data_x, data_y = self.data_get_ac(med_sub, avg_sub, avg_len)
         # Plot title and file
         title = self.plot_title_gen(" Auto Corr, all WFS", med_sub, avg_sub, avg_len)
-        out_file = self.plot_file_gen("_acor", "gif", med_sub, avg_sub, avg_len)
+        out_file = self.plot_file_gen("acor_all_gif", "_acor_all", "gif", med_sub, avg_sub, avg_len)
         # graph
         label_1, label_2, label_3 = "Sx acor", "Sy acor", "Avg acor"
         try:
@@ -745,7 +782,7 @@ class DataPipe:
         y_out = np.average(data_y[self.active_wfs], axis=0)     
         # Plot title and file
         title = self.plot_title_gen(" Auto Corr, WFS avg", med_sub, avg_sub, avg_len)
-        out_file = self.plot_file_gen("_acor_avg", "gif", med_sub, avg_sub, avg_len)
+        out_file = self.plot_file_gen("acor_avg_gif", "_acor_avg", "gif", med_sub, avg_sub, avg_len)
         # graph
         label_1, label_2, label_3 = "Sx acor", "Sy acor", "Avg acor"
         try:
@@ -784,7 +821,7 @@ class DataPipe:
         t_list = self.check_t_list(t_list, data_cx.shape[0])
         # Plot title and file
         title = self.plot_title_gen("Cross Corr, WFS"  + str(wfs_a) + " WFS"+ str(wfs_b), med_sub, avg_sub, avg_len)
-        out_file = self.plot_file_gen("_ccor_wfs" + str(wfs_a) + str(wfs_b), "png", med_sub, avg_sub, avg_len)
+        out_file = self.plot_file_gen("ccor_png", "_ccor_wfs" + str(wfs_a) + str(wfs_b), "png", med_sub, avg_sub, avg_len)
         # graph
         label_1, label_2, label_3 = "Sx ccor", "Sy ccor", "Avg ccor"
         try:
@@ -816,7 +853,7 @@ class DataPipe:
         data_cx, data_cy = self.data_get_cc_all(med_sub, avg_sub, avg_len)
         # Plot title and file
         title = self.plot_title_gen(" Cross Corr, all WFS,", med_sub, avg_sub, avg_len)
-        out_file = self.plot_file_gen("_ccor", "png", med_sub, avg_sub, avg_len)       
+        out_file = self.plot_file_gen("ccor_all_png/", "_ccor_all", "png", med_sub, avg_sub, avg_len)       
         # graph
         try:
             print("Graphing: graph_5_5_ccor")
@@ -846,7 +883,7 @@ class DataPipe:
         data_cx, data_cy = self.data_get_cc(wfs_a, wfs_b, med_sub, avg_sub, avg_len)
         # Plot title and file
         title = self.plot_title_gen(" Cross Corr, WFS"  + str(wfs_a) + " WFS"+ str(wfs_b), med_sub, avg_sub, avg_len)
-        out_file = self.plot_file_gen("_ccor_wfs" + str(wfs_a) + str(wfs_b), "gif", med_sub, avg_sub, avg_len) 
+        out_file = self.plot_file_gen("ccor_gif/", "_ccor_wfs" + str(wfs_a) + str(wfs_b), "gif", med_sub, avg_sub, avg_len) 
         # graph
         label_1, label_2, label_3 = "Sx ccor", "Sy ccor", "Avg ccor"
         try:
@@ -872,7 +909,7 @@ class DataPipe:
         data_cx, data_cy = self.data_get_cc_all(med_sub, avg_sub, avg_len)
         # Plot title and file
         title = self.plot_title_gen(" Cross Corr, all WFS", med_sub, avg_sub, avg_len)
-        out_file = self.plot_file_gen("_ccor_wfsall", "gif", med_sub, avg_sub, avg_len) 
+        out_file = self.plot_file_gen("ccor_all_gif/", "_ccor_all", "gif", med_sub, avg_sub, avg_len) 
         # animate all correlations 
         try:
             print("Graphing: cor_animate_all")
