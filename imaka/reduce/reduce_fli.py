@@ -338,6 +338,12 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
             fits.writeto(img_files[ii].replace('.fits', '_psf_obs.fits'), final_psf_obs, hdr, overwrite=True)
             fits.writeto(img_files[ii].replace('.fits', '_psf_mod.fits'), final_psf_mod, hdr, overwrite=True)
 
+            # Drop sources with fwhms of less than 1.5 pixels
+            good_xfwhm = np.where(sources['x_fwhm'] > 1.5)[0]
+            sources = sources[good_xfwhm]
+            good_yfwhm = np.where(sources['y_fwhm'] > 1.5)[0]
+            sources = sources[good_yfwhm]
+            
             # Drop sources with flux (signifiance) that isn't good enough.
             # Empirically this is <1.2
             good = np.where(sources['flux'] > 1.9)[0]

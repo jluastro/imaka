@@ -65,8 +65,8 @@ def treat_overscan(files):
 
         orig_wid = np.shape(dat)[1]        # Width of original image
         cell_wid = orig_wid / 8            # Width of one cell (1/8 of image)
-        scan_wid = int(cell_wid * (3/25))  # Width of overscan region (3/25 of cell)
-        data_wid = int(cell_wid * (22/25)) # Width of data region (22/25 of cell)
+        scan_wid = int(round(cell_wid * (3/25)))  # Width of overscan region (3/25 of cell)
+        data_wid = int(round(cell_wid * (22/25))) # Width of data region (22/25 of cell)
 
         # For each cell, take the median of each overscan row and 
         # subtract that from the corresponding row in the data
@@ -75,7 +75,7 @@ def treat_overscan(files):
             scans.append(scan)
             imgs.append(img)
             med_col = np.median(scan, axis=1)
-            med_cell = np.array([med_col,]*data_wid).transpose()
+            med_cell = np.array([med_col,]*(data_wid)).transpose()
             clean_cell = img - med_cell 
             clean_cells.append(clean_cell)
 
@@ -83,7 +83,7 @@ def treat_overscan(files):
         clean_one_row = np.hstack(clean_cells)
         clean_rows = np.hsplit(clean_one_row, 2)
         clean_image = np.vstack(clean_rows)
-
+        
         # Write new image
         new_filename = file[:-5] + '_scan.fits'
         fits.writeto(new_filename, clean_image, hdr, overwrite=True)
