@@ -245,12 +245,13 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
         bkg_mean = img[good_pix].mean()
         bkg_std = img[good_pix].std()
         img_threshold = threshold * bkg_std 
+        pdb.set_trace()
         print('     Bkg = {0:.2f} +/- {1:.2f}'.format(bkg_mean, bkg_std))
         print('     Bkg Threshold = {0:.2f}'.format(img_threshold))
-
+        
         # Detect stars
         print('     Detecting Stars')
-
+        
         # Each pass will have an updated fwhm for the PSF.
         for nn in range(N_passes):
             print('     Pass {0:d} assuming FWHM = {1:.1f}'.format(nn, fwhm_curr))
