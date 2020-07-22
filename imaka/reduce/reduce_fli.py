@@ -106,7 +106,7 @@ def clean_images(img_files, out_dir, rebin=1, sky_frame=None, flat_frame=None, f
         flat = fits.getdata(flat_frame)
     else:
         flat = flat_frame
-
+        
     #####
     # Loop through the image stack
     #####
@@ -219,9 +219,7 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
     for ii in range(len(img_files)):
         print("  Working on image: ", img_files[ii])
         img, hdr = fits.getdata(img_files[ii], header=True, ignore_missing_end=True)
-
         img = np.ma.masked_array(img, mask=mask)
-        
         fwhm_curr = fwhm
         
 
@@ -245,7 +243,7 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
         bkg_mean = img[good_pix].mean()
         bkg_std = img[good_pix].std()
         img_threshold = threshold * bkg_std 
-        pdb.set_trace()
+        #pdb.set_trace()
         print('     Bkg = {0:.2f} +/- {1:.2f}'.format(bkg_mean, bkg_std))
         print('     Bkg Threshold = {0:.2f}'.format(img_threshold))
         
@@ -339,15 +337,15 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
             fits.writeto(img_files[ii].replace('.fits', '_psf_obs.fits'), final_psf_obs, hdr, overwrite=True)
             fits.writeto(img_files[ii].replace('.fits', '_psf_mod.fits'), final_psf_mod, hdr, overwrite=True)
 
-            # Drop sources with fwhms of less than 1.5 pixels
-            good_xfwhm = np.where(sources['x_fwhm'] > 1.5)[0]
+            # Drop sources with fwhms of less than 2.5 pixels
+            good_xfwhm = np.where(sources['x_fwhm'] > 2.5)[0]
             sources = sources[good_xfwhm]
-            good_yfwhm = np.where(sources['y_fwhm'] > 1.5)[0]
+            good_yfwhm = np.where(sources['y_fwhm'] > 2.5)[0]
             sources = sources[good_yfwhm]
             
             # Drop sources with flux (signifiance) that isn't good enough.
             # Empirically this is <1.2
-            good = np.where(sources['flux'] > 1.9)[0]
+            good = np.where(sources['flux'] > 10)[0]
             sources = sources[good]
 
             # Only use the brightest sources for calculating the mean. This is just for printing.
@@ -840,7 +838,7 @@ def get_transforms_from_starlists(starlists):
         for ii in range(len(starlists)):
             # Load up the corresponding starlist.
             stars = read_starlist(starlists[ii])
-            pdb.set_trace()
+            
             t = align.initial_align(stars, stars_ref, briteN=N_brite, transformModel=transforms.Shift, req_match=3)
 
             idx1, idx2 = align.transform_and_match(stars, stars_ref, t, dr_tol=5, dm_tol=None)

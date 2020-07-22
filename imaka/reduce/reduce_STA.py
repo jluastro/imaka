@@ -67,6 +67,7 @@ def treat_overscan(files):
         cell_wid = orig_wid / 8            # Width of one cell (1/8 of image)
         scan_wid = int(round(cell_wid * (3/25)))  # Width of overscan region (3/25 of cell)
         data_wid = int(round(cell_wid * (22/25))) # Width of data region (22/25 of cell)
+        print("Scan wid: {}\nData wid: {}".format(scan_wid,data_wid))
 
         # For each cell, take the median of each overscan row and 
         # subtract that from the corresponding row in the data
@@ -154,6 +155,188 @@ def create_bias(bias_files):
     bias_dir = file.split('bias_')[0]
     combined_median.write(bias_dir+'master_bias.fits')
 
+    return
+
+def find_stars(img_files, fwhm=5, threshold=4, min_flux=10, N_passes=2, plot_psf_compare=False, mask_flat=None, \
+                   flat_file=None, mask_min=None, mask_max=None, \
+                   left_slice=None, right_slice=None, top_slice=None, bottom_slice=None):
+    """
+    This function was copied from the find_stars() function in reduce_fli.py
+    img_files - a list of image files.
+    fwhm - First guess at the FWHM of the PSF for the first pass on the first image.
+    threshold - the SNR threshold (mean + threshold*std) above which to search for sources.
+    min_flux - the minimum source flux to consider for the starlist
+    N_passes - how many times to find sources, recalc the PSF FWHM, and find sources again. 
+    """
+    print('\nREDUCE_STA: find_stars()')
+    
+    # If no mask specified, make empty mask
+    if mask_flat == None:
+        img_shape = np.shape(fits.getdata(img_files[0]))
+        mask = np.zeros(img_shape, dtype=bool)
+
+    # Creates mask from flat if specified - very optional (deals with vignetting, edges)
+    else:
+        mask = mask_pix(mask_flat, mask_min, mask_max, \
+                            left_slice=left_slice, right_slice=right_slice, top_slice=top_slice, bottom_slice=bottom_slice)
+        print("Using mask")
+
+    for ii in range(len(img_files)):
+        print("  Working on image: ", img_files[ii])
+        img, hdr = fits.getdata(img_files[ii], header=True, ignore_missing_end=True)
+        img = np.ma.masked_array(img, mask=mask)
+        fwhm_curr = fwhm
+        
+
+        # Calculate the bacgkround and noise (iteratively)
+        print("    Calculating background")
+        bkg_threshold_above = 1
+        bkg_threshold_below = 3
+        for nn in range(5):
+            if nn == 0:
+                bkg_mean = img.mean()
+                bkg_std = img.std()
+            else:
+                bkg_mean = img[good_pix].mean()
+                bkg_std = img[good_pix].std()
+
+            bad_hi = bkg_mean + (bkg_threshold_above * bkg_std)
+            bad_lo = bkg_mean - (bkg_threshold_below * bkg_std)
+
+            good_pix = np.where((img < bad_hi) & (img > bad_lo))
+        
+        bkg_mean = img[good_pix].mean()
+        bkg_std = img[good_pix].std()
+        img_threshold = threshold * bkg_std 
+        #pdb.set_trace()
+        print('     Bkg = {0:.2f} +/- {1:.2f}'.format(bkg_mean, bkg_std))
+        print('     Bkg Threshold = {0:.2f}'.format(img_threshold))
+        
+        # Detect stars
+        print('     Detecting Stars')
+        
+        # Each pass will have an updated fwhm for the PSF.
+        for nn in range(N_passes):
+            print('     Pass {0:d} assuming FWHM = {1:.1f}'.format(nn, fwhm_curr))
+            daofind = DAOStarFinder(fwhm=fwhm_curr, threshold = img_threshold, exclude_border=True)
+            sources = daofind(img - bkg_mean)
+            print(len(sources), 'sources found')
+
+            # Calculate FWHM for each detected star.
+            x_fwhm = np.zeros(len(sources), dtype=int)
+            y_fwhm = np.zeros(len(sources), dtype=int)
+            theta = np.zeros(len(sources), dtype=int)
+        
+            cutout_half_size = int(round(fwhm_curr * 3))
+            
+            cutout_size = 2 * cutout_half_size
+
+            final_psf_obs = np.zeros((cutout_size, cutout_size), dtype=float)
+            final_psf_mod = np.zeros((cutout_size, cutout_size), dtype=float)
+            final_psf_count = 0
+        
+            cutouts = np.zeros((len(sources), cutout_size, cutout_size), dtype=float)
+            sigma_init_guess = fwhm_curr * gaussian_fwhm_to_sigma
+            g2d_model = models.Gaussian2D(1.0, cutout_half_size, cutout_half_size,
+                                              sigma_init_guess, sigma_init_guess, theta=0,
+                                              bounds={'x_stddev':[0, 20], 'y_stddev':[0, 20]})
+            g2d_fitter = fitting.LevMarLSQFitter()
+            cut_y, cut_x = np.mgrid[:cutout_size, :cutout_size]
+            
+            
+            for ss in range(len(sources)):
+                x_lo = int(round(sources[ss]['xcentroid'] - cutout_half_size))
+                x_hi = x_lo + cutout_size
+                y_lo = int(round(sources[ss]['ycentroid'] - cutout_half_size))
+                y_hi = y_lo + cutout_size
+
+                cutout_tmp = img[y_lo:y_hi, x_lo:x_hi].astype(float)
+                if ((cutout_tmp.shape[0] != cutout_size) | (cutout_tmp.shape[1] != cutout_size)):
+                    # Edge source... fitting is no good
+                    continue
+            
+                cutouts[ss] = cutout_tmp#-bkg_mean ###Might be a source of issue in reduced images
+                cutouts[ss] /= cutouts[ss].sum()
+
+                # Fit an elliptical gaussian to the cutout image.
+                g2d_params = g2d_fitter(g2d_model, cut_x, cut_y, cutouts[ss])
+                g2d_image = g2d_params(cut_x, cut_y)
+                
+                final_psf_count += 1
+                final_psf_obs += cutout_tmp
+                final_psf_mod += g2d_image
+
+                if plot_psf_compare == True:
+                    #plt.figure(4)
+                    #plt.clf()
+                    #plt.imshow(cutouts[ss])
+                    #plt.pause(0.05)
+                
+                    #plt.figure(5)
+                    #plt.clf()
+                    #plt.imshow(g2d_image)
+                    #plt.pause(0.05)
+                
+                    #plt.figure(6)
+                    #plt.clf()
+                    #plt.imshow(cutouts[ss] - g2d_image)
+                    #plt.pause(0.05)
+                
+                    pdb.set_trace()
+
+                x_fwhm[ss] = g2d_params.x_stddev.value / gaussian_fwhm_to_sigma
+                y_fwhm[ss] = g2d_params.y_stddev.value / gaussian_fwhm_to_sigma
+                theta[ss] = g2d_params.theta.value
+
+            sources['x_fwhm'] = x_fwhm
+            sources['y_fwhm'] = y_fwhm
+            sources['theta'] = theta
+
+            # Save the average PSF (flux-weighted). Note we are making a slight mistake
+            # here since each PSF has a different sub-pixel position... still same for both
+            # obs and model.
+            final_psf_obs /= final_psf_count
+            final_psf_mod /= final_psf_count
+            final_psf_obs /= final_psf_obs.sum()
+            final_psf_mod /= final_psf_mod.sum()
+            fits.writeto(img_files[ii].replace('.fits', '_psf_obs.fits'), final_psf_obs, hdr, overwrite=True)
+            fits.writeto(img_files[ii].replace('.fits', '_psf_mod.fits'), final_psf_mod, hdr, overwrite=True)
+
+            # Drop sources with fwhms of less than 2.5 pixels
+            good_xfwhm = np.where(sources['x_fwhm'] > 2.5)[0]
+            sources = sources[good_xfwhm]
+            good_yfwhm = np.where(sources['y_fwhm'] > 2.5)[0]
+            sources = sources[good_yfwhm]
+            
+            # Drop sources with flux (signifiance) that isn't good enough.
+            # Empirically this is <1.2
+            good = np.where(sources['flux'] > min_flux)[0]
+            sources = sources[good]
+
+            # Only use the brightest sources for calculating the mean. This is just for printing.
+            idx = np.where(sources['flux'] > min_flux+5)[0]
+            x_fwhm_med = np.median(sources['x_fwhm'][idx])
+            y_fwhm_med = np.median(sources['y_fwhm'][idx])
+            
+            print('        Number of sources = ', len(sources))
+            print('        Median x_fwhm = {0:.1f} +/- {1:.1f}'.format(x_fwhm_med,
+                                                                     sources['x_fwhm'].std()))
+            print('        Median y_fwhm = {0:.1f} +/- {1:.1f}'.format(y_fwhm_med,
+                                                                     sources['y_fwhm'].std()))
+
+            fwhm_curr = np.mean([x_fwhm_med, y_fwhm_med])
+            
+
+
+            formats = {'xcentroid': '%8.3f', 'ycentroid': '%8.3f', 'sharpness': '%.2f',
+                       'roundness1': '%.2f', 'roundness2': '%.2f', 'peak': '%10.1f',
+                       'flux': '%10.6f', 'mag': '%6.2f', 'x_fwhm': '%5.2f', 'y_fwhm': '%5.2f',
+                       'theta': '%6.3f'}
+        
+            sources.write(img_files[ii].replace('.fits', '_stars.txt'), format='ascii.fixed_width',
+                              delimiter=None, bookend=False, formats=formats, overwrite=True)
+
+        
     return
 
 
@@ -247,7 +430,7 @@ def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None, fourf
         # Define the background annuli (typically from 2"-3"). Calculate mean background for each star.
         bkg_annuli = CircularAnnulus(coords, max_radius / plate_scale, (max_radius + 1) / plate_scale)
         bkg = aperture_photometry(img, bkg_annuli)
-        bkg_mean = bkg['aperture_sum'] / bkg_annuli.area()
+        bkg_mean = bkg['aperture_sum'] / bkg_annuli.area
 
         enc_energy = np.zeros((N_stars, len(radii)), dtype=float)
         int_psf2_all = np.zeros(N_stars, dtype=float)
@@ -260,7 +443,7 @@ def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None, fourf
 
             energy = phot_table['aperture_sum']
 
-            bkg_sum = apertures.area() * bkg_mean
+            bkg_sum = apertures.area * bkg_mean
             
             enc_energy[:, rr] = energy - bkg_sum
 
