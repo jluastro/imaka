@@ -127,7 +127,7 @@ def clean_images(img_files, out_dir, rebin=1, sky_frame=None, flat_frame=None, f
         out_name = file_name.replace('.fits', '_clean.fits')
         fits.writeto(out_dir + out_name, img_clean, hdr, overwrite=True)
 
-        if bad_pixels != None:
+        if bad_pixels.any() != None:
             mask_name = file_name.replace('.fits', '_mask.fits')
             fits.writeto(out_dir + mask_name, bad_pixels, hdr, overwrite=True)
         print('\nImage stored: {}/{}'.format(file_dir, out_name))
@@ -190,7 +190,7 @@ def mask_pix(flat_file, mask_min, mask_max, left_slice=0, right_slice=0, top_sli
 
     # Combine masks
     combo_mask = np.ma.mask_or(mask1, mask2)
-    
+    #pdb.set_trace()
     return combo_mask
 
 
@@ -394,7 +394,7 @@ def find_outlier_pixels(data, tolerance=3, worry_about_edges=True, median_filter
     blurred = median_filter(data, size=median_filter_size)
     difference = data - blurred.astype(float)
     threshold = tolerance * np.std(difference)
-    pdb.set_trace()
+    #pdb.set_trace()
 
     # Find the hot pixels, but ignore the edges
     hot_pixels = np.nonzero((np.abs(difference[1:-1,1:-1]) > threshold) )

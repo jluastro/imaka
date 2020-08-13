@@ -42,47 +42,77 @@ from astropy.table import Column
 
 def treat_overscan(files):
     """
-    Performs bias/dark subtraction from overscan images on STA camera
-    Assumes STA 8x2 'cell' structure, each with its own overscan region
-    Works independent of image binning
+    Performs bias/dark subtraction from overscan images on STA camera.
+    Assumes STA 8x2 'cell' structure, each with its own overscan region.
+    Works independent of image binning and checks image creation date
+    before applying overscan treatment.
     Input: an array of files from STA camera
     Output: writes new images with '_scan' suffix in name
     """
+    
+    sta_date = datetime.strptime('2020-01-21','%Y-%m-%d')  #date of first known sky imgs taken with
+                                                           #the 5280x5760 STA cam settings 
     for file in files:
         
         # Read in data and divide into 'cells'
         print('Working on file: ', file)
         dat, hdr = fits.getdata(file, header=True)
+        date = datetime.strptime(hdr['DATE-OBS'],'%Y-%m-%d')
+        
         rows = np.vsplit(dat, 2)
         one_row = np.hstack([rows[0], rows[1]])
         cells = np.hsplit(one_row, 16)
 
-        # Define the 'image' and 'overscan' region 
-        # Done with fractions, so independent of binning
-        imgs = []
-        scans = []
-        clean_cells = []
+        if date >= sta_date:
+            # Define the 'image' and 'overscan' region 
+            # Done with fractions, so independent of binning
+            # print("Using post-2018 STA overscan protocol...")
+            imgs = []
+            scans = []
+            clean_cells = []
+            corr_term = 24
 
-        orig_wid = np.shape(dat)[1]        # Width of original image
-        cell_wid = orig_wid / 8            # Width of one cell (1/8 of image)
-        scan_wid = int(round(cell_wid * (3/25)))  # Width of overscan region (3/25 of cell)
-        data_wid = int(round(cell_wid * (22/25))) # Width of data region (22/25 of cell)
-        print("Scan wid: {}\nData wid: {}".format(scan_wid,data_wid))
+            orig_wid = np.shape(dat)[1]             # Width of original image
+            cell_wid = int(orig_wid / 8)            # Width of one cell (1/8 of image)
+            scan_wid = int(round(cell_wid * (3/25))) - corr_term # Width of overscan region (3/25 of cell)
+            data_wid = int(round(cell_wid * (22/25))) + corr_term # Width of data region (22/25 of cell)
+            
 
-        # For each cell, take the median of each overscan row and 
-        # subtract that from the corresponding row in the data
-        for ii in range(16):
-            scan, img = np.split(cells[ii], [scan_wid], axis=1)
-            scans.append(scan)
-            imgs.append(img)
-            med_col = np.median(scan, axis=1)
-            med_cell = np.array([med_col,]*(data_wid)).transpose()
-            clean_cell = img - med_cell 
-            clean_cells.append(clean_cell)
+            # For each cell, split the overscan and data regions 
+            # into separate variables
+            for ii in range(16):
+                cell = cells[ii]
+                scan = cell[:,:scan_wid]
+                scans.append(scan)
+                img = cell[:,scan_wid:data_wid]
+                clean_cells.append(img)
+        else:
+            print("Using pre-2020 STA overscan protocol...")
+            # Define the 'image' and 'overscan' region 
+            # Done with fractions, so independent of binning
+            imgs = []
+            scans = []
+            clean_cells = []
 
+            orig_wid = np.shape(dat)[1]        # Width of original image
+            cell_wid = orig_wid / 8            # Width of one cell (1/8 of image)
+            scan_wid = int(round(cell_wid * (3/25)))  # Width of overscan region (3/25 of cell)
+            data_wid = int(round(cell_wid * (22/25))) # Width of data region (22/25 of cell)
+
+            # For each cell, take the median of each overscan row and 
+            # subtract that from the corresponding row in the data
+            for ii in range(16):
+                scan, img = np.split(cells[ii], [scan_wid], axis=1)
+                scans.append(scan)
+                imgs.append(img)
+                med_col = np.median(scan, axis=1)
+                med_cell = np.array([med_col,]*(data_wid)).transpose()
+                clean_cell = img - med_cell 
+                clean_cells.append(clean_cell)
+            
         # Rebuild image with clean cells
         clean_one_row = np.hstack(clean_cells)
-        clean_rows = np.hsplit(clean_one_row, 2)
+        clean_rows = np.hsplit(clean_one_row,2)
         clean_image = np.vstack(clean_rows)
         
         # Write new image
@@ -157,15 +187,17 @@ def create_bias(bias_files):
 
     return
 
-def find_stars(img_files, fwhm=5, threshold=4, min_flux=10, N_passes=2, plot_psf_compare=False, mask_flat=None, \
-                   flat_file=None, mask_min=None, mask_max=None, \
-                   left_slice=None, right_slice=None, top_slice=None, bottom_slice=None):
+def find_stars(img_files, fwhm=5, threshold=4, min_flux=10, min_x_fwhm=2.5, min_y_fwhm=2.5, N_passes=2, plot_psf_compare=False, \
+               mask_flat=None, flat_file=None, mask_min=None, mask_max=None, left_slice=None, \ 
+               right_slice=None, top_slice=None, bottom_slice=None):
     """
     This function was copied from the find_stars() function in reduce_fli.py
     img_files - a list of image files.
     fwhm - First guess at the FWHM of the PSF for the first pass on the first image.
     threshold - the SNR threshold (mean + threshold*std) above which to search for sources.
     min_flux - the minimum source flux to consider for the starlist
+    min_x_fwhm - the minimum x_fwhm to consider for the starlist
+    min_y_fwhm - the minimum y_fwhm to consider for the starlist
     N_passes - how many times to find sources, recalc the PSF FWHM, and find sources again. 
     """
     print('\nREDUCE_STA: find_stars()')
@@ -177,7 +209,7 @@ def find_stars(img_files, fwhm=5, threshold=4, min_flux=10, N_passes=2, plot_psf
 
     # Creates mask from flat if specified - very optional (deals with vignetting, edges)
     else:
-        mask = mask_pix(mask_flat, mask_min, mask_max, \
+        mask = reduce_fli.mask_pix(mask_flat, mask_min, mask_max, \
                             left_slice=left_slice, right_slice=right_slice, top_slice=top_slice, bottom_slice=bottom_slice)
         print("Using mask")
 
@@ -302,10 +334,10 @@ def find_stars(img_files, fwhm=5, threshold=4, min_flux=10, N_passes=2, plot_psf
             fits.writeto(img_files[ii].replace('.fits', '_psf_obs.fits'), final_psf_obs, hdr, overwrite=True)
             fits.writeto(img_files[ii].replace('.fits', '_psf_mod.fits'), final_psf_mod, hdr, overwrite=True)
 
-            # Drop sources with fwhms of less than 2.5 pixels
-            good_xfwhm = np.where(sources['x_fwhm'] > 2.5)[0]
+            # Drop sources with fwhms of less than the specified minimum pixels
+            good_xfwhm = np.where(sources['x_fwhm'] > min_x_fwhm)[0]
             sources = sources[good_xfwhm]
-            good_yfwhm = np.where(sources['y_fwhm'] > 2.5)[0]
+            good_yfwhm = np.where(sources['y_fwhm'] > min_y_fwhm)[0]
             sources = sources[good_yfwhm]
             
             # Drop sources with flux (signifiance) that isn't good enough.
@@ -333,8 +365,8 @@ def find_stars(img_files, fwhm=5, threshold=4, min_flux=10, N_passes=2, plot_psf
                        'flux': '%10.6f', 'mag': '%6.2f', 'x_fwhm': '%5.2f', 'y_fwhm': '%5.2f',
                        'theta': '%6.3f'}
         
-            sources.write(img_files[ii].replace('.fits', '_stars.txt'), format='ascii.fixed_width',
-                              delimiter=None, bookend=False, formats=formats, overwrite=True)
+            sources.write(img_files[ii].replace('.fits', '_stars.txt'), format='ascii.fixed_width', \
+                          delimiter=None, bookend=False, formats=formats, overwrite=True)
 
         
     return

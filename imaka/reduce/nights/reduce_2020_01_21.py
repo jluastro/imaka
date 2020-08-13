@@ -29,11 +29,10 @@ stacks_dir = root_dir + 'reduce/stacks/'
 twi_dir = root_dir + 'twilights/'
 massdimm_dir = root_dir + 'reduce/massdimm/'
 
-fnum_o = [3, 4, 7, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, \
-          32, 33, 34, 35, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 59, 63, 65, 67, 68, 70, 72, 73, 74, 75, \
+fnum_o = [3, 4, 7, 35, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 59, 63, 65, 67, 68, 70, 72, 73, 74, 75, \
           76, 77, 79, 81, 83, 85, 87, 89, 91, 93, 107, 109, 111, 113, 115]
 
-fnum_c =[8, 10, 36, 37, 39, 41, 43, 45, 47, 49, 51, 53, 57, 60, 61, 62, 64, 66, 69, 71, 78, 80, 82, 84, 86, 88, \
+fnum_c =[8, 36, 37, 39, 41, 43, 45, 47, 49, 51, 53, 57, 60, 61, 62, 64, 66, 69, 71, 78, 80, 82, 84, 86, 88, \
          90, 92, 106, 108, 110, 112, 114]
 
 def make_flat(): 
@@ -51,13 +50,13 @@ def make_flat():
 
 def make_sky():
 
-#     util.mkdir(sky_dir)
+    util.mkdir(sky_dir)
 
-#     sky_num = np.arange(0, 3)
-#     sky_frames = ['{0:s}sta{1:03d}_o.fits'.format(root_dir+'HR2286/', ss) for ss in sky_num]
-#     reduce_STA.treat_overscan(sky_frames)
-#     scan_sky_frames = ['{0:s}sta{1:03d}_o_scan.fits'.format(root_dir+'HR2286/', ss) for ss in sky_num]
-#     calib.makedark(scan_sky_frames, sky_dir+F'{obs_obj}_sky.fits')
+    sky_num = np.arange(208, 220+1)
+    sky_frames = ['{0:s}sky_{1:03d}_o.fits'.format('/g/lu/data/imaka/onaga/20200122/sta/Beehive-W/', ss) for ss in sky_num]
+    reduce_STA.treat_overscan(sky_frames)
+    scan_sky_frames = ['{0:s}sky_{1:03d}_o_scan.fits'.format('/g/lu/data/imaka/onaga/20200122/sta/Beehive-W/', ss) for ss in sky_num]
+    calib.makedark(scan_sky_frames, sky_dir+F'{obs_obj}_sky.fits')
     
     return
 
@@ -69,31 +68,33 @@ def reduce_FLD2():
     img_files = [data_dir + 'sta{0:03d}_o.fits'.format(ii) for ii in fnum_o]
     reduce_STA.treat_overscan(img_files)
     scan_img_files = [data_dir + 'sta{0:03d}_o_scan.fits'.format(ii) for ii in fnum_o]
-    reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'beehive_sky_60.fits', flat_frame=None)
+    reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir+'Beehive-W_sky.fits', \
+                            flat_frame=flat_dir+'flat.fits', fix_bad_pixels=True)
 
     # Closed - x10LS5WFS
     img_files = [data_dir + 'sta{0:03d}x10LS5WFS_c.fits'.format(ii) for ii in fnum_c]
     reduce_STA.treat_overscan(img_files)
     scan_img_files = [data_dir + 'sta{0:03d}x10LS5WFS_c_scan.fits'.format(ii) for ii in fnum_c]
-    reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir + 'beehive_sky_60.fits', flat_frame =None)
+    reduce_fli.clean_images(scan_img_files, out_dir, rebin=1, sky_frame=sky_dir+'Beehive-W_sky.fits', \
+                            flat_frame=flat_dir+'flat.fits', fix_bad_pixels=True)
 
 
     return
 
 
 def find_stars_FLD2():
-
+    flat = flat_dir+'flat.fits'
     # Open Loop
     img_files = [out_dir + 'sta{0:03d}_o_scan_clean.fits'.format(ii) for ii in fnum_o]
-    reduce_STA.find_stars(img_files, fwhm=8, threshold=10, min_flux = 10, N_passes=2, plot_psf_compare=False, \
-                              mask_flat=None, mask_min=0.7, mask_max=1.4, \
-                              left_slice =25, right_slice=0, top_slice=25, bottom_slice=0)
+    reduce_STA.find_stars(img_files, fwhm=8, threshold=10, min_flux = 15, N_passes=2, plot_psf_compare=False, mask_flat=None)
+#                               mask_flat=flat, mask_min=0.752, mask_max=1.4, \
+#                               left_slice =1247, right_slice=3518, top_slice=2646, bottom_slice=0)
     
     #Closed Loop - threeWFS_LS
     img_files = [out_dir + 'sta{0:03d}x10LS5WFS_c_scan_clean.fits'.format(ii) for ii in fnum_c]
-    reduce_STA.find_stars(img_files, fwhm=7, threshold=30, min_flux = 10, N_passes=2, plot_psf_compare=False, \
-                              mask_flat=None, mask_min=0.7, mask_max=1.4, \
-                              left_slice =25, right_slice=0, top_slice=25, bottom_slice=25)
+    reduce_STA.find_stars(img_files, fwhm=8, threshold=10, min_flux = 15, N_passes=2, plot_psf_compare=False, mask_flat=None)
+#                               mask_flat=flat, mask_min=0.752, mask_max=1.4, \
+#                               left_slice =1247, right_slice=3518, top_slice=2646, bottom_slice=0)
                           
     return
 

@@ -39,13 +39,13 @@ def makedark(dark_files, output):
 
     # Sigma clip  (about the median)
     print('Sigma clipping and median combining (3 sigma lower, 2 sigma upper, 5 iterations) about the median.')
-    dark_mean, dark_median, dark_std = sigma_clipped_stats(darks, sigma_lower=3, sigma_upper=2, iters=5, axis=0)
+    dark_mean, dark_median, dark_std = sigma_clipped_stats(darks, sigma_lower=3, sigma_upper=2, maxiters=5, axis=0)
     dark = dark_median
     
     # Save the output files.
     # Get the header from the first image.
     hdr = fits.getheader(dark_files[0])
-    fits.writeto(_out, dark.data, header=hdr, clobber=True)
+    fits.writeto(_out, dark.data, header=hdr, overwrite=True)
 
     outlis_file = open(_outlis, 'w')
     for ff in range(len(dark_files)):
@@ -118,13 +118,13 @@ def makeflat(flat_files, dark_files, output_file, darks=True):
     print('  Normalizing each flat...')
     norm_flats = []
     for i in range(len(flat_ds)):
-        mean, median, stdev = sigma_clipped_stats(flat_ds[i], sigma=3, iters=2, axis=None)
+        mean, median, stdev = sigma_clipped_stats(flat_ds[i], sigma=3, maxiters=2, axis=None)
         norm = flat_ds[i] / median
         norm_flats.append(norm)
 
     # Sigma clip  (about the median)
     print('  Sigma clipping (3 sigma, 2 iterations) about the median...')
-    mean, median, stdev = sigma_clipped_stats(norm_flats, sigma=3, iters=2, axis=0)
+    mean, median, stdev = sigma_clipped_stats(norm_flats, sigma=3, maxiters=2, axis=0)
 
     # Median combine the masked images.
     print('  Median combining all images...')
@@ -133,7 +133,7 @@ def makeflat(flat_files, dark_files, output_file, darks=True):
     # Save the output files.
     # Get the header from the first image.
     hdr = fits.getheader(flat_files[0])
-    fits.writeto(_out, flat, header=hdr, clobber=True)
+    fits.writeto(_out, flat, header=hdr, overwrite=True)
 
     return
 
