@@ -195,7 +195,7 @@ def fit_moffat(img_files, stats_file, x_guess=5, y_guess=5, flux_percent=0.9, st
         # mistake here since each PSF has a different sub-pixel position
 
         final_psf_mof /= N_good_stars
-        fits.writeto(img_files[ii].replace('.fits', '_psf_mof.fits'), final_psf_mof, hdr, clobber=True)
+        fits.writeto(img_files[ii].replace('.fits', '_psf_mof.fits'), final_psf_mof, hdr, overwrite=True)
 
     # Read in existing stats table and append new data
     stats = Table.read(stats_file)

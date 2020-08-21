@@ -188,8 +188,8 @@ def create_bias(bias_files):
     return
 
 def find_stars(img_files, fwhm=5, threshold=4, min_flux=10, min_x_fwhm=2.5, min_y_fwhm=2.5, N_passes=2, plot_psf_compare=False, \
-               mask_flat=None, flat_file=None, mask_min=None, mask_max=None, left_slice=None, \ 
-               right_slice=None, top_slice=None, bottom_slice=None):
+               mask_flat=None, flat_file=None, mask_min=None, mask_max=None, left_slice=None, right_slice=None, top_slice=None, \
+               bottom_slice=None):
     """
     This function was copied from the find_stars() function in reduce_fli.py
     img_files - a list of image files.
@@ -650,6 +650,87 @@ def add_focus(stats_files):
 
     return 
 
+def shift_and_add(img_files, starlists, output_root, method='mean', clip_sigma=None):
+    """
+    Take a stack of images and starlists, calculate the 
+    """
+    plate_scale_orig = 0.04 # " / pixel
+    N_files = len(img_files)
+
+    # Loop through all the starlists and get the transformations.
+    # We will align all frames to the first frame. We can repeat
+    # this process. 
+    shift_trans = reduce_fli.get_transforms_from_starlists(starlists)
+
+    # Make some arrays to store the stack of images... this is a big array.
+    # But it allows us to do some clever sigma clipping or median combine.
+    # We only do this if asked (becaues it is RAM intensive).
+    if method != 'mean':
+        img, hdr = fits.getdata(img_files[0], header=True)
+        
+        image_stack = np.zeros((N_files, img.shape[0], img.shape[1]), dtype=float)
+        image_cover = np.zeros((N_files, img.shape[0], img.shape[1]), dtype=int)
+
+        ccddata_arr = []
+
+
+    # Now loop through all the images and stack them.
+    for ii in range(N_files):
+        # Load up the image to work on.
+        print("reduce_STA Shifting image: ", img_files[ii])
+        img, hdr = fits.getdata(img_files[ii], header=True)
+
+        # Make a coverage map that will also get shifted.
+        img_covers = np.ones(img.shape, dtype=int)
+
+        # Pull out the shifts
+        #pdb.set_trace()
+        shiftx = shift_trans[ii].px.parameters[0]
+        shifty = shift_trans[ii].py.parameters[0]
+
+        # Make an array to hold our final image.
+        if method == 'mean':
+            if ii == 0:
+                final_image = np.zeros(img.shape, dtype=float)
+                final_count = np.zeros(img.shape, dtype=int)
+
+            # Shift the image and the coverage image and add to total
+            final_image += interpolation.shift(img, (shifty, shiftx), order=1, cval=0)
+            final_count += interpolation.shift(img_covers, (shifty, shiftx), order=1, cval=0)
+        else:
+            # image_stack[ii, :, :] = interpolation.shift(img, (shifty, shiftx), order=1, cval=0)
+            # image_cover[ii, :, :] = interpolation.shift(img_covers, (shifty, shiftx), order=1, cval=0)
+            img_tmp = interpolation.shift(img, (shifty, shiftx), order=1, cval=0)
+            img_cnt_tmp = interpolation.shift(img_covers, (shifty, shiftx), order=1, cval=0)
+
+            ccddata_cur = ccdproc.CCDData(img_tmp, unit=units.adu)
+
+            ccddata_arr.append(ccddata_cur)
+
+            
+    # Done with all the images... do clipping, combining, or averaging.
+    # Depends on method.
+    if method == 'mean':
+        final_image /= final_count
+        final_image[final_count == 0] = 0
+
+    if method == 'median':
+        final_image = np.median(image_stack, axis=0)
+
+    if method == 'meanclip':
+        # avg = image_stack.mean(axis=0)
+        # std = image_stack.std(axis=0)
+
+        combiner = ccdproc.Combiner(ccddata_arr)
+        combiner.sigma_clipping()
+        final_image = combiner.average_combine()
+
+    # Save file (note we are just using the last hdr... not necessarily the best)
+    fits.writeto(output_root + '.fits', final_image, hdr, overwrite=True)
+    
+    return
+
+
 
 def four_filt_split(starlists, filt_order):
     
@@ -698,3 +779,4 @@ def four_filt_split(starlists, filt_order):
         stars[ind_4].write(list_root + filt_4 + '_' + filt_order + '_stars.txt', format='ascii', overwrite=True)
     
     return
+
