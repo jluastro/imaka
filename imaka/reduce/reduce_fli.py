@@ -33,7 +33,20 @@ from datetime import datetime
 import pytz
 
 
-scale = 40.0 # mas/pixel
+#scale = 40.0 # mas/pixel
+
+def get_plate_scale(filename):
+    
+    with fits.open(filename) as file:
+    
+        dat, hdr = fits.getdata(filename, header=True)
+    
+        if hdr['NAXIS2'] >= 5000:
+            plate_scale = hdr['SECPIX1'] #"/pixel
+        else:
+            plate_scale = 0.016 #"/pixel
+    
+    return plate_scale
 
 def rebin(a, bin_fac):
     """
@@ -479,7 +492,7 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
     """
     Calculate statistics for the Data Metrics table.
     """
-    plate_scale_orig = 0.04 # " / pixel
+    
 
     # radial bins for the EE curves
     max_radius = 3.0
@@ -539,7 +552,7 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
 
         # Get the bin fraction from the header
         bin_factor = hdr['BINFAC']
-        plate_scale_orig = 0.04
+        plate_scale_orig = get_plate_scale(img_files[ii]) # " / pixel
         plate_scale = plate_scale_orig * bin_factor
 
         # Load up the corresponding starlist.
@@ -742,7 +755,6 @@ def shift_and_add(img_files, starlists, output_root, method='mean', clip_sigma=N
     """
     Take a stack of images and starlists, calculate the 
     """
-    plate_scale_orig = 0.04 # " / pixel
     N_files = len(img_files)
 
     # Loop through all the starlists and get the transformations.
@@ -766,6 +778,7 @@ def shift_and_add(img_files, starlists, output_root, method='mean', clip_sigma=N
     for ii in range(N_files):
         # Load up the image to work on.
         print("Shifting image: ", img_files[ii])
+        plate_scale_orig = get_plate_scale(img_files[ii]) # " / pixel
         img, hdr = fits.getdata(img_files[ii], header=True)
 
         # Make a coverage map that will also get shifted.
@@ -819,7 +832,6 @@ def shift_and_add(img_files, starlists, output_root, method='mean', clip_sigma=N
     
 
 def get_transforms_from_starlists(starlists):
-    plate_scale_orig = 0.04 # " / pixel
     N_files = len(starlists)
     N_brite = 7
     N_passes = 2

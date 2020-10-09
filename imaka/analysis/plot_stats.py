@@ -588,6 +588,8 @@ def compare_fwhm(stats_files, out_dir):
         for directory in names:
             if "201" in directory:
                 date = (directory[4:6]+"/"+directory[6:]+"/"+directory[0:4])
+            else:
+                date = stats['DATE_UTC'][0]
     
         plot_title = date + " FWHM Comparison: "+ title_seg
         
