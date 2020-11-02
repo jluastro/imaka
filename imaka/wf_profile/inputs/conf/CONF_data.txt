@@ -1,0 +1,16 @@
+# Configure file for DATA
+# => Change data paths here
+
+# Commented lines will be ignored
+# variables must be defined with " = " (spaces included)
+
+# where to place files
+data_path = /home/imaka/data/
+out_path = /home/emcewen/out/
+target_path = /home/emcewen/data/target_input/
+
+# options: all, data, plots
+pipe_fn = all
+
+# Parallel processing
+parallel = True

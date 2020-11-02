@@ -1,0 +1,15 @@
+# Configure file for SIMULATION
+###############################
+# Commented lines will be ignored
+# variables must be defined with " = " (spaces included)
+
+# TODO => Change data paths here
+data_path = /home/imaka/data/sim/
+out_path = /home/emcewen/out_sim/
+target_path = /home/emcewen/data/target_input/
+
+# options: all, data, plots
+pipe_fn = all
+
+# Parallel processing
+parallel = False
