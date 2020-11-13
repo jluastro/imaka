@@ -22,10 +22,12 @@ import hdbscan
 import seaborn as sns
 
 # Self-witten code
-from tpoint import TPoint
+from pipeline.code.tpoint import TPoint
+from pipeline.code.corr_code import *
+from pipeline.code.Correlator import *
 
 #generating a mask for corr data
-mask_data = dp.mask_8_8_center
+mask_data = mask_8_8_center
 mask_cor = signal.correlate2d(mask_data, mask_data)
 mask = ~np.array(mask_cor, dtype=bool)
 
