@@ -3,6 +3,8 @@ Created by Eden McEwen <emcewen@berkeley.edu> <br>
 Summer 2020 REU, [IfA at the University of Hawaii](https://student.ifa.hawaii.edu/reu/) <br>
 Mentor: Mark Chun
 
+Documentation pdf: [LINK](https://docs.google.com/document/d/e/2PACX-1vQRuThSnEPpXRZy12O6BXV6kNo6oPF7S2aClpCTIMWfSb5oWzfJCzW82liy8IDLTDOyzUbBUW-4jLyC/pub)
+
 ## Overview
 
 The Imaka Wavefront Profiler takes in imaka Adaptive Optics circular buffers and produces spacial-temporal correlations fits from Wavefront Sensor slopes, as well as graphical representations of those correlations. 
