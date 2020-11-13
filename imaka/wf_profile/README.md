@@ -20,9 +20,18 @@ The Imaka Wavefront Profiler takes in imaka Adaptive Optics circular buffers and
 For running a large batch of files, use the profiler pipeline: `wfp_pipeline.py`
 This runs the correlator on the input RUN files
 
+**Files to edit before execution:**
+` inputs/CONF_ex.txt`
+
+CONF files contain input and output paths that are unique to users. Please edit these file paths in the example CONF file before running the tester funtion. 
+
 **Example for running this function:**
 
  `python3 pipeline/wfp_pipeline.py inputs/CONF_ex.txt inputs/RUN_ex.txt`
+ 
+ Run the above command in the command line to generate correlation files and plots for the dates in `RUN_ex.txt`. You will find them in the `out_path` listed in `CONF_ex.txt`.
+ 
+ > TODO: add aocb file for example purposes, have proper links.
 
 
 ## Package Structure:
@@ -107,8 +116,6 @@ The default graphing parameters are:
 - code/log_ex.py
   - Sets up the logger, or the output of 
 - code/file_reader.py
-
-
 
 
 ## Main Code Files:
