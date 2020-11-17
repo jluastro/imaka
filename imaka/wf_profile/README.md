@@ -5,6 +5,21 @@ Mentor: Mark Chun
 
 Documentation pdf: [LINK](https://docs.google.com/document/d/e/2PACX-1vQRuThSnEPpXRZy12O6BXV6kNo6oPF7S2aClpCTIMWfSb5oWzfJCzW82liy8IDLTDOyzUbBUW-4jLyC/pub)
 
+## Downloading
+
+Currently, this demo is on the `wfp_demo` branch of the imaka project. 
+
+To pull the imaka code with this demo, run:
+
+first initialize git:
+
+``git init``
+
+then pull from this branch:
+
+``git clone --branch wfp_demo https://github.com/jluastro/imaka``
+
+
 ## Overview
 
 The Imaka Wavefront Profiler takes in imaka Adaptive Optics circular buffers and produces spacial-temporal correlations fits from Wavefront Sensor slopes, as well as graphical representations of those correlations. 
