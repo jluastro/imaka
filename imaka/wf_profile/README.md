@@ -13,11 +13,11 @@ To pull the imaka code with this demo, run:
 
 first initialize git:
 
-``git init``
+	git init
 
 then pull from this branch:
 
-``git clone --branch wfp_demo https://github.com/jluastro/imaka``
+	git clone --branch wfp_demo https://github.com/jluastro/imaka
 
 
 ## Overview
@@ -42,7 +42,7 @@ CONF files contain input and output paths that are unique to users. Please edit 
 
 **Example for running this function:**
 
- `python3 pipeline/wfp_pipeline.py inputs/CONF_ex.txt inputs/RUN_ex.txt`
+ 	python3 pipeline/wfp_pipeline.py inputs/CONF_ex.txt inputs/RUN_ex.txt
  
  Run the above command in the command line to generate correlation files and plots for the dates in `RUN_ex.txt`. You will find them in the `out_path` listed in `CONF_ex.txt`.
  
