@@ -12,4 +12,4 @@ target_path = /home/emcewen/data/target_input/
 pipe_fn = all
 
 # Parallel processing
-parallel = False
+parallel = True

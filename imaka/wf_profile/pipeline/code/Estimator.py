@@ -25,6 +25,7 @@ import seaborn as sns
 from pipeline.code.tpoint import TPoint
 from pipeline.code.corr_code import *
 from pipeline.code.Correlator import *
+from pipeline.code.est_plots import *
 
 #generating a mask for corr data
 mask_data = mask_8_8_center
@@ -35,17 +36,61 @@ mask = ~np.array(mask_cor, dtype=bool)
 #### Output dir
 out_dir = "/home/emcewen/out_est/"
 
+
+
+### ITERATORS TO WORK THROUGH A DF ###
+
+def df_iterator(df, xcor=False, sub_len=5, sig=3, thresh=3, c_size=4):
+    """ 
+    Takes in a df and iterates Estimator on each row
+        input: data frame, xcor option, post subtraction length, sigma, threshold
+        output: dataframe with estimates added
+    """
+    frames = []
+    for index, row in df.iterrows():
+        row_est = Estimator(row)
+        est = row_est.estimate(xcor, sub_len, sig, thresh, c_size)
+        frames.append(est)
+    return pd.concat(frames, ignore_index=True)
+
+def df_iterator_mult(df, sl_list, sig_list, thresh_list, c_list):
+    """ 
+    Takes in a df and iterates Estimator on each row, with variable options
+        input: data frame, xcor options, post subtraction length options, sigma options, threshold options
+        output: dataframe with estimates added
+    """
+    frames = [] 
+    for index, row in df.iterrows():
+        row_est = Estimator(row)        
+        #TODO: figure out how to test multiple params
+        for i in range(len(sl_list)):
+            xc = False
+            sl = sl_list[i]
+            row_est.gen_wfs(xcor=xc, sub_len=sl)
+            for j in range(len(sig_list)):
+                for k in range(len(thresh_list)):
+                    sg = sig_list[j]
+                    thr = thresh_list[k]
+                    row_est.gen_peaks(sig=sg, thresh=thr)
+                    for m in range(len(c_list)):
+                        cm = c_list[m]
+                        row_est.gen_cluster(c_size=cm)
+                        frames.append(row_est.get_df())
+    return pd.concat(frames, ignore_index=True)
+
+
 ############################ 
 ######## BASE CLASS ########
 ############################ 
 
 
 class Estimator(object):
-    columns = ['dataname','DATETIME', "cfht_wspd","cfht_wdir", "250_wspd", "250_wdir", "p_spd", 'p_spd_sdev', "p_dir", 'p_dir_sdev']
+    columns = ['dataname','DATETIME', "cfht_wspd","cfht_wdir", "250_wspd", "250_wdir", "p_spd", 'p_spd_sdev', "p_dir", 'p_dir_sdev', "sub_len", "sig", "thresh", "c_min"]
     
     def __init__(self, row):
         self.df_in = row
         self.out_fits = self.pull_row('outfits')
+        print(self.out_fits)
         self.data = Correlator("", "", "", f_file=self.out_fits)
         self.name = self.data.name
         self.date = self.data.date
@@ -54,6 +99,7 @@ class Estimator(object):
         self.obs_list = self.pull_obs()
         self.min_run_length = 5
         #params, changed each itter
+        self.avg_sub = True
         self.sub_len = 0 
         self.sig = 0
         self.thresh = 0 
@@ -111,7 +157,7 @@ class Estimator(object):
         wfs_use = [el>=20 for el in s_rates]
         if xcor:
             print("XCORR")
-            x_ccor, y_ccor = self.data.data_get_cc_all(avg_sub=True, avg_len=sub_len)
+            x_ccor, y_ccor = self.data.data_get_cc_all(avg_sub=avg_sub, avg_len=sub_len)
             avg_ccor = (x_ccor + y_ccor)/2
             ccors_only = np.zeros_like(avg_ccor[0][0])
             count = 0
@@ -140,7 +186,7 @@ class Estimator(object):
     
     def peak_cluster(self, points, wfs):
         # sets up data
-        c_size = len(points)//self.c_min +1
+        c_size = int(len(points)//self.c_min + 1)
         if len(points) == 0:
             return [], None
         dirs_n = [pt.dir_d() for pt in points]
@@ -171,9 +217,9 @@ class Estimator(object):
         # spd dir plot
         dirs = [pt.dir_d() for pt in points]
         out_d = out_dir + str(self.date) + "/"
-        plot_speed_dir_est(out_d, self.name, dirs, v, clusterer, layer_stats, params=prms)
+        #plot_speed_dir_est(out_d, self.name, dirs, v, clusterer, layer_stats, params=prms)
         # max peak animation
-        plot_max_pts(out_d, self.name, [pt.x for pt in points_used], [pt.y for pt in points_used], [pt.vel_ms() for pt in points_used], prms)
+        #plot_max_pts(out_d, self.name, [pt.x for pt in points_used], [pt.y for pt in points_used], [pt.vel_ms() for pt in points_used], prms)
         #gif_cor_peaks(wfs, points_used, 50, out_d=out_d, name = self.name, params=prms)
         return layer_stats, clusterer
     
@@ -184,8 +230,10 @@ class Estimator(object):
         df_est = pd.DataFrame(columns = self.columns)        
         for n in range(n_est):
             est_list = [estimates[n][0][0], estimates[n][0][1], estimates[n][1][0], estimates[n][1][1]]
+            param_list = [self.sub_len, self.sig, self.thresh, self.c_min]
             row_list = self.obs_list.copy()
             row_list.extend(est_list)
+            row_list.extend(param_list)
             new_row = pd.Series(row_list, index = self.columns)
             df_est = df_est.append(new_row, ignore_index=True)
         return df_est

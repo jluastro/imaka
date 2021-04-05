@@ -22,8 +22,8 @@ import hdbscan
 import seaborn as sns
 
 # Self-witten code
-from Estimator import *
-from tpoint import TPoint
+from pipeline.code.Estimator import *
+from pipeline.code.tpoint import TPoint
 
 ############################        
 ### Plot Naming Functs #####

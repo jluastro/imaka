@@ -1,0 +1,17 @@
+2021-01-04 09:23:22,862| MainThread | INFO | File 0: starting 20201222_aocb_2020122_012857o
+2021-01-04 09:23:22,862| MainThread | INFO |    0 name: 20201222_aocb_2020122_012857o
+2021-01-04 09:23:22,862| MainThread | INFO |    0 d_file: /home/imaka/data/sim/20201222/ao/aocb_2020122_012857o.fits
+2021-01-04 09:23:22,862| MainThread | INFO |    0 o_dirs: /home/emcewen/out_sim/20201222/
+2021-01-04 09:23:22,863| MainThread | INFO |    0 t_file: /home/emcewen/data/target_input/simul_4GS_12am_6mag_USNOB_GS.txt
+2021-01-04 09:23:22,863| MainThread | INFO | ======== 20201222_aocb_2020122_012857o ========
+2021-01-04 09:23:22,863| MainThread | INFO | == sub_len = 0 
+2021-01-04 09:23:22,863| MainThread | INFO | == s_sub = False 
+2021-01-04 09:23:22,863| MainThread | INFO | == tt_sub = False 
+2021-01-04 09:23:22,863| MainThread | DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 09:23:22,863| MainThread | DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_012857o.fits
+2021-01-04 09:23:22,892| MainThread | DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_012857o.fits
+2021-01-04 09:23:22,961| MainThread | DEBUG| path created: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 09:23:22,961| MainThread | DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_012857o_tmax200_raw.fits
+2021-01-04 09:23:22,961| MainThread | DEBUG| fits not found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_012857o_tmax200_raw.fits
+2021-01-04 09:23:22,961| MainThread | INFO | ====> Starting acor
+2021-01-04 09:23:22,961| MainThread | INFO | Generating auto corr tmax = 200

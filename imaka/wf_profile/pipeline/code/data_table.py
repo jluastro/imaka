@@ -12,6 +12,8 @@ from astropy.time import Time
 from datetime import datetime, date, time, timezone
 import pytz
 
+from pipeline.code.file_reader import *
+
 ## Functions for Timezones
 
 def hst_to_utc(date):
@@ -37,7 +39,7 @@ def str_to_datetime(string):
 ######################################################
 
 #returns dataframe for all run files given
-def df_gen_main(run_files):
+def df_gen_main(run_files, run_input, out_d):
     #generate empty dataframe
     df_main = pd.DataFrame()
     for run in run_files:
@@ -49,7 +51,7 @@ def df_gen_main(run_files):
         r = rname.replace("RUN", "")
         #run_fits = []
         for d in dates:
-            fits_out_p = "/home/emcewen/out/"+d+"/fits/"
+            fits_out_p = out_d+d+"/fits/"
             d_fits = []
             if os.path.isdir(fits_out_p):
                 fs = os.listdir(fits_out_p)

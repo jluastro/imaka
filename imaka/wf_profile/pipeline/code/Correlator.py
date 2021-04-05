@@ -52,12 +52,12 @@ class Correlator:
         self.data_file = data_f
         self.fits_file = None
         self.date = None
-        self.path_valid = self.path_check(out_d, loud=True)
         # Variables in corr generation
         self.s_sub = s_sub
         self.tt_sub = tt_sub
         self.tmax = tmax
-        self.n_wfs = self.n_wfs_gen()
+        # This following should be reset iminently
+        self.n_wfs = 5 #default value 
         self.active_wfs = [True]*self.n_wfs
         # Target dependent vars
         self.target = None
@@ -77,9 +77,29 @@ class Correlator:
         self.ccor_x = np.zeros((self.n_wfs,self.n_wfs))
         self.ccor_y = np.zeros((self.n_wfs,self.n_wfs))
         # if there is a fits file, use it
-        self.data_valid = self.slopes_gen()
-        if self.fits_check(f_file, loud=True): self.fits_pull()
-
+        if f_file and self.fits_check(f_file, loud=True): 
+            self.fits_pull()
+        else:
+            self.path_valid = self.path_check(out_d, loud=True)
+            self.start_set()
+            self.data_valid = self.slopes_gen()
+            
+            
+    def start_set(self):
+        #setting sizes if there is no fits files
+        self.n_wfs = self.n_wfs_gen()
+        self.active_wfs = [True]*self.n_wfs
+        
+        self.wfs_ra = [None]*self.n_wfs
+        self.wfs_dec = [None]*self.n_wfs
+        self.wfs_mag = [None]*self.n_wfs
+        
+        self.acor_x = np.zeros(self.n_wfs)
+        self.acor_y = np.zeros(self.n_wfs)
+        
+        self.ccor_x = np.zeros((self.n_wfs,self.n_wfs))
+        self.ccor_y = np.zeros((self.n_wfs,self.n_wfs))
+            
     ####################### Checking files #######################
     ### These files work with os.path functions to check for a files existence
     ### retunr based on if the request was successful or not
@@ -435,6 +455,27 @@ class Correlator:
         except Exception as e: 
             logging.error("Error in acor_from_ccor: %s", e)
             return False
+        
+    # for ease of use pulling data
+    def avg_acor(self, avg_sub = False, avg_len = 0):
+        x_acor, y_acor = self.data_get_ac(avg_sub=avg_sub, avg_len=avg_len)
+        avg_wfs = np.average((x_acor + y_acor)/2, axis=0)
+        return avg_wfs
+    
+    def avg_xcor(self, avg_sub = False, avg_len = 0):
+        data = self.data
+        x_cor, y_cor = self.data_get_cc_all(avg_sub=avg_sub, avg_len=avg_len)
+        avg_cor = (x_cor + y_cor)/2
+        wfs_use = self.active_wfs
+        avg_xcor = np.zeros_like(avg_cor[0][0])
+        count = 0
+        for i, row in enumerate(avg_cor):
+            for j in range(len(row)):
+                if i < j and wfs_use[i] and wfs_use[j]:
+                    avg_xcor = avg_xcor + row[j]
+                    count = count + 1
+        avg_xcor = np.divide(avg_xcor, count)
+        return avg_xcor
     
     
     ####################### Getting Data #######################
@@ -480,8 +521,10 @@ class Correlator:
             output: x slopes acor n_wfs array, y slopes acor n_wfs array
         """
         if self.data_valid and self.acor:
-            data_x = np.array([np.array([mat / mat[7,7] for mat in wfs]) for wfs in self.acor_x])
-            data_y = np.array([np.array([mat / mat[7,7] for mat in wfs]) for wfs in self.acor_y])
+            data_x = np.array([np.array([mat / 1 for mat in wfs]) for wfs in self.acor_x])
+            data_y = np.array([np.array([mat / 1 for mat in wfs]) for wfs in self.acor_y])
+            #data_x = np.array([np.array([mat / mat[7,7] for mat in wfs]) for wfs in self.acor_x])
+            #data_y = np.array([np.array([mat / mat[7,7] for mat in wfs]) for wfs in self.acor_y])
             if med_sub:
                 xcor_med = np.array([running_med(wfs, avg_len) for wfs in data_x])
                 ycor_med = np.array([running_med(wfs, avg_len) for wfs in data_y])

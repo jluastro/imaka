@@ -1,0 +1,1581 @@
+2021-01-04 09:23:22,860| MainThread | INFO | Number of files: 7
+2021-01-04 09:23:22,861| MainThread | INFO | Name of files: ['20201222_aocb_2020122_012857o', '20201222_aocb_2020122_043832o', '20201222_aocb_2020122_074836o', '20201222_aocb_2020122_101126o', '20201222_aocb_2020122_121720o', '20201222_aocb_2020122_142344o', '20201222_aocb_2020121_221213o']
+2021-01-04 09:23:22,862| MainThread | INFO | ============ STARTING RUN ============
+2021-01-04 09:23:22,862| MainThread | INFO | ==|==|==|==|==|== Starting file 1 of 7 ==|==|==|==|==|==
+2021-01-04 09:23:22,862| MainThread | INFO | File 0: starting 20201222_aocb_2020122_012857o
+2021-01-04 09:23:22,862| MainThread | INFO |    0 name: 20201222_aocb_2020122_012857o
+2021-01-04 09:23:22,862| MainThread | INFO |    0 d_file: /home/imaka/data/sim/20201222/ao/aocb_2020122_012857o.fits
+2021-01-04 09:23:22,862| MainThread | INFO |    0 o_dirs: /home/emcewen/out_sim/20201222/
+2021-01-04 09:23:22,863| MainThread | INFO |    0 t_file: /home/emcewen/data/target_input/simul_4GS_12am_6mag_USNOB_GS.txt
+2021-01-04 09:23:22,863| MainThread | INFO | ======== 20201222_aocb_2020122_012857o ========
+2021-01-04 09:23:22,863| MainThread | INFO | == sub_len = 0 
+2021-01-04 09:23:22,863| MainThread | INFO | == s_sub = False 
+2021-01-04 09:23:22,863| MainThread | INFO | == tt_sub = False 
+2021-01-04 09:23:22,863| MainThread | DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 09:23:22,863| MainThread | DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_012857o.fits
+2021-01-04 09:23:22,892| MainThread | DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_012857o.fits
+2021-01-04 09:23:22,961| MainThread | DEBUG| path created: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 09:23:22,961| MainThread | DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_012857o_tmax200_raw.fits
+2021-01-04 09:23:22,961| MainThread | DEBUG| fits not found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_012857o_tmax200_raw.fits
+2021-01-04 09:23:22,961| MainThread | INFO | ====> Starting acor
+2021-01-04 09:23:22,961| MainThread | INFO | Generating auto corr tmax = 200
+2021-01-04 09:25:02,976| MainThread | INFO | Number of files: 7
+2021-01-04 09:25:02,977| MainThread | INFO | Name of files: ['20201222_aocb_2020122_012857o', '20201222_aocb_2020122_043832o', '20201222_aocb_2020122_074836o', '20201222_aocb_2020122_101126o', '20201222_aocb_2020122_121720o', '20201222_aocb_2020122_142344o', '20201222_aocb_2020121_221213o']
+2021-01-04 09:25:02,977| MainThread | INFO | ============ STARTING THREAD RUN ============
+2021-01-04 09:25:02,977| MainThread | INFO | BEGIN THREADS
+2021-01-04 09:25:02,979| ThreadPoolExecutor-0_0| INFO | File 0: starting 20201222_aocb_2020122_012857o
+2021-01-04 09:25:02,979| ThreadPoolExecutor-0_1| INFO | File 1: starting 20201222_aocb_2020122_043832o
+2021-01-04 09:25:02,980| ThreadPoolExecutor-0_0| INFO |    0 name: 20201222_aocb_2020122_012857o
+2021-01-04 09:25:02,980| ThreadPoolExecutor-0_3| INFO | File 3: starting 20201222_aocb_2020122_101126o
+2021-01-04 09:25:02,980| ThreadPoolExecutor-0_2| INFO | File 2: starting 20201222_aocb_2020122_074836o
+2021-01-04 09:25:02,980| ThreadPoolExecutor-0_4| INFO | File 4: starting 20201222_aocb_2020122_121720o
+2021-01-04 09:25:02,980| ThreadPoolExecutor-0_1| INFO |    1 name: 20201222_aocb_2020122_043832o
+2021-01-04 09:25:02,980| ThreadPoolExecutor-0_0| INFO |    0 d_file: /home/imaka/data/sim/20201222/ao/aocb_2020122_012857o.fits
+2021-01-04 09:25:02,980| ThreadPoolExecutor-0_3| INFO |    3 name: 20201222_aocb_2020122_101126o
+2021-01-04 09:25:02,981| ThreadPoolExecutor-0_2| INFO |    2 name: 20201222_aocb_2020122_074836o
+2021-01-04 09:25:02,981| ThreadPoolExecutor-0_4| INFO |    4 name: 20201222_aocb_2020122_121720o
+2021-01-04 09:25:02,981| ThreadPoolExecutor-0_1| INFO |    1 d_file: /home/imaka/data/sim/20201222/ao/aocb_2020122_043832o.fits
+2021-01-04 09:25:02,981| ThreadPoolExecutor-0_0| INFO |    0 o_dirs: /home/emcewen/out_sim/20201222/
+2021-01-04 09:25:02,981| ThreadPoolExecutor-0_3| INFO |    3 d_file: /home/imaka/data/sim/20201222/ao/aocb_2020122_101126o.fits
+2021-01-04 09:25:02,981| ThreadPoolExecutor-0_2| INFO |    2 d_file: /home/imaka/data/sim/20201222/ao/aocb_2020122_074836o.fits
+2021-01-04 09:25:02,981| ThreadPoolExecutor-0_4| INFO |    4 d_file: /home/imaka/data/sim/20201222/ao/aocb_2020122_121720o.fits
+2021-01-04 09:25:02,982| ThreadPoolExecutor-0_1| INFO |    1 o_dirs: /home/emcewen/out_sim/20201222/
+2021-01-04 09:25:02,982| ThreadPoolExecutor-0_0| INFO |    0 t_file: /home/emcewen/data/target_input/simul_4GS_12am_6mag_USNOB_GS.txt
+2021-01-04 09:25:02,982| ThreadPoolExecutor-0_3| INFO |    3 o_dirs: /home/emcewen/out_sim/20201222/
+2021-01-04 09:25:02,982| ThreadPoolExecutor-0_2| INFO |    2 o_dirs: /home/emcewen/out_sim/20201222/
+2021-01-04 09:25:02,982| ThreadPoolExecutor-0_4| INFO |    4 o_dirs: /home/emcewen/out_sim/20201222/
+2021-01-04 09:25:02,982| ThreadPoolExecutor-0_1| INFO |    1 t_file: /home/emcewen/data/target_input/simul_4GS_12am_6mag_USNOB_GS.txt
+2021-01-04 09:25:02,983| ThreadPoolExecutor-0_0| INFO | ======== 20201222_aocb_2020122_012857o ========
+2021-01-04 09:25:02,983| ThreadPoolExecutor-0_3| INFO |    3 t_file: /home/emcewen/data/target_input/simul_4GS_12am_6mag_USNOB_GS.txt
+2021-01-04 09:25:02,983| ThreadPoolExecutor-0_2| INFO |    2 t_file: /home/emcewen/data/target_input/simul_4GS_12am_6mag_USNOB_GS.txt
+2021-01-04 09:25:02,983| ThreadPoolExecutor-0_4| INFO |    4 t_file: /home/emcewen/data/target_input/simul_4GS_12am_6mag_USNOB_GS.txt
+2021-01-04 09:25:02,983| ThreadPoolExecutor-0_1| INFO | ======== 20201222_aocb_2020122_043832o ========
+2021-01-04 09:25:02,983| ThreadPoolExecutor-0_0| INFO | == sub_len = 0 
+2021-01-04 09:25:02,983| ThreadPoolExecutor-0_3| INFO | ======== 20201222_aocb_2020122_101126o ========
+2021-01-04 09:25:02,984| ThreadPoolExecutor-0_2| INFO | ======== 20201222_aocb_2020122_074836o ========
+2021-01-04 09:25:02,984| ThreadPoolExecutor-0_4| INFO | ======== 20201222_aocb_2020122_121720o ========
+2021-01-04 09:25:02,984| ThreadPoolExecutor-0_1| INFO | == sub_len = 0 
+2021-01-04 09:25:02,984| ThreadPoolExecutor-0_0| INFO | == s_sub = False 
+2021-01-04 09:25:02,984| ThreadPoolExecutor-0_3| INFO | == sub_len = 0 
+2021-01-04 09:25:02,984| ThreadPoolExecutor-0_2| INFO | == sub_len = 0 
+2021-01-04 09:25:02,985| ThreadPoolExecutor-0_4| INFO | == sub_len = 0 
+2021-01-04 09:25:02,985| ThreadPoolExecutor-0_1| INFO | == s_sub = False 
+2021-01-04 09:25:02,985| ThreadPoolExecutor-0_0| INFO | == tt_sub = False 
+2021-01-04 09:25:02,985| ThreadPoolExecutor-0_3| INFO | == s_sub = False 
+2021-01-04 09:25:02,985| ThreadPoolExecutor-0_2| INFO | == s_sub = False 
+2021-01-04 09:25:02,985| ThreadPoolExecutor-0_4| INFO | == s_sub = False 
+2021-01-04 09:25:02,985| ThreadPoolExecutor-0_1| INFO | == tt_sub = False 
+2021-01-04 09:25:02,986| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 09:25:02,986| ThreadPoolExecutor-0_3| INFO | == tt_sub = False 
+2021-01-04 09:25:02,986| ThreadPoolExecutor-0_2| INFO | == tt_sub = False 
+2021-01-04 09:25:02,986| ThreadPoolExecutor-0_4| INFO | == tt_sub = False 
+2021-01-04 09:25:02,986| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 09:25:02,986| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_012857o.fits
+2021-01-04 09:25:02,987| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 09:25:02,987| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 09:25:02,987| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 09:25:02,987| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_043832o.fits
+2021-01-04 09:25:02,989| ThreadPoolExecutor-0_3| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_101126o.fits
+2021-01-04 09:25:02,989| ThreadPoolExecutor-0_2| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_074836o.fits
+2021-01-04 09:25:02,989| ThreadPoolExecutor-0_4| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_121720o.fits
+2021-01-04 09:25:02,993| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_012857o.fits
+2021-01-04 09:25:03,005| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 09:25:03,005| ThreadPoolExecutor-0_0| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_012857o_tmax200_raw.fits
+2021-01-04 09:25:03,005| ThreadPoolExecutor-0_0| DEBUG| fits not found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_012857o_tmax200_raw.fits
+2021-01-04 09:25:03,006| ThreadPoolExecutor-0_0| INFO | ====> Starting acor
+2021-01-04 09:25:03,006| ThreadPoolExecutor-0_0| INFO | Generating auto corr tmax = 200
+2021-01-04 09:25:03,019| ThreadPoolExecutor-0_3| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_101126o.fits
+2021-01-04 09:25:03,023| ThreadPoolExecutor-0_2| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_074836o.fits
+2021-01-04 09:25:03,028| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_043832o.fits
+2021-01-04 09:25:03,032| ThreadPoolExecutor-0_4| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_121720o.fits
+2021-01-04 09:25:03,136| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 09:25:03,137| ThreadPoolExecutor-0_3| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_101126o_tmax200_raw.fits
+2021-01-04 09:25:03,137| ThreadPoolExecutor-0_3| DEBUG| fits not found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_101126o_tmax200_raw.fits
+2021-01-04 09:25:03,137| ThreadPoolExecutor-0_3| INFO | ====> Starting acor
+2021-01-04 09:25:03,137| ThreadPoolExecutor-0_3| INFO | Generating auto corr tmax = 200
+2021-01-04 09:25:03,200| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 09:25:03,201| ThreadPoolExecutor-0_2| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_074836o_tmax200_raw.fits
+2021-01-04 09:25:03,201| ThreadPoolExecutor-0_2| DEBUG| fits not found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_074836o_tmax200_raw.fits
+2021-01-04 09:25:03,201| ThreadPoolExecutor-0_2| INFO | ====> Starting acor
+2021-01-04 09:25:03,201| ThreadPoolExecutor-0_2| INFO | Generating auto corr tmax = 200
+2021-01-04 09:25:03,224| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 09:25:03,225| ThreadPoolExecutor-0_1| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_043832o_tmax200_raw.fits
+2021-01-04 09:25:03,225| ThreadPoolExecutor-0_1| DEBUG| fits not found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_043832o_tmax200_raw.fits
+2021-01-04 09:25:03,226| ThreadPoolExecutor-0_1| INFO | ====> Starting acor
+2021-01-04 09:25:03,226| ThreadPoolExecutor-0_1| INFO | Generating auto corr tmax = 200
+2021-01-04 09:25:03,228| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 09:25:03,229| ThreadPoolExecutor-0_4| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_121720o_tmax200_raw.fits
+2021-01-04 09:25:03,229| ThreadPoolExecutor-0_4| DEBUG| fits not found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_121720o_tmax200_raw.fits
+2021-01-04 09:25:03,229| ThreadPoolExecutor-0_4| INFO | ====> Starting acor
+2021-01-04 09:25:03,229| ThreadPoolExecutor-0_4| INFO | Generating auto corr tmax = 200
+2021-01-04 09:35:27,802| ThreadPoolExecutor-0_0| INFO | == finished in 624.7965846061707 s
+2021-01-04 09:35:27,803| ThreadPoolExecutor-0_0| INFO | ====> Starting ccor
+2021-01-04 09:35:27,803| ThreadPoolExecutor-0_0| INFO | Generating cross corr tmax = 200
+2021-01-04 09:35:30,864| ThreadPoolExecutor-0_1| INFO | == finished in 627.6382613182068 s
+2021-01-04 09:35:30,865| ThreadPoolExecutor-0_1| INFO | ====> Starting ccor
+2021-01-04 09:35:30,865| ThreadPoolExecutor-0_1| INFO | Generating cross corr tmax = 200
+2021-01-04 09:35:38,496| ThreadPoolExecutor-0_3| INFO | == finished in 635.3587672710419 s
+2021-01-04 09:35:38,496| ThreadPoolExecutor-0_3| INFO | ====> Starting ccor
+2021-01-04 09:35:38,497| ThreadPoolExecutor-0_3| INFO | Generating cross corr tmax = 200
+2021-01-04 09:35:42,306| ThreadPoolExecutor-0_4| INFO | == finished in 639.0760447978973 s
+2021-01-04 09:35:42,307| ThreadPoolExecutor-0_4| INFO | ====> Starting ccor
+2021-01-04 09:35:42,307| ThreadPoolExecutor-0_4| INFO | Generating cross corr tmax = 200
+2021-01-04 09:35:53,086| ThreadPoolExecutor-0_2| INFO | == finished in 649.8847289085388 s
+2021-01-04 09:35:53,087| ThreadPoolExecutor-0_2| INFO | ====> Starting ccor
+2021-01-04 09:35:53,087| ThreadPoolExecutor-0_2| INFO | Generating cross corr tmax = 200
+2021-01-04 09:51:57,669| ThreadPoolExecutor-0_0| INFO | == finished in 989.8652436733246 s
+2021-01-04 09:51:57,669| ThreadPoolExecutor-0_0| INFO | ====> writing fits
+2021-01-04 09:51:57,670| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 09:51:57,670| ThreadPoolExecutor-0_0| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_012857o_tmax200_raw.fits
+2021-01-04 09:51:57,716| ThreadPoolExecutor-0_0| INFO | ---> saving ccor
+2021-01-04 09:51:57,773| ThreadPoolExecutor-0_0| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_012857o_tmax200_raw.fits
+2021-01-04 09:51:57,773| ThreadPoolExecutor-0_0| INFO | ====> Graphing
+2021-01-04 09:51:57,962| ThreadPoolExecutor-0_0| DEBUG| path created: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 09:51:57,964| ThreadPoolExecutor-0_0| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 09:51:58,867| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_012857o_raw_acor_avg_0.png
+2021-01-04 09:51:59,016| ThreadPoolExecutor-0_0| DEBUG| path created: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 09:51:59,017| ThreadPoolExecutor-0_0| DEBUG| Graphing: gif_3_mat
+2021-01-04 09:52:04,930| ThreadPoolExecutor-0_1| INFO | == finished in 994.064843416214 s
+2021-01-04 09:52:04,931| ThreadPoolExecutor-0_1| INFO | ====> writing fits
+2021-01-04 09:52:04,931| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 09:52:04,931| ThreadPoolExecutor-0_1| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_043832o_tmax200_raw.fits
+2021-01-04 09:52:04,961| ThreadPoolExecutor-0_1| INFO | ---> saving ccor
+2021-01-04 09:52:05,016| ThreadPoolExecutor-0_1| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_043832o_tmax200_raw.fits
+2021-01-04 09:52:05,016| ThreadPoolExecutor-0_1| INFO | ====> Graphing
+2021-01-04 09:52:05,186| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 09:52:05,187| ThreadPoolExecutor-0_1| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 09:52:06,026| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_043832o_raw_acor_avg_0.png
+2021-01-04 09:52:06,168| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 09:52:06,168| ThreadPoolExecutor-0_1| DEBUG| Graphing: gif_3_mat
+2021-01-04 09:52:08,375| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_012857o_raw_acor_avg_0.gif
+2021-01-04 09:52:09,790| ThreadPoolExecutor-0_0| DEBUG| path created: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 09:52:09,791| ThreadPoolExecutor-0_0| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 09:52:10,810| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_012857o_raw_ccor_all_0.png
+2021-01-04 09:52:11,592| ThreadPoolExecutor-0_0| DEBUG| path created: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 09:52:11,592| ThreadPoolExecutor-0_0| DEBUG| Graphing: cor_animate_all
+2021-01-04 09:52:16,147| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_043832o_raw_acor_avg_0.gif
+2021-01-04 09:52:17,498| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 09:52:17,498| ThreadPoolExecutor-0_1| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 09:52:18,622| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_043832o_raw_ccor_all_0.png
+2021-01-04 09:52:19,941| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 09:52:19,942| ThreadPoolExecutor-0_1| DEBUG| Graphing: cor_animate_all
+2021-01-04 09:52:30,219| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_012857o_raw_ccor_all_0.gif
+2021-01-04 09:52:30,219| ThreadPoolExecutor-0_0| INFO | ===> complete
+2021-01-04 09:52:30,223| ThreadPoolExecutor-0_0| INFO | ======== 20201222_aocb_2020122_012857o ========
+2021-01-04 09:52:30,223| ThreadPoolExecutor-0_0| INFO | == sub_len = 5 
+2021-01-04 09:52:30,223| ThreadPoolExecutor-0_0| INFO | == s_sub = False 
+2021-01-04 09:52:30,224| ThreadPoolExecutor-0_0| INFO | == tt_sub = False 
+2021-01-04 09:52:30,224| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 09:52:30,224| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_012857o.fits
+2021-01-04 09:52:30,233| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_012857o.fits
+2021-01-04 09:52:30,249| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 09:52:30,250| ThreadPoolExecutor-0_0| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_012857o_tmax200_raw.fits
+2021-01-04 09:52:30,250| ThreadPoolExecutor-0_0| DEBUG| fits found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_012857o_tmax200_raw.fits
+2021-01-04 09:52:30,251| ThreadPoolExecutor-0_0| INFO | ---> Pulling data from fits file :  /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_012857o_tmax200_raw.fits
+2021-01-04 09:52:30,271| ThreadPoolExecutor-0_0| INFO | Generating auto corr from ccor tmax = 200
+2021-01-04 09:52:30,272| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_012857o.fits
+2021-01-04 09:52:30,292| ThreadPoolExecutor-0_0| DEBUG| self.target_file: None
+2021-01-04 09:52:30,293| ThreadPoolExecutor-0_0| INFO | ====> Starting acor
+2021-01-04 09:52:30,293| ThreadPoolExecutor-0_0| INFO | Auto corr already generated, tmax = 200
+2021-01-04 09:52:30,294| ThreadPoolExecutor-0_0| INFO | == finished in 0.00021076202392578125 s
+2021-01-04 09:52:30,294| ThreadPoolExecutor-0_0| INFO | ====> Starting ccor
+2021-01-04 09:52:30,294| ThreadPoolExecutor-0_0| INFO | Cross corr already generated, tmax = 200
+2021-01-04 09:52:30,294| ThreadPoolExecutor-0_0| INFO | == finished in 0.00015163421630859375 s
+2021-01-04 09:52:30,294| ThreadPoolExecutor-0_0| INFO | ====> writing fits
+2021-01-04 09:52:30,296| ThreadPoolExecutor-0_0| INFO | ---> saving ccor
+2021-01-04 09:52:30,334| ThreadPoolExecutor-0_0| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_012857o_tmax200_raw.fits
+2021-01-04 09:52:30,335| ThreadPoolExecutor-0_0| INFO | ====> Graphing
+2021-01-04 09:52:30,390| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 09:52:30,391| ThreadPoolExecutor-0_0| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 09:52:31,142| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_012857o_raw_acor_avg_1.png
+2021-01-04 09:52:31,196| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 09:52:31,196| ThreadPoolExecutor-0_0| DEBUG| Graphing: gif_3_mat
+2021-01-04 09:52:36,204| ThreadPoolExecutor-0_4| INFO | == finished in 1013.8972775936127 s
+2021-01-04 09:52:36,205| ThreadPoolExecutor-0_4| INFO | ====> writing fits
+2021-01-04 09:52:36,206| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 09:52:36,206| ThreadPoolExecutor-0_4| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_121720o_tmax200_raw.fits
+2021-01-04 09:52:36,245| ThreadPoolExecutor-0_4| INFO | ---> saving ccor
+2021-01-04 09:52:36,308| ThreadPoolExecutor-0_4| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_121720o_tmax200_raw.fits
+2021-01-04 09:52:36,308| ThreadPoolExecutor-0_4| INFO | ====> Graphing
+2021-01-04 09:52:36,467| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 09:52:36,467| ThreadPoolExecutor-0_4| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 09:52:36,632| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_043832o_raw_ccor_all_0.gif
+2021-01-04 09:52:36,634| ThreadPoolExecutor-0_1| INFO | ===> complete
+2021-01-04 09:52:36,639| ThreadPoolExecutor-0_1| INFO | ======== 20201222_aocb_2020122_043832o ========
+2021-01-04 09:52:36,640| ThreadPoolExecutor-0_1| INFO | == sub_len = 5 
+2021-01-04 09:52:36,643| ThreadPoolExecutor-0_1| INFO | == s_sub = False 
+2021-01-04 09:52:36,649| ThreadPoolExecutor-0_1| INFO | == tt_sub = False 
+2021-01-04 09:52:36,651| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 09:52:36,653| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_043832o.fits
+2021-01-04 09:52:36,671| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_043832o.fits
+2021-01-04 09:52:36,747| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 09:52:36,750| ThreadPoolExecutor-0_1| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_043832o_tmax200_raw.fits
+2021-01-04 09:52:36,763| ThreadPoolExecutor-0_1| DEBUG| fits found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_043832o_tmax200_raw.fits
+2021-01-04 09:52:36,765| ThreadPoolExecutor-0_1| INFO | ---> Pulling data from fits file :  /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_043832o_tmax200_raw.fits
+2021-01-04 09:52:36,822| ThreadPoolExecutor-0_1| INFO | Generating auto corr from ccor tmax = 200
+2021-01-04 09:52:36,833| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_043832o.fits
+2021-01-04 09:52:36,889| ThreadPoolExecutor-0_1| DEBUG| self.target_file: None
+2021-01-04 09:52:36,892| ThreadPoolExecutor-0_1| INFO | ====> Starting acor
+2021-01-04 09:52:36,898| ThreadPoolExecutor-0_1| INFO | Auto corr already generated, tmax = 200
+2021-01-04 09:52:36,899| ThreadPoolExecutor-0_1| INFO | == finished in 0.0012950897216796875 s
+2021-01-04 09:52:36,903| ThreadPoolExecutor-0_1| INFO | ====> Starting ccor
+2021-01-04 09:52:36,909| ThreadPoolExecutor-0_1| INFO | Cross corr already generated, tmax = 200
+2021-01-04 09:52:36,910| ThreadPoolExecutor-0_1| INFO | == finished in 0.000957489013671875 s
+2021-01-04 09:52:36,913| ThreadPoolExecutor-0_1| INFO | ====> writing fits
+2021-01-04 09:52:36,921| ThreadPoolExecutor-0_1| INFO | ---> saving ccor
+2021-01-04 09:52:36,993| ThreadPoolExecutor-0_4| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_121720o_raw_acor_avg_0.png
+2021-01-04 09:52:37,017| ThreadPoolExecutor-0_1| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_043832o_tmax200_raw.fits
+2021-01-04 09:52:37,017| ThreadPoolExecutor-0_1| INFO | ====> Graphing
+2021-01-04 09:52:37,128| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 09:52:37,129| ThreadPoolExecutor-0_1| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 09:52:37,980| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 09:52:37,980| ThreadPoolExecutor-0_4| DEBUG| Graphing: gif_3_mat
+2021-01-04 09:52:38,774| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_043832o_raw_acor_avg_1.png
+2021-01-04 09:52:38,978| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 09:52:38,979| ThreadPoolExecutor-0_1| DEBUG| Graphing: gif_3_mat
+2021-01-04 09:52:40,396| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_012857o_raw_acor_avg_1.gif
+2021-01-04 09:52:40,747| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 09:52:40,748| ThreadPoolExecutor-0_0| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 09:52:41,936| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_012857o_raw_ccor_all_1.png
+2021-01-04 09:52:42,238| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 09:52:42,238| ThreadPoolExecutor-0_0| DEBUG| Graphing: cor_animate_all
+2021-01-04 09:52:56,019| ThreadPoolExecutor-0_3| INFO | == finished in 1037.5222387313843 s
+2021-01-04 09:52:56,019| ThreadPoolExecutor-0_3| INFO | ====> writing fits
+2021-01-04 09:52:56,020| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 09:52:56,020| ThreadPoolExecutor-0_3| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_101126o_tmax200_raw.fits
+2021-01-04 09:52:56,045| ThreadPoolExecutor-0_3| INFO | ---> saving ccor
+2021-01-04 09:52:56,086| ThreadPoolExecutor-0_3| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_101126o_tmax200_raw.fits
+2021-01-04 09:52:56,087| ThreadPoolExecutor-0_3| INFO | ====> Graphing
+2021-01-04 09:52:56,175| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 09:52:56,175| ThreadPoolExecutor-0_3| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 09:52:57,046| ThreadPoolExecutor-0_3| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_101126o_raw_acor_avg_0.png
+2021-01-04 09:52:57,140| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 09:52:57,140| ThreadPoolExecutor-0_3| DEBUG| Graphing: gif_3_mat
+2021-01-04 09:52:57,876| ThreadPoolExecutor-0_4| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_121720o_raw_acor_avg_0.gif
+2021-01-04 09:52:58,171| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_043832o_raw_acor_avg_1.gif
+2021-01-04 09:52:58,655| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 09:52:58,659| ThreadPoolExecutor-0_1| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 09:52:59,873| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_043832o_raw_ccor_all_1.png
+2021-01-04 09:53:00,164| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 09:53:00,164| ThreadPoolExecutor-0_1| DEBUG| Graphing: cor_animate_all
+2021-01-04 09:53:00,197| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 09:53:00,199| ThreadPoolExecutor-0_4| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 09:53:01,670| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_012857o_raw_ccor_all_1.gif
+2021-01-04 09:53:01,848| ThreadPoolExecutor-0_0| INFO | ===> complete
+2021-01-04 09:53:01,850| ThreadPoolExecutor-0_0| INFO | ======== 20201222_aocb_2020122_012857o ========
+2021-01-04 09:53:01,860| ThreadPoolExecutor-0_0| INFO | == sub_len = 0 
+2021-01-04 09:53:01,889| ThreadPoolExecutor-0_0| INFO | == s_sub = True 
+2021-01-04 09:53:01,901| ThreadPoolExecutor-0_0| INFO | == tt_sub = False 
+2021-01-04 09:53:01,909| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 09:53:01,921| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_012857o.fits
+2021-01-04 09:53:01,996| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_012857o.fits
+2021-01-04 09:53:02,389| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 09:53:02,412| ThreadPoolExecutor-0_0| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_012857o_tmax200_s.fits
+2021-01-04 09:53:02,417| ThreadPoolExecutor-0_0| DEBUG| fits not found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_012857o_tmax200_s.fits
+2021-01-04 09:53:02,423| ThreadPoolExecutor-0_0| INFO | ====> Starting acor
+2021-01-04 09:53:02,423| ThreadPoolExecutor-0_0| INFO | Generating auto corr tmax = 200
+2021-01-04 09:53:03,258| ThreadPoolExecutor-0_4| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_121720o_raw_ccor_all_0.png
+2021-01-04 09:53:04,550| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 09:53:04,552| ThreadPoolExecutor-0_4| DEBUG| Graphing: cor_animate_all
+2021-01-04 09:53:19,942| ThreadPoolExecutor-0_3| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_101126o_raw_acor_avg_0.gif
+2021-01-04 09:53:20,527| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 09:53:20,528| ThreadPoolExecutor-0_3| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 09:53:21,326| ThreadPoolExecutor-0_3| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_101126o_raw_ccor_all_0.png
+2021-01-04 09:53:21,625| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 09:53:21,626| ThreadPoolExecutor-0_3| DEBUG| Graphing: cor_animate_all
+2021-01-04 09:53:25,913| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_043832o_raw_ccor_all_1.gif
+2021-01-04 09:53:25,914| ThreadPoolExecutor-0_1| INFO | ===> complete
+2021-01-04 09:53:25,917| ThreadPoolExecutor-0_1| INFO | ======== 20201222_aocb_2020122_043832o ========
+2021-01-04 09:53:25,920| ThreadPoolExecutor-0_1| INFO | == sub_len = 0 
+2021-01-04 09:53:25,921| ThreadPoolExecutor-0_1| INFO | == s_sub = True 
+2021-01-04 09:53:25,921| ThreadPoolExecutor-0_1| INFO | == tt_sub = False 
+2021-01-04 09:53:25,921| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 09:53:25,922| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_043832o.fits
+2021-01-04 09:53:25,930| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_043832o.fits
+2021-01-04 09:53:25,979| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 09:53:25,979| ThreadPoolExecutor-0_1| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_043832o_tmax200_s.fits
+2021-01-04 09:53:25,980| ThreadPoolExecutor-0_1| DEBUG| fits not found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_043832o_tmax200_s.fits
+2021-01-04 09:53:25,980| ThreadPoolExecutor-0_1| INFO | ====> Starting acor
+2021-01-04 09:53:25,982| ThreadPoolExecutor-0_1| INFO | Generating auto corr tmax = 200
+2021-01-04 09:53:26,816| ThreadPoolExecutor-0_4| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_121720o_raw_ccor_all_0.gif
+2021-01-04 09:53:26,816| ThreadPoolExecutor-0_4| INFO | ===> complete
+2021-01-04 09:53:26,818| ThreadPoolExecutor-0_4| INFO | ======== 20201222_aocb_2020122_121720o ========
+2021-01-04 09:53:26,818| ThreadPoolExecutor-0_4| INFO | == sub_len = 5 
+2021-01-04 09:53:26,818| ThreadPoolExecutor-0_4| INFO | == s_sub = False 
+2021-01-04 09:53:26,819| ThreadPoolExecutor-0_4| INFO | == tt_sub = False 
+2021-01-04 09:53:26,819| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 09:53:26,820| ThreadPoolExecutor-0_4| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_121720o.fits
+2021-01-04 09:53:26,826| ThreadPoolExecutor-0_4| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_121720o.fits
+2021-01-04 09:53:26,862| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 09:53:26,863| ThreadPoolExecutor-0_4| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_121720o_tmax200_raw.fits
+2021-01-04 09:53:26,863| ThreadPoolExecutor-0_4| DEBUG| fits found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_121720o_tmax200_raw.fits
+2021-01-04 09:53:26,868| ThreadPoolExecutor-0_4| INFO | ---> Pulling data from fits file :  /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_121720o_tmax200_raw.fits
+2021-01-04 09:53:26,900| ThreadPoolExecutor-0_4| INFO | Generating auto corr from ccor tmax = 200
+2021-01-04 09:53:26,908| ThreadPoolExecutor-0_4| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_121720o.fits
+2021-01-04 09:53:26,937| ThreadPoolExecutor-0_4| DEBUG| self.target_file: None
+2021-01-04 09:53:26,938| ThreadPoolExecutor-0_4| INFO | ====> Starting acor
+2021-01-04 09:53:26,939| ThreadPoolExecutor-0_4| INFO | Auto corr already generated, tmax = 200
+2021-01-04 09:53:26,939| ThreadPoolExecutor-0_4| INFO | == finished in 0.00033664703369140625 s
+2021-01-04 09:53:26,941| ThreadPoolExecutor-0_4| INFO | ====> Starting ccor
+2021-01-04 09:53:26,946| ThreadPoolExecutor-0_4| INFO | Cross corr already generated, tmax = 200
+2021-01-04 09:53:26,947| ThreadPoolExecutor-0_4| INFO | == finished in 0.00034809112548828125 s
+2021-01-04 09:53:26,947| ThreadPoolExecutor-0_4| INFO | ====> writing fits
+2021-01-04 09:53:26,949| ThreadPoolExecutor-0_4| INFO | ---> saving ccor
+2021-01-04 09:53:27,001| ThreadPoolExecutor-0_4| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_121720o_tmax200_raw.fits
+2021-01-04 09:53:27,002| ThreadPoolExecutor-0_4| INFO | ====> Graphing
+2021-01-04 09:53:27,196| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 09:53:27,197| ThreadPoolExecutor-0_4| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 09:53:28,305| ThreadPoolExecutor-0_4| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_121720o_raw_acor_avg_1.png
+2021-01-04 09:53:28,502| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 09:53:28,503| ThreadPoolExecutor-0_4| DEBUG| Graphing: gif_3_mat
+2021-01-04 09:53:36,702| ThreadPoolExecutor-0_2| INFO | == finished in 1063.6144971847534 s
+2021-01-04 09:53:36,703| ThreadPoolExecutor-0_2| INFO | ====> writing fits
+2021-01-04 09:53:36,704| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 09:53:36,704| ThreadPoolExecutor-0_2| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_074836o_tmax200_raw.fits
+2021-01-04 09:53:36,755| ThreadPoolExecutor-0_2| INFO | ---> saving ccor
+2021-01-04 09:53:36,826| ThreadPoolExecutor-0_2| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_074836o_tmax200_raw.fits
+2021-01-04 09:53:36,826| ThreadPoolExecutor-0_2| INFO | ====> Graphing
+2021-01-04 09:53:37,000| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 09:53:37,001| ThreadPoolExecutor-0_2| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 09:53:37,767| ThreadPoolExecutor-0_2| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_074836o_raw_acor_avg_0.png
+2021-01-04 09:53:37,913| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 09:53:37,913| ThreadPoolExecutor-0_2| DEBUG| Graphing: gif_3_mat
+2021-01-04 09:53:40,607| ThreadPoolExecutor-0_4| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_121720o_raw_acor_avg_1.gif
+2021-01-04 09:53:41,029| ThreadPoolExecutor-0_3| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_101126o_raw_ccor_all_0.gif
+2021-01-04 09:53:41,031| ThreadPoolExecutor-0_3| INFO | ===> complete
+2021-01-04 09:53:41,032| ThreadPoolExecutor-0_3| INFO | ======== 20201222_aocb_2020122_101126o ========
+2021-01-04 09:53:41,033| ThreadPoolExecutor-0_3| INFO | == sub_len = 5 
+2021-01-04 09:53:41,033| ThreadPoolExecutor-0_3| INFO | == s_sub = False 
+2021-01-04 09:53:41,034| ThreadPoolExecutor-0_3| INFO | == tt_sub = False 
+2021-01-04 09:53:41,034| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 09:53:41,035| ThreadPoolExecutor-0_3| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_101126o.fits
+2021-01-04 09:53:41,047| ThreadPoolExecutor-0_3| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_101126o.fits
+2021-01-04 09:53:41,098| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 09:53:41,102| ThreadPoolExecutor-0_3| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_101126o_tmax200_raw.fits
+2021-01-04 09:53:41,103| ThreadPoolExecutor-0_3| DEBUG| fits found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_101126o_tmax200_raw.fits
+2021-01-04 09:53:41,104| ThreadPoolExecutor-0_3| INFO | ---> Pulling data from fits file :  /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_101126o_tmax200_raw.fits
+2021-01-04 09:53:41,127| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 09:53:41,127| ThreadPoolExecutor-0_4| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 09:53:41,129| ThreadPoolExecutor-0_3| INFO | Generating auto corr from ccor tmax = 200
+2021-01-04 09:53:41,145| ThreadPoolExecutor-0_3| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_101126o.fits
+2021-01-04 09:53:41,222| ThreadPoolExecutor-0_3| DEBUG| self.target_file: None
+2021-01-04 09:53:41,227| ThreadPoolExecutor-0_3| INFO | ====> Starting acor
+2021-01-04 09:53:41,229| ThreadPoolExecutor-0_3| INFO | Auto corr already generated, tmax = 200
+2021-01-04 09:53:41,231| ThreadPoolExecutor-0_3| INFO | == finished in 0.0022788047790527344 s
+2021-01-04 09:53:41,237| ThreadPoolExecutor-0_3| INFO | ====> Starting ccor
+2021-01-04 09:53:41,238| ThreadPoolExecutor-0_3| INFO | Cross corr already generated, tmax = 200
+2021-01-04 09:53:41,241| ThreadPoolExecutor-0_3| INFO | == finished in 0.0023927688598632812 s
+2021-01-04 09:53:41,241| ThreadPoolExecutor-0_3| INFO | ====> writing fits
+2021-01-04 09:53:41,256| ThreadPoolExecutor-0_3| INFO | ---> saving ccor
+2021-01-04 09:53:41,486| ThreadPoolExecutor-0_3| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_101126o_tmax200_raw.fits
+2021-01-04 09:53:41,493| ThreadPoolExecutor-0_3| INFO | ====> Graphing
+2021-01-04 09:53:42,174| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 09:53:42,175| ThreadPoolExecutor-0_3| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 09:53:42,873| ThreadPoolExecutor-0_4| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_121720o_raw_ccor_all_1.png
+2021-01-04 09:53:43,261| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 09:53:43,262| ThreadPoolExecutor-0_4| DEBUG| Graphing: cor_animate_all
+2021-01-04 09:53:44,441| ThreadPoolExecutor-0_3| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_101126o_raw_acor_avg_1.png
+2021-01-04 09:53:45,431| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 09:53:45,431| ThreadPoolExecutor-0_3| DEBUG| Graphing: gif_3_mat
+2021-01-04 09:53:53,261| ThreadPoolExecutor-0_2| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_074836o_raw_acor_avg_0.gif
+2021-01-04 09:53:54,649| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 09:53:54,650| ThreadPoolExecutor-0_2| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 09:53:55,893| ThreadPoolExecutor-0_2| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_074836o_raw_ccor_all_0.png
+2021-01-04 09:53:57,148| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 09:53:57,149| ThreadPoolExecutor-0_2| DEBUG| Graphing: cor_animate_all
+2021-01-04 09:54:01,820| ThreadPoolExecutor-0_3| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_101126o_raw_acor_avg_1.gif
+2021-01-04 09:54:02,297| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 09:54:02,298| ThreadPoolExecutor-0_3| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 09:54:03,238| ThreadPoolExecutor-0_4| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_121720o_raw_ccor_all_1.gif
+2021-01-04 09:54:03,239| ThreadPoolExecutor-0_4| INFO | ===> complete
+2021-01-04 09:54:03,239| ThreadPoolExecutor-0_4| INFO | ======== 20201222_aocb_2020122_121720o ========
+2021-01-04 09:54:03,240| ThreadPoolExecutor-0_4| INFO | == sub_len = 0 
+2021-01-04 09:54:03,240| ThreadPoolExecutor-0_4| INFO | == s_sub = True 
+2021-01-04 09:54:03,241| ThreadPoolExecutor-0_4| INFO | == tt_sub = False 
+2021-01-04 09:54:03,241| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 09:54:03,241| ThreadPoolExecutor-0_4| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_121720o.fits
+2021-01-04 09:54:03,252| ThreadPoolExecutor-0_4| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_121720o.fits
+2021-01-04 09:54:03,292| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 09:54:03,292| ThreadPoolExecutor-0_4| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_121720o_tmax200_s.fits
+2021-01-04 09:54:03,293| ThreadPoolExecutor-0_4| DEBUG| fits not found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_121720o_tmax200_s.fits
+2021-01-04 09:54:03,293| ThreadPoolExecutor-0_4| INFO | ====> Starting acor
+2021-01-04 09:54:03,293| ThreadPoolExecutor-0_4| INFO | Generating auto corr tmax = 200
+2021-01-04 09:54:03,423| ThreadPoolExecutor-0_3| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_101126o_raw_ccor_all_1.png
+2021-01-04 09:54:03,870| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 09:54:03,876| ThreadPoolExecutor-0_3| DEBUG| Graphing: cor_animate_all
+2021-01-04 09:54:19,417| ThreadPoolExecutor-0_2| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_074836o_raw_ccor_all_0.gif
+2021-01-04 09:54:19,418| ThreadPoolExecutor-0_2| INFO | ===> complete
+2021-01-04 09:54:19,419| ThreadPoolExecutor-0_2| INFO | ======== 20201222_aocb_2020122_074836o ========
+2021-01-04 09:54:19,420| ThreadPoolExecutor-0_2| INFO | == sub_len = 5 
+2021-01-04 09:54:19,420| ThreadPoolExecutor-0_2| INFO | == s_sub = False 
+2021-01-04 09:54:19,421| ThreadPoolExecutor-0_2| INFO | == tt_sub = False 
+2021-01-04 09:54:19,421| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 09:54:19,422| ThreadPoolExecutor-0_2| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_074836o.fits
+2021-01-04 09:54:19,430| ThreadPoolExecutor-0_2| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_074836o.fits
+2021-01-04 09:54:19,450| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 09:54:19,451| ThreadPoolExecutor-0_2| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_074836o_tmax200_raw.fits
+2021-01-04 09:54:19,451| ThreadPoolExecutor-0_2| DEBUG| fits found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_074836o_tmax200_raw.fits
+2021-01-04 09:54:19,451| ThreadPoolExecutor-0_2| INFO | ---> Pulling data from fits file :  /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_074836o_tmax200_raw.fits
+2021-01-04 09:54:19,470| ThreadPoolExecutor-0_2| INFO | Generating auto corr from ccor tmax = 200
+2021-01-04 09:54:19,472| ThreadPoolExecutor-0_2| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_074836o.fits
+2021-01-04 09:54:19,492| ThreadPoolExecutor-0_2| DEBUG| self.target_file: None
+2021-01-04 09:54:19,493| ThreadPoolExecutor-0_2| INFO | ====> Starting acor
+2021-01-04 09:54:19,494| ThreadPoolExecutor-0_2| INFO | Auto corr already generated, tmax = 200
+2021-01-04 09:54:19,494| ThreadPoolExecutor-0_2| INFO | == finished in 0.0003123283386230469 s
+2021-01-04 09:54:19,494| ThreadPoolExecutor-0_2| INFO | ====> Starting ccor
+2021-01-04 09:54:19,494| ThreadPoolExecutor-0_2| INFO | Cross corr already generated, tmax = 200
+2021-01-04 09:54:19,495| ThreadPoolExecutor-0_2| INFO | == finished in 0.0001723766326904297 s
+2021-01-04 09:54:19,495| ThreadPoolExecutor-0_2| INFO | ====> writing fits
+2021-01-04 09:54:19,496| ThreadPoolExecutor-0_2| INFO | ---> saving ccor
+2021-01-04 09:54:19,533| ThreadPoolExecutor-0_2| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_074836o_tmax200_raw.fits
+2021-01-04 09:54:19,533| ThreadPoolExecutor-0_2| INFO | ====> Graphing
+2021-01-04 09:54:19,601| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 09:54:19,602| ThreadPoolExecutor-0_2| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 09:54:20,375| ThreadPoolExecutor-0_2| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_074836o_raw_acor_avg_1.png
+2021-01-04 09:54:20,436| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 09:54:20,437| ThreadPoolExecutor-0_2| DEBUG| Graphing: gif_3_mat
+2021-01-04 09:54:23,392| ThreadPoolExecutor-0_3| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_101126o_raw_ccor_all_1.gif
+2021-01-04 09:54:23,393| ThreadPoolExecutor-0_3| INFO | ===> complete
+2021-01-04 09:54:23,400| ThreadPoolExecutor-0_3| INFO | ======== 20201222_aocb_2020122_101126o ========
+2021-01-04 09:54:23,402| ThreadPoolExecutor-0_3| INFO | == sub_len = 0 
+2021-01-04 09:54:23,403| ThreadPoolExecutor-0_3| INFO | == s_sub = True 
+2021-01-04 09:54:23,404| ThreadPoolExecutor-0_3| INFO | == tt_sub = False 
+2021-01-04 09:54:23,405| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 09:54:23,406| ThreadPoolExecutor-0_3| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_101126o.fits
+2021-01-04 09:54:23,415| ThreadPoolExecutor-0_3| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_101126o.fits
+2021-01-04 09:54:23,458| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 09:54:23,464| ThreadPoolExecutor-0_3| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_101126o_tmax200_s.fits
+2021-01-04 09:54:23,466| ThreadPoolExecutor-0_3| DEBUG| fits not found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_101126o_tmax200_s.fits
+2021-01-04 09:54:23,467| ThreadPoolExecutor-0_3| INFO | ====> Starting acor
+2021-01-04 09:54:23,467| ThreadPoolExecutor-0_3| INFO | Generating auto corr tmax = 200
+2021-01-04 09:54:30,143| ThreadPoolExecutor-0_2| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_074836o_raw_acor_avg_1.gif
+2021-01-04 09:54:30,485| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 09:54:30,486| ThreadPoolExecutor-0_2| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 09:54:31,305| ThreadPoolExecutor-0_2| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_074836o_raw_ccor_all_1.png
+2021-01-04 09:54:31,540| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 09:54:31,541| ThreadPoolExecutor-0_2| DEBUG| Graphing: cor_animate_all
+2021-01-04 09:54:47,555| ThreadPoolExecutor-0_2| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_074836o_raw_ccor_all_1.gif
+2021-01-04 09:54:47,555| ThreadPoolExecutor-0_2| INFO | ===> complete
+2021-01-04 09:54:47,558| ThreadPoolExecutor-0_2| INFO | ======== 20201222_aocb_2020122_074836o ========
+2021-01-04 09:54:47,558| ThreadPoolExecutor-0_2| INFO | == sub_len = 0 
+2021-01-04 09:54:47,558| ThreadPoolExecutor-0_2| INFO | == s_sub = True 
+2021-01-04 09:54:47,559| ThreadPoolExecutor-0_2| INFO | == tt_sub = False 
+2021-01-04 09:54:47,559| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 09:54:47,560| ThreadPoolExecutor-0_2| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_074836o.fits
+2021-01-04 09:54:47,566| ThreadPoolExecutor-0_2| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_074836o.fits
+2021-01-04 09:54:47,594| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 09:54:47,594| ThreadPoolExecutor-0_2| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_074836o_tmax200_s.fits
+2021-01-04 09:54:47,595| ThreadPoolExecutor-0_2| DEBUG| fits not found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_074836o_tmax200_s.fits
+2021-01-04 09:54:47,595| ThreadPoolExecutor-0_2| INFO | ====> Starting acor
+2021-01-04 09:54:47,595| ThreadPoolExecutor-0_2| INFO | Generating auto corr tmax = 200
+2021-01-04 10:04:23,414| ThreadPoolExecutor-0_1| INFO | == finished in 657.4322180747986 s
+2021-01-04 10:04:23,415| ThreadPoolExecutor-0_1| INFO | ====> Starting ccor
+2021-01-04 10:04:23,415| ThreadPoolExecutor-0_1| INFO | Generating cross corr tmax = 200
+2021-01-04 10:04:25,683| ThreadPoolExecutor-0_0| INFO | == finished in 683.2597780227661 s
+2021-01-04 10:04:25,684| ThreadPoolExecutor-0_0| INFO | ====> Starting ccor
+2021-01-04 10:04:25,684| ThreadPoolExecutor-0_0| INFO | Generating cross corr tmax = 200
+2021-01-04 10:04:44,060| ThreadPoolExecutor-0_4| INFO | == finished in 640.7663156986237 s
+2021-01-04 10:04:44,061| ThreadPoolExecutor-0_4| INFO | ====> Starting ccor
+2021-01-04 10:04:44,061| ThreadPoolExecutor-0_4| INFO | Generating cross corr tmax = 200
+2021-01-04 10:04:55,300| ThreadPoolExecutor-0_3| INFO | == finished in 631.832777261734 s
+2021-01-04 10:04:55,301| ThreadPoolExecutor-0_3| INFO | ====> Starting ccor
+2021-01-04 10:04:55,301| ThreadPoolExecutor-0_3| INFO | Generating cross corr tmax = 200
+2021-01-04 10:05:26,555| ThreadPoolExecutor-0_2| INFO | == finished in 638.9598729610443 s
+2021-01-04 10:05:26,556| ThreadPoolExecutor-0_2| INFO | ====> Starting ccor
+2021-01-04 10:05:26,556| ThreadPoolExecutor-0_2| INFO | Generating cross corr tmax = 200
+2021-01-04 10:20:03,861| ThreadPoolExecutor-0_0| INFO | == finished in 938.1771912574768 s
+2021-01-04 10:20:03,862| ThreadPoolExecutor-0_0| INFO | ====> writing fits
+2021-01-04 10:20:03,863| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 10:20:03,863| ThreadPoolExecutor-0_0| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_012857o_tmax200_s.fits
+2021-01-04 10:20:03,909| ThreadPoolExecutor-0_0| INFO | ---> saving ccor
+2021-01-04 10:20:03,970| ThreadPoolExecutor-0_0| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_012857o_tmax200_s.fits
+2021-01-04 10:20:03,970| ThreadPoolExecutor-0_0| INFO | ====> Graphing
+2021-01-04 10:20:04,165| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 10:20:04,166| ThreadPoolExecutor-0_0| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 10:20:05,010| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_012857o_s_acor_avg_0.png
+2021-01-04 10:20:05,236| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 10:20:05,236| ThreadPoolExecutor-0_0| DEBUG| Graphing: gif_3_mat
+2021-01-04 10:20:14,625| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_012857o_s_acor_avg_0.gif
+2021-01-04 10:20:15,304| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 10:20:15,305| ThreadPoolExecutor-0_0| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 10:20:16,098| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_012857o_s_ccor_all_0.png
+2021-01-04 10:20:16,675| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 10:20:16,676| ThreadPoolExecutor-0_0| DEBUG| Graphing: cor_animate_all
+2021-01-04 10:20:26,788| ThreadPoolExecutor-0_1| INFO | == finished in 963.3730285167694 s
+2021-01-04 10:20:26,790| ThreadPoolExecutor-0_1| INFO | ====> writing fits
+2021-01-04 10:20:26,790| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 10:20:26,790| ThreadPoolExecutor-0_1| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_043832o_tmax200_s.fits
+2021-01-04 10:20:26,825| ThreadPoolExecutor-0_1| INFO | ---> saving ccor
+2021-01-04 10:20:26,879| ThreadPoolExecutor-0_1| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_043832o_tmax200_s.fits
+2021-01-04 10:20:26,879| ThreadPoolExecutor-0_1| INFO | ====> Graphing
+2021-01-04 10:20:27,078| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 10:20:27,079| ThreadPoolExecutor-0_1| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 10:20:27,950| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_043832o_s_acor_avg_0.png
+2021-01-04 10:20:28,142| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 10:20:28,142| ThreadPoolExecutor-0_1| DEBUG| Graphing: gif_3_mat
+2021-01-04 10:20:32,328| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_012857o_s_ccor_all_0.gif
+2021-01-04 10:20:32,329| ThreadPoolExecutor-0_0| INFO | ===> complete
+2021-01-04 10:20:32,329| ThreadPoolExecutor-0_0| INFO | ======== 20201222_aocb_2020122_012857o ========
+2021-01-04 10:20:32,329| ThreadPoolExecutor-0_0| INFO | == sub_len = 5 
+2021-01-04 10:20:32,329| ThreadPoolExecutor-0_0| INFO | == s_sub = True 
+2021-01-04 10:20:32,329| ThreadPoolExecutor-0_0| INFO | == tt_sub = False 
+2021-01-04 10:20:32,329| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 10:20:32,329| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_012857o.fits
+2021-01-04 10:20:32,335| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_012857o.fits
+2021-01-04 10:20:32,361| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 10:20:32,361| ThreadPoolExecutor-0_0| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_012857o_tmax200_s.fits
+2021-01-04 10:20:32,362| ThreadPoolExecutor-0_0| DEBUG| fits found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_012857o_tmax200_s.fits
+2021-01-04 10:20:32,362| ThreadPoolExecutor-0_0| INFO | ---> Pulling data from fits file :  /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_012857o_tmax200_s.fits
+2021-01-04 10:20:32,376| ThreadPoolExecutor-0_0| INFO | Generating auto corr from ccor tmax = 200
+2021-01-04 10:20:32,377| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_012857o.fits
+2021-01-04 10:20:32,393| ThreadPoolExecutor-0_0| DEBUG| self.target_file: None
+2021-01-04 10:20:32,394| ThreadPoolExecutor-0_0| INFO | ====> Starting acor
+2021-01-04 10:20:32,394| ThreadPoolExecutor-0_0| INFO | Auto corr already generated, tmax = 200
+2021-01-04 10:20:32,394| ThreadPoolExecutor-0_0| INFO | == finished in 9.870529174804688e-05 s
+2021-01-04 10:20:32,395| ThreadPoolExecutor-0_0| INFO | ====> Starting ccor
+2021-01-04 10:20:32,395| ThreadPoolExecutor-0_0| INFO | Cross corr already generated, tmax = 200
+2021-01-04 10:20:32,395| ThreadPoolExecutor-0_0| INFO | == finished in 0.00015282630920410156 s
+2021-01-04 10:20:32,395| ThreadPoolExecutor-0_0| INFO | ====> writing fits
+2021-01-04 10:20:32,396| ThreadPoolExecutor-0_0| INFO | ---> saving ccor
+2021-01-04 10:20:32,424| ThreadPoolExecutor-0_0| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_012857o_tmax200_s.fits
+2021-01-04 10:20:32,425| ThreadPoolExecutor-0_0| INFO | ====> Graphing
+2021-01-04 10:20:32,484| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 10:20:32,484| ThreadPoolExecutor-0_0| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 10:20:33,241| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_012857o_s_acor_avg_1.png
+2021-01-04 10:20:33,298| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 10:20:33,298| ThreadPoolExecutor-0_0| DEBUG| Graphing: gif_3_mat
+2021-01-04 10:20:37,134| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_043832o_s_acor_avg_0.gif
+2021-01-04 10:20:38,095| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 10:20:38,095| ThreadPoolExecutor-0_1| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 10:20:38,859| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_043832o_s_ccor_all_0.png
+2021-01-04 10:20:39,302| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 10:20:39,303| ThreadPoolExecutor-0_1| DEBUG| Graphing: cor_animate_all
+2021-01-04 10:20:42,417| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_012857o_s_acor_avg_1.gif
+2021-01-04 10:20:42,857| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 10:20:42,858| ThreadPoolExecutor-0_0| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 10:20:43,896| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_012857o_s_ccor_all_1.png
+2021-01-04 10:20:44,320| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 10:20:44,321| ThreadPoolExecutor-0_0| DEBUG| Graphing: cor_animate_all
+2021-01-04 10:21:03,167| ThreadPoolExecutor-0_4| INFO | == finished in 979.105874300003 s
+2021-01-04 10:21:03,168| ThreadPoolExecutor-0_4| INFO | ====> writing fits
+2021-01-04 10:21:03,168| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 10:21:03,169| ThreadPoolExecutor-0_4| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_121720o_tmax200_s.fits
+2021-01-04 10:21:03,213| ThreadPoolExecutor-0_4| INFO | ---> saving ccor
+2021-01-04 10:21:03,277| ThreadPoolExecutor-0_4| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_121720o_tmax200_s.fits
+2021-01-04 10:21:03,278| ThreadPoolExecutor-0_4| INFO | ====> Graphing
+2021-01-04 10:21:03,445| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 10:21:03,446| ThreadPoolExecutor-0_4| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 10:21:03,817| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_043832o_s_ccor_all_0.gif
+2021-01-04 10:21:03,823| ThreadPoolExecutor-0_1| INFO | ===> complete
+2021-01-04 10:21:03,831| ThreadPoolExecutor-0_1| INFO | ======== 20201222_aocb_2020122_043832o ========
+2021-01-04 10:21:03,842| ThreadPoolExecutor-0_1| INFO | == sub_len = 5 
+2021-01-04 10:21:03,844| ThreadPoolExecutor-0_1| INFO | == s_sub = True 
+2021-01-04 10:21:03,847| ThreadPoolExecutor-0_1| INFO | == tt_sub = False 
+2021-01-04 10:21:03,850| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 10:21:03,859| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_043832o.fits
+2021-01-04 10:21:03,883| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_043832o.fits
+2021-01-04 10:21:04,014| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 10:21:04,020| ThreadPoolExecutor-0_1| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_043832o_tmax200_s.fits
+2021-01-04 10:21:04,025| ThreadPoolExecutor-0_1| DEBUG| fits found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_043832o_tmax200_s.fits
+2021-01-04 10:21:04,032| ThreadPoolExecutor-0_1| INFO | ---> Pulling data from fits file :  /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_043832o_tmax200_s.fits
+2021-01-04 10:21:04,084| ThreadPoolExecutor-0_4| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_121720o_s_acor_avg_0.png
+2021-01-04 10:21:04,111| ThreadPoolExecutor-0_1| INFO | Generating auto corr from ccor tmax = 200
+2021-01-04 10:21:04,114| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_043832o.fits
+2021-01-04 10:21:04,140| ThreadPoolExecutor-0_1| DEBUG| self.target_file: None
+2021-01-04 10:21:04,142| ThreadPoolExecutor-0_1| INFO | ====> Starting acor
+2021-01-04 10:21:04,143| ThreadPoolExecutor-0_1| INFO | Auto corr already generated, tmax = 200
+2021-01-04 10:21:04,143| ThreadPoolExecutor-0_1| INFO | == finished in 0.00032782554626464844 s
+2021-01-04 10:21:04,143| ThreadPoolExecutor-0_1| INFO | ====> Starting ccor
+2021-01-04 10:21:04,144| ThreadPoolExecutor-0_1| INFO | Cross corr already generated, tmax = 200
+2021-01-04 10:21:04,144| ThreadPoolExecutor-0_1| INFO | == finished in 0.00039505958557128906 s
+2021-01-04 10:21:04,145| ThreadPoolExecutor-0_1| INFO | ====> writing fits
+2021-01-04 10:21:04,147| ThreadPoolExecutor-0_1| INFO | ---> saving ccor
+2021-01-04 10:21:04,199| ThreadPoolExecutor-0_1| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_043832o_tmax200_s.fits
+2021-01-04 10:21:04,199| ThreadPoolExecutor-0_1| INFO | ====> Graphing
+2021-01-04 10:21:04,312| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 10:21:04,313| ThreadPoolExecutor-0_1| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 10:21:04,845| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 10:21:04,852| ThreadPoolExecutor-0_4| DEBUG| Graphing: gif_3_mat
+2021-01-04 10:21:05,355| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_012857o_s_ccor_all_1.gif
+2021-01-04 10:21:05,361| ThreadPoolExecutor-0_0| INFO | ===> complete
+2021-01-04 10:21:05,363| ThreadPoolExecutor-0_0| INFO | ======== 20201222_aocb_2020122_012857o ========
+2021-01-04 10:21:05,363| ThreadPoolExecutor-0_0| INFO | == sub_len = 0 
+2021-01-04 10:21:05,363| ThreadPoolExecutor-0_0| INFO | == s_sub = True 
+2021-01-04 10:21:05,371| ThreadPoolExecutor-0_0| INFO | == tt_sub = True 
+2021-01-04 10:21:05,387| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 10:21:05,404| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_012857o.fits
+2021-01-04 10:21:05,509| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_012857o.fits
+2021-01-04 10:21:05,743| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 10:21:05,746| ThreadPoolExecutor-0_0| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_012857o_tmax200_stt.fits
+2021-01-04 10:21:05,747| ThreadPoolExecutor-0_0| DEBUG| fits not found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_012857o_tmax200_stt.fits
+2021-01-04 10:21:05,747| ThreadPoolExecutor-0_0| INFO | ====> Starting acor
+2021-01-04 10:21:05,747| ThreadPoolExecutor-0_0| INFO | Generating auto corr tmax = 200
+2021-01-04 10:21:06,058| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_043832o_s_acor_avg_1.png
+2021-01-04 10:21:06,297| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 10:21:06,303| ThreadPoolExecutor-0_1| DEBUG| Graphing: gif_3_mat
+2021-01-04 10:21:18,531| ThreadPoolExecutor-0_4| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_121720o_s_acor_avg_0.gif
+2021-01-04 10:21:18,538| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_043832o_s_acor_avg_1.gif
+2021-01-04 10:21:18,761| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 10:21:18,766| ThreadPoolExecutor-0_1| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 10:21:19,585| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_043832o_s_ccor_all_1.png
+2021-01-04 10:21:19,838| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 10:21:19,839| ThreadPoolExecutor-0_1| DEBUG| Graphing: cor_animate_all
+2021-01-04 10:21:20,004| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 10:21:20,006| ThreadPoolExecutor-0_4| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 10:21:23,031| ThreadPoolExecutor-0_4| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_121720o_s_ccor_all_0.png
+2021-01-04 10:21:24,429| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 10:21:24,430| ThreadPoolExecutor-0_4| DEBUG| Graphing: cor_animate_all
+2021-01-04 10:21:40,472| ThreadPoolExecutor-0_3| INFO | == finished in 1005.1704404354095 s
+2021-01-04 10:21:40,473| ThreadPoolExecutor-0_3| INFO | ====> writing fits
+2021-01-04 10:21:40,473| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 10:21:40,474| ThreadPoolExecutor-0_3| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_101126o_tmax200_s.fits
+2021-01-04 10:21:40,503| ThreadPoolExecutor-0_3| INFO | ---> saving ccor
+2021-01-04 10:21:40,546| ThreadPoolExecutor-0_3| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_101126o_tmax200_s.fits
+2021-01-04 10:21:40,547| ThreadPoolExecutor-0_3| INFO | ====> Graphing
+2021-01-04 10:21:40,716| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 10:21:40,717| ThreadPoolExecutor-0_3| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 10:21:41,597| ThreadPoolExecutor-0_3| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_101126o_s_acor_avg_0.png
+2021-01-04 10:21:41,741| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 10:21:41,742| ThreadPoolExecutor-0_3| DEBUG| Graphing: gif_3_mat
+2021-01-04 10:21:44,309| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_043832o_s_ccor_all_1.gif
+2021-01-04 10:21:44,310| ThreadPoolExecutor-0_1| INFO | ===> complete
+2021-01-04 10:21:44,311| ThreadPoolExecutor-0_1| INFO | ======== 20201222_aocb_2020122_043832o ========
+2021-01-04 10:21:44,311| ThreadPoolExecutor-0_1| INFO | == sub_len = 0 
+2021-01-04 10:21:44,311| ThreadPoolExecutor-0_1| INFO | == s_sub = True 
+2021-01-04 10:21:44,312| ThreadPoolExecutor-0_1| INFO | == tt_sub = True 
+2021-01-04 10:21:44,312| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 10:21:44,312| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_043832o.fits
+2021-01-04 10:21:44,321| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_043832o.fits
+2021-01-04 10:21:44,392| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 10:21:44,393| ThreadPoolExecutor-0_1| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_043832o_tmax200_stt.fits
+2021-01-04 10:21:44,393| ThreadPoolExecutor-0_1| DEBUG| fits not found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_043832o_tmax200_stt.fits
+2021-01-04 10:21:44,394| ThreadPoolExecutor-0_1| INFO | ====> Starting acor
+2021-01-04 10:21:44,394| ThreadPoolExecutor-0_1| INFO | Generating auto corr tmax = 200
+2021-01-04 10:21:45,659| ThreadPoolExecutor-0_4| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_121720o_s_ccor_all_0.gif
+2021-01-04 10:21:45,660| ThreadPoolExecutor-0_4| INFO | ===> complete
+2021-01-04 10:21:45,661| ThreadPoolExecutor-0_4| INFO | ======== 20201222_aocb_2020122_121720o ========
+2021-01-04 10:21:45,662| ThreadPoolExecutor-0_4| INFO | == sub_len = 5 
+2021-01-04 10:21:45,662| ThreadPoolExecutor-0_4| INFO | == s_sub = True 
+2021-01-04 10:21:45,663| ThreadPoolExecutor-0_4| INFO | == tt_sub = False 
+2021-01-04 10:21:45,663| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 10:21:45,665| ThreadPoolExecutor-0_4| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_121720o.fits
+2021-01-04 10:21:45,682| ThreadPoolExecutor-0_4| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_121720o.fits
+2021-01-04 10:21:45,734| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 10:21:45,735| ThreadPoolExecutor-0_4| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_121720o_tmax200_s.fits
+2021-01-04 10:21:45,735| ThreadPoolExecutor-0_4| DEBUG| fits found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_121720o_tmax200_s.fits
+2021-01-04 10:21:45,736| ThreadPoolExecutor-0_4| INFO | ---> Pulling data from fits file :  /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_121720o_tmax200_s.fits
+2021-01-04 10:21:45,756| ThreadPoolExecutor-0_4| INFO | Generating auto corr from ccor tmax = 200
+2021-01-04 10:21:45,757| ThreadPoolExecutor-0_4| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_121720o.fits
+2021-01-04 10:21:45,795| ThreadPoolExecutor-0_4| DEBUG| self.target_file: None
+2021-01-04 10:21:45,796| ThreadPoolExecutor-0_4| INFO | ====> Starting acor
+2021-01-04 10:21:45,797| ThreadPoolExecutor-0_4| INFO | Auto corr already generated, tmax = 200
+2021-01-04 10:21:45,797| ThreadPoolExecutor-0_4| INFO | == finished in 0.0002856254577636719 s
+2021-01-04 10:21:45,797| ThreadPoolExecutor-0_4| INFO | ====> Starting ccor
+2021-01-04 10:21:45,798| ThreadPoolExecutor-0_4| INFO | Cross corr already generated, tmax = 200
+2021-01-04 10:21:45,798| ThreadPoolExecutor-0_4| INFO | == finished in 0.00022125244140625 s
+2021-01-04 10:21:45,799| ThreadPoolExecutor-0_4| INFO | ====> writing fits
+2021-01-04 10:21:45,801| ThreadPoolExecutor-0_4| INFO | ---> saving ccor
+2021-01-04 10:21:45,855| ThreadPoolExecutor-0_4| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_121720o_tmax200_s.fits
+2021-01-04 10:21:45,856| ThreadPoolExecutor-0_4| INFO | ====> Graphing
+2021-01-04 10:21:46,057| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 10:21:46,058| ThreadPoolExecutor-0_4| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 10:21:46,980| ThreadPoolExecutor-0_4| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_121720o_s_acor_avg_1.png
+2021-01-04 10:21:47,038| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 10:21:47,039| ThreadPoolExecutor-0_4| DEBUG| Graphing: gif_3_mat
+2021-01-04 10:21:51,482| ThreadPoolExecutor-0_3| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_101126o_s_acor_avg_0.gif
+2021-01-04 10:21:51,950| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 10:21:51,950| ThreadPoolExecutor-0_3| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 10:21:52,769| ThreadPoolExecutor-0_3| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_101126o_s_ccor_all_0.png
+2021-01-04 10:21:53,156| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 10:21:53,156| ThreadPoolExecutor-0_3| DEBUG| Graphing: cor_animate_all
+2021-01-04 10:21:56,035| ThreadPoolExecutor-0_4| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_121720o_s_acor_avg_1.gif
+2021-01-04 10:21:56,609| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 10:21:56,609| ThreadPoolExecutor-0_4| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 10:21:57,655| ThreadPoolExecutor-0_4| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_121720o_s_ccor_all_1.png
+2021-01-04 10:21:58,182| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 10:21:58,183| ThreadPoolExecutor-0_4| DEBUG| Graphing: cor_animate_all
+2021-01-04 10:22:16,471| ThreadPoolExecutor-0_3| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_101126o_s_ccor_all_0.gif
+2021-01-04 10:22:16,471| ThreadPoolExecutor-0_3| INFO | ===> complete
+2021-01-04 10:22:16,472| ThreadPoolExecutor-0_3| INFO | ======== 20201222_aocb_2020122_101126o ========
+2021-01-04 10:22:16,472| ThreadPoolExecutor-0_3| INFO | == sub_len = 5 
+2021-01-04 10:22:16,472| ThreadPoolExecutor-0_3| INFO | == s_sub = True 
+2021-01-04 10:22:16,472| ThreadPoolExecutor-0_3| INFO | == tt_sub = False 
+2021-01-04 10:22:16,472| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 10:22:16,473| ThreadPoolExecutor-0_3| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_101126o.fits
+2021-01-04 10:22:16,478| ThreadPoolExecutor-0_3| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_101126o.fits
+2021-01-04 10:22:16,499| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 10:22:16,500| ThreadPoolExecutor-0_3| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_101126o_tmax200_s.fits
+2021-01-04 10:22:16,500| ThreadPoolExecutor-0_3| DEBUG| fits found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_101126o_tmax200_s.fits
+2021-01-04 10:22:16,500| ThreadPoolExecutor-0_3| INFO | ---> Pulling data from fits file :  /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_101126o_tmax200_s.fits
+2021-01-04 10:22:16,511| ThreadPoolExecutor-0_3| INFO | Generating auto corr from ccor tmax = 200
+2021-01-04 10:22:16,513| ThreadPoolExecutor-0_3| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_101126o.fits
+2021-01-04 10:22:16,541| ThreadPoolExecutor-0_3| DEBUG| self.target_file: None
+2021-01-04 10:22:16,542| ThreadPoolExecutor-0_3| INFO | ====> Starting acor
+2021-01-04 10:22:16,543| ThreadPoolExecutor-0_3| INFO | Auto corr already generated, tmax = 200
+2021-01-04 10:22:16,543| ThreadPoolExecutor-0_3| INFO | == finished in 0.00023317337036132812 s
+2021-01-04 10:22:16,543| ThreadPoolExecutor-0_3| INFO | ====> Starting ccor
+2021-01-04 10:22:16,544| ThreadPoolExecutor-0_3| INFO | Cross corr already generated, tmax = 200
+2021-01-04 10:22:16,544| ThreadPoolExecutor-0_3| INFO | == finished in 0.000335693359375 s
+2021-01-04 10:22:16,544| ThreadPoolExecutor-0_3| INFO | ====> writing fits
+2021-01-04 10:22:16,547| ThreadPoolExecutor-0_3| INFO | ---> saving ccor
+2021-01-04 10:22:16,593| ThreadPoolExecutor-0_3| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_101126o_tmax200_s.fits
+2021-01-04 10:22:16,593| ThreadPoolExecutor-0_3| INFO | ====> Graphing
+2021-01-04 10:22:16,670| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 10:22:16,670| ThreadPoolExecutor-0_3| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 10:22:17,641| ThreadPoolExecutor-0_3| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_101126o_s_acor_avg_1.png
+2021-01-04 10:22:17,708| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 10:22:17,709| ThreadPoolExecutor-0_3| DEBUG| Graphing: gif_3_mat
+2021-01-04 10:22:18,201| ThreadPoolExecutor-0_4| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_121720o_s_ccor_all_1.gif
+2021-01-04 10:22:18,212| ThreadPoolExecutor-0_4| INFO | ===> complete
+2021-01-04 10:22:18,213| ThreadPoolExecutor-0_4| INFO | ======== 20201222_aocb_2020122_121720o ========
+2021-01-04 10:22:18,218| ThreadPoolExecutor-0_4| INFO | == sub_len = 0 
+2021-01-04 10:22:18,229| ThreadPoolExecutor-0_4| INFO | == s_sub = True 
+2021-01-04 10:22:18,229| ThreadPoolExecutor-0_4| INFO | == tt_sub = True 
+2021-01-04 10:22:18,246| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 10:22:18,280| ThreadPoolExecutor-0_4| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_121720o.fits
+2021-01-04 10:22:18,350| ThreadPoolExecutor-0_4| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_121720o.fits
+2021-01-04 10:22:18,544| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 10:22:18,546| ThreadPoolExecutor-0_4| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_121720o_tmax200_stt.fits
+2021-01-04 10:22:18,547| ThreadPoolExecutor-0_4| DEBUG| fits not found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_121720o_tmax200_stt.fits
+2021-01-04 10:22:18,547| ThreadPoolExecutor-0_4| INFO | ====> Starting acor
+2021-01-04 10:22:18,547| ThreadPoolExecutor-0_4| INFO | Generating auto corr tmax = 200
+2021-01-04 10:22:26,719| ThreadPoolExecutor-0_3| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_101126o_s_acor_avg_1.gif
+2021-01-04 10:22:26,981| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 10:22:26,982| ThreadPoolExecutor-0_3| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 10:22:27,755| ThreadPoolExecutor-0_3| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_101126o_s_ccor_all_1.png
+2021-01-04 10:22:27,958| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 10:22:27,958| ThreadPoolExecutor-0_3| DEBUG| Graphing: cor_animate_all
+2021-01-04 10:22:36,845| ThreadPoolExecutor-0_2| INFO | == finished in 1030.2887806892395 s
+2021-01-04 10:22:36,849| ThreadPoolExecutor-0_2| INFO | ====> writing fits
+2021-01-04 10:22:36,850| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 10:22:36,850| ThreadPoolExecutor-0_2| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_074836o_tmax200_s.fits
+2021-01-04 10:22:36,903| ThreadPoolExecutor-0_2| INFO | ---> saving ccor
+2021-01-04 10:22:37,000| ThreadPoolExecutor-0_2| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_074836o_tmax200_s.fits
+2021-01-04 10:22:37,002| ThreadPoolExecutor-0_2| INFO | ====> Graphing
+2021-01-04 10:22:37,635| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 10:22:37,636| ThreadPoolExecutor-0_2| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 10:22:38,579| ThreadPoolExecutor-0_2| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_074836o_s_acor_avg_0.png
+2021-01-04 10:22:38,785| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 10:22:38,786| ThreadPoolExecutor-0_2| DEBUG| Graphing: gif_3_mat
+2021-01-04 10:22:44,567| ThreadPoolExecutor-0_3| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_101126o_s_ccor_all_1.gif
+2021-01-04 10:22:44,568| ThreadPoolExecutor-0_3| INFO | ===> complete
+2021-01-04 10:22:44,568| ThreadPoolExecutor-0_3| INFO | ======== 20201222_aocb_2020122_101126o ========
+2021-01-04 10:22:44,568| ThreadPoolExecutor-0_3| INFO | == sub_len = 0 
+2021-01-04 10:22:44,568| ThreadPoolExecutor-0_3| INFO | == s_sub = True 
+2021-01-04 10:22:44,569| ThreadPoolExecutor-0_3| INFO | == tt_sub = True 
+2021-01-04 10:22:44,569| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 10:22:44,569| ThreadPoolExecutor-0_3| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_101126o.fits
+2021-01-04 10:22:44,574| ThreadPoolExecutor-0_3| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_101126o.fits
+2021-01-04 10:22:44,601| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 10:22:44,601| ThreadPoolExecutor-0_3| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_101126o_tmax200_stt.fits
+2021-01-04 10:22:44,601| ThreadPoolExecutor-0_3| DEBUG| fits not found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_101126o_tmax200_stt.fits
+2021-01-04 10:22:44,601| ThreadPoolExecutor-0_3| INFO | ====> Starting acor
+2021-01-04 10:22:44,602| ThreadPoolExecutor-0_3| INFO | Generating auto corr tmax = 200
+2021-01-04 10:22:48,211| ThreadPoolExecutor-0_2| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_074836o_s_acor_avg_0.gif
+2021-01-04 10:22:48,835| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 10:22:48,835| ThreadPoolExecutor-0_2| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 10:22:49,603| ThreadPoolExecutor-0_2| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_074836o_s_ccor_all_0.png
+2021-01-04 10:22:50,090| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 10:22:50,091| ThreadPoolExecutor-0_2| DEBUG| Graphing: cor_animate_all
+2021-01-04 10:23:05,893| ThreadPoolExecutor-0_2| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_074836o_s_ccor_all_0.gif
+2021-01-04 10:23:05,894| ThreadPoolExecutor-0_2| INFO | ===> complete
+2021-01-04 10:23:05,894| ThreadPoolExecutor-0_2| INFO | ======== 20201222_aocb_2020122_074836o ========
+2021-01-04 10:23:05,895| ThreadPoolExecutor-0_2| INFO | == sub_len = 5 
+2021-01-04 10:23:05,895| ThreadPoolExecutor-0_2| INFO | == s_sub = True 
+2021-01-04 10:23:05,896| ThreadPoolExecutor-0_2| INFO | == tt_sub = False 
+2021-01-04 10:23:05,896| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 10:23:05,897| ThreadPoolExecutor-0_2| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_074836o.fits
+2021-01-04 10:23:05,905| ThreadPoolExecutor-0_2| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_074836o.fits
+2021-01-04 10:23:05,933| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 10:23:05,934| ThreadPoolExecutor-0_2| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_074836o_tmax200_s.fits
+2021-01-04 10:23:05,934| ThreadPoolExecutor-0_2| DEBUG| fits found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_074836o_tmax200_s.fits
+2021-01-04 10:23:05,935| ThreadPoolExecutor-0_2| INFO | ---> Pulling data from fits file :  /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_074836o_tmax200_s.fits
+2021-01-04 10:23:05,951| ThreadPoolExecutor-0_2| INFO | Generating auto corr from ccor tmax = 200
+2021-01-04 10:23:05,953| ThreadPoolExecutor-0_2| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_074836o.fits
+2021-01-04 10:23:05,978| ThreadPoolExecutor-0_2| DEBUG| self.target_file: None
+2021-01-04 10:23:05,979| ThreadPoolExecutor-0_2| INFO | ====> Starting acor
+2021-01-04 10:23:05,979| ThreadPoolExecutor-0_2| INFO | Auto corr already generated, tmax = 200
+2021-01-04 10:23:05,980| ThreadPoolExecutor-0_2| INFO | == finished in 0.0002636909484863281 s
+2021-01-04 10:23:05,980| ThreadPoolExecutor-0_2| INFO | ====> Starting ccor
+2021-01-04 10:23:05,980| ThreadPoolExecutor-0_2| INFO | Cross corr already generated, tmax = 200
+2021-01-04 10:23:05,981| ThreadPoolExecutor-0_2| INFO | == finished in 0.00038695335388183594 s
+2021-01-04 10:23:05,981| ThreadPoolExecutor-0_2| INFO | ====> writing fits
+2021-01-04 10:23:05,983| ThreadPoolExecutor-0_2| INFO | ---> saving ccor
+2021-01-04 10:23:06,022| ThreadPoolExecutor-0_2| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_074836o_tmax200_s.fits
+2021-01-04 10:23:06,023| ThreadPoolExecutor-0_2| INFO | ====> Graphing
+2021-01-04 10:23:06,149| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 10:23:06,150| ThreadPoolExecutor-0_2| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 10:23:07,065| ThreadPoolExecutor-0_2| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_074836o_s_acor_avg_1.png
+2021-01-04 10:23:07,163| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 10:23:07,164| ThreadPoolExecutor-0_2| DEBUG| Graphing: gif_3_mat
+2021-01-04 10:23:16,790| ThreadPoolExecutor-0_2| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_074836o_s_acor_avg_1.gif
+2021-01-04 10:23:17,114| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 10:23:17,115| ThreadPoolExecutor-0_2| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 10:23:17,893| ThreadPoolExecutor-0_2| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_074836o_s_ccor_all_1.png
+2021-01-04 10:23:18,111| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 10:23:18,111| ThreadPoolExecutor-0_2| DEBUG| Graphing: cor_animate_all
+2021-01-04 10:23:33,555| ThreadPoolExecutor-0_2| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_074836o_s_ccor_all_1.gif
+2021-01-04 10:23:33,557| ThreadPoolExecutor-0_2| INFO | ===> complete
+2021-01-04 10:23:33,557| ThreadPoolExecutor-0_2| INFO | ======== 20201222_aocb_2020122_074836o ========
+2021-01-04 10:23:33,558| ThreadPoolExecutor-0_2| INFO | == sub_len = 0 
+2021-01-04 10:23:33,559| ThreadPoolExecutor-0_2| INFO | == s_sub = True 
+2021-01-04 10:23:33,559| ThreadPoolExecutor-0_2| INFO | == tt_sub = True 
+2021-01-04 10:23:33,559| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 10:23:33,560| ThreadPoolExecutor-0_2| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_074836o.fits
+2021-01-04 10:23:33,569| ThreadPoolExecutor-0_2| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_074836o.fits
+2021-01-04 10:23:33,612| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 10:23:33,612| ThreadPoolExecutor-0_2| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_074836o_tmax200_stt.fits
+2021-01-04 10:23:33,613| ThreadPoolExecutor-0_2| DEBUG| fits not found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_074836o_tmax200_stt.fits
+2021-01-04 10:23:33,613| ThreadPoolExecutor-0_2| INFO | ====> Starting acor
+2021-01-04 10:23:33,613| ThreadPoolExecutor-0_2| INFO | Generating auto corr tmax = 200
+2021-01-04 10:33:13,753| ThreadPoolExecutor-0_0| INFO | == finished in 728.0055732727051 s
+2021-01-04 10:33:13,754| ThreadPoolExecutor-0_0| INFO | ====> Starting ccor
+2021-01-04 10:33:13,755| ThreadPoolExecutor-0_0| INFO | Generating cross corr tmax = 200
+2021-01-04 10:33:42,155| ThreadPoolExecutor-0_1| INFO | == finished in 717.7607047557831 s
+2021-01-04 10:33:42,156| ThreadPoolExecutor-0_1| INFO | ====> Starting ccor
+2021-01-04 10:33:42,156| ThreadPoolExecutor-0_1| INFO | Generating cross corr tmax = 200
+2021-01-04 10:33:53,286| ThreadPoolExecutor-0_4| INFO | == finished in 694.7388117313385 s
+2021-01-04 10:33:53,287| ThreadPoolExecutor-0_4| INFO | ====> Starting ccor
+2021-01-04 10:33:53,287| ThreadPoolExecutor-0_4| INFO | Generating cross corr tmax = 200
+2021-01-04 10:34:36,938| ThreadPoolExecutor-0_3| INFO | == finished in 712.3359773159027 s
+2021-01-04 10:34:36,939| ThreadPoolExecutor-0_3| INFO | ====> Starting ccor
+2021-01-04 10:34:36,939| ThreadPoolExecutor-0_3| INFO | Generating cross corr tmax = 200
+2021-01-04 10:35:10,688| ThreadPoolExecutor-0_2| INFO | == finished in 697.0750403404236 s
+2021-01-04 10:35:10,689| ThreadPoolExecutor-0_2| INFO | ====> Starting ccor
+2021-01-04 10:35:10,690| ThreadPoolExecutor-0_2| INFO | Generating cross corr tmax = 200
+2021-01-04 10:50:09,139| ThreadPoolExecutor-0_0| INFO | == finished in 1015.3840570449829 s
+2021-01-04 10:50:09,140| ThreadPoolExecutor-0_0| INFO | ====> writing fits
+2021-01-04 10:50:09,141| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 10:50:09,141| ThreadPoolExecutor-0_0| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_012857o_tmax200_stt.fits
+2021-01-04 10:50:09,192| ThreadPoolExecutor-0_0| INFO | ---> saving ccor
+2021-01-04 10:50:09,249| ThreadPoolExecutor-0_0| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_012857o_tmax200_stt.fits
+2021-01-04 10:50:09,250| ThreadPoolExecutor-0_0| INFO | ====> Graphing
+2021-01-04 10:50:09,495| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 10:50:09,495| ThreadPoolExecutor-0_0| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 10:50:10,520| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_012857o_stt_acor_avg_0.png
+2021-01-04 10:50:10,738| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 10:50:10,739| ThreadPoolExecutor-0_0| DEBUG| Graphing: gif_3_mat
+2021-01-04 10:50:19,949| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_012857o_stt_acor_avg_0.gif
+2021-01-04 10:50:20,475| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 10:50:20,476| ThreadPoolExecutor-0_0| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 10:50:21,231| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_012857o_stt_ccor_all_0.png
+2021-01-04 10:50:21,704| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 10:50:21,705| ThreadPoolExecutor-0_0| DEBUG| Graphing: cor_animate_all
+2021-01-04 10:50:37,490| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_012857o_stt_ccor_all_0.gif
+2021-01-04 10:50:37,490| ThreadPoolExecutor-0_0| INFO | ===> complete
+2021-01-04 10:50:37,493| ThreadPoolExecutor-0_0| INFO | ======== 20201222_aocb_2020122_012857o ========
+2021-01-04 10:50:37,493| ThreadPoolExecutor-0_0| INFO | == sub_len = 5 
+2021-01-04 10:50:37,493| ThreadPoolExecutor-0_0| INFO | == s_sub = True 
+2021-01-04 10:50:37,493| ThreadPoolExecutor-0_0| INFO | == tt_sub = True 
+2021-01-04 10:50:37,494| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 10:50:37,494| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_012857o.fits
+2021-01-04 10:50:37,500| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_012857o.fits
+2021-01-04 10:50:37,527| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 10:50:37,527| ThreadPoolExecutor-0_0| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_012857o_tmax200_stt.fits
+2021-01-04 10:50:37,527| ThreadPoolExecutor-0_0| DEBUG| fits found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_012857o_tmax200_stt.fits
+2021-01-04 10:50:37,528| ThreadPoolExecutor-0_0| INFO | ---> Pulling data from fits file :  /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_012857o_tmax200_stt.fits
+2021-01-04 10:50:37,538| ThreadPoolExecutor-0_0| INFO | Generating auto corr from ccor tmax = 200
+2021-01-04 10:50:37,540| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_012857o.fits
+2021-01-04 10:50:37,564| ThreadPoolExecutor-0_0| DEBUG| self.target_file: None
+2021-01-04 10:50:37,565| ThreadPoolExecutor-0_0| INFO | ====> Starting acor
+2021-01-04 10:50:37,565| ThreadPoolExecutor-0_0| INFO | Auto corr already generated, tmax = 200
+2021-01-04 10:50:37,565| ThreadPoolExecutor-0_0| INFO | == finished in 0.00033545494079589844 s
+2021-01-04 10:50:37,565| ThreadPoolExecutor-0_0| INFO | ====> Starting ccor
+2021-01-04 10:50:37,565| ThreadPoolExecutor-0_0| INFO | Cross corr already generated, tmax = 200
+2021-01-04 10:50:37,566| ThreadPoolExecutor-0_0| INFO | == finished in 0.00034618377685546875 s
+2021-01-04 10:50:37,566| ThreadPoolExecutor-0_0| INFO | ====> writing fits
+2021-01-04 10:50:37,567| ThreadPoolExecutor-0_0| INFO | ---> saving ccor
+2021-01-04 10:50:37,597| ThreadPoolExecutor-0_0| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_012857o_tmax200_stt.fits
+2021-01-04 10:50:37,598| ThreadPoolExecutor-0_0| INFO | ====> Graphing
+2021-01-04 10:50:37,682| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 10:50:37,683| ThreadPoolExecutor-0_0| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 10:50:38,588| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_012857o_stt_acor_avg_1.png
+2021-01-04 10:50:38,699| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 10:50:38,699| ThreadPoolExecutor-0_0| DEBUG| Graphing: gif_3_mat
+2021-01-04 10:50:47,734| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_012857o_stt_acor_avg_1.gif
+2021-01-04 10:50:47,944| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 10:50:47,945| ThreadPoolExecutor-0_0| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 10:50:48,798| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_012857o_stt_ccor_all_1.png
+2021-01-04 10:50:49,006| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 10:50:49,007| ThreadPoolExecutor-0_0| DEBUG| Graphing: cor_animate_all
+2021-01-04 10:51:04,257| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_012857o_stt_ccor_all_1.gif
+2021-01-04 10:51:04,258| ThreadPoolExecutor-0_0| INFO | ===> complete
+2021-01-04 10:51:04,260| ThreadPoolExecutor-0_0| INFO | File 0: ending
+2021-01-04 10:51:04,262| ThreadPoolExecutor-0_0| INFO | File 5: starting 20201222_aocb_2020122_142344o
+2021-01-04 10:51:04,262| ThreadPoolExecutor-0_0| INFO |    5 name: 20201222_aocb_2020122_142344o
+2021-01-04 10:51:04,262| ThreadPoolExecutor-0_0| INFO |    5 d_file: /home/imaka/data/sim/20201222/ao/aocb_2020122_142344o.fits
+2021-01-04 10:51:04,263| ThreadPoolExecutor-0_0| INFO |    5 o_dirs: /home/emcewen/out_sim/20201222/
+2021-01-04 10:51:04,263| ThreadPoolExecutor-0_0| INFO |    5 t_file: /home/emcewen/data/target_input/simul_4GS_12am_6mag_USNOB_GS.txt
+2021-01-04 10:51:04,264| ThreadPoolExecutor-0_0| INFO | ======== 20201222_aocb_2020122_142344o ========
+2021-01-04 10:51:04,264| ThreadPoolExecutor-0_0| INFO | == sub_len = 0 
+2021-01-04 10:51:04,265| ThreadPoolExecutor-0_0| INFO | == s_sub = False 
+2021-01-04 10:51:04,265| ThreadPoolExecutor-0_0| INFO | == tt_sub = False 
+2021-01-04 10:51:04,266| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 10:51:04,266| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_142344o.fits
+2021-01-04 10:51:04,274| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_142344o.fits
+2021-01-04 10:51:04,294| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 10:51:04,294| ThreadPoolExecutor-0_0| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_142344o_tmax200_raw.fits
+2021-01-04 10:51:04,294| ThreadPoolExecutor-0_0| DEBUG| fits not found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_142344o_tmax200_raw.fits
+2021-01-04 10:51:04,295| ThreadPoolExecutor-0_0| INFO | ====> Starting acor
+2021-01-04 10:51:04,295| ThreadPoolExecutor-0_0| INFO | Generating auto corr tmax = 200
+2021-01-04 10:51:11,356| ThreadPoolExecutor-0_1| INFO | == finished in 1049.2000148296356 s
+2021-01-04 10:51:11,358| ThreadPoolExecutor-0_1| INFO | ====> writing fits
+2021-01-04 10:51:11,359| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 10:51:11,359| ThreadPoolExecutor-0_1| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_043832o_tmax200_stt.fits
+2021-01-04 10:51:11,402| ThreadPoolExecutor-0_1| INFO | ---> saving ccor
+2021-01-04 10:51:11,466| ThreadPoolExecutor-0_1| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_043832o_tmax200_stt.fits
+2021-01-04 10:51:11,467| ThreadPoolExecutor-0_1| INFO | ====> Graphing
+2021-01-04 10:51:11,730| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 10:51:11,731| ThreadPoolExecutor-0_1| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 10:51:12,705| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_043832o_stt_acor_avg_0.png
+2021-01-04 10:51:12,979| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 10:51:12,979| ThreadPoolExecutor-0_1| DEBUG| Graphing: gif_3_mat
+2021-01-04 10:51:17,042| ThreadPoolExecutor-0_4| INFO | == finished in 1043.7547051906586 s
+2021-01-04 10:51:17,055| ThreadPoolExecutor-0_4| INFO | ====> writing fits
+2021-01-04 10:51:17,060| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 10:51:17,061| ThreadPoolExecutor-0_4| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_121720o_tmax200_stt.fits
+2021-01-04 10:51:17,113| ThreadPoolExecutor-0_4| INFO | ---> saving ccor
+2021-01-04 10:51:17,208| ThreadPoolExecutor-0_4| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_121720o_tmax200_stt.fits
+2021-01-04 10:51:17,209| ThreadPoolExecutor-0_4| INFO | ====> Graphing
+2021-01-04 10:51:17,707| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 10:51:17,708| ThreadPoolExecutor-0_4| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 10:51:18,648| ThreadPoolExecutor-0_4| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_121720o_stt_acor_avg_0.png
+2021-01-04 10:51:18,850| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 10:51:18,850| ThreadPoolExecutor-0_4| DEBUG| Graphing: gif_3_mat
+2021-01-04 10:51:22,367| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_043832o_stt_acor_avg_0.gif
+2021-01-04 10:51:23,371| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 10:51:23,371| ThreadPoolExecutor-0_1| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 10:51:24,146| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_043832o_stt_ccor_all_0.png
+2021-01-04 10:51:24,525| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 10:51:24,525| ThreadPoolExecutor-0_1| DEBUG| Graphing: cor_animate_all
+2021-01-04 10:51:27,784| ThreadPoolExecutor-0_4| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_121720o_stt_acor_avg_0.gif
+2021-01-04 10:51:29,189| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 10:51:29,190| ThreadPoolExecutor-0_4| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 10:51:30,227| ThreadPoolExecutor-0_4| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_121720o_stt_ccor_all_0.png
+2021-01-04 10:51:31,475| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 10:51:31,475| ThreadPoolExecutor-0_4| DEBUG| Graphing: cor_animate_all
+2021-01-04 10:51:45,487| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_043832o_stt_ccor_all_0.gif
+2021-01-04 10:51:45,488| ThreadPoolExecutor-0_1| INFO | ===> complete
+2021-01-04 10:51:45,488| ThreadPoolExecutor-0_1| INFO | ======== 20201222_aocb_2020122_043832o ========
+2021-01-04 10:51:45,489| ThreadPoolExecutor-0_1| INFO | == sub_len = 5 
+2021-01-04 10:51:45,489| ThreadPoolExecutor-0_1| INFO | == s_sub = True 
+2021-01-04 10:51:45,489| ThreadPoolExecutor-0_1| INFO | == tt_sub = True 
+2021-01-04 10:51:45,489| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 10:51:45,490| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_043832o.fits
+2021-01-04 10:51:45,498| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_043832o.fits
+2021-01-04 10:51:45,542| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 10:51:45,542| ThreadPoolExecutor-0_1| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_043832o_tmax200_stt.fits
+2021-01-04 10:51:45,542| ThreadPoolExecutor-0_1| DEBUG| fits found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_043832o_tmax200_stt.fits
+2021-01-04 10:51:45,543| ThreadPoolExecutor-0_1| INFO | ---> Pulling data from fits file :  /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_043832o_tmax200_stt.fits
+2021-01-04 10:51:45,555| ThreadPoolExecutor-0_1| INFO | Generating auto corr from ccor tmax = 200
+2021-01-04 10:51:45,557| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_043832o.fits
+2021-01-04 10:51:45,683| ThreadPoolExecutor-0_1| DEBUG| self.target_file: None
+2021-01-04 10:51:45,684| ThreadPoolExecutor-0_1| INFO | ====> Starting acor
+2021-01-04 10:51:45,685| ThreadPoolExecutor-0_1| INFO | Auto corr already generated, tmax = 200
+2021-01-04 10:51:45,685| ThreadPoolExecutor-0_1| INFO | == finished in 0.0001366138458251953 s
+2021-01-04 10:51:45,685| ThreadPoolExecutor-0_1| INFO | ====> Starting ccor
+2021-01-04 10:51:45,685| ThreadPoolExecutor-0_1| INFO | Cross corr already generated, tmax = 200
+2021-01-04 10:51:45,685| ThreadPoolExecutor-0_1| INFO | == finished in 0.0001266002655029297 s
+2021-01-04 10:51:45,685| ThreadPoolExecutor-0_1| INFO | ====> writing fits
+2021-01-04 10:51:45,687| ThreadPoolExecutor-0_1| INFO | ---> saving ccor
+2021-01-04 10:51:45,714| ThreadPoolExecutor-0_1| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_043832o_tmax200_stt.fits
+2021-01-04 10:51:45,714| ThreadPoolExecutor-0_1| INFO | ====> Graphing
+2021-01-04 10:51:45,785| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 10:51:45,786| ThreadPoolExecutor-0_1| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 10:51:46,563| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_043832o_stt_acor_avg_1.png
+2021-01-04 10:51:46,641| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 10:51:46,641| ThreadPoolExecutor-0_1| DEBUG| Graphing: gif_3_mat
+2021-01-04 10:51:48,886| ThreadPoolExecutor-0_4| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_121720o_stt_ccor_all_0.gif
+2021-01-04 10:51:48,888| ThreadPoolExecutor-0_4| INFO | ===> complete
+2021-01-04 10:51:48,891| ThreadPoolExecutor-0_4| INFO | ======== 20201222_aocb_2020122_121720o ========
+2021-01-04 10:51:48,891| ThreadPoolExecutor-0_4| INFO | == sub_len = 5 
+2021-01-04 10:51:48,892| ThreadPoolExecutor-0_4| INFO | == s_sub = True 
+2021-01-04 10:51:48,892| ThreadPoolExecutor-0_4| INFO | == tt_sub = True 
+2021-01-04 10:51:48,892| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 10:51:48,892| ThreadPoolExecutor-0_4| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_121720o.fits
+2021-01-04 10:51:48,901| ThreadPoolExecutor-0_4| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_121720o.fits
+2021-01-04 10:51:48,973| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 10:51:48,973| ThreadPoolExecutor-0_4| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_121720o_tmax200_stt.fits
+2021-01-04 10:51:48,974| ThreadPoolExecutor-0_4| DEBUG| fits found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_121720o_tmax200_stt.fits
+2021-01-04 10:51:48,974| ThreadPoolExecutor-0_4| INFO | ---> Pulling data from fits file :  /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_121720o_tmax200_stt.fits
+2021-01-04 10:51:48,998| ThreadPoolExecutor-0_4| INFO | Generating auto corr from ccor tmax = 200
+2021-01-04 10:51:49,001| ThreadPoolExecutor-0_4| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_121720o.fits
+2021-01-04 10:51:49,060| ThreadPoolExecutor-0_4| DEBUG| self.target_file: None
+2021-01-04 10:51:49,063| ThreadPoolExecutor-0_4| INFO | ====> Starting acor
+2021-01-04 10:51:49,065| ThreadPoolExecutor-0_4| INFO | Auto corr already generated, tmax = 200
+2021-01-04 10:51:49,065| ThreadPoolExecutor-0_4| INFO | == finished in 0.0006885528564453125 s
+2021-01-04 10:51:49,068| ThreadPoolExecutor-0_4| INFO | ====> Starting ccor
+2021-01-04 10:51:49,070| ThreadPoolExecutor-0_4| INFO | Cross corr already generated, tmax = 200
+2021-01-04 10:51:49,071| ThreadPoolExecutor-0_4| INFO | == finished in 0.0006558895111083984 s
+2021-01-04 10:51:49,071| ThreadPoolExecutor-0_4| INFO | ====> writing fits
+2021-01-04 10:51:49,074| ThreadPoolExecutor-0_4| INFO | ---> saving ccor
+2021-01-04 10:51:49,139| ThreadPoolExecutor-0_4| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_121720o_tmax200_stt.fits
+2021-01-04 10:51:49,142| ThreadPoolExecutor-0_4| INFO | ====> Graphing
+2021-01-04 10:51:49,301| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 10:51:49,309| ThreadPoolExecutor-0_4| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 10:51:50,313| ThreadPoolExecutor-0_4| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_121720o_stt_acor_avg_1.png
+2021-01-04 10:51:50,501| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 10:51:50,501| ThreadPoolExecutor-0_4| DEBUG| Graphing: gif_3_mat
+2021-01-04 10:51:58,372| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_043832o_stt_acor_avg_1.gif
+2021-01-04 10:51:58,593| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 10:51:58,594| ThreadPoolExecutor-0_1| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 10:51:59,415| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_043832o_stt_ccor_all_1.png
+2021-01-04 10:51:59,570| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 10:51:59,571| ThreadPoolExecutor-0_1| DEBUG| Graphing: cor_animate_all
+2021-01-04 10:52:00,562| ThreadPoolExecutor-0_4| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_121720o_stt_acor_avg_1.gif
+2021-01-04 10:52:01,864| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 10:52:01,864| ThreadPoolExecutor-0_4| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 10:52:02,997| ThreadPoolExecutor-0_4| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_121720o_stt_ccor_all_1.png
+2021-01-04 10:52:03,429| ThreadPoolExecutor-0_4| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 10:52:03,429| ThreadPoolExecutor-0_4| DEBUG| Graphing: cor_animate_all
+2021-01-04 10:52:23,404| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_043832o_stt_ccor_all_1.gif
+2021-01-04 10:52:23,404| ThreadPoolExecutor-0_1| INFO | ===> complete
+2021-01-04 10:52:23,406| ThreadPoolExecutor-0_1| INFO | File 1: ending
+2021-01-04 10:52:23,412| ThreadPoolExecutor-0_1| INFO | File 6: starting 20201222_aocb_2020121_221213o
+2021-01-04 10:52:23,413| ThreadPoolExecutor-0_1| INFO |    6 name: 20201222_aocb_2020121_221213o
+2021-01-04 10:52:23,414| ThreadPoolExecutor-0_1| INFO |    6 d_file: /home/imaka/data/sim/20201222/ao/aocb_2020121_221213o.fits
+2021-01-04 10:52:23,414| ThreadPoolExecutor-0_1| INFO |    6 o_dirs: /home/emcewen/out_sim/20201222/
+2021-01-04 10:52:23,415| ThreadPoolExecutor-0_1| INFO |    6 t_file: /home/emcewen/data/target_input/simul_4GS_12am_6mag_USNOB_GS.txt
+2021-01-04 10:52:23,416| ThreadPoolExecutor-0_1| INFO | ======== 20201222_aocb_2020121_221213o ========
+2021-01-04 10:52:23,416| ThreadPoolExecutor-0_1| INFO | == sub_len = 0 
+2021-01-04 10:52:23,416| ThreadPoolExecutor-0_1| INFO | == s_sub = False 
+2021-01-04 10:52:23,417| ThreadPoolExecutor-0_1| INFO | == tt_sub = False 
+2021-01-04 10:52:23,417| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 10:52:23,418| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020121_221213o.fits
+2021-01-04 10:52:23,445| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020121_221213o.fits
+2021-01-04 10:52:23,502| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 10:52:23,503| ThreadPoolExecutor-0_1| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020121_221213o_tmax200_raw.fits
+2021-01-04 10:52:23,503| ThreadPoolExecutor-0_1| DEBUG| fits not found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020121_221213o_tmax200_raw.fits
+2021-01-04 10:52:23,503| ThreadPoolExecutor-0_1| INFO | ====> Starting acor
+2021-01-04 10:52:23,504| ThreadPoolExecutor-0_1| INFO | Generating auto corr tmax = 200
+2021-01-04 10:52:24,188| ThreadPoolExecutor-0_4| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_121720o_stt_ccor_all_1.gif
+2021-01-04 10:52:24,189| ThreadPoolExecutor-0_4| INFO | ===> complete
+2021-01-04 10:52:24,189| ThreadPoolExecutor-0_4| INFO | File 4: ending
+2021-01-04 10:52:35,437| ThreadPoolExecutor-0_3| INFO | == finished in 1078.49738240242 s
+2021-01-04 10:52:35,438| ThreadPoolExecutor-0_3| INFO | ====> writing fits
+2021-01-04 10:52:35,438| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 10:52:35,439| ThreadPoolExecutor-0_3| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_101126o_tmax200_stt.fits
+2021-01-04 10:52:35,484| ThreadPoolExecutor-0_3| INFO | ---> saving ccor
+2021-01-04 10:52:35,550| ThreadPoolExecutor-0_3| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_101126o_tmax200_stt.fits
+2021-01-04 10:52:35,550| ThreadPoolExecutor-0_3| INFO | ====> Graphing
+2021-01-04 10:52:35,730| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 10:52:35,731| ThreadPoolExecutor-0_3| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 10:52:36,474| ThreadPoolExecutor-0_3| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_101126o_stt_acor_avg_0.png
+2021-01-04 10:52:36,645| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 10:52:36,645| ThreadPoolExecutor-0_3| DEBUG| Graphing: gif_3_mat
+2021-01-04 10:52:45,666| ThreadPoolExecutor-0_3| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_101126o_stt_acor_avg_0.gif
+2021-01-04 10:52:46,172| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 10:52:46,173| ThreadPoolExecutor-0_3| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 10:52:47,116| ThreadPoolExecutor-0_3| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_101126o_stt_ccor_all_0.png
+2021-01-04 10:52:47,615| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 10:52:47,616| ThreadPoolExecutor-0_3| DEBUG| Graphing: cor_animate_all
+2021-01-04 10:53:03,384| ThreadPoolExecutor-0_3| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_101126o_stt_ccor_all_0.gif
+2021-01-04 10:53:03,385| ThreadPoolExecutor-0_3| INFO | ===> complete
+2021-01-04 10:53:03,385| ThreadPoolExecutor-0_3| INFO | ======== 20201222_aocb_2020122_101126o ========
+2021-01-04 10:53:03,386| ThreadPoolExecutor-0_3| INFO | == sub_len = 5 
+2021-01-04 10:53:03,387| ThreadPoolExecutor-0_3| INFO | == s_sub = True 
+2021-01-04 10:53:03,387| ThreadPoolExecutor-0_3| INFO | == tt_sub = True 
+2021-01-04 10:53:03,387| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 10:53:03,388| ThreadPoolExecutor-0_3| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_101126o.fits
+2021-01-04 10:53:03,396| ThreadPoolExecutor-0_3| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_101126o.fits
+2021-01-04 10:53:03,433| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 10:53:03,433| ThreadPoolExecutor-0_3| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_101126o_tmax200_stt.fits
+2021-01-04 10:53:03,434| ThreadPoolExecutor-0_3| DEBUG| fits found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_101126o_tmax200_stt.fits
+2021-01-04 10:53:03,434| ThreadPoolExecutor-0_3| INFO | ---> Pulling data from fits file :  /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_101126o_tmax200_stt.fits
+2021-01-04 10:53:03,454| ThreadPoolExecutor-0_3| INFO | Generating auto corr from ccor tmax = 200
+2021-01-04 10:53:03,456| ThreadPoolExecutor-0_3| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_101126o.fits
+2021-01-04 10:53:03,484| ThreadPoolExecutor-0_3| DEBUG| self.target_file: None
+2021-01-04 10:53:03,485| ThreadPoolExecutor-0_3| INFO | ====> Starting acor
+2021-01-04 10:53:03,485| ThreadPoolExecutor-0_3| INFO | Auto corr already generated, tmax = 200
+2021-01-04 10:53:03,485| ThreadPoolExecutor-0_3| INFO | == finished in 0.00014019012451171875 s
+2021-01-04 10:53:03,485| ThreadPoolExecutor-0_3| INFO | ====> Starting ccor
+2021-01-04 10:53:03,486| ThreadPoolExecutor-0_3| INFO | Cross corr already generated, tmax = 200
+2021-01-04 10:53:03,486| ThreadPoolExecutor-0_3| INFO | == finished in 0.00018215179443359375 s
+2021-01-04 10:53:03,486| ThreadPoolExecutor-0_3| INFO | ====> writing fits
+2021-01-04 10:53:03,487| ThreadPoolExecutor-0_3| INFO | ---> saving ccor
+2021-01-04 10:53:03,523| ThreadPoolExecutor-0_3| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_101126o_tmax200_stt.fits
+2021-01-04 10:53:03,524| ThreadPoolExecutor-0_3| INFO | ====> Graphing
+2021-01-04 10:53:03,602| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 10:53:03,603| ThreadPoolExecutor-0_3| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 10:53:04,364| ThreadPoolExecutor-0_3| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_101126o_stt_acor_avg_1.png
+2021-01-04 10:53:04,423| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 10:53:04,423| ThreadPoolExecutor-0_3| DEBUG| Graphing: gif_3_mat
+2021-01-04 10:53:13,366| ThreadPoolExecutor-0_3| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_101126o_stt_acor_avg_1.gif
+2021-01-04 10:53:13,611| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 10:53:13,611| ThreadPoolExecutor-0_3| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 10:53:14,480| ThreadPoolExecutor-0_3| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_101126o_stt_ccor_all_1.png
+2021-01-04 10:53:14,658| ThreadPoolExecutor-0_3| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 10:53:14,658| ThreadPoolExecutor-0_3| DEBUG| Graphing: cor_animate_all
+2021-01-04 10:53:21,951| ThreadPoolExecutor-0_2| INFO | == finished in 1091.2608604431152 s
+2021-01-04 10:53:21,952| ThreadPoolExecutor-0_2| INFO | ====> writing fits
+2021-01-04 10:53:21,952| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 10:53:21,952| ThreadPoolExecutor-0_2| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_074836o_tmax200_stt.fits
+2021-01-04 10:53:22,003| ThreadPoolExecutor-0_2| INFO | ---> saving ccor
+2021-01-04 10:53:22,099| ThreadPoolExecutor-0_2| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_074836o_tmax200_stt.fits
+2021-01-04 10:53:22,100| ThreadPoolExecutor-0_2| INFO | ====> Graphing
+2021-01-04 10:53:22,578| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 10:53:22,579| ThreadPoolExecutor-0_2| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 10:53:23,561| ThreadPoolExecutor-0_2| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_074836o_stt_acor_avg_0.png
+2021-01-04 10:53:24,004| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 10:53:24,004| ThreadPoolExecutor-0_2| DEBUG| Graphing: gif_3_mat
+2021-01-04 10:53:32,786| ThreadPoolExecutor-0_2| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_074836o_stt_acor_avg_0.gif
+2021-01-04 10:53:33,041| ThreadPoolExecutor-0_3| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_101126o_stt_ccor_all_1.gif
+2021-01-04 10:53:33,041| ThreadPoolExecutor-0_3| INFO | ===> complete
+2021-01-04 10:53:33,041| ThreadPoolExecutor-0_3| INFO | File 3: ending
+2021-01-04 10:53:33,150| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 10:53:33,150| ThreadPoolExecutor-0_2| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 10:53:33,995| ThreadPoolExecutor-0_2| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_074836o_stt_ccor_all_0.png
+2021-01-04 10:53:34,255| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 10:53:34,255| ThreadPoolExecutor-0_2| DEBUG| Graphing: cor_animate_all
+2021-01-04 10:53:48,568| ThreadPoolExecutor-0_2| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_074836o_stt_ccor_all_0.gif
+2021-01-04 10:53:48,568| ThreadPoolExecutor-0_2| INFO | ===> complete
+2021-01-04 10:53:48,570| ThreadPoolExecutor-0_2| INFO | ======== 20201222_aocb_2020122_074836o ========
+2021-01-04 10:53:48,571| ThreadPoolExecutor-0_2| INFO | == sub_len = 5 
+2021-01-04 10:53:48,571| ThreadPoolExecutor-0_2| INFO | == s_sub = True 
+2021-01-04 10:53:48,571| ThreadPoolExecutor-0_2| INFO | == tt_sub = True 
+2021-01-04 10:53:48,571| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 10:53:48,572| ThreadPoolExecutor-0_2| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_074836o.fits
+2021-01-04 10:53:48,576| ThreadPoolExecutor-0_2| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_074836o.fits
+2021-01-04 10:53:48,598| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 10:53:48,599| ThreadPoolExecutor-0_2| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_074836o_tmax200_stt.fits
+2021-01-04 10:53:48,599| ThreadPoolExecutor-0_2| DEBUG| fits found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_074836o_tmax200_stt.fits
+2021-01-04 10:53:48,599| ThreadPoolExecutor-0_2| INFO | ---> Pulling data from fits file :  /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_074836o_tmax200_stt.fits
+2021-01-04 10:53:48,609| ThreadPoolExecutor-0_2| INFO | Generating auto corr from ccor tmax = 200
+2021-01-04 10:53:48,610| ThreadPoolExecutor-0_2| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_074836o.fits
+2021-01-04 10:53:48,628| ThreadPoolExecutor-0_2| DEBUG| self.target_file: None
+2021-01-04 10:53:48,628| ThreadPoolExecutor-0_2| INFO | ====> Starting acor
+2021-01-04 10:53:48,629| ThreadPoolExecutor-0_2| INFO | Auto corr already generated, tmax = 200
+2021-01-04 10:53:48,629| ThreadPoolExecutor-0_2| INFO | == finished in 0.0001418590545654297 s
+2021-01-04 10:53:48,629| ThreadPoolExecutor-0_2| INFO | ====> Starting ccor
+2021-01-04 10:53:48,629| ThreadPoolExecutor-0_2| INFO | Cross corr already generated, tmax = 200
+2021-01-04 10:53:48,629| ThreadPoolExecutor-0_2| INFO | == finished in 0.00013327598571777344 s
+2021-01-04 10:53:48,629| ThreadPoolExecutor-0_2| INFO | ====> writing fits
+2021-01-04 10:53:48,630| ThreadPoolExecutor-0_2| INFO | ---> saving ccor
+2021-01-04 10:53:48,656| ThreadPoolExecutor-0_2| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_074836o_tmax200_stt.fits
+2021-01-04 10:53:48,657| ThreadPoolExecutor-0_2| INFO | ====> Graphing
+2021-01-04 10:53:48,705| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 10:53:48,706| ThreadPoolExecutor-0_2| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 10:53:49,401| ThreadPoolExecutor-0_2| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_074836o_stt_acor_avg_1.png
+2021-01-04 10:53:49,453| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 10:53:49,454| ThreadPoolExecutor-0_2| DEBUG| Graphing: gif_3_mat
+2021-01-04 10:53:58,202| ThreadPoolExecutor-0_2| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_074836o_stt_acor_avg_1.gif
+2021-01-04 10:53:58,334| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 10:53:58,334| ThreadPoolExecutor-0_2| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 10:53:59,041| ThreadPoolExecutor-0_2| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_074836o_stt_ccor_all_1.png
+2021-01-04 10:53:59,151| ThreadPoolExecutor-0_2| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 10:53:59,152| ThreadPoolExecutor-0_2| DEBUG| Graphing: cor_animate_all
+2021-01-04 10:54:13,540| ThreadPoolExecutor-0_2| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_074836o_stt_ccor_all_1.gif
+2021-01-04 10:54:13,541| ThreadPoolExecutor-0_2| INFO | ===> complete
+2021-01-04 10:54:13,541| ThreadPoolExecutor-0_2| INFO | File 2: ending
+2021-01-04 10:56:08,322| ThreadPoolExecutor-0_0| INFO | == finished in 304.0270836353302 s
+2021-01-04 10:56:08,323| ThreadPoolExecutor-0_0| INFO | ====> Starting ccor
+2021-01-04 10:56:08,323| ThreadPoolExecutor-0_0| INFO | Generating cross corr tmax = 200
+2021-01-04 10:56:19,107| ThreadPoolExecutor-0_1| INFO | == finished in 235.6033971309662 s
+2021-01-04 10:56:19,108| ThreadPoolExecutor-0_1| INFO | ====> Starting ccor
+2021-01-04 10:56:19,108| ThreadPoolExecutor-0_1| INFO | Generating cross corr tmax = 200
+2021-01-04 11:00:22,053| ThreadPoolExecutor-0_0| INFO | == finished in 253.7304491996765 s
+2021-01-04 11:00:22,054| ThreadPoolExecutor-0_0| INFO | ====> writing fits
+2021-01-04 11:00:22,054| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 11:00:22,054| ThreadPoolExecutor-0_0| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_142344o_tmax200_raw.fits
+2021-01-04 11:00:22,079| ThreadPoolExecutor-0_0| INFO | ---> saving ccor
+2021-01-04 11:00:22,123| ThreadPoolExecutor-0_0| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_142344o_tmax200_raw.fits
+2021-01-04 11:00:22,123| ThreadPoolExecutor-0_0| INFO | ====> Graphing
+2021-01-04 11:00:22,213| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 11:00:22,214| ThreadPoolExecutor-0_0| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 11:00:22,910| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_142344o_raw_acor_avg_0.png
+2021-01-04 11:00:23,003| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 11:00:23,003| ThreadPoolExecutor-0_0| DEBUG| Graphing: gif_3_mat
+2021-01-04 11:00:27,119| ThreadPoolExecutor-0_1| INFO | == finished in 248.0115749835968 s
+2021-01-04 11:00:27,120| ThreadPoolExecutor-0_1| INFO | ====> writing fits
+2021-01-04 11:00:27,120| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 11:00:27,120| ThreadPoolExecutor-0_1| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020121_221213o_tmax200_raw.fits
+2021-01-04 11:00:27,142| ThreadPoolExecutor-0_1| INFO | ---> saving ccor
+2021-01-04 11:00:27,178| ThreadPoolExecutor-0_1| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020121_221213o_tmax200_raw.fits
+2021-01-04 11:00:27,178| ThreadPoolExecutor-0_1| INFO | ====> Graphing
+2021-01-04 11:00:27,221| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 11:00:27,221| ThreadPoolExecutor-0_1| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 11:00:27,846| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020121_221213o_raw_acor_avg_0.png
+2021-01-04 11:00:27,890| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 11:00:27,890| ThreadPoolExecutor-0_1| DEBUG| Graphing: gif_3_mat
+2021-01-04 11:00:31,653| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_142344o_raw_acor_avg_0.gif
+2021-01-04 11:00:31,763| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 11:00:31,763| ThreadPoolExecutor-0_0| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 11:00:32,495| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_142344o_raw_ccor_all_0.png
+2021-01-04 11:00:32,604| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 11:00:32,604| ThreadPoolExecutor-0_0| DEBUG| Graphing: cor_animate_all
+2021-01-04 11:00:35,852| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020121_221213o_raw_acor_avg_0.gif
+2021-01-04 11:00:36,471| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 11:00:36,472| ThreadPoolExecutor-0_1| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 11:00:37,251| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020121_221213o_raw_ccor_all_0.png
+2021-01-04 11:00:37,866| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 11:00:37,866| ThreadPoolExecutor-0_1| DEBUG| Graphing: cor_animate_all
+2021-01-04 11:00:50,777| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_142344o_raw_ccor_all_0.gif
+2021-01-04 11:00:50,778| ThreadPoolExecutor-0_0| INFO | ===> complete
+2021-01-04 11:00:50,778| ThreadPoolExecutor-0_0| INFO | ======== 20201222_aocb_2020122_142344o ========
+2021-01-04 11:00:50,778| ThreadPoolExecutor-0_0| INFO | == sub_len = 5 
+2021-01-04 11:00:50,778| ThreadPoolExecutor-0_0| INFO | == s_sub = False 
+2021-01-04 11:00:50,778| ThreadPoolExecutor-0_0| INFO | == tt_sub = False 
+2021-01-04 11:00:50,778| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 11:00:50,778| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_142344o.fits
+2021-01-04 11:00:50,783| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_142344o.fits
+2021-01-04 11:00:50,797| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 11:00:50,797| ThreadPoolExecutor-0_0| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_142344o_tmax200_raw.fits
+2021-01-04 11:00:50,797| ThreadPoolExecutor-0_0| DEBUG| fits found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_142344o_tmax200_raw.fits
+2021-01-04 11:00:50,797| ThreadPoolExecutor-0_0| INFO | ---> Pulling data from fits file :  /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_142344o_tmax200_raw.fits
+2021-01-04 11:00:50,809| ThreadPoolExecutor-0_0| INFO | Generating auto corr from ccor tmax = 200
+2021-01-04 11:00:50,810| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_142344o.fits
+2021-01-04 11:00:50,824| ThreadPoolExecutor-0_0| DEBUG| self.target_file: None
+2021-01-04 11:00:50,825| ThreadPoolExecutor-0_0| INFO | ====> Starting acor
+2021-01-04 11:00:50,825| ThreadPoolExecutor-0_0| INFO | Auto corr already generated, tmax = 200
+2021-01-04 11:00:50,825| ThreadPoolExecutor-0_0| INFO | == finished in 9.703636169433594e-05 s
+2021-01-04 11:00:50,825| ThreadPoolExecutor-0_0| INFO | ====> Starting ccor
+2021-01-04 11:00:50,825| ThreadPoolExecutor-0_0| INFO | Cross corr already generated, tmax = 200
+2021-01-04 11:00:50,825| ThreadPoolExecutor-0_0| INFO | == finished in 8.869171142578125e-05 s
+2021-01-04 11:00:50,825| ThreadPoolExecutor-0_0| INFO | ====> writing fits
+2021-01-04 11:00:50,826| ThreadPoolExecutor-0_0| INFO | ---> saving ccor
+2021-01-04 11:00:50,856| ThreadPoolExecutor-0_0| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_142344o_tmax200_raw.fits
+2021-01-04 11:00:50,856| ThreadPoolExecutor-0_0| INFO | ====> Graphing
+2021-01-04 11:00:50,886| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 11:00:50,886| ThreadPoolExecutor-0_0| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 11:00:51,582| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_142344o_raw_acor_avg_1.png
+2021-01-04 11:00:51,609| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 11:00:51,610| ThreadPoolExecutor-0_0| DEBUG| Graphing: gif_3_mat
+2021-01-04 11:00:53,281| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020121_221213o_raw_ccor_all_0.gif
+2021-01-04 11:00:53,282| ThreadPoolExecutor-0_1| INFO | ===> complete
+2021-01-04 11:00:53,282| ThreadPoolExecutor-0_1| INFO | ======== 20201222_aocb_2020121_221213o ========
+2021-01-04 11:00:53,282| ThreadPoolExecutor-0_1| INFO | == sub_len = 5 
+2021-01-04 11:00:53,282| ThreadPoolExecutor-0_1| INFO | == s_sub = False 
+2021-01-04 11:00:53,282| ThreadPoolExecutor-0_1| INFO | == tt_sub = False 
+2021-01-04 11:00:53,282| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 11:00:53,282| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020121_221213o.fits
+2021-01-04 11:00:53,286| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020121_221213o.fits
+2021-01-04 11:00:53,318| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 11:00:53,319| ThreadPoolExecutor-0_1| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020121_221213o_tmax200_raw.fits
+2021-01-04 11:00:53,319| ThreadPoolExecutor-0_1| DEBUG| fits found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020121_221213o_tmax200_raw.fits
+2021-01-04 11:00:53,319| ThreadPoolExecutor-0_1| INFO | ---> Pulling data from fits file :  /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020121_221213o_tmax200_raw.fits
+2021-01-04 11:00:53,348| ThreadPoolExecutor-0_1| INFO | Generating auto corr from ccor tmax = 200
+2021-01-04 11:00:53,360| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020121_221213o.fits
+2021-01-04 11:00:53,393| ThreadPoolExecutor-0_1| DEBUG| self.target_file: None
+2021-01-04 11:00:53,394| ThreadPoolExecutor-0_1| INFO | ====> Starting acor
+2021-01-04 11:00:53,394| ThreadPoolExecutor-0_1| INFO | Auto corr already generated, tmax = 200
+2021-01-04 11:00:53,394| ThreadPoolExecutor-0_1| INFO | == finished in 8.606910705566406e-05 s
+2021-01-04 11:00:53,394| ThreadPoolExecutor-0_1| INFO | ====> Starting ccor
+2021-01-04 11:00:53,394| ThreadPoolExecutor-0_1| INFO | Cross corr already generated, tmax = 200
+2021-01-04 11:00:53,396| ThreadPoolExecutor-0_1| INFO | == finished in 0.0015597343444824219 s
+2021-01-04 11:00:53,399| ThreadPoolExecutor-0_1| INFO | ====> writing fits
+2021-01-04 11:00:53,400| ThreadPoolExecutor-0_1| INFO | ---> saving ccor
+2021-01-04 11:00:53,452| ThreadPoolExecutor-0_1| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020121_221213o_tmax200_raw.fits
+2021-01-04 11:00:53,452| ThreadPoolExecutor-0_1| INFO | ====> Graphing
+2021-01-04 11:00:53,514| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 11:00:53,515| ThreadPoolExecutor-0_1| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 11:00:54,209| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020121_221213o_raw_acor_avg_1.png
+2021-01-04 11:00:54,273| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 11:00:54,273| ThreadPoolExecutor-0_1| DEBUG| Graphing: gif_3_mat
+2021-01-04 11:01:02,275| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_142344o_raw_acor_avg_1.gif
+2021-01-04 11:01:02,374| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 11:01:02,374| ThreadPoolExecutor-0_0| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 11:01:03,002| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_142344o_raw_ccor_all_1.png
+2021-01-04 11:01:03,070| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 11:01:03,070| ThreadPoolExecutor-0_0| DEBUG| Graphing: cor_animate_all
+2021-01-04 11:01:03,768| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020121_221213o_raw_acor_avg_1.gif
+2021-01-04 11:01:05,194| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 11:01:05,195| ThreadPoolExecutor-0_1| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 11:01:05,938| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020121_221213o_raw_ccor_all_1.png
+2021-01-04 11:01:06,076| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 11:01:06,076| ThreadPoolExecutor-0_1| DEBUG| Graphing: cor_animate_all
+2021-01-04 11:01:23,591| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_142344o_raw_ccor_all_1.gif
+2021-01-04 11:01:23,592| ThreadPoolExecutor-0_0| INFO | ===> complete
+2021-01-04 11:01:23,592| ThreadPoolExecutor-0_0| INFO | ======== 20201222_aocb_2020122_142344o ========
+2021-01-04 11:01:23,592| ThreadPoolExecutor-0_0| INFO | == sub_len = 0 
+2021-01-04 11:01:23,592| ThreadPoolExecutor-0_0| INFO | == s_sub = True 
+2021-01-04 11:01:23,592| ThreadPoolExecutor-0_0| INFO | == tt_sub = False 
+2021-01-04 11:01:23,592| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 11:01:23,592| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_142344o.fits
+2021-01-04 11:01:23,600| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_142344o.fits
+2021-01-04 11:01:23,635| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 11:01:23,635| ThreadPoolExecutor-0_0| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_142344o_tmax200_s.fits
+2021-01-04 11:01:23,635| ThreadPoolExecutor-0_0| DEBUG| fits not found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_142344o_tmax200_s.fits
+2021-01-04 11:01:23,636| ThreadPoolExecutor-0_0| INFO | ====> Starting acor
+2021-01-04 11:01:23,636| ThreadPoolExecutor-0_0| INFO | Generating auto corr tmax = 200
+2021-01-04 11:01:24,102| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020121_221213o_raw_ccor_all_1.gif
+2021-01-04 11:01:24,103| ThreadPoolExecutor-0_1| INFO | ===> complete
+2021-01-04 11:01:24,104| ThreadPoolExecutor-0_1| INFO | ======== 20201222_aocb_2020121_221213o ========
+2021-01-04 11:01:24,104| ThreadPoolExecutor-0_1| INFO | == sub_len = 0 
+2021-01-04 11:01:24,105| ThreadPoolExecutor-0_1| INFO | == s_sub = True 
+2021-01-04 11:01:24,105| ThreadPoolExecutor-0_1| INFO | == tt_sub = False 
+2021-01-04 11:01:24,105| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 11:01:24,105| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020121_221213o.fits
+2021-01-04 11:01:24,109| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020121_221213o.fits
+2021-01-04 11:01:24,130| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 11:01:24,130| ThreadPoolExecutor-0_1| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020121_221213o_tmax200_s.fits
+2021-01-04 11:01:24,130| ThreadPoolExecutor-0_1| DEBUG| fits not found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020121_221213o_tmax200_s.fits
+2021-01-04 11:01:24,131| ThreadPoolExecutor-0_1| INFO | ====> Starting acor
+2021-01-04 11:01:24,131| ThreadPoolExecutor-0_1| INFO | Generating auto corr tmax = 200
+2021-01-04 11:04:09,691| ThreadPoolExecutor-0_0| INFO | == finished in 166.0549910068512 s
+2021-01-04 11:04:09,691| ThreadPoolExecutor-0_0| INFO | ====> Starting ccor
+2021-01-04 11:04:09,691| ThreadPoolExecutor-0_0| INFO | Generating cross corr tmax = 200
+2021-01-04 11:04:13,270| ThreadPoolExecutor-0_1| INFO | == finished in 169.13937091827393 s
+2021-01-04 11:04:13,271| ThreadPoolExecutor-0_1| INFO | ====> Starting ccor
+2021-01-04 11:04:13,271| ThreadPoolExecutor-0_1| INFO | Generating cross corr tmax = 200
+2021-01-04 11:08:19,078| ThreadPoolExecutor-0_1| INFO | == finished in 245.80734992027283 s
+2021-01-04 11:08:19,078| ThreadPoolExecutor-0_1| INFO | ====> writing fits
+2021-01-04 11:08:19,079| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 11:08:19,079| ThreadPoolExecutor-0_1| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020121_221213o_tmax200_s.fits
+2021-01-04 11:08:19,104| ThreadPoolExecutor-0_1| INFO | ---> saving ccor
+2021-01-04 11:08:19,143| ThreadPoolExecutor-0_1| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020121_221213o_tmax200_s.fits
+2021-01-04 11:08:19,143| ThreadPoolExecutor-0_1| INFO | ====> Graphing
+2021-01-04 11:08:19,230| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 11:08:19,231| ThreadPoolExecutor-0_1| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 11:08:20,011| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020121_221213o_s_acor_avg_0.png
+2021-01-04 11:08:20,097| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 11:08:20,097| ThreadPoolExecutor-0_1| DEBUG| Graphing: gif_3_mat
+2021-01-04 11:08:23,895| ThreadPoolExecutor-0_0| INFO | == finished in 254.20319962501526 s
+2021-01-04 11:08:23,895| ThreadPoolExecutor-0_0| INFO | ====> writing fits
+2021-01-04 11:08:23,895| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 11:08:23,895| ThreadPoolExecutor-0_0| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_142344o_tmax200_s.fits
+2021-01-04 11:08:23,917| ThreadPoolExecutor-0_0| INFO | ---> saving ccor
+2021-01-04 11:08:23,957| ThreadPoolExecutor-0_0| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_142344o_tmax200_s.fits
+2021-01-04 11:08:23,957| ThreadPoolExecutor-0_0| INFO | ====> Graphing
+2021-01-04 11:08:24,001| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 11:08:24,001| ThreadPoolExecutor-0_0| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 11:08:24,621| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_142344o_s_acor_avg_0.png
+2021-01-04 11:08:24,665| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 11:08:24,666| ThreadPoolExecutor-0_0| DEBUG| Graphing: gif_3_mat
+2021-01-04 11:08:28,510| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020121_221213o_s_acor_avg_0.gif
+2021-01-04 11:08:28,621| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 11:08:28,621| ThreadPoolExecutor-0_1| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 11:08:29,221| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020121_221213o_s_ccor_all_0.png
+2021-01-04 11:08:29,330| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 11:08:29,330| ThreadPoolExecutor-0_1| DEBUG| Graphing: cor_animate_all
+2021-01-04 11:08:32,944| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_142344o_s_acor_avg_0.gif
+2021-01-04 11:08:33,748| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 11:08:33,749| ThreadPoolExecutor-0_0| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 11:08:34,503| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_142344o_s_ccor_all_0.png
+2021-01-04 11:08:35,115| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 11:08:35,116| ThreadPoolExecutor-0_0| DEBUG| Graphing: cor_animate_all
+2021-01-04 11:08:47,227| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020121_221213o_s_ccor_all_0.gif
+2021-01-04 11:08:47,227| ThreadPoolExecutor-0_1| INFO | ===> complete
+2021-01-04 11:08:47,228| ThreadPoolExecutor-0_1| INFO | ======== 20201222_aocb_2020121_221213o ========
+2021-01-04 11:08:47,228| ThreadPoolExecutor-0_1| INFO | == sub_len = 5 
+2021-01-04 11:08:47,228| ThreadPoolExecutor-0_1| INFO | == s_sub = True 
+2021-01-04 11:08:47,228| ThreadPoolExecutor-0_1| INFO | == tt_sub = False 
+2021-01-04 11:08:47,228| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 11:08:47,228| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020121_221213o.fits
+2021-01-04 11:08:47,235| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020121_221213o.fits
+2021-01-04 11:08:47,253| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 11:08:47,253| ThreadPoolExecutor-0_1| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020121_221213o_tmax200_s.fits
+2021-01-04 11:08:47,254| ThreadPoolExecutor-0_1| DEBUG| fits found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020121_221213o_tmax200_s.fits
+2021-01-04 11:08:47,254| ThreadPoolExecutor-0_1| INFO | ---> Pulling data from fits file :  /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020121_221213o_tmax200_s.fits
+2021-01-04 11:08:47,265| ThreadPoolExecutor-0_1| INFO | Generating auto corr from ccor tmax = 200
+2021-01-04 11:08:47,266| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020121_221213o.fits
+2021-01-04 11:08:47,279| ThreadPoolExecutor-0_1| DEBUG| self.target_file: None
+2021-01-04 11:08:47,279| ThreadPoolExecutor-0_1| INFO | ====> Starting acor
+2021-01-04 11:08:47,280| ThreadPoolExecutor-0_1| INFO | Auto corr already generated, tmax = 200
+2021-01-04 11:08:47,280| ThreadPoolExecutor-0_1| INFO | == finished in 8.535385131835938e-05 s
+2021-01-04 11:08:47,280| ThreadPoolExecutor-0_1| INFO | ====> Starting ccor
+2021-01-04 11:08:47,280| ThreadPoolExecutor-0_1| INFO | Cross corr already generated, tmax = 200
+2021-01-04 11:08:47,280| ThreadPoolExecutor-0_1| INFO | == finished in 7.653236389160156e-05 s
+2021-01-04 11:08:47,280| ThreadPoolExecutor-0_1| INFO | ====> writing fits
+2021-01-04 11:08:47,281| ThreadPoolExecutor-0_1| INFO | ---> saving ccor
+2021-01-04 11:08:47,309| ThreadPoolExecutor-0_1| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020121_221213o_tmax200_s.fits
+2021-01-04 11:08:47,309| ThreadPoolExecutor-0_1| INFO | ====> Graphing
+2021-01-04 11:08:47,336| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 11:08:47,336| ThreadPoolExecutor-0_1| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 11:08:48,094| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020121_221213o_s_acor_avg_1.png
+2021-01-04 11:08:48,121| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 11:08:48,121| ThreadPoolExecutor-0_1| DEBUG| Graphing: gif_3_mat
+2021-01-04 11:08:50,824| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_142344o_s_ccor_all_0.gif
+2021-01-04 11:08:50,824| ThreadPoolExecutor-0_0| INFO | ===> complete
+2021-01-04 11:08:50,824| ThreadPoolExecutor-0_0| INFO | ======== 20201222_aocb_2020122_142344o ========
+2021-01-04 11:08:50,825| ThreadPoolExecutor-0_0| INFO | == sub_len = 5 
+2021-01-04 11:08:50,825| ThreadPoolExecutor-0_0| INFO | == s_sub = True 
+2021-01-04 11:08:50,825| ThreadPoolExecutor-0_0| INFO | == tt_sub = False 
+2021-01-04 11:08:50,825| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 11:08:50,826| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_142344o.fits
+2021-01-04 11:08:50,831| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_142344o.fits
+2021-01-04 11:08:50,884| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 11:08:50,885| ThreadPoolExecutor-0_0| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_142344o_tmax200_s.fits
+2021-01-04 11:08:50,885| ThreadPoolExecutor-0_0| DEBUG| fits found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_142344o_tmax200_s.fits
+2021-01-04 11:08:50,885| ThreadPoolExecutor-0_0| INFO | ---> Pulling data from fits file :  /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_142344o_tmax200_s.fits
+2021-01-04 11:08:50,907| ThreadPoolExecutor-0_0| INFO | Generating auto corr from ccor tmax = 200
+2021-01-04 11:08:50,908| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_142344o.fits
+2021-01-04 11:08:50,952| ThreadPoolExecutor-0_0| DEBUG| self.target_file: None
+2021-01-04 11:08:50,954| ThreadPoolExecutor-0_0| INFO | ====> Starting acor
+2021-01-04 11:08:50,954| ThreadPoolExecutor-0_0| INFO | Auto corr already generated, tmax = 200
+2021-01-04 11:08:50,954| ThreadPoolExecutor-0_0| INFO | == finished in 0.00027632713317871094 s
+2021-01-04 11:08:50,954| ThreadPoolExecutor-0_0| INFO | ====> Starting ccor
+2021-01-04 11:08:50,954| ThreadPoolExecutor-0_0| INFO | Cross corr already generated, tmax = 200
+2021-01-04 11:08:50,955| ThreadPoolExecutor-0_0| INFO | == finished in 0.0001862049102783203 s
+2021-01-04 11:08:50,955| ThreadPoolExecutor-0_0| INFO | ====> writing fits
+2021-01-04 11:08:50,956| ThreadPoolExecutor-0_0| INFO | ---> saving ccor
+2021-01-04 11:08:51,013| ThreadPoolExecutor-0_0| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_142344o_tmax200_s.fits
+2021-01-04 11:08:51,014| ThreadPoolExecutor-0_0| INFO | ====> Graphing
+2021-01-04 11:08:51,086| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 11:08:51,087| ThreadPoolExecutor-0_0| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 11:08:51,961| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_142344o_s_acor_avg_1.png
+2021-01-04 11:08:52,015| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 11:08:52,015| ThreadPoolExecutor-0_0| DEBUG| Graphing: gif_3_mat
+2021-01-04 11:08:57,709| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020121_221213o_s_acor_avg_1.gif
+2021-01-04 11:08:57,811| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 11:08:57,811| ThreadPoolExecutor-0_1| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 11:08:58,445| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020121_221213o_s_ccor_all_1.png
+2021-01-04 11:08:58,515| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 11:08:58,515| ThreadPoolExecutor-0_1| DEBUG| Graphing: cor_animate_all
+2021-01-04 11:09:00,244| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_142344o_s_acor_avg_1.gif
+2021-01-04 11:09:00,598| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 11:09:00,598| ThreadPoolExecutor-0_0| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 11:09:01,379| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_142344o_s_ccor_all_1.png
+2021-01-04 11:09:01,509| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 11:09:01,509| ThreadPoolExecutor-0_0| DEBUG| Graphing: cor_animate_all
+2021-01-04 11:09:19,003| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020121_221213o_s_ccor_all_1.gif
+2021-01-04 11:09:19,004| ThreadPoolExecutor-0_1| INFO | ===> complete
+2021-01-04 11:09:19,006| ThreadPoolExecutor-0_1| INFO | ======== 20201222_aocb_2020121_221213o ========
+2021-01-04 11:09:19,006| ThreadPoolExecutor-0_1| INFO | == sub_len = 0 
+2021-01-04 11:09:19,006| ThreadPoolExecutor-0_1| INFO | == s_sub = True 
+2021-01-04 11:09:19,006| ThreadPoolExecutor-0_1| INFO | == tt_sub = True 
+2021-01-04 11:09:19,006| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 11:09:19,006| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020121_221213o.fits
+2021-01-04 11:09:19,011| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020121_221213o.fits
+2021-01-04 11:09:19,033| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 11:09:19,033| ThreadPoolExecutor-0_1| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020121_221213o_tmax200_stt.fits
+2021-01-04 11:09:19,033| ThreadPoolExecutor-0_1| DEBUG| fits not found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020121_221213o_tmax200_stt.fits
+2021-01-04 11:09:19,033| ThreadPoolExecutor-0_1| INFO | ====> Starting acor
+2021-01-04 11:09:19,033| ThreadPoolExecutor-0_1| INFO | Generating auto corr tmax = 200
+2021-01-04 11:09:19,797| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_142344o_s_ccor_all_1.gif
+2021-01-04 11:09:19,798| ThreadPoolExecutor-0_0| INFO | ===> complete
+2021-01-04 11:09:19,798| ThreadPoolExecutor-0_0| INFO | ======== 20201222_aocb_2020122_142344o ========
+2021-01-04 11:09:19,799| ThreadPoolExecutor-0_0| INFO | == sub_len = 0 
+2021-01-04 11:09:19,799| ThreadPoolExecutor-0_0| INFO | == s_sub = True 
+2021-01-04 11:09:19,799| ThreadPoolExecutor-0_0| INFO | == tt_sub = True 
+2021-01-04 11:09:19,800| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 11:09:19,800| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_142344o.fits
+2021-01-04 11:09:19,805| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_142344o.fits
+2021-01-04 11:09:19,826| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 11:09:19,826| ThreadPoolExecutor-0_0| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_142344o_tmax200_stt.fits
+2021-01-04 11:09:19,826| ThreadPoolExecutor-0_0| DEBUG| fits not found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_142344o_tmax200_stt.fits
+2021-01-04 11:09:19,826| ThreadPoolExecutor-0_0| INFO | ====> Starting acor
+2021-01-04 11:09:19,826| ThreadPoolExecutor-0_0| INFO | Generating auto corr tmax = 200
+2021-01-04 11:12:02,308| ThreadPoolExecutor-0_0| INFO | == finished in 162.4818994998932 s
+2021-01-04 11:12:02,309| ThreadPoolExecutor-0_0| INFO | ====> Starting ccor
+2021-01-04 11:12:02,309| ThreadPoolExecutor-0_0| INFO | Generating cross corr tmax = 200
+2021-01-04 11:12:03,271| ThreadPoolExecutor-0_1| INFO | == finished in 164.23721027374268 s
+2021-01-04 11:12:03,271| ThreadPoolExecutor-0_1| INFO | ====> Starting ccor
+2021-01-04 11:12:03,271| ThreadPoolExecutor-0_1| INFO | Generating cross corr tmax = 200
+2021-01-04 11:16:03,118| ThreadPoolExecutor-0_0| INFO | == finished in 240.8085741996765 s
+2021-01-04 11:16:03,118| ThreadPoolExecutor-0_0| INFO | ====> writing fits
+2021-01-04 11:16:03,118| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 11:16:03,118| ThreadPoolExecutor-0_0| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_142344o_tmax200_stt.fits
+2021-01-04 11:16:03,143| ThreadPoolExecutor-0_0| INFO | ---> saving ccor
+2021-01-04 11:16:03,185| ThreadPoolExecutor-0_0| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_142344o_tmax200_stt.fits
+2021-01-04 11:16:03,185| ThreadPoolExecutor-0_0| INFO | ====> Graphing
+2021-01-04 11:16:03,269| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 11:16:03,269| ThreadPoolExecutor-0_0| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 11:16:04,126| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_142344o_stt_acor_avg_0.png
+2021-01-04 11:16:04,214| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 11:16:04,214| ThreadPoolExecutor-0_0| DEBUG| Graphing: gif_3_mat
+2021-01-04 11:16:12,595| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_142344o_stt_acor_avg_0.gif
+2021-01-04 11:16:12,811| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 11:16:12,811| ThreadPoolExecutor-0_0| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 11:16:13,562| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_142344o_stt_ccor_all_0.png
+2021-01-04 11:16:13,780| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 11:16:13,780| ThreadPoolExecutor-0_0| DEBUG| Graphing: cor_animate_all
+2021-01-04 11:16:21,560| ThreadPoolExecutor-0_1| INFO | == finished in 258.28867506980896 s
+2021-01-04 11:16:21,560| ThreadPoolExecutor-0_1| INFO | ====> writing fits
+2021-01-04 11:16:21,560| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 11:16:21,560| ThreadPoolExecutor-0_1| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020121_221213o_tmax200_stt.fits
+2021-01-04 11:16:21,582| ThreadPoolExecutor-0_1| INFO | ---> saving ccor
+2021-01-04 11:16:21,621| ThreadPoolExecutor-0_1| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020121_221213o_tmax200_stt.fits
+2021-01-04 11:16:21,621| ThreadPoolExecutor-0_1| INFO | ====> Graphing
+2021-01-04 11:16:21,666| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 11:16:21,666| ThreadPoolExecutor-0_1| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 11:16:22,378| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020121_221213o_stt_acor_avg_0.png
+2021-01-04 11:16:22,426| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 11:16:22,426| ThreadPoolExecutor-0_1| DEBUG| Graphing: gif_3_mat
+2021-01-04 11:16:27,717| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_142344o_stt_ccor_all_0.gif
+2021-01-04 11:16:27,718| ThreadPoolExecutor-0_0| INFO | ===> complete
+2021-01-04 11:16:27,718| ThreadPoolExecutor-0_0| INFO | ======== 20201222_aocb_2020122_142344o ========
+2021-01-04 11:16:27,718| ThreadPoolExecutor-0_0| INFO | == sub_len = 5 
+2021-01-04 11:16:27,718| ThreadPoolExecutor-0_0| INFO | == s_sub = True 
+2021-01-04 11:16:27,718| ThreadPoolExecutor-0_0| INFO | == tt_sub = True 
+2021-01-04 11:16:27,718| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 11:16:27,718| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_142344o.fits
+2021-01-04 11:16:27,722| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_142344o.fits
+2021-01-04 11:16:27,743| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 11:16:27,743| ThreadPoolExecutor-0_0| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_142344o_tmax200_stt.fits
+2021-01-04 11:16:27,743| ThreadPoolExecutor-0_0| DEBUG| fits found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_142344o_tmax200_stt.fits
+2021-01-04 11:16:27,743| ThreadPoolExecutor-0_0| INFO | ---> Pulling data from fits file :  /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_142344o_tmax200_stt.fits
+2021-01-04 11:16:27,754| ThreadPoolExecutor-0_0| INFO | Generating auto corr from ccor tmax = 200
+2021-01-04 11:16:27,755| ThreadPoolExecutor-0_0| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020122_142344o.fits
+2021-01-04 11:16:27,769| ThreadPoolExecutor-0_0| DEBUG| self.target_file: None
+2021-01-04 11:16:27,770| ThreadPoolExecutor-0_0| INFO | ====> Starting acor
+2021-01-04 11:16:27,770| ThreadPoolExecutor-0_0| INFO | Auto corr already generated, tmax = 200
+2021-01-04 11:16:27,770| ThreadPoolExecutor-0_0| INFO | == finished in 8.20159912109375e-05 s
+2021-01-04 11:16:27,770| ThreadPoolExecutor-0_0| INFO | ====> Starting ccor
+2021-01-04 11:16:27,770| ThreadPoolExecutor-0_0| INFO | Cross corr already generated, tmax = 200
+2021-01-04 11:16:27,770| ThreadPoolExecutor-0_0| INFO | == finished in 8.702278137207031e-05 s
+2021-01-04 11:16:27,770| ThreadPoolExecutor-0_0| INFO | ====> writing fits
+2021-01-04 11:16:27,771| ThreadPoolExecutor-0_0| INFO | ---> saving ccor
+2021-01-04 11:16:27,797| ThreadPoolExecutor-0_0| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020122_142344o_tmax200_stt.fits
+2021-01-04 11:16:27,797| ThreadPoolExecutor-0_0| INFO | ====> Graphing
+2021-01-04 11:16:27,824| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 11:16:27,824| ThreadPoolExecutor-0_0| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 11:16:28,566| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020122_142344o_stt_acor_avg_1.png
+2021-01-04 11:16:28,594| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 11:16:28,594| ThreadPoolExecutor-0_0| DEBUG| Graphing: gif_3_mat
+2021-01-04 11:16:30,318| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020121_221213o_stt_acor_avg_0.gif
+2021-01-04 11:16:31,231| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 11:16:31,232| ThreadPoolExecutor-0_1| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 11:16:32,010| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020121_221213o_stt_ccor_all_0.png
+2021-01-04 11:16:32,563| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 11:16:32,564| ThreadPoolExecutor-0_1| DEBUG| Graphing: cor_animate_all
+2021-01-04 11:16:39,337| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020122_142344o_stt_acor_avg_1.gif
+2021-01-04 11:16:39,487| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 11:16:39,487| ThreadPoolExecutor-0_0| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 11:16:40,317| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020122_142344o_stt_ccor_all_1.png
+2021-01-04 11:16:40,445| ThreadPoolExecutor-0_0| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 11:16:40,445| ThreadPoolExecutor-0_0| DEBUG| Graphing: cor_animate_all
+2021-01-04 11:16:48,993| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020121_221213o_stt_ccor_all_0.gif
+2021-01-04 11:16:48,993| ThreadPoolExecutor-0_1| INFO | ===> complete
+2021-01-04 11:16:48,993| ThreadPoolExecutor-0_1| INFO | ======== 20201222_aocb_2020121_221213o ========
+2021-01-04 11:16:48,993| ThreadPoolExecutor-0_1| INFO | == sub_len = 5 
+2021-01-04 11:16:48,994| ThreadPoolExecutor-0_1| INFO | == s_sub = True 
+2021-01-04 11:16:48,994| ThreadPoolExecutor-0_1| INFO | == tt_sub = True 
+2021-01-04 11:16:48,994| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/
+2021-01-04 11:16:48,994| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020121_221213o.fits
+2021-01-04 11:16:49,002| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020121_221213o.fits
+2021-01-04 11:16:49,037| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/fits/
+2021-01-04 11:16:49,037| ThreadPoolExecutor-0_1| DEBUG| fits name: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020121_221213o_tmax200_stt.fits
+2021-01-04 11:16:49,037| ThreadPoolExecutor-0_1| DEBUG| fits found: /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020121_221213o_tmax200_stt.fits
+2021-01-04 11:16:49,037| ThreadPoolExecutor-0_1| INFO | ---> Pulling data from fits file :  /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020121_221213o_tmax200_stt.fits
+2021-01-04 11:16:49,053| ThreadPoolExecutor-0_1| INFO | Generating auto corr from ccor tmax = 200
+2021-01-04 11:16:49,054| ThreadPoolExecutor-0_1| DEBUG| datacheckfile: /home/imaka/data/sim/20201222/ao/aocb_2020121_221213o.fits
+2021-01-04 11:16:49,079| ThreadPoolExecutor-0_1| DEBUG| self.target_file: None
+2021-01-04 11:16:49,080| ThreadPoolExecutor-0_1| INFO | ====> Starting acor
+2021-01-04 11:16:49,080| ThreadPoolExecutor-0_1| INFO | Auto corr already generated, tmax = 200
+2021-01-04 11:16:49,080| ThreadPoolExecutor-0_1| INFO | == finished in 0.00013303756713867188 s
+2021-01-04 11:16:49,080| ThreadPoolExecutor-0_1| INFO | ====> Starting ccor
+2021-01-04 11:16:49,080| ThreadPoolExecutor-0_1| INFO | Cross corr already generated, tmax = 200
+2021-01-04 11:16:49,080| ThreadPoolExecutor-0_1| INFO | == finished in 0.00012731552124023438 s
+2021-01-04 11:16:49,080| ThreadPoolExecutor-0_1| INFO | ====> writing fits
+2021-01-04 11:16:49,081| ThreadPoolExecutor-0_1| INFO | ---> saving ccor
+2021-01-04 11:16:49,116| ThreadPoolExecutor-0_1| INFO | == /home/emcewen/out_sim/20201222/fits/20201222_aocb_2020121_221213o_tmax200_stt.fits
+2021-01-04 11:16:49,116| ThreadPoolExecutor-0_1| INFO | ====> Graphing
+2021-01-04 11:16:49,143| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_png/
+2021-01-04 11:16:49,143| ThreadPoolExecutor-0_1| DEBUG| Graphing: graph_3_rows_t_mat
+2021-01-04 11:16:49,804| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/acor_png/20201222_aocb_2020121_221213o_stt_acor_avg_1.png
+2021-01-04 11:16:49,835| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/acor_avg_gif/
+2021-01-04 11:16:49,835| ThreadPoolExecutor-0_1| DEBUG| Graphing: gif_3_mat
+2021-01-04 11:16:53,969| ThreadPoolExecutor-0_0| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020122_142344o_stt_ccor_all_1.gif
+2021-01-04 11:16:53,969| ThreadPoolExecutor-0_0| INFO | ===> complete
+2021-01-04 11:16:53,971| ThreadPoolExecutor-0_0| INFO | File 5: ending
+2021-01-04 11:16:57,596| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/acor_avg_gif/20201222_aocb_2020121_221213o_stt_acor_avg_1.gif
+2021-01-04 11:16:57,665| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_png/
+2021-01-04 11:16:57,665| ThreadPoolExecutor-0_1| DEBUG| Graphing: graph_5_5_ccor
+2021-01-04 11:16:58,492| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_png/20201222_aocb_2020121_221213o_stt_ccor_all_1.png
+2021-01-04 11:16:58,563| ThreadPoolExecutor-0_1| DEBUG| path found: /home/emcewen/out_sim/20201222/plots/ccor_all_gif/
+2021-01-04 11:16:58,563| ThreadPoolExecutor-0_1| DEBUG| Graphing: cor_animate_all
+2021-01-04 11:17:11,659| ThreadPoolExecutor-0_1| INFO | /home/emcewen/out_sim/20201222/plots/ccor_all_gif/20201222_aocb_2020121_221213o_stt_ccor_all_1.gif
+2021-01-04 11:17:11,659| ThreadPoolExecutor-0_1| INFO | ===> complete
+2021-01-04 11:17:11,661| ThreadPoolExecutor-0_1| INFO | File 6: ending
+2021-01-04 11:17:11,662| MainThread | INFO | END THREADS
+2021-01-04 11:17:11,662| MainThread | INFO | THREAD Time: 6728.684154987335
