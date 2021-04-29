@@ -65,13 +65,19 @@ def treat_overscan(files):
 
         orig_wid = np.shape(dat)[1]        # Width of original image
         cell_wid = orig_wid / 8            # Width of one cell (1/8 of image)
-        scan_wid = int(cell_wid * (3/25))  # Width of overscan region (3/25 of cell)
-        data_wid = int(cell_wid * (22/25)) # Width of data region (22/25 of cell)
+        scan_wid = int(round(cell_wid * (3./25.)))  # Width of overscan region (3/25 of cell)
+        data_wid = int(round(cell_wid * (22./25.))) # Width of data region (22/25 of cell)
+        # print('orig_wid = ', orig_wid)
+        # print('cell_wid = ', cell_wid)
+        # print('scan_wid = ', scan_wid)
+        # print('data_wid = ', data_wid)
 
         # For each cell, take the median of each overscan row and 
         # subtract that from the corresponding row in the data
         for ii in range(16):
+            # print(ii, cells[ii], scan_wid)
             scan, img = np.split(cells[ii], [scan_wid], axis=1)
+            # print(scan.shape, img.shape)
             scans.append(scan)
             imgs.append(img)
             med_col = np.median(scan, axis=1)
@@ -89,6 +95,113 @@ def treat_overscan(files):
         fits.writeto(new_filename, clean_image, hdr, overwrite=True)
     
     return
+
+def treat_overscan_2020(files):
+    """
+    Performs bias/dark subtraction from overscan images on STA camera
+    Assumes STA 8x2 'cell' structure, each with its own overscan region
+    Works independent of image binning
+    Input: an array of files from STA camera
+    Output: writes new images with '_scan' suffix in name
+    """
+    for file in files:
+
+        # Read in data
+        print('Working on file: ', file)
+        dat, hdr = fits.getdata(file, header=True)
+
+        # Determine binning from image shape
+        binfac = get_bin_factor(dat, hdr)
+
+        # Split the data vertically for the two different read-outs. Take the 
+        # bottom 8 and gang them on the end of the top 8 for easier access.
+        rows = np.vsplit(dat, 2)
+        one_row = np.hstack([rows[0], rows[1]])
+        cells = np.hsplit(one_row, 16)
+
+        # Define the 'image' and 'overscan' region 
+        # Done with fractions, so independent of binning
+        imgs = []
+        scans = []
+        clean_cells = []
+
+        orig_wid = np.shape(dat)[1]        # Width of original image
+        cell_wid = orig_wid / 8            # Width of one cell (1/8 of image)
+        scan_wid = int(120 / binfac)       # Width of overscan region (3/25 of cell)
+        data_wid = int(1440 / binfac)      # Width of data region (22/25 of cell)
+        pix_shift = 5
+        print('orig_wid = ', orig_wid)
+        print('cell_wid = ', cell_wid)
+        print('scan_wid = ', scan_wid)
+        print('data_wid = ', data_wid)
+
+        # For each cell, take the median of each overscan row and 
+        # subtract that from the corresponding row in the data
+        for ii in range(16):
+            ## Take each data column located between ni*dw+ow and (ni+1)*dw and put 
+            ## them next to each other in the new image
+            img_lo = ii*data_wid + scan_wid - pix_shift
+            img_hi = (ii + 1)*data_wid - pix_shift
+            scn_lo = ii*data_wid - pix_shift
+            if scn_low < 0:
+                scn_low = 0
+            scn_hi = scn_lo + scan_wid
+
+            img = one_row[img_lo:img_hi, :]
+            scn = one_row[scn_lo:scn_hi, :]
+
+            med_cal = np.median(scn, axis=1)
+            med_cell = np.array([med_col,]*img.shape[0]).transpose()
+
+            clean_cell = img - med_cell
+            clean_cells.append(clean_cell)
+
+            pdb.set_trace()
+            # scan, img = np.split(cells[ii], [scan_wid - pix_shift], axis=1)
+            # scans.append(scan)
+            # imgs.append(img)
+            # med_col = np.median(scan, axis=1)
+            # med_cell = np.array([med_col,]*data_wid).transpose()
+            # clean_cell = img - med_cell 
+            # clean_cells.append(clean_cell)
+
+        # Rebuild image with clean cells
+        clean_one_row = np.hstack(clean_cells)
+        clean_rows = np.hsplit(clean_one_row, 2)
+        clean_image = np.vstack(clean_rows)
+
+        # Write new image
+        new_filename = file[:-5] + '_scan.fits'
+        fits.writeto(new_filename, clean_image, hdr, overwrite=True)
+    
+    return
+
+def get_bin_factor(image, header):
+
+    if 'BINFAC' in header:
+        return header['BINFAC']
+
+    imgshape = image.shape
+
+    ## Determine binning from image size
+    ## For 1x1 binning
+    if (imgshape[0] > 10500) and (imgshape[1] > 11500):
+        binfac = 1
+
+    ## For 2x2 binning
+    elif (imgshape[0] > 5200) and (imgshape[0] < 5500):
+        binfac = 2
+    
+    ## For 3x3 binning
+    elif (imgshape[0] > 3500) and (imgshape[0] < 3700):
+        binfac = 3
+
+    ## For 4x4 binning
+    elif (imgshape[0] > 2600) and (imgshape[0] < 2700):
+        binfac = 4
+
+    return binfac
+
 
 def clean_image(image_file):
     """
