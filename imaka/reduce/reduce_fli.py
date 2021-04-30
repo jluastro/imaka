@@ -81,7 +81,8 @@ def fix_bad_pixels(img):
     return cleanarr
 
 
-def clean_images(img_files, out_dir, rebin=1, sky_frame=None, flat_frame=None, fix_bad_pixels=False):
+def clean_images(img_files, out_dir, rebin=1, sky_frame=None, flat_frame=None,
+                     fix_bad_pixels=False, worry_about_edges=False):
     """
     Clean a stack of imaka images. Options include:
       - sky subtraction
@@ -118,7 +119,9 @@ def clean_images(img_files, out_dir, rebin=1, sky_frame=None, flat_frame=None, f
         
         # Clean it
         print('\nCleaning image\n')
-        img_clean, bad_pixels = clean_single_image(img, sky=sky, flat=flat, rebin=rebin, fix_bad_pixels=fix_bad_pixels)
+        img_clean, bad_pixels = clean_single_image(img, sky=sky, flat=flat, rebin=rebin,
+                                                       fix_bad_pixels=fix_bad_pixels,
+                                                       worry_about_edges=worry_about_edges)
         
 
         # Write it out
@@ -135,7 +138,8 @@ def clean_images(img_files, out_dir, rebin=1, sky_frame=None, flat_frame=None, f
     return
 
 
-def clean_single_image(img, sky=None, flat=None, rebin=1, fix_bad_pixels=False, verbose=False):
+def clean_single_image(img, sky=None, flat=None, rebin=1,
+                           fix_bad_pixels=False, worry_about_edges=False, verbose=False):
     # Bin by a factor of 10 (or as specified).
     if rebin != 1:
         print('  Bin by a factor of ', rebin)
@@ -150,15 +154,26 @@ def clean_single_image(img, sky=None, flat=None, rebin=1, fix_bad_pixels=False, 
     else:
         img = img - sky
 
+        # Calculate the mean background and make sure it isn't too negative.
+        # This happens when the skies are taken with moonlight or twilight.
+        mean, median, stddev = sigma_clipped_stats(img.flatten(), sigma_lower=5, sigma_upper=3, maxiters=5)
+
+        if median < 0:
+            img -= median
+            
     # Flat field.
     if flat is not None:
         print('  Dividing by flat')
         img = img / flat
 
+    # Fix any inifinte or nan pixels... just set to 0
+    idx = np.where(np.isfinite(img) == False)
+    img[idx] = 0
+
     # Fix hot and dead pixels
     if fix_bad_pixels:
         print('\t Fix bad pixels')
-        bad_pixels, img = find_outlier_pixels(img, tolerance=5, worry_about_edges=False)
+        bad_pixels, img = find_outlier_pixels(img, tolerance=5, worry_about_edges=worry_about_edges)
     else:
         bad_pixels = None
             
@@ -181,7 +196,7 @@ def mask_pix(flat_file, mask_min, mask_max, left_slice=0, right_slice=0, top_sli
     # Mask pixels below a defined threshold 'mask_min'
     copy1 = np.copy(flat)
     copy1[np.where((copy1>mask_min) & (copy1<mask_max))] = 0
-    mask1 = np.ma.make_mask(copy1,copy=True,shrink=True,dtype=np.bool)
+    mask1 = np.ma.make_mask(copy1,copy=True, shrink=True,dtype=np.bool)
 
     # Mask edge pixels as defined by 'slice' variables 
     copy2 = np.copy(flat)
@@ -224,23 +239,21 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
         
         fwhm_curr = fwhm
         
-
         # Calculate the bacgkround and noise (iteratively)
         print("    Calculating background")
         bkg_threshold_above = 1
         bkg_threshold_below = 3
+
+        good_pix = np.where(np.isfinite(img))
+        
         for nn in range(5):
-            if nn == 0:
-                bkg_mean = img.mean()
-                bkg_std = img.std()
-            else:
-                bkg_mean = img[good_pix].mean()
-                bkg_std = img[good_pix].std()
+            bkg_mean = img[good_pix].mean()
+            bkg_std = img[good_pix].std()
 
             bad_hi = bkg_mean + (bkg_threshold_above * bkg_std)
             bad_lo = bkg_mean - (bkg_threshold_below * bkg_std)
 
-            good_pix = np.where((img < bad_hi) & (img > bad_lo))
+            good_pix = np.where((img > bad_lo) & (img < bad_hi))
         
         bkg_mean = img[good_pix].mean()
         bkg_std = img[good_pix].std()
@@ -255,7 +268,7 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
         for nn in range(N_passes):
             print('     Pass {0:d} assuming FWHM = {1:.1f}'.format(nn, fwhm_curr))
             daofind = DAOStarFinder(fwhm=fwhm_curr, threshold = img_threshold, exclude_border=True)
-            sources = daofind(img - bkg_mean)
+            sources = daofind(img - bkg_mean, mask=mask)
             print(len(sources), 'sources found')
 
             # Calculate FWHM for each detected star.
@@ -302,20 +315,20 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
                 final_psf_mod += g2d_image
 
                 if plot_psf_compare == True:
-                    #plt.figure(4)
-                    #plt.clf()
-                    #plt.imshow(cutouts[ss])
-                    #plt.pause(0.05)
+                    plt.figure(4)
+                    plt.clf()
+                    plt.imshow(cutouts[ss])
+                    plt.pause(0.05)
                 
-                    #plt.figure(5)
-                    #plt.clf()
-                    #plt.imshow(g2d_image)
-                    #plt.pause(0.05)
+                    plt.figure(5)
+                    plt.clf()
+                    plt.imshow(g2d_image)
+                    plt.pause(0.05)
                 
-                    #plt.figure(6)
-                    #plt.clf()
-                    #plt.imshow(cutouts[ss] - g2d_image)
-                    #plt.pause(0.05)
+                    plt.figure(6)
+                    plt.clf()
+                    plt.imshow(cutouts[ss] - g2d_image)
+                    plt.pause(0.05)
                 
                     pdb.set_trace()
 
@@ -388,7 +401,6 @@ def find_outlier_pixels(data, tolerance=3, worry_about_edges=True, median_filter
     blurred = median_filter(data, size=median_filter_size)
     difference = data - blurred.astype(float)
     threshold = tolerance * np.std(difference)
-    pdb.set_trace()
 
     # Find the hot pixels, but ignore the edges
     hot_pixels = np.nonzero((np.abs(difference[1:-1,1:-1]) > threshold) )

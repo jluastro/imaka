@@ -112,6 +112,7 @@ def treat_overscan_2020(files):
 
         # Determine binning from image shape
         binfac = get_bin_factor(dat, hdr)
+        pdb.set_trace()
 
         # Split the data vertically for the two different read-outs. Take the 
         # bottom 8 and gang them on the end of the top 8 for easier access.
@@ -143,14 +144,14 @@ def treat_overscan_2020(files):
             img_lo = ii*data_wid + scan_wid - pix_shift
             img_hi = (ii + 1)*data_wid - pix_shift
             scn_lo = ii*data_wid - pix_shift
-            if scn_low < 0:
-                scn_low = 0
+            if scn_lo < 0:
+                scn_lo = 0
             scn_hi = scn_lo + scan_wid
 
             img = one_row[img_lo:img_hi, :]
             scn = one_row[scn_lo:scn_hi, :]
 
-            med_cal = np.median(scn, axis=1)
+            med_col = np.median(scn, axis=1)
             med_cell = np.array([med_col,]*img.shape[0]).transpose()
 
             clean_cell = img - med_cell
@@ -176,11 +177,92 @@ def treat_overscan_2020(files):
     
     return
 
+def treat_overscan_2021(files, remake=False):
+    """
+    Performs bias/dark subtraction from overscan images on STA camera
+    Assumes STA 8x2 'cell' structure, each with its own overscan region
+    Works independent of image binning
+    Input: an array of files from STA camera
+    Output: writes new images with '_scan' suffix in name
+    """
+    for file in files:
+        # Write new image
+        new_filename = file[:-5] + '_scan.fits'
+        if file.endswith('.gz'):
+            new_filename = file[:-8] + '_scan.fits'
+
+        # Check to see if it exists. If not, make it.
+        if os.path.exists(new_filename) and not remake:
+            continue
+            
+        # Read in data
+        print('Working on file: ', file)
+        dat, hdr = fits.getdata(file, header=True)
+
+        # Determine binning from image shape
+        binfac = get_bin_factor(dat, hdr)
+
+        # Split the data vertically for the two different read-outs. Take the 
+        # bottom 8 and gang them on the end of the top 8 for easier access.
+        row_bottom = dat[0:2640, :]
+        row_top = dat[2660:5300, :]
+        one_row = np.hstack([row_bottom, row_top])
+        cells = np.hsplit(one_row, 16)
+
+        # Define the 'image' and 'overscan' region 
+        # Done with fractions, so independent of binning
+        imgs = []
+        scans = []
+        clean_cells = []
+
+        orig_wid = np.shape(dat)[1]        # Width of original image
+        cell_wid = orig_wid / 8            # Width of one cell (1/8 of image)
+        scan_wid = int(240 / binfac)       # Width of overscan region (2/13 of cell)
+        data_wid = int(1320 / binfac)      # Width of data region (11/13 of cell)
+        pix_shift = 0
+        print('orig_wid = ', orig_wid)
+        print('cell_wid = ', cell_wid)
+        print('scan_wid = ', scan_wid)
+        print('data_wid = ', data_wid)
+
+        # For each cell, take the median of each overscan row and 
+        # subtract that from the corresponding row in the data
+        for ii in range(16):
+            ## Take each data column located between ni*dw+ow and (ni+1)*dw and put 
+            ## them next to each other in the new image
+            img_lo = ii*(data_wid + scan_wid) + pix_shift
+            img_hi = img_lo + data_wid
+            scn_lo = img_hi
+            if scn_lo < 0:
+                scn_lo = 0
+            scn_hi = scn_lo + scan_wid
+
+            img = one_row[:, img_lo:img_hi]
+            scn = one_row[:, scn_lo:scn_hi]
+
+            med_col = np.median(scn, axis=1)
+            med_cell = np.array([med_col,]*img.shape[1]).transpose()
+
+            clean_cell = img - med_cell
+            clean_cells.append(clean_cell)
+
+        # Rebuild image with clean cells
+        clean_one_row = np.hstack(clean_cells)
+        clean_rows = np.hsplit(clean_one_row, 2)
+        clean_image = np.vstack(clean_rows)
+
+        fits.writeto(new_filename, clean_image, hdr, overwrite=True)
+    
+    return
+
 def get_bin_factor(image, header):
 
     if 'BINFAC' in header:
         return header['BINFAC']
 
+    if 'CCDBIN1' in header:
+        return header['CCDBIN1']
+    
     imgshape = image.shape
 
     ## Determine binning from image size

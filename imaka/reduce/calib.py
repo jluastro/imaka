@@ -7,14 +7,33 @@ import pdb
 
 module_dir = os.path.dirname(__file__)
 
-def makedark(dark_files, output):
+try:
+    str_type = types.StringTypes
+    float_type = types.FloatType
+    int_type = types.IntType
+except:
+    str_type = str
+    float_type = float
+    int_type = int
+
+def makedark(dark_files, output, rescale=None):
     """
     Make dark image for data. Makes a calib/ directory
     and stores all output there. All output and temporary files
     will be created in a darks/ subdirectory. 
 
-    files: integer list of the files. Does not require padded zeros.
-    output: output file name. Include the .fits extension.
+    Inputs
+    ------
+    files: list of ints
+        integer list of the files. Does not require padded zeros.
+    output: str
+        output file name. Include the .fits extension.
+
+    Optional Inputs
+    --------------------
+    rescale: None, float, or list of floats
+        Useful for constructing skies from different integration times.
+        Default is no rescaling.
     """
     # Catch if there are no files sent in.
     if len(dark_files) == 0:
@@ -37,15 +56,24 @@ def makedark(dark_files, output):
     print('\nReading in files')
     darks = np.array([fits.getdata(dark_file) for dark_file in dark_files])
 
+    if rescale != None:
+        if (isinstance(rescale, int_type) or isinstance(rescale, float_type)):
+            print(f'Rescaling all frames a factor of {rescale:.1f}')
+            darks *= rescale
+        else:
+            for ff in range(len(rescale)):
+                print(f'Rescaling frame {ff} by a factor of {rescale[ff]:.1f}')
+                darks[ff] *= rescale[ff]
+
     # Sigma clip  (about the median)
-    print('Sigma clipping and median combining (3 sigma lower, 2 sigma upper, 5 iterations) about the median.')
-    dark_mean, dark_median, dark_std = sigma_clipped_stats(darks, sigma_lower=3, sigma_upper=2, iters=5, axis=0)
-    dark = dark_median
+    print('Sigma clipping and median combining (3 sigma lower, 1 sigma upper, 10 iterations) about the median.')
+    dark_mean, dark_median, dark_std = sigma_clipped_stats(darks, sigma_lower=3, sigma_upper=1, maxiters=10, axis=0)
+    dark = dark_mean
     
     # Save the output files.
     # Get the header from the first image.
     hdr = fits.getheader(dark_files[0])
-    fits.writeto(_out, dark.data, header=hdr, clobber=True)
+    fits.writeto(_out, dark.data, header=hdr, overwrite=True)
 
     outlis_file = open(_outlis, 'w')
     for ff in range(len(dark_files)):
@@ -88,7 +116,7 @@ def makeflat(flat_files, dark_files, output_file, darks=True):
     # Read in the dark images
     print('  Reading in dark files...')
     if darks==True:
-        darks = np.array([fits.getdata(dark) for dark in dark_files])
+        dark_imgs = np.array([fits.getdata(dark) for dark in dark_files])
 
     # Read in the flat images
     print('  Reading in flat files...')
@@ -104,13 +132,14 @@ def makeflat(flat_files, dark_files, output_file, darks=True):
             filedir2, filename2 = os.path.split(flat_files[ff])
             print('  Flat: ' + filename2 + '  Dark: ' + filename1)
             _lis.write('{0:s}  {1:s}\n'.format(filename1, filename2))
-            _lis.close()
+            
+    _lis.close()
 
 
     #Dark subtraction
     print('  Subtracting darks from flats...')
     if darks==True:
-        flat_ds = flats - darks
+        flat_ds = flats - dark_imgs
     else:
         flat_ds = flats
 
@@ -118,13 +147,13 @@ def makeflat(flat_files, dark_files, output_file, darks=True):
     print('  Normalizing each flat...')
     norm_flats = []
     for i in range(len(flat_ds)):
-        mean, median, stdev = sigma_clipped_stats(flat_ds[i], sigma=3, iters=2, axis=None)
+        mean, median, stdev = sigma_clipped_stats(flat_ds[i], sigma=3, maxiters=2, axis=None)
         norm = flat_ds[i] / median
         norm_flats.append(norm)
 
     # Sigma clip  (about the median)
     print('  Sigma clipping (3 sigma, 2 iterations) about the median...')
-    mean, median, stdev = sigma_clipped_stats(norm_flats, sigma=3, iters=2, axis=0)
+    mean, median, stdev = sigma_clipped_stats(norm_flats, sigma=3, maxiters=2, axis=0)
 
     # Median combine the masked images.
     print('  Median combining all images...')
@@ -133,7 +162,7 @@ def makeflat(flat_files, dark_files, output_file, darks=True):
     # Save the output files.
     # Get the header from the first image.
     hdr = fits.getheader(flat_files[0])
-    fits.writeto(_out, flat, header=hdr, clobber=True)
+    fits.writeto(_out, flat, header=hdr, overwrite=True)
 
     return
 

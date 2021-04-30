@@ -124,3 +124,24 @@ def update_header_coords(fileList):
         fits_f[0].writeto(_out, output_verify='silentfix')
 
     return
+
+def get_plate_scale(img, hdr):
+    """
+    Return plate scale in arcsec / pixel. Should work 
+    for all of our cameras. 
+    """
+    scale = 1.0
+    
+    if 'BINFAC' in header:
+        scale_orig = 0.04 # " / pixel
+
+        scale = scale_orig * header['BINFAC']
+
+    # STA Camera
+    if 'CCDBIN1' in header:
+        if 'SECPIX1' in header:
+            scale = header['SECPIX1']
+        else:
+            scale = 0.08322 * header['CCDBIN1']
+    
+    return scale
