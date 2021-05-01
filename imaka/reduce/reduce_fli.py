@@ -31,7 +31,7 @@ from astropy.table import Table
 from skimage.measure import block_reduce
 from datetime import datetime
 import pytz
-
+import multiprocessing as mp
 
 scale = 40.0 # mas/pixel
 
@@ -108,10 +108,11 @@ def clean_images(img_files, out_dir, rebin=1, sky_frame=None, flat_frame=None,
     else:
         flat = flat_frame
 
-    #####
-    # Loop through the image stack
-    #####
-    for ii in range(len(img_files)):
+    ####
+    # Define a function we can call
+    # per image, to clean and save each one.
+    ####
+    def clean_and_save_single_image(img_file):
         print('  Working on image: ', img_files[ii])
 
         # Read image in
@@ -120,8 +121,8 @@ def clean_images(img_files, out_dir, rebin=1, sky_frame=None, flat_frame=None,
         # Clean it
         print('\nCleaning image\n')
         img_clean, bad_pixels = clean_single_image(img, sky=sky, flat=flat, rebin=rebin,
-                                                       fix_bad_pixels=fix_bad_pixels,
-                                                       worry_about_edges=worry_about_edges)
+                                                    fix_bad_pixels=fix_bad_pixels,
+                                                    worry_about_edges=worry_about_edges)
         
 
         # Write it out
@@ -129,12 +130,21 @@ def clean_images(img_files, out_dir, rebin=1, sky_frame=None, flat_frame=None,
         file_dir, file_name = os.path.split(img_files[ii])
         out_name = file_name.replace('.fits', '_clean.fits')
         fits.writeto(out_dir + out_name, img_clean, hdr, overwrite=True)
-
+    
         if bad_pixels != None:
             mask_name = file_name.replace('.fits', '_mask.fits')
             fits.writeto(out_dir + mask_name, bad_pixels, hdr, overwrite=True)
+        
         print('\nImage stored: {}/{}'.format(file_dir, out_name))
-            
+
+        return
+    
+    #####
+    # Loop through the image stack
+    #####
+    for ii in range(len(img_files)):
+        clean_and_save_single_image(img_files[ii])
+
     return
 
 
@@ -269,28 +279,35 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
             print('     Pass {0:d} assuming FWHM = {1:.1f}'.format(nn, fwhm_curr))
             daofind = DAOStarFinder(fwhm=fwhm_curr, threshold = img_threshold, exclude_border=True)
             sources = daofind(img - bkg_mean, mask=mask)
-            print(len(sources), 'sources found')
+            print('          ', len(sources), 'sources found, now fitting for FWHM.')
 
             # Calculate FWHM for each detected star.
-            x_fwhm = np.zeros(len(sources), dtype=int)
-            y_fwhm = np.zeros(len(sources), dtype=int)
-            theta = np.zeros(len(sources), dtype=int)
+            x_fwhm = np.zeros(len(sources), dtype=float)
+            y_fwhm = np.zeros(len(sources), dtype=float)
+            theta = np.zeros(len(sources), dtype=float)
         
-            cutout_half_size = int(round(fwhm_curr * 3))
-            cutout_size = 2 * cutout_half_size
+            # We will actually be resampling the images for the Gaussian fits.
+            resamp = 2
+            
+            cutout_half_size = int(round(fwhm_curr * 3.5))
+            cutout_size = 2 * cutout_half_size + 1
 
-            final_psf_obs = np.zeros((cutout_size, cutout_size), dtype=float)
-            final_psf_mod = np.zeros((cutout_size, cutout_size), dtype=float)
+            # Define variables to hold final averages PSFs
+            final_psf_obs = np.zeros((cutout_size*resamp, cutout_size*resamp), dtype=float)
+            final_psf_mod = np.zeros((cutout_size*resamp, cutout_size*resamp), dtype=float)
             final_psf_count = 0
-        
-            cutouts = np.zeros((len(sources), cutout_size, cutout_size), dtype=float)
+
+            # Setup our gaussian fitter with some good initial guesses.
             sigma_init_guess = fwhm_curr * gaussian_fwhm_to_sigma
-            g2d_model = models.Gaussian2D(1.0, cutout_half_size, cutout_half_size,
-                                              sigma_init_guess, sigma_init_guess, theta=0,
-                                              bounds={'x_stddev':[0, 20], 'y_stddev':[0, 20]})
-            g2d_fitter = fitting.LevMarLSQFitter()
+            g2d_model = models.Gaussian2D(1.0, cutout_half_size*resamp, cutout_half_size*resamp,
+                                              sigma_init_guess*resamp, sigma_init_guess*resamp, theta=0,
+                                              bounds={'x_stddev':[0, 20], 'y_stddev':[0, 20], 'amplitude':[0, 2]})
+            c2d_model = models.Const2D(0.0)
+            
+            the_model = g2d_model + c2d_model
+            the_fitter = fitting.LevMarLSQFitter()
+            
             cut_y, cut_x = np.mgrid[:cutout_size, :cutout_size]
-            print('fwhm_type = \n',type(fwhm_curr))
             
             for ss in range(len(sources)):
                 x_lo = int(round(sources[ss]['xcentroid'] - cutout_half_size))
@@ -303,38 +320,86 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
                     # Edge source... fitting is no good
                     continue
             
-                cutouts[ss] = cutout_tmp#-bkg_mean ###Might be a source of issue in reduced images
-                cutouts[ss] /= cutouts[ss].sum()
+                # Oversample the image
+                cutout_resamp = scipy.ndimage.zoom(cutout_tmp, resamp, order = 1)
+                cutout_resamp /= cutout_resamp.sum()
+                cut_y_resamp, cut_x_resamp = np.mgrid[:cutout_size*resamp, :cutout_size*resamp]
 
-                # Fit an elliptical gaussian to the cutout image.
-                g2d_params = g2d_fitter(g2d_model, cut_x, cut_y, cutouts[ss])
-                g2d_image = g2d_params(cut_x, cut_y)
-                
-                final_psf_count += 1
-                final_psf_obs += cutout_tmp
-                final_psf_mod += g2d_image
+                # Fit a 2D gaussian + constant
+                g2d_params = the_fitter(the_model, cut_x_resamp, cut_y_resamp, cutout_resamp)
+                g2d_image = g2d_params(cut_x_resamp, cut_y_resamp)
 
-                if plot_psf_compare == True:
-                    plt.figure(4)
+                # Catch bad fits and ignore. 
+                if (np.isnan(g2d_params.x_mean_0.value) or
+                    (np.abs(g2d_params.x_mean_0.value) > (cutout_size * resamp)) or
+                    (np.abs(g2d_params.y_mean_0.value) > (cutout_size * resamp))):
+                    print(f'Bad fit for {ss}')
+                    continue
+
+                # Add to our average observed/model PSFs
+                if sources['flux'][ss] > 1.9:
+                    final_psf_count += 1
+                    final_psf_obs += cutout_resamp
+                    final_psf_mod += g2d_image
+
+                if (plot_psf_compare == True) and (x_lo > 200) and (y_lo > 200):
+                    plt.figure(4, figsize=(6, 4))
                     plt.clf()
-                    plt.imshow(cutouts[ss])
+                    plt.subplots_adjust(left=0.08)
+                    plt.imshow(cutout_resamp)
+                    plt.colorbar(fraction=0.25)
+                    plt.axis('equal')
+                    plt.title(f'Image (resamp={resamp:d})')
                     plt.pause(0.05)
                 
-                    plt.figure(5)
+                    plt.figure(5, figsize=(6, 4))
                     plt.clf()
+                    plt.subplots_adjust(left=0.08)
                     plt.imshow(g2d_image)
+                    plt.colorbar(fraction=0.25)
+                    plt.axis('equal')
+                    plt.title(f'Model (resamp={resamp:d})')
                     plt.pause(0.05)
                 
-                    plt.figure(6)
+                    plt.figure(6, figsize=(6, 4))
                     plt.clf()
-                    plt.imshow(cutouts[ss] - g2d_image)
+                    plt.subplots_adjust(left=0.08)
+                    plt.imshow((cutout_resamp - g2d_image) / cutout_resamp)
+                    cbar = plt.colorbar(fraction=0.25)
+                    plt.axis('equal')
+                    cbar.set_label('% Residual')
                     plt.pause(0.05)
-                
+                    
                     pdb.set_trace()
 
-                x_fwhm[ss] = g2d_params.x_stddev.value / gaussian_fwhm_to_sigma
-                y_fwhm[ss] = g2d_params.y_stddev.value / gaussian_fwhm_to_sigma
-                theta[ss] = g2d_params.theta.value
+                # Save the FWHM and angle.
+                x_fwhm[ss] = g2d_params.x_stddev_0.value / gaussian_fwhm_to_sigma / resamp
+                y_fwhm[ss] = g2d_params.y_stddev_0.value / gaussian_fwhm_to_sigma / resamp
+                theta[ss] = g2d_params.theta_0.value
+                    
+                # Some occasional display
+                if ss % 250 == 0:
+                    plt.figure(2, figsize=(6, 4))
+                    plt.clf()
+                    plt.subplots_adjust(left=0.08)
+                    plt.imshow(final_psf_obs)
+                    plt.colorbar(fraction=0.25)
+                    plt.axis('equal')
+                    plt.title(f'Obs PSF (resamp = {resamp:d})')
+                    plt.pause(0.05)
+                    
+                    plt.figure(3, figsize=(6, 4))
+                    plt.clf()
+                    plt.subplots_adjust(left=0.08)
+                    plt.imshow(final_psf_mod)
+                    plt.colorbar(fraction=0.25)
+                    plt.axis('equal')
+                    plt.title(f'Mod PSF (resamp = {resamp:d})')
+                    plt.pause(0.05)
+
+                    print(f'ss={ss} fwhm_x={x_fwhm[ss]:.1f} fwhm_y={y_fwhm[ss]:.1f}')
+
+                    
 
             sources['x_fwhm'] = x_fwhm
             sources['y_fwhm'] = y_fwhm
@@ -367,8 +432,6 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
                                                                      sources['y_fwhm'].std()))
 
             fwhm_curr = np.mean([x_fwhm_med, y_fwhm_med])
-            print('fwhm_type = \n',type(fwhm_curr))
-
 
             formats = {'xcentroid': '%8.3f', 'ycentroid': '%8.3f', 'sharpness': '%.2f',
                        'roundness1': '%.2f', 'roundness2': '%.2f', 'peak': '%10.1f',
@@ -485,8 +548,6 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
     """
     Calculate statistics for the Data Metrics table.
     """
-    plate_scale_orig = 0.04 # " / pixel
-
     # radial bins for the EE curves
     max_radius = 3.0
     radii = np.arange(0.05, max_radius, 0.05)
@@ -545,8 +606,7 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
 
         # Get the bin fraction from the header
         bin_factor = hdr['BINFAC']
-        plate_scale_orig = 0.04
-        plate_scale = plate_scale_orig * bin_factor
+        plate_scale = util.get_plate_scale(img, hdr)
 
         # Load up the corresponding starlist.
         starlist = img_files[ii].replace('.fits', '_stars.txt')
@@ -748,7 +808,6 @@ def shift_and_add(img_files, starlists, output_root, method='mean', clip_sigma=N
     """
     Take a stack of images and starlists, calculate the 
     """
-    plate_scale_orig = 0.04 # " / pixel
     N_files = len(img_files)
 
     # Loop through all the starlists and get the transformations.
@@ -825,7 +884,6 @@ def shift_and_add(img_files, starlists, output_root, method='mean', clip_sigma=N
     
 
 def get_transforms_from_starlists(starlists):
-    plate_scale_orig = 0.04 # " / pixel
     N_files = len(starlists)
     N_brite = 7
     N_passes = 2

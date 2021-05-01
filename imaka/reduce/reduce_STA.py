@@ -356,8 +356,6 @@ def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None, fourf
     """
     Calculate statistics for the Data Metrics table.
     """
-    plate_scale_orig = 0.016 # " / pixel
-
     # radial bins for the EE curves
     max_radius = 3.0
     radii = np.arange(0.05, max_radius, 0.05)
@@ -383,6 +381,7 @@ def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None, fourf
     s_emp_fwhm = np.zeros(N_files, dtype=float)
     s_emp_fwhm_std = np.zeros(N_files, dtype=float)
 
+
     if fourfilt==True:
         # Make a column to designate filter position in four filter images
         quadrant = np.zeros(N_files, dtype='S15')
@@ -393,8 +392,16 @@ def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None, fourf
         img, hdr = fits.getdata(img_files[ii], header=True)
 
         # Make dates and times in UT and HST
-        s_time_hst[ii] = hdr['SYS-TIME']
-        s_date_hst[ii] = hdr['SYS-DATE']
+        if 'SYS-TIME' in hdr:
+            s_time_hst[ii] = hdr['SYS-TIME']
+        else:
+            s_time_hst[ii] = hdr['SYSTIME']
+
+        if 'SYS-DATE' in hdr:
+            s_date_hst[ii] = hdr['SYS-DATE']
+        else:
+            s_date_hst[ii] = hdr['SYSDATE']
+            
         s_date_utc[ii] = hdr['DATE-OBS']
 
         time = hdr['UT']
@@ -404,9 +411,7 @@ def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None, fourf
         
 
         # Get the bin fraction from the header
-        bin_factor = hdr['CCDBIN1']
-        plate_scale_orig = 0.016
-        plate_scale = plate_scale_orig * bin_factor
+        plate_scale = util.get_plate_scale(img, hdr)
 
         if starlists == None:
             # Load up the corresponding starlist.
@@ -440,9 +445,9 @@ def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None, fourf
         coords = np.array([stars['xcentroid'], stars['ycentroid']])
 
         # Define the background annuli (typically from 2"-3"). Calculate mean background for each star.
-        bkg_annuli = CircularAnnulus(coords, max_radius / plate_scale, (max_radius + 1) / plate_scale)
+        bkg_annuli = CircularAnnulus(coords.T, max_radius / plate_scale, (max_radius + 1) / plate_scale)
         bkg = aperture_photometry(img, bkg_annuli)
-        bkg_mean = bkg['aperture_sum'] / bkg_annuli.area()
+        bkg_mean = bkg['aperture_sum'] / bkg_annuli.area
 
         enc_energy = np.zeros((N_stars, len(radii)), dtype=float)
         int_psf2_all = np.zeros(N_stars, dtype=float)
@@ -450,12 +455,12 @@ def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None, fourf
         # Loop through radial bins and calculate EE
         for rr in range(len(radii)):
             radius_pixel = radii[rr] / plate_scale
-            apertures = CircularAperture(coords, r=radius_pixel)
+            apertures = CircularAperture(coords.T, r=radius_pixel)
             phot_table = aperture_photometry(img, apertures)
 
             energy = phot_table['aperture_sum']
 
-            bkg_sum = apertures.area() * bkg_mean
+            bkg_sum = apertures.area * bkg_mean
             
             enc_energy[:, rr] = energy - bkg_sum
 
@@ -474,6 +479,19 @@ def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None, fourf
 
         # Normalize all the curves so that the mean of the last 5 bins = 1
         enc_energy /= np.tile(enc_energy[:, -5:].mean(axis=1), (len(radii), 1)).T
+
+        # Calculate the EE 25, 50, and 80% radii for each star separately for saving.
+        i_ee25_rad = np.zeros(N_stars, dtype=float)
+        i_ee50_rad = np.zeros(N_stars, dtype=float)
+        i_ee80_rad = np.zeros(N_stars, dtype=float)
+        for ss in range(N_stars):
+            i_ee25_rad[ss] = radii[ np.where(enc_energy[ss] >= 0.25)[0][0] ]
+            i_ee25_rad[ss] = radii[ np.where(enc_energy[ss] >= 0.50)[0][0] ]
+            i_ee25_rad[ss] = radii[ np.where(enc_energy[ss] >= 0.80)[0][0] ]
+
+        stars['ee25_rad'] = i_ee25_rad
+        stars['ee50_rad'] = i_ee50_rad
+        stars['ee80_rad'] = i_ee80_rad
 
         # Find the median EE curve. But first, trim to just the brightest stars.
         idx = np.where(stars['flux'] > 5)[0]
@@ -499,10 +517,14 @@ def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None, fourf
         ee80_rad = radii[ np.where(enc_energy_final >= 0.8)[0][0] ]
 
         # Find the median NEA. Convert into arcsec^2
-        nea2 = 1.0 / np.median(int_psf2_all[idx])
+        stars['nea2'] = (1.0 / int_psf2_all) * plate_scale**2   # inidividual stars
+        nea2 = 1.0 / np.median(int_psf2_all[idx])               # combined
         nea2 *= plate_scale**2
 
         # Calculate the NEA in a different way.
+        stars['nea'] = 0.0  # make new column
+        for ss in range(N_stars):
+            stars['nea'][ss] = 1.0 / (np.diff(enc_energy[ss])**2 / (2.0 * math.pi * radii[1:] * np.diff(radii))).sum()
         nea = 1.0 / (np.diff(enc_energy_final)**2 / (2.0 * math.pi * radii[1:] * np.diff(radii))).sum()
 
         #plt.clf()
@@ -549,7 +571,9 @@ def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None, fourf
                 area_count = len(idx[0]) / 5**2   # area in pix**2 -- note we went back to raw pixels (not oversampled)
                 emp_FWHM = 2.0 * (area_count / np.pi)**0.5
                 emp_FWHM_list[jj] = emp_FWHM
- 
+
+        stars['fwhm_emp'] = emp_FWHM_list
+        
         # Find the median empirical FWHM of all stars. But first, trim to just the brightest stars.
         idx = np.where(stars['flux'] > 5)[0]
         if len(idx) == 0:
@@ -573,8 +597,11 @@ def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None, fourf
         s_emp_fwhm[ii] = med_emp_FWHM
         s_emp_fwhm_std[ii] = std_emp_FWHM
 
+        # Save the individual star stats.
+        starlist = img_files[ii].replace('.fits', '_stars_stats.fits')
+        stars.write(starlist, overwrite=True)
     
-    # Make a date array that holds UTC.
+    # FUTURE: Make a date array that holds UTC.
 
     stats = table.Table([img_files, band, binfac, s_date_utc, s_time_utc, s_date_hst, s_time_hst,
                              s_fwhm, s_fwhm_std, s_ee25, s_ee50, s_ee80,

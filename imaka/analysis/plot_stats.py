@@ -91,7 +91,7 @@ def load_stats_to_onaga(dates, input_root):
     return
 
 
-def plot_stack_stats(date, suffixes=['open', 'ttf', 'closed'], root_dir='/Users/jlu/work/imaka/pleiades/'):
+def plot_stack_stats(date, suffixes=['open', 'ttf', 'closed'], root_dir='/Users/jlu/work/imaka/pleiades/', reduce_dir='fli/reduce/'):
     """
         Make a suite of standard plots for the stats on a given night.
         Parameters
@@ -108,8 +108,8 @@ def plot_stack_stats(date, suffixes=['open', 'ttf', 'closed'], root_dir='/Users/
         stats files will be searched for in:
         <root_dir>/<date>/fli/reduce/stats/
         """
-    stats_dir = root_dir + date + '/fli/reduce/stats/'
-    plots_dir = root_dir + date + '/fli/reduce/plots/'
+    stats_dir = root_dir + date + '/' + reduce_dir + 'stats/'
+    plots_dir = root_dir + date + '/' + reduce_dir + 'plots/'
     
     util.mkdir(plots_dir)
     
@@ -329,7 +329,7 @@ def plot_stack_stats(date, suffixes=['open', 'ttf', 'closed'], root_dir='/Users/
 
     utcs = []
     for ss in range(len(suffixes)):
-        utc_dt = [datetime.strptime(stats[ss]['TIME_UTC'][ii], '%I:%M:%S') for ii in range(len(stats[ss]))]
+        utc_dt = [datetime.strptime(stats[ss]['TIME_UTC'][ii], '%H:%M:%S') for ii in range(len(stats[ss]))]
         utcs.append(utc_dt)
 
     time_fmt = mp_dates.DateFormatter('%H:%M')

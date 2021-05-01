@@ -132,16 +132,13 @@ def get_plate_scale(img, hdr):
     """
     scale = 1.0
     
-    if 'BINFAC' in header:
+    if 'BINFAC' in hdr:
         scale_orig = 0.04 # " / pixel
 
-        scale = scale_orig * header['BINFAC']
+        scale = scale_orig * hdr['BINFAC']
 
     # STA Camera
-    if 'CCDBIN1' in header:
-        if 'SECPIX1' in header:
-            scale = header['SECPIX1']
-        else:
-            scale = 0.08322 * header['CCDBIN1']
+    if 'CCDBIN1' in hdr:
+        scale = 0.063 * hdr['CCDBIN1']
     
     return scale
