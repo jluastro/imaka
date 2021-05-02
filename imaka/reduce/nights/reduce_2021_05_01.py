@@ -20,7 +20,7 @@ root_dir = '/g/lu/data/imaka/onaga/20210501/sta/'
 
 sky_dir = root_dir + 'reduce/sky/' 
 data_dir = root_dir + 'Fld2/'
-flat_dir = root_dir + 'reduce/calib/'
+calib_dir = root_dir + 'reduce/calib/'
 out_dir = root_dir + 'reduce/Fld2/'
 stats_dir = root_dir +'reduce/stats/'
 stacks_dir = root_dir + 'reduce/stacks/'
@@ -29,6 +29,7 @@ massdimm_dir = root_dir + 'reduce/massdimm/'
 
 # Junk files -- see logs
 #  -- old docz
+# Note all in 1x1 binning.
 
 dict_suffix = {'open': '_o',
                'LS': 'LS_c',
@@ -41,10 +42,10 @@ dict_images = {'open':      [73, 75, 78, 80, 83, 85, 88, 90],
                'doczskycl': [76, 81, 86, 91]}
 
 # These don't exist yet... make some temp files with zeros.
-dict_skies = {'open':    'fld2_sky_180.fits',
-              'LS':      'fld2_sky_180.fits',
-              'docz':    'fld2_sky_180.fits',
-              'moda':    'fld2_sky_180.fits'}
+dict_skies = {'open':      'fld2_sky.fits',
+              'LS':        'fld2_sky.fits',
+              'docz':      'fld2_sky.fits',
+              'doczskycl': 'fld2_sky.fits'}
     
 
 def make_flat(): 
@@ -53,7 +54,17 @@ def make_flat():
     These are junk... replace with twilight flats. 
     """
 
-    # Copy flight from previous night.
+    # Copy flight from previous night because twilight exposures
+    # were a little saturated.
+    util.mkdir(calib_dir)
+    shutil.copyfile(root_dir + '../../20210430/sta/reduce/calib/flat_bin1.fits', calib_dir + 'flat.fits')
+
+    # Lets also make a mask to use when we call find_stars.
+    # This mask tells us where not to search for stars.
+    calib.make_mask(calib_dir + 'flat.fits', calib_dir + 'mask.fits',
+                       mask_min=0.8, mask_max=1.4,
+                       left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
+    
 
     return
 
@@ -62,46 +73,12 @@ def make_sky():
 
     util.mkdir(sky_dir)
 
-    sky_num_180 = np.arange(106, 108+1)
-    sky_frames_180 = ['{0:s}sky_{1:03d}_o.fits'.format(data_dir, ss) for ss in sky_num_180]
-    reduce_STA.treat_overscan_2021(sky_frames_180)
+    sky_num = np.arange(97, 101+1)
+    sky_frames = ['{0:s}sky_{1:03d}_o.fits'.format(data_dir, ss) for ss in sky_num]
+    reduce_STA.treat_overscan(sky_frames)
 
-    sky_num_30 = np.arange(109, 111+1)
-    sky_frames_30 = ['{0:s}sky_{1:03d}_o.fits'.format(data_dir, ss) for ss in sky_num_30]
-    reduce_STA.treat_overscan_2021(sky_frames_30)
-
-    # Put all the 30 sec and 180 sec together. We have no choice since we had so few. 
-    scan_sky_frames =  ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num_30]
-    scan_sky_frames += ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num_180]
-
-    rescale_to_180 = [6 for ss in sky_num_30]
-    rescale_to_180 += [1 for ss in sky_num_180]
-    rescale_to_30 = [1 for ss in sky_num_30]
-    rescale_to_30 += [(1./6.) for ss in sky_num_180]
-
-    # We also need to account for the increasing sky brightness.
-    for ff in range(len(scan_sky_frames)):
-        img = fits.getdata(scan_sky_frames[ff])
-
-        # Fix 180 scales
-        img_180 = img * rescale_to_180[ff]
-        mean_180, median_180, stddev_180 = sigma_clipped_stats(img_180, sigma_lower=4, sigma_upper=2, maxiters=10)
-        if ff == 0:
-            mean0_180 = mean_180
-        rescale_to_180[ff] *= mean0_180 / mean_180
-
-        # Fix 30 scales
-        img_30 = img * rescale_to_30[ff]
-        mean_30, median_30, stddev_30 = sigma_clipped_stats(img_30, sigma_lower=4, sigma_upper=2, maxiters=10)
-        if ff == 0:
-            mean0_30 = mean_30
-        rescale_to_30[ff] *= mean0_30 / mean_30
-        
-
-    print(rescale_to_180)
-    print(rescale_to_30)
-    calib.makedark(scan_sky_frames, sky_dir+'fld2_sky_180.fits', rescale=rescale_to_180)
-    calib.makedark(scan_sky_frames, sky_dir+'fld2_sky_30.fits', rescale=rescale_to_30)
+    scan_sky_frames =  ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num]
+    calib.makedark(scan_sky_frames, sky_dir + 'fld2_sky.fits')
     
     return
 
@@ -111,8 +88,8 @@ def reduce_fld2():
     util.mkdir(out_dir)
 
     # Loop through all the different data sets and reduce them.
-    for key in dict_suffix.keys():
-    # for key in ['docz']:
+    # for key in dict_suffix.keys():
+    for key in ['doczskycl']:
         
         img = dict_images[key]
         suf = dict_suffix[key]
@@ -125,8 +102,10 @@ def reduce_fld2():
         img_files = [data_dir + 'sta{img:03d}{suf:s}.fits'.format(img=ii, suf=suf) for ii in img]
         scn_files = [data_dir + 'sta{img:03d}{suf:s}_scan.fits'.format(img=ii, suf=suf) for ii in img]
         
-        reduce_STA.treat_overscan_2021(img_files)
-        reduce_fli.clean_images(scn_files, out_dir, rebin=1, sky_frame=sky_dir + sky, flat_frame=flat_dir + "domeflat.fits")#,
+        reduce_STA.treat_overscan(img_files)
+        reduce_fli.clean_images(scn_files, out_dir, rebin=1,
+                                    sky_frame=sky_dir + sky,
+                                    flat_frame=calib_dir + "flat.fits")#,
                                 # fix_bad_pixels=True, worry_about_edges=True)
 
     return

@@ -186,7 +186,8 @@ def find_stars_fld2():
 def calc_star_stats():
     util.mkdir(stats_dir)
 
-    for key in dict_suffix.keys():
+    # for key in dict_suffix.keys():
+    for key in ['docz']:
         
         img = dict_images[key]
         suf = dict_suffix[key]
@@ -196,7 +197,7 @@ def calc_star_stats():
         
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
         stats_file = stats_dir + 'stats_' + key + '.fits'
-        reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
+        redu.calc_star_stats(img_files, output_stats=stats_file)
         moffat.fit_moffat(img_files, stats_file)
 
     return

@@ -1,7 +1,10 @@
+import numpy as np
 from astropy.table import Table
 from astropy.io import fits
 import os, errno, shutil
 import pdb
+import pytz
+from datetime import datetime
 
 # Load up directory aliases
 module_dir = os.path.dirname(__file__)
@@ -142,3 +145,85 @@ def get_plate_scale(img, hdr):
         scale = 0.063 * hdr['CCDBIN1']
     
     return scale
+
+def get_times(hdr):
+    camera = get_camera(hdr)
+
+    if camera == 'STA':
+        # Make dates and times in UT and HST
+        if 'SYS-TIME' in hdr:
+            time_hst = hdr['SYS-TIME']
+        else:
+            time_hst = hdr['SYSTIME']
+    
+        if 'SYS-DATE' in hdr:
+            date_hst = hdr['SYS-DATE']
+        else:
+            date_hst = hdr['SYSDATE']
+            
+        date_utc = hdr['DATE-OBS']
+    
+        time = hdr['UT']
+        h, m, s = time.split(':')
+        new_time = h+":"+m+":"+s[:2]
+        time_utc = new_time
+
+    else:
+        # Make dates and times in UT.
+        # The time comes in from the header with "hh:mm:ss PM" in HST.
+        # The date comes in from the header in HST.
+        time_tmp = hdr['TIMEOBS']
+        date_tmp = hdr['DATEOBS']
+        hst_tz = pytz.timezone('US/Hawaii')
+
+        if hdr['SHUTTER'] == True:
+            dt_hst = datetime.strptime(date_tmp + ' ' + time_tmp, '%m/%d/%Y %H:%M:%S')
+            dt_hst = hst_tz.localize(dt_hst)
+        else:
+            dt_hst = datetime.strptime(date_tmp + ' ' + time_tmp, '%d/%m/%Y %I:%M:%S %p')
+            dt_hst = hst_tz.localize(dt_hst)
+            noon = datetime.time(12, 0, 0) #assuming you'll never be taking images at local noon...
+            del_day = datetime.timedelta(days=1)
+            if dt_hst.time() < noon:
+                dt_hst += del_day
+                    
+        dt_utc = dt_hst.astimezone(pytz.utc)
+
+
+        time_hst = str(dt_hst.time())
+        date_hst = str(dt_hst.date())
+        time_utc = str(dt_utc.time())
+        date_utc = str(dt_utc.date())
+
+    return date_hst, time_hst, date_utc, time_utc
+
+def get_camera(hdr):
+    if 'TIMEOBS' in hdr:
+        # This is an FLI only keyword.
+        camera = 'FLI'
+    else:
+        camera = 'STA'
+
+    return camera
+
+def get_four_filter_quadrant(starlist_name):
+    # Get filter position in case of four filter data
+    name_strings = starlist_name.split("_")
+    filt_name    = name_strings[-3]
+    filt_order   = name_strings[-2]
+
+    if filt_name == filt_order[0]:
+        quad = 'NW'
+    elif filt_name == filt_order[1]:
+        quad = 'NE'
+    elif filt_name == filt_order[2]:
+        quad = 'SE'
+    elif filt_name == filt_order[3]:
+        quad = 'SW'
+
+    return quad
+    
+def get_filter(hdr):
+    return
+    
+    

@@ -36,7 +36,7 @@ from itertools import repeat
 import warnings
 from astropy.utils.exceptions import AstropyWarning
 
-scale = 40.0 # mas/pixel
+np.seterr(all='ignore')
 
 def rebin(a, bin_fac):
     """
@@ -138,20 +138,22 @@ def clean_and_save_single_image(img_file, sky, flat, out_dir, rebin, fix_bad_pix
     """
     Clean and save an image file. 
     """
-    print('  Working on image: ', img_file)
+    pid = mp.current_process().pid
+    
+    print(f'  p{pid} - Working on image: {img_file}')
 
     # Read image in
     img, hdr = fits.getdata(img_file, header=True)
     
     # Clean it
-    print('\nCleaning image\n')
+    print('  p{pid} - Cleaning image')
     img_clean, bad_pixels = clean_single_image(img, sky=sky, flat=flat, rebin=rebin,
                                                 fix_bad_pixels=fix_bad_pixels,
                                                 worry_about_edges=worry_about_edges)
     
 
     # Write it out
-    print('\nWriting image\n')
+    print(f'  p{pid} - Writing image')
     file_dir, file_name = os.path.split(img_file)
     out_name = file_name.replace('.fits', '_clean.fits')
     fits.writeto(out_dir + out_name, img_clean, hdr, overwrite=True)
@@ -160,22 +162,24 @@ def clean_and_save_single_image(img_file, sky, flat, out_dir, rebin, fix_bad_pix
         mask_name = file_name.replace('.fits', '_mask.fits')
         fits.writeto(out_dir + mask_name, bad_pixels, hdr, overwrite=True)
     
-    print('\nImage stored: {}/{}'.format(out_dir, out_name))
+    print(f'  p{pid} - Image stored: {out_dir}/{out_name}')
 
     return
 
 
 def clean_single_image(img, sky=None, flat=None, rebin=1,
                            fix_bad_pixels=False, worry_about_edges=False, verbose=False):
+    pid = mp.current_process().pid    
+
     # Bin by a factor of 10 (or as specified).
     if rebin != 1:
-        print('  Bin by a factor of ', rebin)
+        print(f'  p{pid} Bin by a factor of {rebin}')
         img = block_reduce(img, (rebin, rebin), func=np.sum)
 
     # Subtract background.
     if sky is None:
         bkg_box_size = int(round(img.shape[0] / 10.))
-        print('  Subtract background with smoothing box size of ', bkg_box_size)
+        print(f'  p{pid} Subtract background with smoothing box size of {bkg_box_size}')
         blurred = median_filter(img, size=bkg_box_size)
         img = img - blurred.astype(float)
     else:
@@ -190,7 +194,7 @@ def clean_single_image(img, sky=None, flat=None, rebin=1,
             
     # Flat field.
     if flat is not None:
-        print('  Dividing by flat')
+        print(f'  p{pid} Dividing by flat')
         img = img / flat
 
     # Fix any inifinte or nan pixels... just set to 0
@@ -199,7 +203,7 @@ def clean_single_image(img, sky=None, flat=None, rebin=1,
 
     # Fix hot and dead pixels
     if fix_bad_pixels:
-        print('\t Fix bad pixels')
+        print(f'  p{pid} Fixing bad pixels')
         bad_pixels, img = find_outlier_pixels(img, tolerance=5, worry_about_edges=worry_about_edges)
     else:
         bad_pixels = None
@@ -234,7 +238,9 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
     return
 
 def find_stars_single(img_file, fwhm, threshold, N_passes, plot_psf_compare, mask_file):
-    print("  Working on image: ", img_file)
+    pid = mp.current_process().pid
+    
+    print(f'  p{pid} - Working on image: {img_file}')
     img, hdr = fits.getdata(img_file, header=True, ignore_missing_end=True)
 
     mask = fits.getdata(mask_file).astype('bool')
@@ -244,7 +250,7 @@ def find_stars_single(img_file, fwhm, threshold, N_passes, plot_psf_compare, mas
     fwhm_curr = fwhm
     
     # Calculate the bacgkround and noise (iteratively)
-    print("    Calculating background")
+    print(f'  p{pid} - Calculating background')
     bkg_threshold_above = 1
     bkg_threshold_below = 3
 
@@ -262,18 +268,18 @@ def find_stars_single(img_file, fwhm, threshold, N_passes, plot_psf_compare, mas
     bkg_mean = img[good_pix].mean()
     bkg_std = img[good_pix].std()
     img_threshold = threshold * bkg_std 
-    print('     Bkg = {0:.2f} +/- {1:.2f}'.format(bkg_mean, bkg_std))
-    print('     Bkg Threshold = {0:.2f}'.format(img_threshold))
+    print(f'    p{pid} - Bkg = {bkg_mean:.2f} +/- {bkg_std:.2f}')
+    print(f'    p{pid} - Bkg Threshold = {img_threshold:.2f}')
 
     # Detect stars
-    print('     Detecting Stars')
+    print(f'     p{pid} - Detecting Stars')
 
     # Each pass will have an updated fwhm for the PSF.
     for nn in range(N_passes):
-        print('     Pass {0:d} assuming FWHM = {1:.1f}'.format(nn, fwhm_curr))
+        print(f'    p{pid} - Pass {nn:d} assuming FWHM = {fwhm_curr:.1f}')
         daofind = DAOStarFinder(fwhm=fwhm_curr, threshold = img_threshold, exclude_border=True)
         sources = daofind(img - bkg_mean, mask=mask)
-        print('          ', len(sources), 'sources found, now fitting for FWHM.')
+        print(f'    p{pid} - {len(sources)} sources found, now fitting for FWHM.')
 
         # Calculate FWHM for each detected star.
         x_fwhm = np.zeros(len(sources), dtype=float)
@@ -332,7 +338,7 @@ def find_stars_single(img_file, fwhm, threshold, N_passes, plot_psf_compare, mas
             if (np.isnan(g2d_params.x_mean_0.value) or
                 (np.abs(g2d_params.x_mean_0.value) > (cutout_size * resamp)) or
                 (np.abs(g2d_params.y_mean_0.value) > (cutout_size * resamp))):
-                print(f'Bad fit for {ss}')
+                print(f'      p{pid} - Bad fit for {ss}')
                 continue
 
             # Add to our average observed/model PSFs
@@ -396,7 +402,7 @@ def find_stars_single(img_file, fwhm, threshold, N_passes, plot_psf_compare, mas
                 plt.title(f'Mod PSF (resamp = {resamp:d})')
                 plt.pause(0.05)
 
-                print(f'ss={ss} fwhm_x={x_fwhm[ss]:.1f} fwhm_y={y_fwhm[ss]:.1f}')
+                print(f'    p{pid} - ss={ss} fwhm_x={x_fwhm[ss]:.1f} fwhm_y={y_fwhm[ss]:.1f}')
 
                 
 
@@ -425,11 +431,9 @@ def find_stars_single(img_file, fwhm, threshold, N_passes, plot_psf_compare, mas
         x_fwhm_med = np.median(sources['x_fwhm'][idx])
         y_fwhm_med = np.median(sources['y_fwhm'][idx])
         
-        print('        Number of sources = ', len(sources))
-        print('        Median x_fwhm = {0:.1f} +/- {1:.1f}'.format(x_fwhm_med,
-                                                                 sources['x_fwhm'].std()))
-        print('        Median y_fwhm = {0:.1f} +/- {1:.1f}'.format(y_fwhm_med,
-                                                                 sources['y_fwhm'].std()))
+        print(f'      p{pid} - Number of sources = {len(sources)}')
+        print(f'      p{pid} - Median x_fwhm = {x_fwhm_med:.1f} +/- {sources["x_fwhm"].std():.1f}')
+        print(f'      p{pid} - Median y_fwhm = {y_fwhm_med:.1f} +/- {sources["y_fwhm"].std():.1f}')
 
         fwhm_curr = np.mean([x_fwhm_med, y_fwhm_med])
 
@@ -542,9 +546,8 @@ def find_outlier_pixels(data, tolerance=3, worry_about_edges=True, median_filter
 
     return hot_pixels, fixed_image
 
-    
-        
-def calc_star_stats(img_files, output_stats='image_stats.fits'):
+
+def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None, fourfilt=False, starlists=None):
     """
     Calculate statistics for the Data Metrics table.
     """
@@ -558,8 +561,8 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
     s_time_utc = np.zeros(N_files, dtype='S15')
     s_date_hst = np.zeros(N_files, dtype='S15')
     s_date_utc = np.zeros(N_files, dtype='S15')
-    band = np.zeros(N_files, dtype='S15')
-    binfac = np.zeros(N_files, dtype=float)
+    s_band = np.zeros(N_files, dtype='S15')
+    s_binfac = np.zeros(N_files, dtype=float)
     s_ee25 = np.zeros(N_files, dtype=float)
     s_ee50 = np.zeros(N_files, dtype=float)
     s_ee80 = np.zeros(N_files, dtype=float)
@@ -572,54 +575,51 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
     s_NEA2 = np.zeros(N_files, dtype=float)
     s_emp_fwhm = np.zeros(N_files, dtype=float)
     s_emp_fwhm_std = np.zeros(N_files, dtype=float)
+    # Make a column to designate filter position in four filter images
+    s_quadrant = np.zeros(N_files, dtype='S15')
     
     for ii in range(N_files):
+        # Select the image file and starlist to work on
+        img_file = img_files[ii]
+
+        if starlists == None:
+            if filt==None:
+                starlist = img_file.replace('.fits', '_stars.txt')
+            else:
+                starlist = img_file.replace('.fits', '_'+filt+'_stars.txt')
+        elif starlists != None:
+            starlist = starlists[ii]
+        
+        
         # Load up the image to work on.
-        print("Working on image: ", img_files[ii])
+        print("calc_star_stats on image: ", img_file)
         img, hdr = fits.getdata(img_files[ii], header=True)
 
-        # Make dates and times in UT.
-        # The time comes in from the header with "hh:mm:ss PM" in HST.
-        # The date comes in from the header in HST.
-        time_tmp = hdr['TIMEOBS']
-        date_tmp = hdr['DATEOBS']
-        hst_tz = pytz.timezone('US/Hawaii')
-
-        if hdr['SHUTTER'] == True:
-            dt_hst = datetime.strptime(date_tmp + ' ' + time_tmp, '%m/%d/%Y %H:%M:%S')
-            dt_hst = hst_tz.localize(dt_hst)
-        else:
-            dt_hst = datetime.strptime(date_tmp + ' ' + time_tmp, '%d/%m/%Y %I:%M:%S %p')
-            dt_hst = hst_tz.localize(dt_hst)
-            noon = datetime.time(12, 0, 0) #assuming you'll never be taking images at local noon...
-            del_day = datetime.timedelta(days=1)
-            if dt_hst.time() < noon:
-                dt_hst += del_day
-                    
-        dt_utc = dt_hst.astimezone(pytz.utc)
-
-
-        s_time_hst[ii] = str(dt_hst.time())
-        s_date_hst[ii] = str(dt_hst.date())
-        s_time_utc[ii] = str(dt_utc.time())
-        s_date_utc[ii] = str(dt_utc.date())
+        # Get times
+        d_hst, t_hst, d_utc, t_utc = util.get_times(hdr)
 
         # Get the bin fraction from the header
-        bin_factor = hdr['BINFAC']
         plate_scale = util.get_plate_scale(img, hdr)
 
-        # Load up the corresponding starlist.
-        starlist = img_files[ii].replace('.fits', '_stars.txt')
+            
+        # Read in the appropriate starlist for this image. 
         stars = table.Table.read(starlist, format='ascii')
         N_stars = len(stars)
 
+        # Figure out quadrant information (relevant of four-filter only)
+        if fourfilt:
+            quad = util.get_four_filter_quadrant(starlist)
+        else:
+            quad = ''
+
+            
         # Put the positions into an array for photutils work.
         coords = np.array([stars['xcentroid'], stars['ycentroid']])
 
         # Define the background annuli (typically from 2"-3"). Calculate mean background for each star.
-        bkg_annuli = CircularAnnulus(coords, max_radius / plate_scale, (max_radius + 1) / plate_scale)
+        bkg_annuli = CircularAnnulus(coords.T, max_radius / plate_scale, (max_radius + 1) / plate_scale)
         bkg = aperture_photometry(img, bkg_annuli)
-        bkg_mean = bkg['aperture_sum'] / bkg_annuli.area()
+        bkg_mean = bkg['aperture_sum'] / bkg_annuli.area
 
         enc_energy = np.zeros((N_stars, len(radii)), dtype=float)
         int_psf2_all = np.zeros(N_stars, dtype=float)
@@ -627,12 +627,12 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
         # Loop through radial bins and calculate EE
         for rr in range(len(radii)):
             radius_pixel = radii[rr] / plate_scale
-            apertures = CircularAperture(coords, r=radius_pixel)
+            apertures = CircularAperture(coords.T, r=radius_pixel)
             phot_table = aperture_photometry(img, apertures)
 
             energy = phot_table['aperture_sum']
 
-            bkg_sum = apertures.area() * bkg_mean
+            bkg_sum = apertures.area * bkg_mean
             
             enc_energy[:, rr] = energy - bkg_sum
 
@@ -652,6 +652,19 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
         # Normalize all the curves so that the mean of the last 5 bins = 1
         enc_energy /= np.tile(enc_energy[:, -5:].mean(axis=1), (len(radii), 1)).T
 
+        # Calculate the EE 25, 50, and 80% radii for each star separately for saving.
+        i_ee25_rad = np.zeros(N_stars, dtype=float)
+        i_ee50_rad = np.zeros(N_stars, dtype=float)
+        i_ee80_rad = np.zeros(N_stars, dtype=float)
+        for ss in range(N_stars):
+            i_ee25_rad[ss] = radii[ np.where(enc_energy[ss] >= 0.25)[0][0] ]
+            i_ee25_rad[ss] = radii[ np.where(enc_energy[ss] >= 0.50)[0][0] ]
+            i_ee25_rad[ss] = radii[ np.where(enc_energy[ss] >= 0.80)[0][0] ]
+
+        stars['ee25_rad'] = i_ee25_rad
+        stars['ee50_rad'] = i_ee50_rad
+        stars['ee80_rad'] = i_ee80_rad
+
         # Find the median EE curve. But first, trim to just the brightest stars.
         idx = np.where(stars['flux'] > 5)[0]
         if len(idx) == 0:
@@ -660,7 +673,7 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
         enc_energy_final = np.median(enc_energy[idx], axis=0)
 
         # Plot and save the EE curve and data.
-        img_dir_name, img_file_name = os.path.split(img_files[ii])
+        img_dir_name, img_file_name = os.path.split(img_file)
         ee_dir = img_dir_name + '/ee/'
         util.mkdir(ee_dir)
         _ee_out = open(ee_dir + img_file_name.replace('.fits', '_ee.txt'), 'w')
@@ -676,10 +689,14 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
         ee80_rad = radii[ np.where(enc_energy_final >= 0.8)[0][0] ]
 
         # Find the median NEA. Convert into arcsec^2
-        nea2 = 1.0 / np.median(int_psf2_all[idx])
+        stars['nea2'] = (1.0 / int_psf2_all) * plate_scale**2   # inidividual stars
+        nea2 = 1.0 / np.median(int_psf2_all[idx])               # combined
         nea2 *= plate_scale**2
 
         # Calculate the NEA in a different way.
+        stars['nea'] = 0.0  # make new column
+        for ss in range(N_stars):
+            stars['nea'][ss] = 1.0 / (np.diff(enc_energy[ss])**2 / (2.0 * math.pi * radii[1:] * np.diff(radii))).sum()
         nea = 1.0 / (np.diff(enc_energy_final)**2 / (2.0 * math.pi * radii[1:] * np.diff(radii))).sum()
 
         #plt.clf()
@@ -706,15 +723,18 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
             # Make a 21x21 patch centered on centroid, oversample and interpolate
             x_cent = int(round(float(coords[0][jj])))
             y_cent = int(round(float(coords[1][jj])))
-            if y_cent-10 > 0 and x_cent-10 > 0 and y_cent+10<np.shape(img)[0] and x_cent+10<np.shape(img)[1]:
+            
+            if (y_cent-10 > 0 and x_cent-10 > 0 and
+                y_cent+10 < np.shape(img)[0] and x_cent+10 < np.shape(img)[1]):
+                
                 one_star = img[y_cent-10 : y_cent+10+1, x_cent-10 : x_cent+10+1]  # Odd box, with center in middle pixel.
                 over_samp_5 = scipy.ndimage.zoom(one_star, 5, order = 1)
 
-            # # Make an array with the radius at each pixel.
-            # y_1d = np.arange(over_samp_5.shape[0])
-            # x_1d = np.arange(over_samp_5.shape[1])
-            # y_2d, x_2d = np.meshgrid(y_1d, x_1d)
-            # r_2d = np.hypot(x_2d, y_2d)
+                # # Make an array with the radius at each pixel.
+                # y_1d = np.arange(over_samp_5.shape[0])
+                # x_1d = np.arange(over_samp_5.shape[1])
+                # y_2d, x_2d = np.meshgrid(y_1d, x_1d)
+                # r_2d = np.hypot(x_2d, y_2d)
 
                 # Find the pixels where the flux is a above half max value.
                 max_flux = np.amax(over_samp_5) 
@@ -726,7 +746,9 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
                 area_count = len(idx[0]) / 5**2   # area in pix**2 -- note we went back to raw pixels (not oversampled)
                 emp_FWHM = 2.0 * (area_count / np.pi)**0.5
                 emp_FWHM_list[jj] = emp_FWHM
- 
+
+        stars['fwhm_emp'] = emp_FWHM_list
+        
         # Find the median empirical FWHM of all stars. But first, trim to just the brightest stars.
         idx = np.where(stars['flux'] > 5)[0]
         if len(idx) == 0:
@@ -735,23 +757,32 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
         med_emp_FWHM = np.median(emp_FWHM_list[idx])
         std_emp_FWHM = np.std(emp_FWHM_list[idx])
 
-        band[ii] = "I"#hdr['FILTER']
-        binfac[ii] = hdr['BINFAC']
+        # Save results
+        s_band[ii] = "I"#hdr['FILTER']
+        s_binfac[ii] = hdr['CCDBIN1']
+        s_time_utc[ii] = t_utc
+        s_date_utc[ii] = d_utc
+        s_time_hst[ii] = t_hst
+        s_date_hst[ii] = d_hst
+        s_fwhm[ii] = fwhm
+        s_fwhm_std[ii] = fwhm_std
         s_ee25[ii] = ee25_rad
         s_ee50[ii] = ee50_rad
         s_ee80[ii] = ee80_rad
+        s_NEA[ii] = nea
+        s_NEA2[ii] = nea2
         s_xfwhm[ii] = xfwhm
         s_yfwhm[ii] = yfwhm
         s_theta[ii] = theta
-        s_fwhm[ii] = fwhm
-        s_fwhm_std[ii] = fwhm_std
-        s_NEA[ii] = nea
-        s_NEA2[ii] = nea2
         s_emp_fwhm[ii] = med_emp_FWHM
         s_emp_fwhm_std[ii] = std_emp_FWHM
+        s_quadrant[ii] = quad
 
+        # Save the individual star stats.
+        starlist = img_files[ii].replace('.fits', '_stars_stats.fits')
+        stars.write(starlist, overwrite=True)
     
-    # Make a date array that holds UTC.
+    # FUTURE: Make a date array that holds UTC.
 
     stats = table.Table([img_files, band, binfac, s_date_utc, s_time_utc, s_date_hst, s_time_hst,
                              s_fwhm, s_fwhm_std, s_ee25, s_ee50, s_ee80,
@@ -760,6 +791,10 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
                                         'FWHM', 'FWHM_std', 'EE25', 'EE50', 'EE80',
                                         'NEA', 'NEA2', 'xFWHM', 'yFWHM', 'theta', 'emp_fwhm', 'emp_fwhm_std'),
                             meta={'name':'Stats Table'})
+
+    if fourfilt:
+        quad_col = Column(quadrant, name='quadrant')
+        stats.add_column(quad_col)
     
     stats['FWHM'].format = '7.3f'
     stats['FWHM_std'].format = '7.3f'
@@ -774,14 +809,14 @@ def calc_star_stats(img_files, output_stats='image_stats.fits'):
     stats['emp_fwhm'].format = '7.3f'
     stats['emp_fwhm_std'].format = '7.3f'
 
-    add_frame_number_column(stats)
+    reduce_fli.add_frame_number_column(stats)
     
     stats.write(output_stats, overwrite=True)
-    #stats.write(output_stats.replace('.fits', '.csv'), format='csv') # Auto overwrites
                         
     return
 
-
+def calc_star_stats_single(img_file, starliist, is_four_filt):
+    return
 
 def add_frame_number_column(stats_table):
     # Get the frame numbers for plotting.
