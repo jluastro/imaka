@@ -40,7 +40,7 @@ sky_dir_bin2 = root_dir_2 + 'reduce/sky/'
 # Junk files -- see logs
 # 
 
-dict_suffix = {'open_bin1': 'o',
+dict_suffix = {'open_bin1': '_o',
                'LS_bin1':   'LS_c',
                'docz_bin1': 'docz2_c',
                'open_bin2': '_o',
@@ -119,9 +119,11 @@ def reduce_fld2():
     util.mkdir(out_dir)
 
     # Loop through all the different data sets and reduce them.
-    # for key in dict_suffix.keys():
-    for key in ['docz']:
-        
+    # for ke
+    for key in dict_suffix.keys():
+        print(key)
+        bin = 'bin1' if 'bin1' in key else 'bin2'
+	
         img = dict_images[key]
         suf = dict_suffix[key]
         sky = dict_skies[key]
@@ -133,8 +135,8 @@ def reduce_fld2():
         img_files = [data_dir + 'sta{img:03d}{suf:s}.fits'.format(img=ii, suf=suf) for ii in img]
         scn_files = [data_dir + 'sta{img:03d}{suf:s}_scan.fits'.format(img=ii, suf=suf) for ii in img]
         
-        reduce_STA.treat_overscan_2021(img_files)
-        reduce_fli.clean_images(scn_files, out_dir, rebin=1, sky_frame=sky_dir + sky, flat_frame=flat_dir + "domeflat.fits")#,
+        reduce_STA.treat_overscan(img_files)
+        reduce_fli.clean_images(scn_files, out_dir, rebin=1, sky_frame=sky_dir + sky, flat_frame=flat_dir+"flat_"+bin+".fits")#,
                                 # fix_bad_pixels=True, worry_about_edges=True)
 
     return
@@ -163,7 +165,7 @@ def find_stars_fld2():
         
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
         reduce_fli.find_stars(img_files, fwhm=fwhm, threshold=3, N_passes=2, plot_psf_compare=False,
-                              mask_flat=flat_dir+"domeflat.fits", mask_min=0.8, mask_max=1.4,
+                              mask_flat=flat_dir+"flat_"+bin+".fits", mask_min=0.8, mask_max=1.4,
                               left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
                           
     return
