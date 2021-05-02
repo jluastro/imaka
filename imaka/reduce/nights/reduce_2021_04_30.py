@@ -45,7 +45,7 @@ dict_suffix = {'open_bin1': '_o',
                'docz_bin1': 'docz2_c',
                'open_bin2': '_o',
                'LS_bin2':   'LS_c',
-               'docz_bin2': 'modal_c'}
+               'docz_bin2': 'docz2_c'}
 
 dict_images = {'open_bin1': [68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92, 94],
                'LS_bin1':   [67, 71, 75, 79, 83, 87, 91],
@@ -119,10 +119,10 @@ def reduce_fld2():
     util.mkdir(out_dir)
 
     # Loop through all the different data sets and reduce them.
-    # for ke
+    # for all keys in dictionary 
     for key in dict_suffix.keys():
-        print(key)
-        bin = 'bin1' if 'bin1' in key else 'bin2'
+    #for key in ['docz_bin2']:    
+        bin = 'bin1' if 'bin1' in key else 'bin2'  # key should contain bin info
 	
         img = dict_images[key]
         suf = dict_suffix[key]
@@ -136,37 +136,41 @@ def reduce_fld2():
         scn_files = [data_dir + 'sta{img:03d}{suf:s}_scan.fits'.format(img=ii, suf=suf) for ii in img]
         
         reduce_STA.treat_overscan(img_files)
-        reduce_fli.clean_images(scn_files, out_dir, rebin=1, sky_frame=sky_dir + sky, flat_frame=flat_dir+"flat_"+bin+".fits")#,
+        redu.clean_images(scn_files, out_dir, rebin=1, sky_frame=sky_dir + sky, flat_frame=flat_dir+"flat_"+bin+".fits")#,
                                 # fix_bad_pixels=True, worry_about_edges=True)
 
     return
 
 
 def find_stars_fld2():
-    dict_fwhm = {'open_30': 7,
-                 'LS_30':   3,
-                 'docz_30': 3,
-                 'open': 7,
-                 'LS': 3,
-                 'docz': 3,
-                 'moda': 3}
+    dict_fwhm = {'open_bin1': 7,
+               'LS_bin1':     3,
+               'docz_bin1':   3,
+               'open_bin2':   7,
+               'LS_bin2':     3,
+               'docz_bin2':   3}
     
     # Loop through all the different data sets and reduce them.
-    # for key in dict_suffix.keys():
-    for key in ['docz']:
+    for key in dict_suffix.keys():
+    #for key in ['docz']:
         img = dict_images[key]
         suf = dict_suffix[key]
         sky = dict_skies[key]
         fwhm = dict_fwhm[key]
+
+        bin = 'bin1' if 'bin1' in key else 'bin2'  # key should contain bin info 
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
         print('      Sky: ', sky)
         
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
-        reduce_fli.find_stars(img_files, fwhm=fwhm, threshold=3, N_passes=2, plot_psf_compare=False,
-                              mask_flat=flat_dir+"flat_"+bin+".fits", mask_min=0.8, mask_max=1.4,
-                              left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
+        redu.find_stars(img_files, fwhm=fwhm, threshold=3, N_passes=2, plot_psf_compare=False,
+                              mask_file=calib_dir+'mask_'+bin+'.fits')
+        #reduce_fli.find_stars(img_files, fwhm=fwhm, threshold=3, N_passes=2, plot_psf_compare=False,
+        #                      mask_flat=flat_dir+"flat"+bin+".fits", mask_min=0.8, mask_max=1.4,
+        #                      left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
+
                           
     return
 
