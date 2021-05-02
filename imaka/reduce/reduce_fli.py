@@ -112,38 +112,42 @@ def clean_images(img_files, out_dir, rebin=1, sky_frame=None, flat_frame=None,
     # Define a function we can call
     # per image, to clean and save each one.
     ####
-    def clean_and_save_single_image(img_file):
-        print('  Working on image: ', img_files[ii])
-
-        # Read image in
-        img, hdr = fits.getdata(img_files[ii], header=True)
-        
-        # Clean it
-        print('\nCleaning image\n')
-        img_clean, bad_pixels = clean_single_image(img, sky=sky, flat=flat, rebin=rebin,
-                                                    fix_bad_pixels=fix_bad_pixels,
-                                                    worry_about_edges=worry_about_edges)
-        
-
-        # Write it out
-        print('\nWriting image\n')
-        file_dir, file_name = os.path.split(img_files[ii])
-        out_name = file_name.replace('.fits', '_clean.fits')
-        fits.writeto(out_dir + out_name, img_clean, hdr, overwrite=True)
-    
-        if bad_pixels != None:
-            mask_name = file_name.replace('.fits', '_mask.fits')
-            fits.writeto(out_dir + mask_name, bad_pixels, hdr, overwrite=True)
-        
-        print('\nImage stored: {}/{}'.format(file_dir, out_name))
-
-        return
     
     #####
     # Loop through the image stack
     #####
     for ii in range(len(img_files)):
-        clean_and_save_single_image(img_files[ii])
+        clean_and_save_single_image(img_files[ii], sky, flat, out_dir, rebin, fix_bad_pixels, worry_about_edges)
+
+    return
+
+def clean_and_save_single_image(img_file, sky, flat, out_dir, rebin, fix_bad_pixels, worry_about_edges):
+    """
+    Clean and save an image file. 
+    """
+    print('  Working on image: ', img_file)
+
+    # Read image in
+    img, hdr = fits.getdata(img_file, header=True)
+    
+    # Clean it
+    print('\nCleaning image\n')
+    img_clean, bad_pixels = clean_single_image(img, sky=sky, flat=flat, rebin=rebin,
+                                                fix_bad_pixels=fix_bad_pixels,
+                                                worry_about_edges=worry_about_edges)
+    
+
+    # Write it out
+    print('\nWriting image\n')
+    file_dir, file_name = os.path.split(img_file)
+    out_name = file_name.replace('.fits', '_clean.fits')
+    fits.writeto(out_dir + out_name, img_clean, hdr, overwrite=True)
+
+    if bad_pixels != None:
+        mask_name = file_name.replace('.fits', '_mask.fits')
+        fits.writeto(out_dir + mask_name, bad_pixels, hdr, overwrite=True)
+    
+    print('\nImage stored: {}/{}'.format(out_dir, out_name))
 
     return
 
@@ -190,38 +194,7 @@ def clean_single_image(img, sky=None, flat=None, rebin=1,
     return img, bad_pixels
 
 
-def mask_pix(flat_file, mask_min, mask_max, left_slice=0, right_slice=0, top_slice=0, bottom_slice=0):
-    """
-    Masks pixels in flat image based on input minimum and maximum values.
-    Also masks edges as specified by 'slice' values. Note that indexing/orientation 
-    is based in python, not fits (0,0 is top left, not bottom left, and starts at 0)
-    
-    Returns boolean mask array
-    """
-
-    # Read in file
-    flat = fits.getdata(flat_file)
-    y, x = np.shape(flat)
-
-    # Mask pixels below a defined threshold 'mask_min'
-    copy1 = np.copy(flat)
-    copy1[np.where((copy1>mask_min) & (copy1<mask_max))] = 0
-    mask1 = np.ma.make_mask(copy1,copy=True, shrink=True,dtype=np.bool)
-
-    # Mask edge pixels as defined by 'slice' variables 
-    copy2 = np.copy(flat)
-    copy2[top_slice:y-bottom_slice, left_slice:x-right_slice] = 0
-    mask2 = np.ma.make_mask(copy2, copy=True, shrink=True, dtype=np.bool)
-
-    # Combine masks
-    combo_mask = np.ma.mask_or(mask1, mask2)
-    
-    return combo_mask
-
-
-def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=False, mask_flat=None, \
-                   flat_file=None, mask_min=None, mask_max=None, \
-                   left_slice=None, right_slice=None, top_slice=None, bottom_slice=None):
+def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=False, mask_file=None):
     """
     img_files - a list of image files.
     fwhm - First guess at the FWHM of the PSF for the first pass on the first image.
@@ -230,218 +203,224 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
     """
     print('\nREDUCE_FLI: find_stars()')
     
-    # If no mask specified, make empty mask
-    if mask_flat == None:
-        img_shape = np.shape(fits.getdata(img_files[0]))
-        mask = np.zeros(img_shape, dtype=bool)
+    # Prepare for parallel compute.
+    # Use N_cpu - 2 so we leave 2 for normal
+    # operations. 
+    cpu_count = mp.cpu_count()
+    if (cpu_count > 2):
+        cpu_count -= 2
 
-    # Creates mask from flat if specified - very optional (deals with vignetting, edges)
-    else:
-        mask = mask_pix(mask_flat, mask_min, mask_max, \
-                            left_slice=left_slice, right_slice=right_slice, top_slice=top_slice, bottom_slice=bottom_slice)
-        print("Using mask")
+    # Start the pool
+    pool = mp.Pool(cpu_count)
 
-    for ii in range(len(img_files)):
-        print("  Working on image: ", img_files[ii])
-        img, hdr = fits.getdata(img_files[ii], header=True, ignore_missing_end=True)
+    # Normalize each of the flats: in parallel
+    print(f'  Finding stars in parallel with {cpu_count} cores.')
+    args = zip(img_files, repeat(fwhm), repeat(threshold), repeat(N_passes), repeat(plot_psf_compare), repeat(mask_file))
+    results = pool.map(find_stars_single, [flat_ds[i] for i in range(len(flat_ds))])
 
-        img = np.ma.masked_array(img, mask=mask)
-        
-        fwhm_curr = fwhm
-        
-        # Calculate the bacgkround and noise (iteratively)
-        print("    Calculating background")
-        bkg_threshold_above = 1
-        bkg_threshold_below = 3
+    return
 
-        good_pix = np.where(np.isfinite(img))
-        
-        for nn in range(5):
-            bkg_mean = img[good_pix].mean()
-            bkg_std = img[good_pix].std()
+def find_stars_single(img_file, fwhm, threshold, N_passes, plot_psf_compare, mask_file):
+    print("  Working on image: ", img_files[ii])
+    img, hdr = fits.getdata(img_files[ii], header=True, ignore_missing_end=True)
 
-            bad_hi = bkg_mean + (bkg_threshold_above * bkg_std)
-            bad_lo = bkg_mean - (bkg_threshold_below * bkg_std)
+    img = np.ma.masked_array(img, mask=mask)
+    
+    fwhm_curr = fwhm
+    
+    # Calculate the bacgkround and noise (iteratively)
+    print("    Calculating background")
+    bkg_threshold_above = 1
+    bkg_threshold_below = 3
 
-            good_pix = np.where((img > bad_lo) & (img < bad_hi))
-        
+    good_pix = np.where(np.isfinite(img))
+    
+    for nn in range(5):
         bkg_mean = img[good_pix].mean()
         bkg_std = img[good_pix].std()
-        img_threshold = threshold * bkg_std 
-        print('     Bkg = {0:.2f} +/- {1:.2f}'.format(bkg_mean, bkg_std))
-        print('     Bkg Threshold = {0:.2f}'.format(img_threshold))
 
-        # Detect stars
-        print('     Detecting Stars')
+        bad_hi = bkg_mean + (bkg_threshold_above * bkg_std)
+        bad_lo = bkg_mean - (bkg_threshold_below * bkg_std)
 
-        # Each pass will have an updated fwhm for the PSF.
-        for nn in range(N_passes):
-            print('     Pass {0:d} assuming FWHM = {1:.1f}'.format(nn, fwhm_curr))
-            daofind = DAOStarFinder(fwhm=fwhm_curr, threshold = img_threshold, exclude_border=True)
-            sources = daofind(img - bkg_mean, mask=mask)
-            print('          ', len(sources), 'sources found, now fitting for FWHM.')
+        good_pix = np.where((img > bad_lo) & (img < bad_hi))
+    
+    bkg_mean = img[good_pix].mean()
+    bkg_std = img[good_pix].std()
+    img_threshold = threshold * bkg_std 
+    print('     Bkg = {0:.2f} +/- {1:.2f}'.format(bkg_mean, bkg_std))
+    print('     Bkg Threshold = {0:.2f}'.format(img_threshold))
 
-            # Calculate FWHM for each detected star.
-            x_fwhm = np.zeros(len(sources), dtype=float)
-            y_fwhm = np.zeros(len(sources), dtype=float)
-            theta = np.zeros(len(sources), dtype=float)
+    # Detect stars
+    print('     Detecting Stars')
+
+    # Each pass will have an updated fwhm for the PSF.
+    for nn in range(N_passes):
+        print('     Pass {0:d} assuming FWHM = {1:.1f}'.format(nn, fwhm_curr))
+        daofind = DAOStarFinder(fwhm=fwhm_curr, threshold = img_threshold, exclude_border=True)
+        sources = daofind(img - bkg_mean, mask=mask)
+        print('          ', len(sources), 'sources found, now fitting for FWHM.')
+
+        # Calculate FWHM for each detected star.
+        x_fwhm = np.zeros(len(sources), dtype=float)
+        y_fwhm = np.zeros(len(sources), dtype=float)
+        theta = np.zeros(len(sources), dtype=float)
+    
+        # We will actually be resampling the images for the Gaussian fits.
+        resamp = 2
         
-            # We will actually be resampling the images for the Gaussian fits.
-            resamp = 2
+        cutout_half_size = int(round(fwhm_curr * 3.5))
+        cutout_size = 2 * cutout_half_size + 1
+
+        # Define variables to hold final averages PSFs
+        final_psf_obs = np.zeros((cutout_size*resamp, cutout_size*resamp), dtype=float)
+        final_psf_mod = np.zeros((cutout_size*resamp, cutout_size*resamp), dtype=float)
+        final_psf_count = 0
+
+        # Setup our gaussian fitter with some good initial guesses.
+        sigma_init_guess = fwhm_curr * gaussian_fwhm_to_sigma
+        g2d_model = models.Gaussian2D(1.0, cutout_half_size*resamp, cutout_half_size*resamp,
+                                          sigma_init_guess*resamp, sigma_init_guess*resamp, theta=0,
+                                          bounds={'x_stddev':[0, 20], 'y_stddev':[0, 20], 'amplitude':[0, 2]})
+        c2d_model = models.Const2D(0.0)
+        
+        the_model = g2d_model + c2d_model
+        the_fitter = fitting.LevMarLSQFitter()
+        
+        cut_y, cut_x = np.mgrid[:cutout_size, :cutout_size]
+        
+        for ss in range(len(sources)):
+            x_lo = int(round(sources[ss]['xcentroid'] - cutout_half_size))
+            x_hi = x_lo + cutout_size
+            y_lo = int(round(sources[ss]['ycentroid'] - cutout_half_size))
+            y_hi = y_lo + cutout_size
+
+            cutout_tmp = img[y_lo:y_hi, x_lo:x_hi].astype(float)
+            if ((cutout_tmp.shape[0] != cutout_size) | (cutout_tmp.shape[1] != cutout_size)):
+                # Edge source... fitting is no good
+                continue
+        
+            # Oversample the image
+            cutout_resamp = scipy.ndimage.zoom(cutout_tmp, resamp, order = 1)
+            cutout_resamp /= cutout_resamp.sum()
+            cut_y_resamp, cut_x_resamp = np.mgrid[:cutout_size*resamp, :cutout_size*resamp]
+
+            # Fit a 2D gaussian + constant
+            g2d_params = the_fitter(the_model, cut_x_resamp, cut_y_resamp, cutout_resamp)
+            g2d_image = g2d_params(cut_x_resamp, cut_y_resamp)
+
+            # Catch bad fits and ignore. 
+            if (np.isnan(g2d_params.x_mean_0.value) or
+                (np.abs(g2d_params.x_mean_0.value) > (cutout_size * resamp)) or
+                (np.abs(g2d_params.y_mean_0.value) > (cutout_size * resamp))):
+                print(f'Bad fit for {ss}')
+                continue
+
+            # Add to our average observed/model PSFs
+            if sources['flux'][ss] > 1.9:
+                final_psf_count += 1
+                final_psf_obs += cutout_resamp
+                final_psf_mod += g2d_image
+
+            if (plot_psf_compare == True) and (x_lo > 200) and (y_lo > 200):
+                plt.figure(4, figsize=(6, 4))
+                plt.clf()
+                plt.subplots_adjust(left=0.08)
+                plt.imshow(cutout_resamp)
+                plt.colorbar(fraction=0.25)
+                plt.axis('equal')
+                plt.title(f'Image (resamp={resamp:d})')
+                plt.pause(0.05)
             
-            cutout_half_size = int(round(fwhm_curr * 3.5))
-            cutout_size = 2 * cutout_half_size + 1
-
-            # Define variables to hold final averages PSFs
-            final_psf_obs = np.zeros((cutout_size*resamp, cutout_size*resamp), dtype=float)
-            final_psf_mod = np.zeros((cutout_size*resamp, cutout_size*resamp), dtype=float)
-            final_psf_count = 0
-
-            # Setup our gaussian fitter with some good initial guesses.
-            sigma_init_guess = fwhm_curr * gaussian_fwhm_to_sigma
-            g2d_model = models.Gaussian2D(1.0, cutout_half_size*resamp, cutout_half_size*resamp,
-                                              sigma_init_guess*resamp, sigma_init_guess*resamp, theta=0,
-                                              bounds={'x_stddev':[0, 20], 'y_stddev':[0, 20], 'amplitude':[0, 2]})
-            c2d_model = models.Const2D(0.0)
+                plt.figure(5, figsize=(6, 4))
+                plt.clf()
+                plt.subplots_adjust(left=0.08)
+                plt.imshow(g2d_image)
+                plt.colorbar(fraction=0.25)
+                plt.axis('equal')
+                plt.title(f'Model (resamp={resamp:d})')
+                plt.pause(0.05)
             
-            the_model = g2d_model + c2d_model
-            the_fitter = fitting.LevMarLSQFitter()
-            
-            cut_y, cut_x = np.mgrid[:cutout_size, :cutout_size]
-            
-            for ss in range(len(sources)):
-                x_lo = int(round(sources[ss]['xcentroid'] - cutout_half_size))
-                x_hi = x_lo + cutout_size
-                y_lo = int(round(sources[ss]['ycentroid'] - cutout_half_size))
-                y_hi = y_lo + cutout_size
-
-                cutout_tmp = img[y_lo:y_hi, x_lo:x_hi].astype(float)
-                if ((cutout_tmp.shape[0] != cutout_size) | (cutout_tmp.shape[1] != cutout_size)):
-                    # Edge source... fitting is no good
-                    continue
-            
-                # Oversample the image
-                cutout_resamp = scipy.ndimage.zoom(cutout_tmp, resamp, order = 1)
-                cutout_resamp /= cutout_resamp.sum()
-                cut_y_resamp, cut_x_resamp = np.mgrid[:cutout_size*resamp, :cutout_size*resamp]
-
-                # Fit a 2D gaussian + constant
-                g2d_params = the_fitter(the_model, cut_x_resamp, cut_y_resamp, cutout_resamp)
-                g2d_image = g2d_params(cut_x_resamp, cut_y_resamp)
-
-                # Catch bad fits and ignore. 
-                if (np.isnan(g2d_params.x_mean_0.value) or
-                    (np.abs(g2d_params.x_mean_0.value) > (cutout_size * resamp)) or
-                    (np.abs(g2d_params.y_mean_0.value) > (cutout_size * resamp))):
-                    print(f'Bad fit for {ss}')
-                    continue
-
-                # Add to our average observed/model PSFs
-                if sources['flux'][ss] > 1.9:
-                    final_psf_count += 1
-                    final_psf_obs += cutout_resamp
-                    final_psf_mod += g2d_image
-
-                if (plot_psf_compare == True) and (x_lo > 200) and (y_lo > 200):
-                    plt.figure(4, figsize=(6, 4))
-                    plt.clf()
-                    plt.subplots_adjust(left=0.08)
-                    plt.imshow(cutout_resamp)
-                    plt.colorbar(fraction=0.25)
-                    plt.axis('equal')
-                    plt.title(f'Image (resamp={resamp:d})')
-                    plt.pause(0.05)
+                plt.figure(6, figsize=(6, 4))
+                plt.clf()
+                plt.subplots_adjust(left=0.08)
+                plt.imshow((cutout_resamp - g2d_image) / cutout_resamp)
+                cbar = plt.colorbar(fraction=0.25)
+                plt.axis('equal')
+                cbar.set_label('% Residual')
+                plt.pause(0.05)
                 
-                    plt.figure(5, figsize=(6, 4))
-                    plt.clf()
-                    plt.subplots_adjust(left=0.08)
-                    plt.imshow(g2d_image)
-                    plt.colorbar(fraction=0.25)
-                    plt.axis('equal')
-                    plt.title(f'Model (resamp={resamp:d})')
-                    plt.pause(0.05)
+                pdb.set_trace()
+
+            # Save the FWHM and angle.
+            x_fwhm[ss] = g2d_params.x_stddev_0.value / gaussian_fwhm_to_sigma / resamp
+            y_fwhm[ss] = g2d_params.y_stddev_0.value / gaussian_fwhm_to_sigma / resamp
+            theta[ss] = g2d_params.theta_0.value
                 
-                    plt.figure(6, figsize=(6, 4))
-                    plt.clf()
-                    plt.subplots_adjust(left=0.08)
-                    plt.imshow((cutout_resamp - g2d_image) / cutout_resamp)
-                    cbar = plt.colorbar(fraction=0.25)
-                    plt.axis('equal')
-                    cbar.set_label('% Residual')
-                    plt.pause(0.05)
-                    
-                    pdb.set_trace()
+            # Some occasional display
+            if (plot_psf_compare == True) and (ss % 250 == 0):
+                plt.figure(2, figsize=(6, 4))
+                plt.clf()
+                plt.subplots_adjust(left=0.08)
+                plt.imshow(final_psf_obs)
+                plt.colorbar(fraction=0.25)
+                plt.axis('equal')
+                plt.title(f'Obs PSF (resamp = {resamp:d})')
+                plt.pause(0.05)
+                
+                plt.figure(3, figsize=(6, 4))
+                plt.clf()
+                plt.subplots_adjust(left=0.08)
+                plt.imshow(final_psf_mod)
+                plt.colorbar(fraction=0.25)
+                plt.axis('equal')
+                plt.title(f'Mod PSF (resamp = {resamp:d})')
+                plt.pause(0.05)
 
-                # Save the FWHM and angle.
-                x_fwhm[ss] = g2d_params.x_stddev_0.value / gaussian_fwhm_to_sigma / resamp
-                y_fwhm[ss] = g2d_params.y_stddev_0.value / gaussian_fwhm_to_sigma / resamp
-                theta[ss] = g2d_params.theta_0.value
-                    
-                # Some occasional display
-                if ss % 250 == 0:
-                    plt.figure(2, figsize=(6, 4))
-                    plt.clf()
-                    plt.subplots_adjust(left=0.08)
-                    plt.imshow(final_psf_obs)
-                    plt.colorbar(fraction=0.25)
-                    plt.axis('equal')
-                    plt.title(f'Obs PSF (resamp = {resamp:d})')
-                    plt.pause(0.05)
-                    
-                    plt.figure(3, figsize=(6, 4))
-                    plt.clf()
-                    plt.subplots_adjust(left=0.08)
-                    plt.imshow(final_psf_mod)
-                    plt.colorbar(fraction=0.25)
-                    plt.axis('equal')
-                    plt.title(f'Mod PSF (resamp = {resamp:d})')
-                    plt.pause(0.05)
+                print(f'ss={ss} fwhm_x={x_fwhm[ss]:.1f} fwhm_y={y_fwhm[ss]:.1f}')
 
-                    print(f'ss={ss} fwhm_x={x_fwhm[ss]:.1f} fwhm_y={y_fwhm[ss]:.1f}')
+                
 
-                    
+        sources['x_fwhm'] = x_fwhm
+        sources['y_fwhm'] = y_fwhm
+        sources['theta'] = theta
 
-            sources['x_fwhm'] = x_fwhm
-            sources['y_fwhm'] = y_fwhm
-            sources['theta'] = theta
+        # Save the average PSF (flux-weighted). Note we are making a slight mistake
+        # here since each PSF has a different sub-pixel position... still same for both
+        # obs and model.
+        final_psf_obs /= final_psf_count
+        final_psf_mod /= final_psf_count
+        final_psf_obs /= final_psf_obs.sum()
+        final_psf_mod /= final_psf_mod.sum()
+        fits.writeto(img_files[ii].replace('.fits', '_psf_obs.fits'), final_psf_obs, hdr, overwrite=True)
+        fits.writeto(img_files[ii].replace('.fits', '_psf_mod.fits'), final_psf_mod, hdr, overwrite=True)
 
-            # Save the average PSF (flux-weighted). Note we are making a slight mistake
-            # here since each PSF has a different sub-pixel position... still same for both
-            # obs and model.
-            final_psf_obs /= final_psf_count
-            final_psf_mod /= final_psf_count
-            final_psf_obs /= final_psf_obs.sum()
-            final_psf_mod /= final_psf_mod.sum()
-            fits.writeto(img_files[ii].replace('.fits', '_psf_obs.fits'), final_psf_obs, hdr, overwrite=True)
-            fits.writeto(img_files[ii].replace('.fits', '_psf_mod.fits'), final_psf_mod, hdr, overwrite=True)
+        # Drop sources with flux (signifiance) that isn't good enough.
+        # Empirically this is <1.2
+        good = np.where(sources['flux'] > 1.9)[0]
+        sources = sources[good]
 
-            # Drop sources with flux (signifiance) that isn't good enough.
-            # Empirically this is <1.2
-            good = np.where(sources['flux'] > 1.9)[0]
-            sources = sources[good]
-
-            # Only use the brightest sources for calculating the mean. This is just for printing.
-            idx = np.where(sources['flux'] > 5)[0]
-            x_fwhm_med = np.median(sources['x_fwhm'][idx])
-            y_fwhm_med = np.median(sources['y_fwhm'][idx])
-            
-            print('        Number of sources = ', len(sources))
-            print('        Median x_fwhm = {0:.1f} +/- {1:.1f}'.format(x_fwhm_med,
-                                                                     sources['x_fwhm'].std()))
-            print('        Median y_fwhm = {0:.1f} +/- {1:.1f}'.format(y_fwhm_med,
-                                                                     sources['y_fwhm'].std()))
-
-            fwhm_curr = np.mean([x_fwhm_med, y_fwhm_med])
-
-            formats = {'xcentroid': '%8.3f', 'ycentroid': '%8.3f', 'sharpness': '%.2f',
-                       'roundness1': '%.2f', 'roundness2': '%.2f', 'peak': '%10.1f',
-                       'flux': '%10.6f', 'mag': '%6.2f', 'x_fwhm': '%5.2f', 'y_fwhm': '%5.2f',
-                       'theta': '%6.3f'}
+        # Only use the brightest sources for calculating the mean. This is just for printing.
+        idx = np.where(sources['flux'] > 5)[0]
+        x_fwhm_med = np.median(sources['x_fwhm'][idx])
+        y_fwhm_med = np.median(sources['y_fwhm'][idx])
         
-            sources.write(img_files[ii].replace('.fits', '_stars.txt'), format='ascii.fixed_width',
-                              delimiter=None, bookend=False, formats=formats, overwrite=True)
+        print('        Number of sources = ', len(sources))
+        print('        Median x_fwhm = {0:.1f} +/- {1:.1f}'.format(x_fwhm_med,
+                                                                 sources['x_fwhm'].std()))
+        print('        Median y_fwhm = {0:.1f} +/- {1:.1f}'.format(y_fwhm_med,
+                                                                 sources['y_fwhm'].std()))
 
-        
+        fwhm_curr = np.mean([x_fwhm_med, y_fwhm_med])
+
+        formats = {'xcentroid': '%8.3f', 'ycentroid': '%8.3f', 'sharpness': '%.2f',
+                   'roundness1': '%.2f', 'roundness2': '%.2f', 'peak': '%10.1f',
+                   'flux': '%10.6f', 'mag': '%6.2f', 'x_fwhm': '%5.2f', 'y_fwhm': '%5.2f',
+                   'theta': '%6.3f'}
+    
+        sources.write(img_files[ii].replace('.fits', '_stars.txt'), format='ascii.fixed_width',
+                          delimiter=None, bookend=False, formats=formats, overwrite=True)
+
+    
     return
     
 def find_outlier_pixels(data, tolerance=3, worry_about_edges=True, median_filter_size=10):
