@@ -32,6 +32,9 @@ from skimage.measure import block_reduce
 from datetime import datetime
 import pytz
 import multiprocessing as mp
+from itertools import repeat
+import warnings
+from astropy.utils.exceptions import AstropyWarning
 
 scale = 40.0 # mas/pixel
 
@@ -109,15 +112,25 @@ def clean_images(img_files, out_dir, rebin=1, sky_frame=None, flat_frame=None,
         flat = flat_frame
 
     ####
-    # Define a function we can call
-    # per image, to clean and save each one.
+    # Setup for parallel processing.
     ####
+    # Use N_cpu - 2 so we leave 2 for normal operations. 
+    cpu_count = mp.cpu_count()
+    if (cpu_count > 2):
+        cpu_count -= 2
+
+    # Start the pool
+    pool = mp.Pool(cpu_count)
+
     
     #####
     # Loop through the image stack
     #####
-    for ii in range(len(img_files)):
-        clean_and_save_single_image(img_files[ii], sky, flat, out_dir, rebin, fix_bad_pixels, worry_about_edges)
+    # Run
+    print(f'Cleaning images in parallel with {cpu_count} cores.')
+    args = zip(img_files, repeat(sky), repeat(flat), repeat(out_dir),
+                   repeat(rebin), repeat(fix_bad_pixels), repeat(worry_about_edges))
+    pool.starmap(clean_and_save_single_image, args)
 
     return
 
@@ -216,14 +229,16 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
     # Normalize each of the flats: in parallel
     print(f'  Finding stars in parallel with {cpu_count} cores.')
     args = zip(img_files, repeat(fwhm), repeat(threshold), repeat(N_passes), repeat(plot_psf_compare), repeat(mask_file))
-    results = pool.map(find_stars_single, [flat_ds[i] for i in range(len(flat_ds))])
+    results = pool.starmap(find_stars_single, args)
 
     return
 
 def find_stars_single(img_file, fwhm, threshold, N_passes, plot_psf_compare, mask_file):
-    print("  Working on image: ", img_files[ii])
-    img, hdr = fits.getdata(img_files[ii], header=True, ignore_missing_end=True)
+    print("  Working on image: ", img_file)
+    img, hdr = fits.getdata(img_file, header=True, ignore_missing_end=True)
 
+    mask = fits.getdata(mask_file).astype('bool')
+    
     img = np.ma.masked_array(img, mask=mask)
     
     fwhm_curr = fwhm
@@ -305,7 +320,12 @@ def find_stars_single(img_file, fwhm, threshold, N_passes, plot_psf_compare, mas
             cut_y_resamp, cut_x_resamp = np.mgrid[:cutout_size*resamp, :cutout_size*resamp]
 
             # Fit a 2D gaussian + constant
-            g2d_params = the_fitter(the_model, cut_x_resamp, cut_y_resamp, cutout_resamp)
+            with warnings.catch_warnings():
+                # Suppress warnings... too many.
+                warnings.simplefilter("ignore", category=UserWarning)
+                warnings.simplefilter("ignore", category=AstropyWarning)
+                g2d_params = the_fitter(the_model, cut_x_resamp, cut_y_resamp, cutout_resamp)
+                
             g2d_image = g2d_params(cut_x_resamp, cut_y_resamp)
 
             # Catch bad fits and ignore. 
@@ -391,12 +411,13 @@ def find_stars_single(img_file, fwhm, threshold, N_passes, plot_psf_compare, mas
         final_psf_mod /= final_psf_count
         final_psf_obs /= final_psf_obs.sum()
         final_psf_mod /= final_psf_mod.sum()
-        fits.writeto(img_files[ii].replace('.fits', '_psf_obs.fits'), final_psf_obs, hdr, overwrite=True)
-        fits.writeto(img_files[ii].replace('.fits', '_psf_mod.fits'), final_psf_mod, hdr, overwrite=True)
+        fits.writeto(img_file.replace('.fits', '_psf_obs.fits'), final_psf_obs, hdr, overwrite=True)
+        fits.writeto(img_file.replace('.fits', '_psf_mod.fits'), final_psf_mod, hdr, overwrite=True)
 
         # Drop sources with flux (signifiance) that isn't good enough.
         # Empirically this is <1.2
-        good = np.where(sources['flux'] > 1.9)[0]
+        # Also drop sources that couldn't be fit.
+        good = np.where((sources['flux'] > 1.9) and (sources['x_fwhm'] > 0) and (sources['y_fwhm'] > 0))[0]
         sources = sources[good]
 
         # Only use the brightest sources for calculating the mean. This is just for printing.
@@ -417,7 +438,7 @@ def find_stars_single(img_file, fwhm, threshold, N_passes, plot_psf_compare, mas
                    'flux': '%10.6f', 'mag': '%6.2f', 'x_fwhm': '%5.2f', 'y_fwhm': '%5.2f',
                    'theta': '%6.3f'}
     
-        sources.write(img_files[ii].replace('.fits', '_stars.txt'), format='ascii.fixed_width',
+        sources.write(img_file.replace('.fits', '_stars.txt'), format='ascii.fixed_width',
                           delimiter=None, bookend=False, formats=formats, overwrite=True)
 
     

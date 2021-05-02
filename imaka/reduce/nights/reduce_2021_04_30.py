@@ -4,7 +4,7 @@ from astropy import table
 from astropy import units
 #import scipy
 import glob
-from imaka.reduce import reduce_fli
+from imaka.reduce import reduce_fli as redu
 from imaka.reduce import calib
 from imaka.reduce import util
 from imaka.analysis import moffat
@@ -20,7 +20,8 @@ root_dir = '/g/lu/data/imaka/onaga/20210430/sta/'
 
 sky_dir = root_dir + 'reduce/sky/' 
 data_dir = root_dir + 'Fld2/'
-flat_dir = root_dir + 'reduce/calib/'
+calib_dir = root_dir + 'reduce/calib/'
+flat_dir = calib_dir # in case some name changes not caught
 out_dir = root_dir + 'reduce/Fld2/'
 stats_dir = root_dir +'reduce/stats/'
 stacks_dir = root_dir + 'reduce/stacks/'
@@ -28,7 +29,7 @@ twi_dir = root_dir + 'twilights/'
 #old_cals_dir = root_dir + 'cals_from_20210403/'
 massdimm_dir = root_dir + 'reduce/massdimm/'
 
-#didn't have skies for bin2, pulling from previous night
+# skies for bin2 are pulled from previous night
 root_dir_2 = '/g/lu/data/imaka/onaga/20210429/sta/'
 data_dir_bin2 = root_dir_2 + 'Fld2/'
 sky_dir_bin2 = root_dir_2 + 'reduce/sky/'
@@ -39,29 +40,19 @@ sky_dir_bin2 = root_dir_2 + 'reduce/sky/'
 # Junk files -- see logs
 # 
 
-#don't have 30 int this night
-fnum_c_180_ls_bin1 =[67, 71, 75, 79, 83, 87, 91]
-fnum_c_180_docz_bin1 = [69, 73, 77, 81, 85, 89, 93] # cmat 1: zonal
-fnum_c_180_moda_bin1 = []        # cmat 2: modal
-fnum_o_180_bin1 = [68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92, 94]      # open loop
-fnum_c_180_ls_bin2 = [63]
-fnum_c_180_docz_bin2 = [65]     # cmat 1: zonal
-fnum_c_180_moda_bin2 = []        # cmat 2: modal
-fnum_o_180_bin2 = [64, 66]      # open loop
-
 dict_suffix = {'open_bin1': 'o',
-               'LS_bin1': 'LS_c',
+               'LS_bin1':   'LS_c',
                'docz_bin1': 'docz2_c',
                'open_bin2': '_o',
-               'LS_bin2': 'LS_c',
+               'LS_bin2':   'LS_c',
                'docz_bin2': 'modal_c'}
 
-dict_images = {'open_bin1': fnum_o_180_bin1,
-               'LS_bin1': fnum_c_180_ls_bin1,
-               'docz_bin1': fnum_c_180_docz_bin1,
-               'open_bin2': fnum_o_180_bin2,
-               'LS_bin2': fnum_c_180_ls_bin2,
-               'docz_bin2': fnum_c_180_docz_bin2}
+dict_images = {'open_bin1': [68, 70, 72, 74, 76, 78, 80, 82, 84, 86, 88, 90, 92, 94],
+               'LS_bin1':   [67, 71, 75, 79, 83, 87, 91],
+               'docz_bin1': [69, 73, 77, 81, 85, 89, 93],
+               'open_bin2': [64, 66],
+               'LS_bin2':   [63],
+               'docz_bin2': [65]}
 
 # These don't exist yet... make some temp files with zeros.
 # have bin1 skies but not bin2, borrow from night2?
@@ -80,22 +71,27 @@ def make_flat():
     """
     util.mkdir(flat_dir)
 
+    # running for two different binnings
     flat_num_bin1 = np.arange(51, 54+1)
     flat_num_bin2 = np.arange(55, 62+1)
     flat_frames_bin1 = ['{0:s}twi{1:03d}.fits'.format(twi_dir, ss) for ss in flat_num_bin1]
     flat_frames_bin2 = ['{0:s}twi{1:03d}.fits'.format(twi_dir, ss) for ss in flat_num_bin2]
-    reduce_STA.treat_overscan_2021(flat_frames_bin1)
-    reduce_STA.treat_overscan_2021(flat_frames_bin2)
-
-    dark_num = np.arange(21, 29+1)
-    # dark_frames = ['{0:s}dark.{1:03d}.fits.gz'.format(old_cals_dir, ss) for ss in dark_num]
-    # reduce_STA.treat_overscan_2021(dark_frames)
+    reduce_STA.treat_overscan(flat_frames_bin1)
+    reduce_STA.treat_overscan(flat_frames_bin2)
     
     scan_flat_frames_bin1 = ['{0:s}twi{1:03d}_scan.fits'.format(twi_dir, ss) for ss in flat_num_bin1]
     scan_flat_frames_bin2 = ['{0:s}twi{1:03d}_scan.fits'.format(twi_dir, ss) for ss in flat_num_bin2]
-    #scan_dark_frames = ['{0:s}dark.{1:03d}_scan.fits'.format(old_cals_dir, ss) for ss in dark_num]
-    calib.makeflat(scan_flat_frames_bin1, None, flat_dir + 'flat_bin1.fits', darks=False)
-    calib.makeflat(scan_flat_frames_bin2, None, flat_dir + 'flat_bin2.fits', darks=False)
+  
+    calib.makeflat(scan_flat_frames_bin1, None, calib_dir + 'flat_bin1.fits', darks=False)
+    calib.makeflat(scan_flat_frames_bin2, None, calib_dir + 'flat_bin2.fits', darks=False)
+
+    # This mask tells us where not to search for stars.
+    calib.make_mask(calib_dir + 'flat_bin1.fits', calib_dir + 'mask_bin1.fits',
+                       mask_min=0.8, mask_max=1.4,
+                       left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
+    calib.make_mask(calib_dir + 'flat_bin2.fits', calib_dir + 'mask_bin2.fits',
+                       mask_min=0.8, mask_max=1.4,
+                       left_slice=10, right_slice=10, top_slice=15, bottom_slice=15)
 
     return
 
@@ -107,7 +103,7 @@ def make_sky():
     # bin1 skys were taken 0430
     sky_num_180_bin1 = np.arange(96, 103+1)
     sky_frames_180 = ['{0:s}sky_{1:03d}_o.fits'.format(data_dir, ss) for ss in sky_num_180_bin1]
-    reduce_STA.treat_overscan_2021(sky_frames_180)
+    reduce_STA.treat_overscan(sky_frames_180, remake=True)
     scan_sky_frames = ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num_180_bin1]
     calib.makedark(scan_sky_frames, sky_dir+'fld2_sky_180_bin1.fits')
 

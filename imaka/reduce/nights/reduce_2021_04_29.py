@@ -147,7 +147,7 @@ def reduce_fld2():
         img_files = [data_dir + 'sta{img:03d}{suf:s}.fits'.format(img=ii, suf=suf) for ii in img]
         scn_files = [data_dir + 'sta{img:03d}{suf:s}_scan.fits'.format(img=ii, suf=suf) for ii in img]
         
-        reduce_STA.treat_overscan(img_files, remake=True)
+        reduce_STA.treat_overscan(img_files)
         redu.clean_images(scn_files, out_dir, rebin=1, sky_frame=sky_dir + sky, flat_frame=calib_dir + "flat.fits")#,
                                 # fix_bad_pixels=True, worry_about_edges=True)
 
