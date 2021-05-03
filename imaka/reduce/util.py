@@ -224,6 +224,43 @@ def get_four_filter_quadrant(starlist_name):
     return quad
     
 def get_filter(hdr):
+    if 'FILT' in hdr:
+        return hdr['FILT']
+
+    if 'FILTER' in hdr:
+        return hdr['FILTER']
+    else:
+        return 'I'
+    
     return
     
     
+def get_bin_factor(image, header):
+
+    if 'BINFAC' in header:
+        return header['BINFAC']
+
+    if 'CCDBIN1' in header:
+        return header['CCDBIN1']
+    
+    imgshape = image.shape
+
+    ## Determine binning from image size
+    ## For 1x1 binning
+    if (imgshape[0] > 10500) and (imgshape[1] > 11500):
+        binfac = 1
+
+    ## For 2x2 binning
+    elif (imgshape[0] > 5200) and (imgshape[0] < 5500):
+        binfac = 2
+    
+    ## For 3x3 binning
+    elif (imgshape[0] > 3500) and (imgshape[0] < 3700):
+        binfac = 3
+
+    ## For 4x4 binning
+    elif (imgshape[0] > 2600) and (imgshape[0] < 2700):
+        binfac = 4
+
+    return binfac
+

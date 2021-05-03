@@ -63,6 +63,9 @@ def treat_overscan(files, remake=False):
     # Run
     print(f'Treating overscan in parallel with {cpu_count} cores.')
     pool.starmap(treat_overscan_single, zip(files, repeat(remake)))
+
+    pool.close()
+    pool.join()
     
     return
 
@@ -86,7 +89,7 @@ def treat_overscan_single(filename, remake):
     dat, hdr = fits.getdata(filename, header=True)
 
     # Determine binning from image shape
-    binfac = get_bin_factor(dat, hdr)
+    binfac = util.get_bin_factor(dat, hdr)
 
     # Split the data vertically for the two different read-outs. Take the 
     # bottom 8 and gang them on the end of the top 8 for easier access.
@@ -152,36 +155,6 @@ def treat_overscan_single(filename, remake):
     fits.writeto(new_filename, clean_image, hdr, overwrite=True)
 
     return
-
-
-def get_bin_factor(image, header):
-
-    if 'BINFAC' in header:
-        return header['BINFAC']
-
-    if 'CCDBIN1' in header:
-        return header['CCDBIN1']
-    
-    imgshape = image.shape
-
-    ## Determine binning from image size
-    ## For 1x1 binning
-    if (imgshape[0] > 10500) and (imgshape[1] > 11500):
-        binfac = 1
-
-    ## For 2x2 binning
-    elif (imgshape[0] > 5200) and (imgshape[0] < 5500):
-        binfac = 2
-    
-    ## For 3x3 binning
-    elif (imgshape[0] > 3500) and (imgshape[0] < 3700):
-        binfac = 3
-
-    ## For 4x4 binning
-    elif (imgshape[0] > 2600) and (imgshape[0] < 2700):
-        binfac = 4
-
-    return binfac
 
 
 def clean_image(image_file):

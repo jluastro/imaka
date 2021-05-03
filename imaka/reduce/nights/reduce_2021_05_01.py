@@ -88,8 +88,8 @@ def reduce_fld2():
     util.mkdir(out_dir)
 
     # Loop through all the different data sets and reduce them.
-    # for key in dict_suffix.keys():
-    for key in ['doczskycl']:
+    # for key in ['doczskycl']:
+    for key in dict_suffix.keys():
         
         img = dict_images[key]
         suf = dict_suffix[key]
@@ -121,8 +121,8 @@ def find_stars_fld2():
                  'moda': 3}
     
     # Loop through all the different data sets and reduce them.
-    # for key in dict_suffix.keys():
-    for key in ['docz']:
+    # for key in ['docz']:
+    for key in dict_suffix.keys():
         img = dict_images[key]
         suf = dict_suffix[key]
         sky = dict_skies[key]
@@ -134,8 +134,8 @@ def find_stars_fld2():
         
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
         reduce_fli.find_stars(img_files, fwhm=fwhm, threshold=3, N_passes=2, plot_psf_compare=False,
-                              mask_flat=flat_dir+"domeflat.fits", mask_min=0.8, mask_max=1.4,
-                              left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
+                              mask_file=calib_dir+'mask.fits')
+        
                           
     return
 
