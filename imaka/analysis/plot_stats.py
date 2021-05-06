@@ -117,7 +117,7 @@ def plot_stack_stats(date, suffixes=['open', 'ttf', 'closed'], root_dir='/Users/
     for suffix in suffixes:
         stats.append(Table.read(stats_dir + 'stats_' + suffix + '.fits'))
     
-    scale = 0.04
+    scale = stats[0].meta['SCALE']
     colors = get_color_list()
     
     #
@@ -138,7 +138,7 @@ def plot_stack_stats(date, suffixes=['open', 'ttf', 'closed'], root_dir='/Users/
     plt.clf()
     plt.subplot(121)
     for ss in range(len(suffixes)):
-        plt.plot(stats[ss]['Index'], stats[ss]['FWHM']*stats[ss]['BINFAC']*scale, marker='o', linestyle='none', label=suffixes[ss])
+        plt.plot(stats[ss]['Index'], stats[ss]['FWHM']*scale, marker='o', linestyle='none', label=suffixes[ss])
     plt.xlabel('Frame Number')
     plt.ylabel('Gaussian-Fit FWHM (")')
     plt.legend(numpoints=1)
@@ -165,7 +165,7 @@ def plot_stack_stats(date, suffixes=['open', 'ttf', 'closed'], root_dir='/Users/
     plt.clf()
     plt.subplot(121)
     for ss in range(len(suffixes)):
-        plt.plot(stats[ss]['Index'], stats[ss]['emp_fwhm']*stats[ss]['BINFAC']*scale, marker='o', linestyle='none', label=suffixes[ss])
+        plt.plot(stats[ss]['Index'], stats[ss]['emp_fwhm']*scale, marker='o', linestyle='none', label=suffixes[ss])
     plt.xlabel('Frame Number')
     plt.ylabel('Empirical FWHM (")')
     plt.legend(numpoints=1)
@@ -246,7 +246,7 @@ def plot_stack_stats(date, suffixes=['open', 'ttf', 'closed'], root_dir='/Users/
     plt.clf()
     plt.subplot(121)
     for ss in range(len(suffixes)):
-        plt.plot(stats[ss]['Index'], stats[ss]['NEA'], marker='o', linestyle='none', label=suffixes[ss])
+        plt.plot(stats[ss]['Index'], stats[ss]['NEA'] * scale**2, marker='o', linestyle='none', label=suffixes[ss])
     plt.xlabel('Frame Number')
     plt.ylabel('NEA (Sq. Arcsec)')
     plt.legend(numpoints=1)
@@ -273,7 +273,7 @@ def plot_stack_stats(date, suffixes=['open', 'ttf', 'closed'], root_dir='/Users/
     plt.clf()
     plt.subplot(121)
     for ss in range(len(suffixes)):
-        plt.plot(stats[ss]['Index'], stats[ss]['NEA2'], marker='o', linestyle='none', label=suffixes[ss])
+        plt.plot(stats[ss]['Index'], stats[ss]['NEA2']*scale**2, marker='o', linestyle='none', label=suffixes[ss])
     plt.xlabel('Frame Number')
     plt.ylabel('NEA2 (Sq. Arcsec)')
     plt.legend(numpoints=1)
@@ -301,8 +301,8 @@ def plot_stack_stats(date, suffixes=['open', 'ttf', 'closed'], root_dir='/Users/
     plt.subplot(121)
     for ss in range(len(suffixes)):
         c = np.take(colors, ss, mode='wrap')
-        plt.plot(stats[ss]['Index'], stats[ss]['xFWHM']*stats[ss]['BINFAC']*scale, marker='o', color=c, linestyle='none', label='X ' + suffixes[ss])
-        plt.plot(stats[ss]['Index'], stats[ss]['yFWHM']*stats[ss]['BINFAC']*scale, marker='^', color=c, linestyle='none', label='Y ' + suffixes[ss])
+        plt.plot(stats[ss]['Index'], stats[ss]['xFWHM']*scale, marker='o', color=c, linestyle='none', label='X ' + suffixes[ss])
+        plt.plot(stats[ss]['Index'], stats[ss]['yFWHM']*scale, marker='^', color=c, linestyle='none', label='Y ' + suffixes[ss])
     plt.xlabel('Frame Number')
     plt.ylabel('Gaussian-Fit FWHM (")')
     plt.legend(numpoints=1, fontsize=10)
@@ -343,7 +343,7 @@ def plot_stack_stats(date, suffixes=['open', 'ttf', 'closed'], root_dir='/Users/
     plt.clf()
     plt.subplot(121)
     for ss in range(len(suffixes)):
-        plt.plot(utcs[ss], stats[ss]['FWHM']*stats[ss]['BINFAC']*scale, marker='o', linestyle='none', label=suffixes[ss])
+        plt.plot(utcs[ss], stats[ss]['FWHM']*scale, marker='o', linestyle='none', label=suffixes[ss])
     plt.gca().xaxis.set_major_formatter(time_fmt)
     plt.xticks(rotation=35)
     plt.xlabel('UTC Time (hr)')
@@ -375,7 +375,7 @@ def plot_stack_stats(date, suffixes=['open', 'ttf', 'closed'], root_dir='/Users/
     plt.clf()
     plt.subplot(121)
     for ss in range(len(suffixes)):
-        plt.plot(utcs[ss], stats[ss]['emp_fwhm']*stats[ss]['BINFAC']*scale, marker='o', linestyle='none', label=suffixes[ss])
+        plt.plot(utcs[ss], stats[ss]['emp_fwhm']*scale, marker='o', linestyle='none', label=suffixes[ss])
     plt.gca().xaxis.set_major_formatter(time_fmt)
     plt.xticks(rotation=35)
     plt.xlabel('UTC Time (hr)')
@@ -471,7 +471,7 @@ def plot_stack_stats(date, suffixes=['open', 'ttf', 'closed'], root_dir='/Users/
     plt.clf()
     plt.subplot(121)
     for ss in range(len(suffixes)):
-        plt.plot(utcs[ss], stats[ss]['NEA'], marker='o', linestyle='none', label=suffixes[ss])
+        plt.plot(utcs[ss], stats[ss]['NEA']*scale**2, marker='o', linestyle='none', label=suffixes[ss])
     plt.gca().xaxis.set_major_formatter(time_fmt)
     plt.xticks(rotation=35)
     plt.xlabel('UTC Time (hr)')
@@ -503,7 +503,7 @@ def plot_stack_stats(date, suffixes=['open', 'ttf', 'closed'], root_dir='/Users/
     plt.clf()
     plt.subplot(121)
     for ss in range(len(suffixes)):
-        plt.plot(utcs[ss], stats[ss]['NEA2'], marker='o', linestyle='none', label=suffixes[ss])
+        plt.plot(utcs[ss], stats[ss]['NEA2']*scale**2, marker='o', linestyle='none', label=suffixes[ss])
     plt.gca().xaxis.set_major_formatter(time_fmt)
     plt.xticks(rotation=35)
     plt.xlabel('UTC Time (hr)')
@@ -535,8 +535,8 @@ def plot_stack_stats(date, suffixes=['open', 'ttf', 'closed'], root_dir='/Users/
     plt.subplot(121)
     for ss in range(len(suffixes)):
         c = np.take(colors, ss, mode='wrap')
-        plt.plot(utcs[ss], stats[ss]['xFWHM']*stats[ss]['BINFAC']*scale, marker='o', color=c, linestyle='none', label='X ' + suffixes[ss])
-        plt.plot(utcs[ss], stats[ss]['yFWHM']*stats[ss]['BINFAC']*scale, marker='^', color=c, linestyle='none', label='Y ' + suffixes[ss])
+        plt.plot(utcs[ss], stats[ss]['xFWHM']*scale, marker='o', color=c, linestyle='none', label='X ' + suffixes[ss])
+        plt.plot(utcs[ss], stats[ss]['yFWHM']*scale, marker='^', color=c, linestyle='none', label='Y ' + suffixes[ss])
     plt.gca().xaxis.set_major_formatter(time_fmt)
     plt.xticks(rotation=35)
     plt.xlabel('UTC Time (hr)')
@@ -704,7 +704,7 @@ def plot_stats_mdp(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root
             all_dimm = np.concatenate([all_dimm, st['DIMM']])
             all_mass = np.concatenate([all_mass, st['MASS']])
 
-    scale = 0.04
+    scale = stats[0].meta['SCALE']
     
     time_fmt = mp_dates.DateFormatter('%H:%M')
     time_loc = ticker.MaxNLocator(nbins=6)
@@ -714,7 +714,7 @@ def plot_stats_mdp(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root
     
     for ii in range(len(suffixes)):
         c = np.take(colors, ii, mode='wrap')
-        plt.plot(utc[ii], stats[ii]['emp_fwhm']*stats[ii]['BINFAC']*scale, marker='o', color=c, linestyle='none', label=suffixes[ii])
+        plt.plot(utc[ii], stats[ii]['emp_fwhm']*scale, marker='o', color=c, linestyle='none', label=suffixes[ii])
     
     plt.plot(all_utc, all_dimm, marker='x', color='fuchsia', linestyle='none', label='DIMM')
     plt.plot(all_utc, all_mass, marker='+', color='dodgerblue', linestyle='none', label='MASS')
@@ -732,7 +732,7 @@ def plot_stats_mdp(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root
     plt.figure(2, figsize=(6, 6))
     plt.clf()
     for ii in range(len(suffixes)):
-        plt.plot(utc[ii], stats[ii]['NEA'], marker='o', linestyle='none', label=suffixes[ii])
+        plt.plot(utc[ii], stats[ii]['NEA']*scale**2, marker='o', linestyle='none', label=suffixes[ii])
     plt.gca().xaxis.set_major_formatter(time_fmt)
     plt.gca().xaxis.set_major_locator(time_loc)
     plt.xticks(rotation=35)
@@ -746,7 +746,7 @@ def plot_stats_mdp(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root
     plt.figure(3, figsize=(6, 6))
     plt.clf()
     for ii in range(len(suffixes)):
-        plt.plot(stats[ii]['MASS'], stats[ii]['emp_fwhm']*stats[ii]['BINFAC']*scale, marker='o', linestyle='none', label=suffixes[ii])
+        plt.plot(stats[ii]['MASS'], stats[ii]['emp_fwhm']*scale, marker='o', linestyle='none', label=suffixes[ii])
     plt.xlabel('MASS Seeing (")')
     plt.ylabel('Empirical FWHM (")')
     plt.legend()
@@ -757,7 +757,7 @@ def plot_stats_mdp(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root
     plt.figure(4, figsize=(6, 6))
     plt.clf()
     for ii in range(len(suffixes)):
-        plt.plot(stats[ii]['MASS'], stats[ii]['NEA'], marker='o', linestyle='none', label=suffixes[ii])
+        plt.plot(stats[ii]['MASS'], stats[ii]['NEA']*scale**2, marker='o', linestyle='none', label=suffixes[ii])
     plt.xlabel('MASS Seeing (")')
     plt.ylabel('NEQ (Sq. Arcsec)')
     plt.legend()
@@ -768,7 +768,7 @@ def plot_stats_mdp(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root
     plt.figure(5, figsize=(6, 6))
     plt.clf()
     for ii in range(len(suffixes)):
-        plt.plot(stats[ii]['DIMM'], stats[ii]['emp_fwhm']*stats[ii]['BINFAC']*scale, marker='o', linestyle='none', label=suffixes[ii])
+        plt.plot(stats[ii]['DIMM'], stats[ii]['emp_fwhm']*scale, marker='o', linestyle='none', label=suffixes[ii])
     plt.xlabel('DIMM Seeing (")')
     plt.ylabel('Empirical FWHM (")')
     plt.legend()
@@ -779,7 +779,7 @@ def plot_stats_mdp(date, suffixes=['open', 'ttf', 'closed'], out_suffix='', root
     plt.figure(6, figsize=(6, 6))
     plt.clf()
     for ii in range(len(suffixes)):
-        plt.plot(stats[ii]['DIMM'], stats[ii]['NEA'], marker='o', linestyle='none', label=suffixes[ii])
+        plt.plot(stats[ii]['DIMM'], stats[ii]['NEA']*scale**2, marker='o', linestyle='none', label=suffixes[ii])
     plt.xlabel('DIMM Seeing (")')
     plt.ylabel('NEQ (Sq. Arcsec)')
     plt.legend()
@@ -965,8 +965,8 @@ def plot_all_profiles(dates, root_dir='/Users/dorafohring/Desktop/imaka/data/'):
     plt.figure(2, figsize= (8.3, 4.2))
     plt.subplot(121)
     bins = np.arange(0, 1.3, 0.1)*10E-13
-    plt.hist(mprofs[0], bins=bins, normed=1, histtype='step', label='GL', cumulative=1, color='c')
-    plt.hist(mprofs[1], bins=bins, normed=1, histtype='step', label='FA', cumulative=1, color='r')
+    plt.hist(mprofs[0], bins=bins, density=True, histtype='step', label='GL', cumulative=1, color='c')
+    plt.hist(mprofs[1], bins=bins, density=True, histtype='step', label='FA', cumulative=1, color='r')
     plt.legend(loc=4)
     plt.xlabel('Cn2dh ($m^{1/3}$)')
     plt.ylabel('Probability of being less than')
@@ -1092,8 +1092,8 @@ def telemetry_profiles(dates, root_dir='/Users/dorafohring/Desktop/imaka/data/')
     plt.figure(2, figsize= (8.3, 4.2))
     plt.subplot(121)
     bins = np.arange(0, 1.3, 0.1)*10E-13
-    plt.hist(mprofs[0], bins=bins, normed=1, histtype='step', label='GL', cumulative=1, color='c')
-    plt.hist(mprofs[1], bins=bins, normed=1, histtype='step', label='FA', cumulative=1, color='r')
+    plt.hist(mprofs[0], bins=bins, density=True, histtype='step', label='GL', cumulative=1, color='c')
+    plt.hist(mprofs[1], bins=bins, density=True, histtype='step', label='FA', cumulative=1, color='r')
     plt.legend(loc=4)
     plt.xlabel('Cn2dh ($m^{1/3}$)')
     plt.ylabel('Probability of being less than')
@@ -1122,19 +1122,21 @@ def plot_best_stats(date, suffixes=['open', 'closed'], out_suffix='', root_dir='
     stats_dir = root_dir + date + '/FLI/reduce/stats/'
     plots_dir = root_dir + date + '/FLI/reduce/plots/'
     
-    scale = 0.08
     
     stats = []
     utcs = []
     max_fwhm = 0.0
     for suffix in suffixes:
         ss = Table.read(stats_dir + 'stats_' + suffix + '.fits')
+
+        scale = ss.meta['SCALE']
+        
         stats.append( ss )
         utc_dt = [datetime.strptime(ss['TIME_UTC'][ii], '%H:%M:%S') for ii in range(len(ss))]
         utcs.append(utc_dt)
         
         # Add NEA FWHM to table (temporarilyll)
-        ss['NEA_FWHM'] = nea_to_fwhm(ss['NEA'])
+        ss['NEA_FWHM'] = nea_to_fwhm(ss['NEA']) * scale**2
         
         # Get the max value of all the FWHMs
         max_fwhm_tmp = np.max([ss['NEA_FWHM'], ss['emp_fwhm'], ss['xFWHM'], ss['yFWHM']])
@@ -1151,7 +1153,7 @@ def plot_best_stats(date, suffixes=['open', 'closed'], out_suffix='', root_dir='
     plt.figure()
     for ii in range(len(stats)):
         # Convert NEA to FWHM using NEA = pi * (FWHM*scale/2)**2
-        nea_fwhm = nea_to_fwhm(stats[ii]['NEA'])
+        nea_fwhm = nea_to_fwhm(stats[ii]['NEA']) * scale**2
         plt.plot(utcs[ii], nea_fwhm, color=colors[ii], marker='o', label=suffixes[ii],
                  alpha=0.5, linestyle='none')
 
@@ -1254,7 +1256,7 @@ def plot_fwhmvt(open_file, closed_file, comp_col, title, plots_dir):
         dimm = stats1['DIMM']
         for i in range(len(stats1)):
             wvln = filter2wv(stats1['FILTER'][i])
-            scale = 0.04 * stats1['BINFAC'][i]
+            scale = stats1.meta['SCALE']
             factor = ((500/wvln)**0.2) * scale
             calib.append(factor)
 
@@ -1263,7 +1265,7 @@ def plot_fwhmvt(open_file, closed_file, comp_col, title, plots_dir):
         dimm = stats2['DIMM']
         for i in range(len(stats2)):
             wvln = filter2wv(stats2['FILTER'][i])
-            scale = 0.04 * stats2['BINFAC'][i]
+            scale = stats2.meta['SCALE']
             factor = ((500/wvln)**0.2) * scale
             calib.append(factor)
 
@@ -1399,10 +1401,12 @@ def plot_EE(labels, data_dir_root, stats_dir_end):
 def plot_week_fwhm(labels, data_dir_root, stats_dir_end, title):
     
     plt.figure(1, figsize=(8, 8))
-    scale = 0.04
     for day in labels:
         open_file = data_dir_root+day[0]+stats_dir_end + "stats_open.fits"
         open_data = Table.read(open_file)
+
+        scale = open_data.meta['SCALE']
+        
         o_data = np.array(open_data['emp_fwhm'])
         o_binfac = np.array(open_data['BINFAC'])
         o_filt =  filter2wv(np.array(open_data['FILTER']))
@@ -1435,8 +1439,6 @@ def plot_week_fwhm(labels, data_dir_root, stats_dir_end, title):
 
 def plot_hist(labels, data_dir_root, stats_dir_end, title):
     
-    scale=0.08
-    
     open_files = []
     closed_files = []
     for night in labels:
@@ -1448,8 +1450,14 @@ def plot_hist(labels, data_dir_root, stats_dir_end, title):
     open_tables = []
     closed_tables = []
     for ii in range(len(labels)):
-        open_table = np.array(Table.read(open_files[ii])['emp_fwhm']*((500/labels[ii][2])**(1/5))*scale)
-        closed_table = np.array(Table.read(closed_files[ii])['emp_fwhm']*((500/labels[ii][2])**(1/5))*scale)
+        open_stats = Table.read(open_files[ii])
+        closed_stats = Table.read(closed_files[ii])
+
+        scale = open_stats.meta['SCALE']
+        
+        open_table = np.array(open_stats['emp_fwhm']*((500/labels[ii][2])**(1/5))*scale)
+        closed_table = np.array(closed_stats['emp_fwhm']*((500/labels[ii][2])**(1/5))*scale)
+        
         open_tables.append(open_table)
         closed_tables.append(closed_table)
 
@@ -1587,13 +1595,13 @@ def plot_fwhmvt_nomatch(open_file, closed_file, comp_col, title, plots_dir):
     # Shift to match wavelengths
     for i in range(len(stats1)):
         wvln = filter2wv(stats1['FILTER'][i])
-        scale = .04 * stats1['BINFAC'][i]
+        scale = stats1.meta['SCALE']
         factor = ((500/wvln)**0.2) * scale
         calib1.append(factor)
     
     for i in range(len(stats2)):
         wvln = filter2wv(stats2['FILTER'][i])
-        scale = .04 * stats2['BINFAC'][i]
+        scale = stats2.meta['SCALE']
         factor = ((500/wvln)**0.2) * scale
         calib2.append(factor)
 
@@ -1739,6 +1747,8 @@ def plot_nea(data_root='/Users/jlu/data/imaka/'):
     stats_m['MASS_c'] = stats_m['MASS_c'] * (wave / wave_MD)**(-1.0/5.0)
     stats_m['DIMM_c'] = stats_m['DIMM_c'] * (wave / wave_MD)**(-1.0/5.0)
     stats_m['GL_MASSDIMM_c'] = stats_m['GL_MASSDIMM_c'] * (wave / wave_MD)**(-1.0/5.0)
+
+    scale = stats.meta['SCALE']
     
     wave_obs = np.zeros(len(stats), dtype=float)
     idx_I = np.where(stats['FILTER'] == 'I')[0]
@@ -1776,9 +1786,9 @@ def plot_nea(data_root='/Users/jlu/data/imaka/'):
     good_EE50 = np.where((np.isfinite(stats_m['EE50_o']) == True) &
                          (np.isfinite(stats_m['EE50_c']) == True))[0]
     plt.hist(stats_m['EE50_o'][good_EE50]*res_scale_m_o[good_EE50],
-                 bins=bins, alpha=0.3, normed=True, label='Open')
+                 bins=bins, alpha=0.3, density=True, label='Open')
     plt.hist(stats_m['EE50_c'][good_EE50]*res_scale_m_c[good_EE50],
-                 bins=bins, alpha=0.3, normed=True, label='Closed')
+                 bins=bins, alpha=0.3, density=True, label='Closed')
     plt.grid(True)
     plt.legend()
     plt.xlabel('EE50 (")')
@@ -1787,10 +1797,10 @@ def plot_nea(data_root='/Users/jlu/data/imaka/'):
     plt.clf()
     good_EE25 = np.where((np.isfinite(stats_m['EE25_o']) == True) &
                          (np.isfinite(stats_m['EE25_c']) == True))[0]
-    plt.hist(stats_m['EE25_o'][good_EE25]*res_scale_m_o[good_EE25],
-                 bins=bins, alpha=0.3, normed=True, label='Open')
-    plt.hist(stats_m['EE25_c'][good_EE25]*res_scale_m_c[good_EE25],
-                 bins=bins, alpha=0.3, normed=True, label='Closed')
+    plt.hist(stats_m['EE25_o'][good_EE25]*res_scale_m_o[good_EE25] * scale,
+                 bins=bins, alpha=0.3, density=True, label='Open')
+    plt.hist(stats_m['EE25_c'][good_EE25]*res_scale_m_c[good_EE25] * scale,
+                 bins=bins, alpha=0.3, density=True, label='Closed')
     plt.grid(True)
     plt.legend()
     plt.xlabel('EE25 (")')
@@ -1816,10 +1826,10 @@ def plot_nea(data_root='/Users/jlu/data/imaka/'):
     
     plt.figure(3)
     plt.clf()
-    plt.hist(stats_m['NEA_o'][good_NEA]*res_scale_m_o[good_NEA]**2,
-                 bins=bins, alpha=0.3, label='Open', normed=True)
-    plt.hist(stats_m['NEA_c'][good_NEA]*res_scale_m_c[good_NEA]**2,
-                 bins=bins, alpha=0.3, label='Closed', normed=True)
+    plt.hist(stats_m['NEA_o'][good_NEA]*res_scale_m_o[good_NEA]**2 * scale**2,
+                 bins=bins, alpha=0.3, label='Open', density=True)
+    plt.hist(stats_m['NEA_c'][good_NEA]*res_scale_m_c[good_NEA]**2 * scale**2,
+                 bins=bins, alpha=0.3, label='Closed', density=True)
     plt.grid(True)
     plt.legend()
     plt.xlabel('Noise Equivalent Area ("^2)')
@@ -1827,10 +1837,10 @@ def plot_nea(data_root='/Users/jlu/data/imaka/'):
     plt.figure(4)
     bins = np.arange(0, 4, 0.2)
     plt.clf()
-    plt.hist(NEA_ratio, bins=bins, label='NEA Ratio', alpha=0.8, normed=True, histtype='step')
-    plt.hist(EE50_ratio, bins=bins, label='EE50 Ratio', alpha=0.8, normed=True, histtype='step')
-    plt.hist(EE25_ratio, bins=bins, label='EE25 Ratio', alpha=0.8, normed=True, histtype='step')
-    plt.hist(emp_fwhm_ratio, bins=bins, label='emp_fwhm Ratio', alpha=0.8, normed=True, histtype='step')
+    plt.hist(NEA_ratio, bins=bins, label='NEA Ratio', alpha=0.8, density=True, histtype='step')
+    plt.hist(EE50_ratio, bins=bins, label='EE50 Ratio', alpha=0.8, density=True, histtype='step')
+    plt.hist(EE25_ratio, bins=bins, label='EE25 Ratio', alpha=0.8, density=True, histtype='step')
+    plt.hist(emp_fwhm_ratio, bins=bins, label='emp_fwhm Ratio', alpha=0.8, density=True, histtype='step')
     plt.xlabel('Improvement in Metric (Open/Close)')
     plt.legend()
     plt.grid(True)
@@ -1854,16 +1864,16 @@ def plot_nea(data_root='/Users/jlu/data/imaka/'):
 def comp_cdf(files, labels, colors):
     plt.figure(figsize=(15,4))
     for ii in range(len(files)):
-        FWHM_min, sig_FWHM_min, FWHM_maj, sig_FWHM_maj =mof.calc_mof_fwhm(files[ii], filt=False);
+        FWHM_min, sig_FWHM_min, FWHM_maj, sig_FWHM_maj = moffat.calc_mof_fwhm(files[ii], filt=False);
 
         plt.subplot(131)
-        plt.hist(FWHM_min, color=colors[ii], linewidth=2, bins = np.arange(0, 1.3, 0.01), cumulative=True, histtype='step', normed=True, label=labels[ii]);
+        plt.hist(FWHM_min, color=colors[ii], linewidth=2, bins = np.arange(0, 1.3, 0.01), cumulative=True, histtype='step', density=True, label=labels[ii]);
         plt.xlabel('Minor FWHM (arcsec)', fontsize=16)
         if ii == 0:
             plt.xlim(0, np.max(FWHM_maj)+0.1)
 
         plt.subplot(132)
-        plt.hist(FWHM_maj, color=colors[ii], linewidth=2, bins = np.arange(0, 1.3, 0.01), cumulative=True, histtype='step', normed=True, label=labels[ii]);
+        plt.hist(FWHM_maj, color=colors[ii], linewidth=2, bins = np.arange(0, 1.3, 0.01), cumulative=True, histtype='step', density=True, label=labels[ii]);
         plt.xlim(0,1.2)
         plt.xlabel('Major FWHM (arcsec)', fontsize=16)
         if ii == 0:
@@ -1871,7 +1881,7 @@ def comp_cdf(files, labels, colors):
 
         plt.subplot(133)
         elon = FWHM_maj /FWHM_min
-        plt.hist(elon, color=colors[ii], linewidth=2, bins = np.arange(0, 2.1, 0.01), cumulative=True, histtype='step', normed=True, label=labels[ii]);
+        plt.hist(elon, color=colors[ii], linewidth=2, bins = np.arange(0, 2.1, 0.01), cumulative=True, histtype='step', density=True, label=labels[ii]);
         plt.xlabel('Elongation', fontsize=16)
         plt.legend(loc=4)
         if ii == 0:
@@ -1886,46 +1896,51 @@ def plot_var(img_file, starlist, title):
 
     # Read in stack and starlist
     img, hdr = fits.getdata(img_file, header=True)
-    stars = Table.read(starlist, format='ascii')
-    N_stars = len(stars)
 
-    x_cents = []
-    y_cents = []
-    mags  = []
-    FWHMs   = []
+    if starlist.endswith('txt'):
+        stars = Table.read(starlist, format='ascii')
+    else:
+        stars = Table.read(starlist)
 
-    # Pick out stars within above a flux, below a saturation limit, and not on edges
-    stars[0]
-    for star in stars:
-        if star['flux'] > 0 and star['peak'] < 20000 and \
-        star['ycentroid']-10 > 0 and star['xcentroid']-10 > 0 and \
-        star['ycentroid']+10<np.shape(img)[0] and star['xcentroid']+10<np.shape(img)[1]:
-            x_cents.append(star['xcentroid'])
-            y_cents.append(star['ycentroid'])
-            mags.append(-2.5 * np.log10(star['flux']))
+    # Check to see if we have already calculated Moffat parameters. 
+    if 'mdp' in starlist:
+        # Trim out negative beta values.
+        idx = np.where((stars['Beta'] > 0) & (stars['Minor Alpha'] > 0))[0]
+        stars = stars[idx]
 
-    # Moffat fit to all sources in above cut        
-    for i in range(len(x_cents)):
-        one_star = img[int(y_cents[i])-10 : int(y_cents[i])+10+1, int(x_cents[i])-10 : int(x_cents[i])+10+1]
-        y, x = np.mgrid[:21, :21]
-        z = one_star
-        m_init = moffat.Elliptical_Moffat2D(N_sky = 0, amplitude=np.amax(z),  x_0=10.5, y_0=10.5, width_x = 4.55, width_y=4.17)
-        fit_m = fitting.LevMarLSQFitter()
-        m = fit_m(m_init, x, y, z)
-        if abs(m.width_x.value) < abs(m.width_y.value):
-            FWHM = 2*abs(m.width_x.value)*np.sqrt((2**(1/m.power.value))-1)*0.08
-        else:
-            FWHM = 2*abs(m.width_y.value)*np.sqrt((2**(1/m.power.value))-1)*0.08
-        FWHMs.append(FWHM)
+        stars['Moffat FWHM'] = 2.0 * stars['Minor Alpha'] * np.sqrt((2.0**(1. / stars['Beta'])) - 1)
 
-    #Sigma clip data
-    filt = sigma_clip(FWHMs, sigma=3, iters=5, copy=False)
-    x = np.ma.array(FWHMs, mask=filt.mask)
-    FWHMs_clip = x[~x.mask].data
-    x = np.ma.array(x_cents, mask=filt.mask)
-    xcents_clip = x[~x.mask].data
-    x = np.ma.array(y_cents, mask=filt.mask)
-    ycents_clip = x[~x.mask].data
+        # # Get the brightest YY% stars
+        # flux_percent = 0.2
+        # flux_sorted = np.sort(stars['flux'])
+        # flux_cut = flux_sorted[int(len(stars) * flux_percent)]
+
+        # idx = np.where(stars['flux'] > flux_cut)[0]
+        # stars = stars[idx]
+        
+        x_cents = stars['xcentroid'].data
+        y_cents = stars['ycentroid'].data
+        FWHMs = stars['Moffat FWHM'].data
+        mags = stars['mag'].data
+
+        # FWHMs = stars['fwhm_emp']
+    else:
+        raise RuntimeError('Table must include pre-calculate Moffat fits')
+
+    # Fetch the plate scale for plotting
+    img, hdr = fits.getdata(img_file, header=True)
+    scale = util.get_plate_scale(img, hdr)
+
+    # Convert everything into arcsec.
+    x_cents *= scale
+    y_cents *= scale
+    FWHMs *= scale
+    
+    # Sigma clip data
+    filt = sigma_clip(FWHMs, sigma=3, maxiters=5, copy=False)
+    FWHMs_clip = FWHMs[~filt.mask]
+    x_cents_clip = x_cents[~filt.mask]
+    y_cents_clip = y_cents[~filt.mask]
 
     plt.figure(1, figsize=(15,6))
 
@@ -1939,9 +1954,18 @@ def plot_var(img_file, starlist, title):
     plt.title('FWHM Distribution', fontsize=20)
     plt.legend()
 
+    print('Median FWHM           = {0:.3f}"'.format(np.median(FWHMs)))
+    print('Median FWHM (clipped) = {0:.3f}"'.format(np.median(FWHMs_clip)))
+    print('Mean FWHM             = {0:.3f}"'.format(np.mean(FWHMs)))
+    print('Mean FWHM (clipped)   = {0:.3f}"'.format(np.mean(FWHMs_clip)))
+    print('Stddev FWHM           = {0:.3f}"'.format(np.std(FWHMs)))
+    print('Stddev FWHM (clipped) = {0:.3f}"'.format(np.std(FWHMs_clip)))
+
+    # Plot the FWHM over the field. First, determine the min/max on the colorscale.
     plt.subplot(122)
-    #plt.scatter(np.array(xcents_clip)*0.08, np.array(ycents_clip)*0.08, c=np.array(FWHMs_clip))#, alpha=0.75)#, vmin=np.mean(FWHMs)-np.std(FWHMs), vmax=np.mean(FWHMs)+np.std(FWHMs))
-    plt.scatter(np.array(x_cents)*0.08, np.array(y_cents)*0.08, c=np.array(FWHMs))#, alpha=0.75)#, vmin=np.mean(FWHMs)-np.std(FWHMs), vmax=np.mean(FWHMs)+np.std(FWHMs))
+    plt.scatter(x_cents_clip, y_cents_clip, c=FWHMs_clip,
+                    vmin=FWHMs_clip.min(), vmax=FWHMs_clip.max(),
+                    cmap = plt.cm.viridis)
     plt.xlabel('x offset (arcsec)', fontsize=16) 
     plt.ylabel('y offset (arcsec)', fontsize=16)
     plt.title("Field Variability", fontsize=20)

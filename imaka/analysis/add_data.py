@@ -36,7 +36,7 @@ def append_alt_data(stats_file, alt_file, date):
 
     for ii in range(len(stats)):
         hst_str = stats[ii]['DATE_UTC']+","+stats[ii]['TIME_UTC']
-        time_obj = datetime.datetime.strptime(hst_str, "%Y-%m-%d,%H:%M:%S")
+        time_obj = datetime.strptime(hst_str, "%Y-%m-%d,%H:%M:%S")
 
         time_diffs = []
         for jj in range(len(new_table)):
@@ -55,7 +55,7 @@ def append_alt_data(stats_file, alt_file, date):
                 second = 0
             HST_date_str = date[0:4]+"-"+date[4:6]+"-"+date[6:8]
             HST_time_str = str(hour)+":"+str(minute)+":"+str(second)
-            comp_time = datetime.datetime.strptime(HST_date_str+","+HST_time_str, '%Y-%m-%d,%H:%M:%S')
+            comp_time = datetime.strptime(HST_date_str+","+HST_time_str, '%Y-%m-%d,%H:%M:%S')
 
             time_diff = ((time_obj-comp_time)).total_seconds()
             time_diffs.append(abs(time_diff))
@@ -200,12 +200,12 @@ def match_cols(open_file, closed_file, comp_col):
         data_1_err[ii] = stats1['emp_fwhm_std'][ii]
 
         dt_str = stats1['DATE_UTC'][ii] + ' ' + stats1['TIME_UTC'][ii]
-        dt_utc = datetime.datetime.strptime(dt_str, '%Y-%m-%d %H:%M:%S')
+        dt_utc = datetime.strptime(dt_str, '%Y-%m-%d %H:%M:%S')
 
         times2 = []
         for jj in range(len(stats2)):
             dt_str2 = stats2['DATE_UTC'][jj] + ' ' + stats2['TIME_UTC'][jj]
-            dt_utc2 = datetime.datetime.strptime(dt_str2, '%Y-%m-%d %H:%M:%S')
+            dt_utc2 = datetime.strptime(dt_str2, '%Y-%m-%d %H:%M:%S')
             diff = abs(dt_utc-dt_utc2)
             times2.append(diff)
 
@@ -214,7 +214,7 @@ def match_cols(open_file, closed_file, comp_col):
         data_2_err[ii] = stats2['emp_fwhm_std'][min_id]
 
         time2_str = stats2['DATE_UTC'][min_id] + ' ' + stats2['TIME_UTC'][min_id]
-        time2_utc = datetime.datetime.strptime(time2_str, '%Y-%m-%d %H:%M:%S')
+        time2_utc = datetime.strptime(time2_str, '%Y-%m-%d %H:%M:%S')
         diff_time = time2_utc - dt_utc
         ave_time = dt_utc + (diff_time/2)
 

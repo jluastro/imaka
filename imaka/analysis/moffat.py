@@ -7,9 +7,11 @@ from astropy.table import Table, Column
 from astropy.modeling import models, fitting
 from astropy.modeling.models import custom_model
 from imaka.analysis import plot_stats
+from imaka.reduce import util
 import multiprocessing as mp
 from itertools import repeat
 import matplotlib.pyplot as plt
+import scipy
 @custom_model
 
 
@@ -82,7 +84,7 @@ def fit_moffat(img_files, stats_file, x_guess=5, y_guess=5, flux_percent=0.9, st
         
         # Load up the corresponding starlist.
         if starlists==None:
-            starlist = img_file.replace('.fits', '_stars.txt')
+            starlist = img_file.replace('.fits', '_stars_stats.fits')
         else:
             starlist = starlists[ii]
 
@@ -91,6 +93,12 @@ def fit_moffat(img_files, stats_file, x_guess=5, y_guess=5, flux_percent=0.9, st
         #####
         results = pool.apply_async(fit_moffat_single, (img_file, starlist, flux_percent))
         results_async.append(results)
+
+    pool.close()
+    pool.join()
+
+    for ii in range(N_files):
+        results = results_async[ii].get()
         
         N_sky[ii]     = results['N_sky']
         amplitude[ii] = results['amplitude']
@@ -116,24 +124,19 @@ def fit_moffat(img_files, stats_file, x_guess=5, y_guess=5, flux_percent=0.9, st
     # Read in existing stats table and append new data
     stats = Table.read(stats_file)
     
-    col_mof_stars = Column(name='N Stars', data = mof_stars)
-    col_N_sky = Column(name='N Sky', data=N_sky)
-    col_N_sky_std = Column(name='N Sky std', data=N_sky_std)
-    col_amplitude = Column(name='Amplitude', data=amplitude)
-    col_amplitude_std = Column(name='Amplitude std', data=amplitude_std)
-    col_phi = Column(name='Phi', data=phi)
-    col_phi_std = Column(name='Phi std', data=phi_std)
-    col_beta = Column(name='Beta', data = power)
-    col_beta_std = Column(name='Beta std', data=power_std)
-    col_alpha_min = Column(name='Minor Alpha', data = width_x)
-    col_alpha_min_std = Column(name='Minor Alpha std', data = width_x_std)
-    col_alpha_maj = Column(name='Major Alpha', data = width_y)
-    col_alpha_maj_std = Column(name='Major Alpha std', data = width_y_std)
-
-    stats.add_columns([col_mof_stars, col_N_sky, col_N_sky_std, col_amplitude,\
-                           col_amplitude_std, col_phi, col_phi_std, col_beta, \
-                           col_beta_std, col_alpha_min, col_alpha_min_std, \
-                           col_alpha_maj, col_alpha_maj_std])
+    stats['N Stars'] = mof_stars
+    stats['N Sky'] = N_sky
+    stats['N Sky std'] = N_sky_std
+    stats['Amplitude'] = amplitude
+    stats['Amplitude std'] = amplitude_std
+    stats['Phi'] = phi
+    stats['Phi std'] = phi_std
+    stats['Beta'] = power
+    stats['Beta std'] = power_std
+    stats['Minor Alpha'] = width_x
+    stats['Minor Alpha std'] = width_x_std
+    stats['Major Alpha'] = width_y
+    stats['Major Alpha std'] = width_y_std
 
     stats_file_root, stats_file_ext = os.path.splitext(stats_file)
     stats.write(stats_file_root.split("_mdp")[0] + stats_file_ext, overwrite=True)
@@ -143,12 +146,12 @@ def fit_moffat(img_files, stats_file, x_guess=5, y_guess=5, flux_percent=0.9, st
 def fit_moffat_single(img_file, starlist, flux_percent):
     pid = mp.current_process().pid
     
-    print(f"p{pid} - Fitting moffat for {img_file}")
+    print(f"p{pid} - Fitting moffat for {img_file} and {starlist}")
     
     # Load up the image to work on.
     img, hdr = fits.getdata(img_file, header=True)
 
-    stars = Table.read(starlist, format='ascii')
+    stars = Table.read(starlist)
     N_stars = len(stars)
 
     # Put the positions into an array 
@@ -159,15 +162,18 @@ def fit_moffat_single(img_file, starlist, flux_percent):
     y_cents = []
     N_good_stars = 0
 
-    flux_cut = np.sort(stars['flux'])[int(len(np.sort(stars['flux']))*flux_percent)]
+    # Lets figure out which stars to actually fit.
+    flux_sorted = np.sort(stars['flux'])                  # array of increasing flux
+    sdx_flux_cut = int(len(flux_sorted) * flux_percent)   # set the cut at brightest YY% of all stars.
+    flux_cut = flux_sorted[sdx_flux_cut]                  # this yields the flux lower limit.
 
     # Trim star sample for edge sources, saturation, and low flux
     cut_size = int(40 / util.get_bin_factor(img, hdr))
     dcut = cut_size / 2.0
-    xlo = int(stars['x_centroid'] - dcut)
-    xhi = int(stars['x_centroid'] + dcut + 1)
-    ylo = int(stars['y_centroid'] - dcut)
-    yhi = int(stars['y_centroid'] + dcut + 1)
+    xlo = (stars['xcentroid'] - dcut).astype('int')
+    xhi = xlo + cut_size + 1
+    ylo = (stars['ycentroid'] - dcut).astype('int')
+    yhi = ylo + cut_size + 1
     
     gdx = np.where((xlo > 0) & (xhi < img.shape[1]) &
                    (ylo > 0) & (yhi < img.shape[0]) &
@@ -180,8 +186,14 @@ def fit_moffat_single(img_file, starlist, flux_percent):
                        (stars['peak'] < 20000))[0]
 
     N_good_stars = len(gdx)
-    x_cents = stars['x_centroid'][gdx]
-    y_cents = stars['y_centroid'][gdx]
+    stars = stars[gdx]
+    x_cents = stars['xcentroid']
+    y_cents = stars['ycentroid']
+    xlo = xlo[gdx]
+    xhi = xhi[gdx]
+    ylo = ylo[gdx]
+    yhi = yhi[gdx]
+    print(f'p{pid} -   Moffat fitting for {N_good_stars}')
     
     # Create lists for each image's stars' parameters
     N_sky_list     = np.zeros(N_good_stars, dtype=float)
@@ -193,15 +205,18 @@ def fit_moffat_single(img_file, starlist, flux_percent):
     width_x_list   = np.zeros(N_good_stars, dtype=float)
     width_y_list   = np.zeros(N_good_stars, dtype=float)
 
-    final_psf_mof = np.zeros((cut_size, cut_size), dtype=float)
+    # We will fit on oversampled images.  This is the over-sampling factor.
+    over_samp = 2
+    
+    final_psf_mof = np.zeros(((cut_size + 1) * over_samp,
+                              (cut_size + 1) * over_samp), dtype=float)
     
     for jj in range(N_good_stars):
         # Make image cut for good star
         x_cent = x_cents[jj]
         y_cent = y_cents[jj]
-        image_cut = img[ylo:yhi, xlo:xhi]
+        image_cut = img[ylo[jj]:yhi[jj], xlo[jj]:xhi[jj]]
 
-        over_samp = 2
         over_samp_cut = scipy.ndimage.zoom(image_cut, over_samp, order=1)
 
         # Conduct moffat fit
@@ -236,7 +251,19 @@ def fit_moffat_single(img_file, starlist, flux_percent):
     # mistake here since each PSF has a different sub-pixel position
     final_psf_mof /= N_good_stars
     fits.writeto(img_file.replace('.fits', '_psf_mof_oversamp{0:d}.fits'.format(over_samp)),
-                 final_psf_mof, hdr, clobber=True)
+                 final_psf_mof, hdr, overwrite=True)
+
+    # Save and updated list of stars with all their moffat fits.
+    stars['N Sky'] = N_sky_list
+    stars['Amplitude'] = amplitude_list
+    stars['Phi'] = phi_list
+    stars['Beta'] = power_list
+    stars['Minor Alpha'] = width_x_list
+    stars['Major Alpha'] = width_y_list
+
+    stars_file_root, stars_file_ext = os.path.splitext(starlist)
+    stars.write(starlist.replace('.fits', '_mdp.fits'), overwrite=True)
+
     
     # Take median values of parameters and put in intial lists
     results = {}

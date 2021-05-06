@@ -428,7 +428,7 @@ def find_stars_single(img_file, fwhm, threshold, N_passes, plot_psf_compare, mas
         # Drop sources with flux (signifiance) that isn't good enough.
         # Empirically this is <1.2
         # Also drop sources that couldn't be fit.
-        good = np.where((sources['flux'] > 1.9) and (sources['x_fwhm'] > 0) and (sources['y_fwhm'] > 0))[0]
+        good = np.where((sources['flux'] > 1.9) & (sources['x_fwhm'] > 0) & (sources['y_fwhm'] > 0))[0]
         sources = sources[good]
 
         # Only use the brightest sources for calculating the mean. This is just for printing.
@@ -613,6 +613,10 @@ def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None, fourf
 
     pool.close()
     pool.join()
+
+    # Fetch the plate scale
+    img, hdr = fits.getdata(img_files[0], header=True)
+    plate_scale = util.get_plate_scale(img, hdr)
         
 
     for ii in range(N_files):
@@ -650,7 +654,7 @@ def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None, fourf
                                         'FWHM', 'FWHM_std', 'EE25', 'EE50', 'EE80',
                                         'NEA', 'NEA2', 'xFWHM', 'yFWHM', 'theta', 'emp_fwhm', 'emp_fwhm_std',
                                         'quadrant'),
-                            meta={'name':'Stats Table'})
+                            meta={'name':'Stats Table', 'scale': plate_scale})
 
     if fourfilt:
         quad_col = Column(quadrant, name='quadrant')
@@ -670,7 +674,7 @@ def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None, fourf
     stats['emp_fwhm_std'].format = '7.3f'
 
     add_frame_number_column(stats)
-    
+
     stats.write(output_stats, overwrite=True)
                         
     return
@@ -679,8 +683,8 @@ def calc_star_stats_single(img_file, starlist, is_four_filt):
     pid = mp.current_process().pid
     
     # radial bins for the EE curves
-    max_radius = 3.0
-    radii = np.arange(0.05, max_radius, 0.05)
+    max_radius = 3.0   # arcsec
+    radii = np.arange(0.05, max_radius, 0.05)  # Arcsec
 
     # Load up the image to work on.
     print(f"p{pid} - calc_star_stats on image: {img_file}")
@@ -779,16 +783,16 @@ def calc_star_stats_single(img_file, starlist, is_four_filt):
     ee50_rad = radii[ np.where(enc_energy_final >= 0.5)[0][0] ]
     ee80_rad = radii[ np.where(enc_energy_final >= 0.8)[0][0] ]
 
-    # Find the median NEA. Convert into arcsec^2
-    stars['nea2'] = (1.0 / int_psf2_all) * plate_scale**2   # inidividual stars
-    nea2 = 1.0 / np.median(int_psf2_all[idx])               # combined
-    nea2 *= plate_scale**2
+    # Find the median NEA in pixel^2.
+    stars['nea2'] = (1.0 / int_psf2_all)       # inidividual stars
+    nea2 = 1.0 / np.median(int_psf2_all[idx])  # combined
 
-    # Calculate the NEA in a different way.
+    # Calculate the NEA in a different way. (in pixel^2)
     stars['nea'] = 0.0  # make new column
+    r_dr_2pi = 2.0 * math.pi * (radii[1:] / plate_scale)  * (np.diff(radii) / plate_scale)
     for ss in range(N_stars):
-        stars['nea'][ss] = 1.0 / (np.diff(enc_energy[ss])**2 / (2.0 * math.pi * radii[1:] * np.diff(radii))).sum()
-    nea = 1.0 / (np.diff(enc_energy_final)**2 / (2.0 * math.pi * radii[1:] * np.diff(radii))).sum()
+        stars['nea'][ss] = 1.0 / (np.diff(enc_energy[ss])**2 / r_dr_2pi).sum()
+    nea = 1.0 / (np.diff(enc_energy_final)**2 / r_dr_2pi).sum()
 
     #plt.clf()
     #plt.plot(radii, enc_energy_final, 'k-')
@@ -851,7 +855,8 @@ def calc_star_stats_single(img_file, starlist, is_four_filt):
     band = util.get_filter(hdr)
     binfac = util.get_bin_factor(img, hdr)
 
-    # Save the individual star stats.
+    # Save the individual star stats. (and plate scale info)
+    stars.meta['scale'] = plate_scale
     new_starlist = img_file.replace('.fits', '_stars_stats.fits')
     stars.write(new_starlist, overwrite=True)
 
@@ -881,20 +886,29 @@ def calc_star_stats_single(img_file, starlist, is_four_filt):
 def add_frame_number_column(stats_table):
     # Get the frame numbers for plotting.
     frame_num = np.zeros(len(stats_table), dtype=int)
+
     for ii in range(len(stats_table)):
 
         full_name = stats_table['Image'][ii]
         last_bit = full_name.split("/")[-1]
         number = '0'
+        found_digits = False
+        
         for character in last_bit:
             if character.isdigit() == True:
+                found_digits = True
                 digit = (character)
                 number += digit
+            else:
+                if found_digits:
+                    # Condition is already found digits,
+                    # and found first letter after that.
+                    # If so, then we should stop.
+                    break
 
         frame_num[ii] = int(number)
-        frame_num_col = table.Column(frame_num, name='Index')
 
-    stats_table.add_column(frame_num_col, index=1)
+    stats_table['Index'] = frame_num
 
     return
 
@@ -932,8 +946,8 @@ def shift_and_add(img_files, starlists, output_root, method='mean', clip_sigma=N
         img_covers = np.ones(img.shape, dtype=int)
 
         # Pull out the shifts
-        shiftx = shift_trans[ii].px[0]
-        shifty = shift_trans[ii].py[0]
+        shiftx = shift_trans[ii].px.c0_0.value
+        shifty = shift_trans[ii].py.c0_0.value
 
         # Make an array to hold our final image.
         if method == 'mean':
@@ -980,7 +994,7 @@ def shift_and_add(img_files, starlists, output_root, method='mean', clip_sigma=N
 
 def get_transforms_from_starlists(starlists):
     N_files = len(starlists)
-    N_brite = 7
+    N_brite = 50
     N_passes = 2
 
     # Read in the first image and use this as the initial
