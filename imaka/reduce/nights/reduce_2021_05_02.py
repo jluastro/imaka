@@ -2,7 +2,6 @@ import numpy as np
 from astropy.io import fits
 from astropy import table
 from astropy import units
-#import scipy
 import glob
 from imaka.reduce import reduce_fli
 from imaka.reduce import calib
@@ -16,7 +15,7 @@ from imaka.reduce import reduce_STA
 import matplotlib
 # matplotlib.use('Agg')
 
-root_dir = '/g/lu/data/imaka/onaga/20210501/sta/'
+root_dir = '/g/lu/data/imaka/onaga/20210502/sta/'
 
 sky_dir = root_dir + 'reduce/sky/' 
 data_dir = root_dir + 'Fld2/'
@@ -36,10 +35,10 @@ dict_suffix = {'open': '_o',
                'docz': 'docz2_c',
                'doczskycl': 'doczskycl_c'}
 
-dict_images = {'open':      [73, 75, 78, 80, 83, 85, 88, 90],
-               'LS':        [72, 77, 82, 87],
-               'docz':      [74, 79, 84, 89],
-               'doczskycl': [76, 81, 86, 91]}
+dict_images = {'open':      [10, 12, 15, 17, 20, 22, 26, 28, 31, 33, 36, 38],
+               'LS':        [9,  14, 19, 25, 30, 35],
+               'docz':      [11, 16, 21, 27, 32, 37],
+               'doczskycl': [13, 18, 23, 29, 34, 39]}
 
 # These don't exist yet... make some temp files with zeros.
 dict_skies = {'open':      'fld2_sky.fits',
@@ -47,12 +46,10 @@ dict_skies = {'open':      'fld2_sky.fits',
               'docz':      'fld2_sky.fits',
               'doczskycl': 'fld2_sky.fits'}
 
-# all bin 1
 dict_fwhm = {'open': 14,
              'LS':   6,
              'docz': 6,
              'doczskycl': 6}
-    
 
 def make_flat(): 
     """
@@ -61,17 +58,24 @@ def make_flat():
     """
     util.mkdir(calib_dir)
     
-    # Copy flight from previous night because twilight exposures
-    # were a little saturated.
-    shutil.copyfile(root_dir + '../../20210430/sta/reduce/calib/flat_bin1.fits', calib_dir + 'flat.fits')
+    ## Copy flight from previous night if twilight exposures
+    ## are a little saturated.
+    #shutil.copyfile(root_dir + '../../20210430/sta/reduce/calib/flat_bin1.fits', calib_dir + 'flat.fits')
+    
+    ## assuming these aren't overexposed
+    flat_num = np.arange(59, 70+1)
+    flat_frames = ['{0:s}twi_{1:03d}.fits'.format(twi_dir, ss) for ss in flat_num]
+    #reduce_STA.treat_overscan(flat_frames)
+    scan_flat_frames = ['{0:s}twi_{1:03d}_scan.fits'.format(twi_dir, ss) for ss in flat_num]
+  
+    calib.makeflat(scan_flat_frames, None, calib_dir + 'flat.fits', darks=False)
 
-    # Lets also make a mask to use when we call find_stars.
-    # This mask tells us where not to search for stars.
-    # UPDATE: mask_min and mask_max were hand calculated 6/14/2021
+    ## Lets also make a mask to use when we call find_stars.
+    ## This mask tells us where not to search for stars.
+    ## UPDATE: mask_min and mask_max were hand calculated 6/14/2021
     calib.make_mask(calib_dir + 'flat.fits', calib_dir + 'mask.fits',
                        mask_min=0.5, mask_max=1.8,
                        left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
-    
     return
 
 
@@ -79,7 +83,7 @@ def make_sky():
 
     util.mkdir(sky_dir)
 
-    sky_num = np.arange(97, 101+1)
+    sky_num = np.arange(1, 8+1)
     sky_frames = ['{0:s}sky_{1:03d}_o.fits'.format(data_dir, ss) for ss in sky_num]
     reduce_STA.treat_overscan(sky_frames)
 
@@ -94,8 +98,8 @@ def reduce_fld2():
     util.mkdir(out_dir)
 
     # Loop through all the different data sets and reduce them.
-    # for key in ['doczskycl']:
     for key in dict_suffix.keys():
+    #for key in ['doczskycl']:
         
         img = dict_images[key]
         suf = dict_suffix[key]
@@ -118,10 +122,9 @@ def reduce_fld2():
 
 
 def find_stars_fld2():
-    ## Loop through all the different data sets and reduce them.
-    # for key in ['docz']:
+    # Loop through all the different data sets and reduce them.
     for key in dict_suffix.keys():
-        
+
         img = dict_images[key]
         suf = dict_suffix[key]
         sky = dict_skies[key]
@@ -130,11 +133,11 @@ def find_stars_fld2():
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
         print('      Sky: ', sky)
-        
+
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
         reduce_fli.find_stars(img_files, fwhm=fwhm, threshold=6, N_passes=2, plot_psf_compare=False,
                               mask_file=calib_dir+'mask.fits')
-        
+                          
     return
 
 
@@ -151,6 +154,7 @@ def calc_star_stats():
         
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
         stats_file = stats_dir + 'stats_' + key + '.fits'
+        
         reduce_fli.calc_star_stats(img_files, output_stats=stats_file)
         moffat.fit_moffat(img_files, stats_file, flux_percent=0.2)
 
@@ -185,10 +189,9 @@ def append_massdimm():
 
 
 def stack():
-
     util.mkdir(stacks_dir)
 
-    # Loop through all the different data sets and reduce them.
+    ## Loop through all the different data sets and reduce them.
     for key in dict_suffix.keys():
         img = dict_images[key]
         suf = dict_suffix[key]
