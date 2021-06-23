@@ -173,6 +173,12 @@ def find_stars_fld2():
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
         redu.find_stars(img_files, fwhm=fwhm, threshold=3, N_passes=2, plot_psf_compare=False,
                               mask_file=calib_dir+'mask.fits')
+
+    # DEBUG - single threaded
+    # fmt = '{dir}sta{img:03d}{suf:s}_scan_clean.fits'
+    # image_file = fmt.format(dir=out_dir, img=dict_images['LS_c'][0], suf=dict_suffix['LS_c'][0]) 
+    # redu.find_stars_single(image_file, dict_fwhm['LS_c'], 3, 2, False, calib_dir + 'mask.fits')
+        
                           
     return
 
@@ -193,14 +199,12 @@ def calc_star_stats():
         redu.calc_star_stats(img_files, output_stats=stats_file)
         moffat.fit_moffat(img_files, stats_file, flux_percent=0.2)
 
-        # stats1 = table.Table.read(stats_file)
-        # redu.add_frame_number_column(stats1)
-        # stats1.write(stats_file, overwrite=True)
 
-        # stats_file_mdp = stats_file.replace('.fits', '_mdp.fits')
-        # stats2 = table.Table.read(stats_file_mdp)
-        # redu.add_frame_number_column(stats1)
-        # stats2.write(stats_file_mdp, overwrite=True)
+    # DEBUG - single threaded
+    # fmt = '{dir}sta{img:03d}{suf:s}_scan_clean.fits'
+    # image_file = fmt.format(dir=out_dir, img=dict_images['LS_c'][0], suf=dict_suffix['LS_c'][0])
+    # stats_file = stats_dir + 'stats_LS_c.fits'
+    # redu.calc_star_stats(image_file, stats_file, flux_percent=0.2)
         
 
     return
@@ -257,14 +261,14 @@ def analyze_stacks():
         print('     Fwhm: ', str(fwhm))
 
         image_file = [stacks_dir + 'fld2_stack_' + suf + '.fits']
-        all_images.append(image_file)
+        all_images.append(image_file[0])
         
-        # redu.find_stars(image_file, fwhm=fwhm, threshold=3, N_passes=2, plot_psf_compare=False,
-        #                       mask_file=calib_dir + 'mask.fits')
+        redu.find_stars(image_file, fwhm=fwhm, threshold=3, N_passes=2, plot_psf_compare=False,
+                              mask_file=calib_dir + 'mask.fits')
 
     # Calc stats on all the stacked images
     out_stats_file = stats_dir + 'stats_stacks.fits'
-    # redu.calc_star_stats(all_images, output_stats=out_stats_file)
+    redu.calc_star_stats(all_images, output_stats=out_stats_file)
     moffat.fit_moffat(all_images, out_stats_file, flux_percent=0.2)
 
     # DEBUG - single threaded
