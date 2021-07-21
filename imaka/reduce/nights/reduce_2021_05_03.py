@@ -1,3 +1,7 @@
+## reduce_2021_05_03.py
+## edited by Eden McEwen
+## June 2021
+
 import numpy as np
 from astropy.io import fits
 from astropy import table
@@ -39,7 +43,6 @@ dict_images = {'open':      [8, 10, 13, 15, 18, 20, 23, 25, 28, 30, 35, 40, 42, 
                'docz':      [9, 14, 19, 24, 29, 34, 41, 46, 51],
                'docm':      [11, 16, 21, 26, 31, 36, 43, 48, 53]}
 
-# These don't exist yet... make some temp files with zeros.
 dict_skies = {'open':      'fld2_sky.fits',
               'LS':        'fld2_sky.fits',
               'docz':      'fld2_sky.fits',
@@ -61,12 +64,12 @@ def make_flat():
     flat_frames = ['{0:s}twi_{1:03d}.fits'.format(twi_dir, ss) for ss in flat_num] # file list
     
     ## STA: needs to deal with overscan
-    #reduce_STA.treat_overscan(flat_frames) # run once
+    reduce_STA.treat_overscan(flat_frames) # run once
     
     scan_flat_frames = ['{0:s}twi_{1:03d}_scan.fits'.format(twi_dir, ss) for ss in flat_num] # new file list
 
     ## Main Function
-    #calib.makeflat(scan_flat_frames, None, calib_dir + 'flat.fits', darks=False)
+    calib.makeflat(scan_flat_frames, None, calib_dir + 'flat.fits', darks=False)
 
     ## Lets also make a mask to use when we call find_stars.
     ## This mask tells us where not to search for stars.
@@ -94,7 +97,7 @@ def reduce_fld2():
 
     util.mkdir(out_dir)
 
-    # Loop through all the different data sets and reduce them.
+    ## Loop through all the different data sets and reduce them.
     for key in dict_suffix.keys():
         
         img = dict_images[key]
@@ -118,10 +121,10 @@ def reduce_fld2():
 
 
 def find_stars_fld2():
-    # Loop through all the different data sets and reduce them.
-    # for key in dict_suffix.keys():
+    ## Loop through all the different data sets
+    #for key in dict_suffix.keys():
     #for key in ['docz']:
-    for key in ['open', 'LS', 'docm']:
+    for key in ['LS', 'docm']:
         img = dict_images[key]
         suf = dict_suffix[key]
         sky = dict_skies[key]
@@ -150,7 +153,8 @@ def calc_star_stats():
         
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
         stats_file = stats_dir + 'stats_' + key + '.fits'
-        reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
+        
+        reduce_fli.calc_star_stats(img_files, output_stats=stats_file)
         moffat.fit_moffat(img_files, stats_file, flux_percent=0.2)
 
     return
@@ -161,44 +165,43 @@ def append_massdimm():
     date_str = root_dir[date_str_start:date_str_start+8]
     print(f'Fetching MASS/DIMM for {date_str}')
 
-    massdimm.fetch_data('20210429', massdimm_dir)
+    massdimm.fetch_data(date_str, massdimm_dir)
     stats_tables = glob.glob(root_dir + 'reduce/stats/stats*.fits')
 
     for stats in stats_tables:
         if 'mdp.fits' not in stats:
             print('Adding MASS/DIMM to ' + stats)
-            massdimm.append_mass_dimm(stats, massdimm_dir)
+            try:
+                massdimm.append_mass_dimm(stats, massdimm_dir)
+            except Exception as e:
+                print(" => ERROR with " + stats)
+                print(" => ", e)
         else:
             print('Skipping ' + stats)
-
-    return
+    return None
 
 
 def stack():
-
     util.mkdir(stacks_dir)
 
-    # Loop through all the different data sets and reduce them.
+    ## Loop through all the different data sets
     for key in dict_suffix.keys():
         img = dict_images[key]
         suf = dict_suffix[key]
-        sky = dict_skies[key]
-        fwhm = dict_fwhm[key]
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
-        print('      Sky: ', sky)
         
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
         starlists = [out_dir + 'sta{img:03d}{suf:s}_scan_clean_stars.txt'.format(img=ii, suf=suf) for ii in img]
         output_root = stacks_dir + 'fld2_stack_' + suf
-        reduce_fli.shift_and_add(img_files, starlists, output_root, method='mean')
+        redu.shift_and_add(img_files, starlists, output_root, method='mean')
         
     return
 
 
 def analyze_stacks():
-    # Loop through all the different data sets and reduce them.
+    ## Loop through all the different data sets
     all_images = []
     for key in dict_suffix.keys():
         img = dict_images[key]
@@ -210,17 +213,17 @@ def analyze_stacks():
         print('     Fwhm: ', str(fwhm))
 
         image_file = [stacks_dir + 'fld2_stack_' + suf + '.fits']
-        all_images.append(image_file)
+        all_images.append(image_file[0])
         
-        # reduce_fli.find_stars(image_file, fwhm=fwhm, threshold=3, N_passes=2, plot_psf_compare=False,
-        #                       mask_file=calib_dir + 'mask.fits')
+        reduce_fli.find_stars(image_file, fwhm=fwhm, threshold=3, N_passes=2, plot_psf_compare=False,
+                               mask_file=calib_dir + 'mask.fits')
 
-    # Calc stats on all the stacked images
+    ## Calc stats on all the stacked images
     out_stats_file = stats_dir + 'stats_stacks.fits'
-    # reduce_fli.calc_star_stats(all_images, output_stats=out_stats_file)
+    reduce_fli.calc_star_stats(all_images, output_stats=out_stats_file)
     moffat.fit_moffat(all_images, out_stats_file, flux_percent=0.2)
 
-    # DEBUG - single threaded
+    ## DEBUG - single threaded
     # image_file = stacks_dir + 'fld2_stack_' + dict_suffix['open'] + '.fits'
     # reduce_fli.find_stars_single(image_file, dict_fwhm['open'], 3, 2, False, calib_dir + 'mask.fits')        
 

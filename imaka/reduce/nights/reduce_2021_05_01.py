@@ -1,3 +1,7 @@
+## reduce_2021_05_01.py
+## edited by Eden McEwen
+## June 2021
+
 import numpy as np
 from astropy.io import fits
 from astropy import table
@@ -50,15 +54,6 @@ dict_images = {'open':      [73, 75, 78, 80, 83, 85, 88, 90, 93, 95, 103, 105, 1
 dict_skies = {'open':      'fld2_sky.fits',
               'LS':        'fld2_sky.fits',
               'docz':      'fld2_sky.fits',
-<<<<<<< HEAD
-              'doczskycl': 'fld2_sky.fits'}
-
-# all bin 1
-dict_fwhm = {'open': 14,
-             'LS':   6,
-             'docz': 6,
-             'doczskycl': 6}
-=======
               'doczskycl': 'fld2_sky.fits',
               'z10glao': 'fld2_sky.fits',
               'z10scao': 'fld2_sky.fits'
@@ -70,9 +65,7 @@ dict_fwhm = {'open': 12,
              'doczskycl': 5,
              'z10glao': 5,
              'z10scao': 5
-            }
->>>>>>> ccfaf181eb56310de080e8e0a2249198e6823663
-    
+            }   
 
 def make_flat(): 
     """
@@ -81,13 +74,13 @@ def make_flat():
     """
     util.mkdir(calib_dir)
     
-    # Copy flight from previous night because twilight exposures
-    # were a little saturated.
+    ## Copy flight from previous night because twilight exposures
+    ## were a little saturated.
     shutil.copyfile(root_dir + '../../20210430/sta/reduce/calib/flat_bin1.fits', calib_dir + 'flat.fits')
 
-    # Lets also make a mask to use when we call find_stars.
-    # This mask tells us where not to search for stars.
-    # UPDATE: mask_min and mask_max were hand calculated 6/14/2021
+    ## Lets also make a mask to use when we call find_stars.
+    ## This mask tells us where not to search for stars.
+    ## UPDATE: mask_min and mask_max were hand calculated 6/14/2021
     calib.make_mask(calib_dir + 'flat.fits', calib_dir + 'mask.fits',
                        mask_min=0.5, mask_max=1.8,
                        left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
@@ -113,7 +106,7 @@ def reduce_fld2():
 
     util.mkdir(out_dir)
 
-    # Loop through all the different data sets and reduce them.
+    ## Loop through all the different data sets and reduce them.
     # for key in ['doczskycl']:
     for key in dict_suffix.keys():
         
@@ -138,11 +131,7 @@ def reduce_fld2():
 
 
 def find_stars_fld2():
-<<<<<<< HEAD
-    ## Loop through all the different data sets and reduce them.
-=======
     # Loop through all the different data sets and reduce them.
->>>>>>> ccfaf181eb56310de080e8e0a2249198e6823663
     # for key in ['docz']:
     for key in dict_suffix.keys():
         
@@ -156,12 +145,8 @@ def find_stars_fld2():
         print('      Sky: ', sky)
         
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
-<<<<<<< HEAD
-        reduce_fli.find_stars(img_files, fwhm=fwhm, threshold=6, N_passes=2, plot_psf_compare=False,
-                              mask_file=calib_dir+'mask.fits')
-        
-=======
-        redu.find_stars(img_files, fwhm=fwhm, threshold=3, N_passes=2, plot_psf_compare=False,
+
+        redu.find_stars(img_files, fwhm=fwhm, threshold=6, N_passes=2, plot_psf_compare=False,
                               mask_file=calib_dir+'mask.fits')
         
     # DEBUG - single threaded
@@ -169,7 +154,6 @@ def find_stars_fld2():
     # image_file = fmt.format(dir=out_dir, img=dict_images['LS_c'][0], suf=dict_suffix['LS_c'][0]) 
     # redu.find_stars_single(image_file, dict_fwhm['LS_c'], 3, 2, False, calib_dir + 'mask.fits')
                           
->>>>>>> ccfaf181eb56310de080e8e0a2249198e6823663
     return
 
 
@@ -186,22 +170,8 @@ def calc_star_stats():
         
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
         stats_file = stats_dir + 'stats_' + key + '.fits'
-<<<<<<< HEAD
-        reduce_fli.calc_star_stats(img_files, output_stats=stats_file)
+        redu.calc_star_stats(img_files, output_stats=stats_file)
         moffat.fit_moffat(img_files, stats_file, flux_percent=0.2)
-
-        # stats1 = table.Table.read(stats_file)
-        # reduce_fli.add_frame_number_column(stats1)
-        # stats1.write(stats_file, overwrite=True)
-
-        # stats_file_mdp = stats_file.replace('.fits', '_mdp.fits')
-        # stats2 = table.Table.read(stats_file_mdp)
-        # reduce_fli.add_frame_number_column(stats1)
-        # stats2.write(stats_file_mdp, overwrite=True)
-=======
-        reduce_STA.calc_star_stats(img_files, output_stats=stats_file)
-        moffat.fit_moffat(img_files, stats_file, flux_percent=0.2)
->>>>>>> ccfaf181eb56310de080e8e0a2249198e6823663
 
     # DEBUG - single threaded
     # fmt = '{dir}sta{img:03d}{suf:s}_scan_clean.fits'
@@ -216,18 +186,18 @@ def append_massdimm():
     date_str_start = root_dir.index('20')
     date_str = root_dir[date_str_start:date_str_start+8]
     print(f'Fetching MASS/DIMM for {date_str}')
-<<<<<<< HEAD
-    
-=======
 
->>>>>>> ccfaf181eb56310de080e8e0a2249198e6823663
     massdimm.fetch_data(date_str, massdimm_dir)
     stats_tables = glob.glob(root_dir + 'reduce/stats/stats*.fits')
 
     for stats in stats_tables:
         if 'mdp.fits' not in stats:
             print('Adding MASS/DIMM to ' + stats)
-            massdimm.append_mass_dimm(stats, massdimm_dir)
+            try:
+                massdimm.append_mass_dimm(stats, massdimm_dir)
+            except Exception as e:
+                print(" => ERROR with " + stats)
+                print(" => ", e)
         else:
             print('Skipping ' + stats)
 
@@ -255,11 +225,7 @@ def stack():
 
 
 def analyze_stacks():
-<<<<<<< HEAD
-    ## Loop through all the different data sets and reduce them.
-=======
     # Loop through all the different data sets and reduce them.
->>>>>>> ccfaf181eb56310de080e8e0a2249198e6823663
     all_images = []
     for key in dict_suffix.keys():
         img = dict_images[key]
@@ -271,23 +237,8 @@ def analyze_stacks():
         print('     Fwhm: ', str(fwhm))
 
         image_file = [stacks_dir + 'fld2_stack_' + suf + '.fits']
-        all_images.append(image_file)
+        all_images.append(image_file[0])
         
-<<<<<<< HEAD
-        # reduce_fli.find_stars(image_file, fwhm=fwhm, threshold=3, N_passes=2, plot_psf_compare=False,
-        #                       mask_file=calib_dir + 'mask.fits')
-
-    ## Calc stats on all the stacked images
-    out_stats_file = stats_dir + 'stats_stacks.fits'
-    # reduce_fli.calc_star_stats(all_images, output_stats=out_stats_file)
-    moffat.fit_moffat(all_images, out_stats_file, flux_percent=0.2)
-
-    ## DEBUG - single threaded
-    # image_file = stacks_dir + 'fld2_stack_' + dict_suffix['open'] + '.fits'
-    # reduce_fli.find_stars_single(image_file, dict_fwhm['open'], 3, 2, False, calib_dir + 'mask.fits')        
-
-    return
-=======
         redu.find_stars(image_file, fwhm=fwhm, threshold=3, N_passes=2, plot_psf_compare=False,
                               mask_file=calib_dir + 'mask.fits')
 
@@ -301,5 +252,3 @@ def analyze_stacks():
     # redu.find_stars_single(image_file, dict_fwhm['open'], 3, 2, False, calib_dir + 'mask.fits')        
 
     return
-
->>>>>>> ccfaf181eb56310de080e8e0a2249198e6823663
