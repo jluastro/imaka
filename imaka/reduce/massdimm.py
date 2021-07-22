@@ -111,8 +111,9 @@ class DIMM(object):
 
             ## Make sure we aren't off by more than an hour
             if timeDiff[closestIndex] > 1.0:
-                print('Could not find MASS data close to ', item) 
-                closestVal = -1.
+                print('Could not find MASS seeing data close to ', item) 
+                closestValShape= np.array(self.seeing[closestIndex]).shape
+                closestVal = np.full(closestValShape, -1)
             else:
                 closestVal = self.seeing[closestIndex]
 
@@ -180,8 +181,9 @@ class MASS(object):
 
             ## Make sure we aren't off by more than an hour
             if timeDiff[closestIndex] > 1.0:
-                print('Could not find MASS data close to ', item) 
-                closestVal = -1.
+                print('Could not find MASS free_seeing data close to ', item) 
+                closestValShape= np.array(self.free_seeing[closestIndex]).shape
+                closestVal = np.full(closestValShape, -1)
             else:
                 closestVal = self.free_seeing[closestIndex]
 
@@ -252,8 +254,9 @@ class MASSPROF(object):
 
             ## Make sure we aren't off by more than an hour
             if timeDiff[closestIndex] > 1.0:
-                print('Could not find MASS data close to ', item) 
-                closestVal = -1.
+                print('Could not find MASS profs data close to ', item) 
+                closestValShape= np.array(self.profs[closestIndex]).shape
+                closestVal = np.full(closestValShape, -1)
             else:
                 closestVal = self.profs[closestIndex]
 
