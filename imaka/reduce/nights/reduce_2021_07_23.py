@@ -1,7 +1,9 @@
-## reduce_2021_07_22.py
+## reduce_2021_07_23.py
 ##########################
 ## edited by Eden McEwen
 ## July 2021
+## NOTE: no science images for this night
+## Primarily flats and darks testing
 
 import numpy as np
 from astropy.io import fits
@@ -21,22 +23,25 @@ from imaka.reduce import reduce_STA
 import matplotlib
 # matplotlib.use('Agg')
 
-root_dir = '/g/lu/data/imaka/onaga/20210501/sta/'
+root_dir = '/g/lu/data/imaka/onaga/20210723/sta/'
+
+data_dir = root_dir + 'Fld2/'
+twi_dir = root_dir + 'twilights/'
+cal_dir = root_dir + 'calunit/'
+dome_dir = root_dir + 'dome/'
+dark_dir = root_dir + 'dark/'
 
 sky_dir = root_dir + 'reduce/sky/' 
-data_dir = root_dir + 'Fld2/'
 calib_dir = root_dir + 'reduce/calib/'
 out_dir = root_dir + 'reduce/Fld2/'
 stats_dir = root_dir +'reduce/stats/'
 stacks_dir = root_dir + 'reduce/stacks/'
-twi_dir = root_dir + 'twilights/'
 massdimm_dir = root_dir + 'reduce/massdimm/'
 
 ## Junk files -- see logs
-## 62, 60 -- old docz
-## cmat 0: LS same all night
-## cmat 1: zonal (changed after frame 59)
-## cmat 2: modal
+## 3-7, 8-12 -- old docz
+## 28, 29-33, 34 -- tests
+## 99 overcopied
 
 dict_suffix = {'open': '_o',
                'LS': 'LS_c',
@@ -77,22 +82,20 @@ dict_fwhm = {'open': 12,
 def make_flat(): 
     """
     Makes flat and data mask. 
+    Just for single filter I band
     """
     util.mkdir(calib_dir)
     
-    ## Copy flat from a previous night
-    #shutil.copyfile(root_dir + '../../20210430/sta/reduce/calib/flat_bin1.fits', calib_dir + 'flat.fits')
-    
-    ## Creating flat from range
-    flat_num = np.arange(59, 70+1)
-    flat_frames = ['{0:s}twi_{1:03d}.fits'.format(twi_dir, ss) for ss in flat_num]
-    scan_flat_frames = ['{0:s}twi_{1:03d}_scan.fits'.format(twi_dir, ss) for ss in flat_num]
+    ## Creating flat from range, I band only, 60 seconds
+    flat_num = np.arange(37, 49+1)
+    flat_frames = ['{0:s}dome_{1:03d}.fits'.format(dome_dir, ss) for ss in flat_num]
+    scan_flat_frames = ['{0:s}dome_{1:03d}_scan.fits'.format(dome_dir, ss) for ss in flat_num]
     
     reduce_STA.treat_overscan(flat_frames)
-    calib.makeflat(scan_flat_frames, None, calib_dir + 'flat.fits', darks=False)
+    calib.makeflat(scan_flat_frames, None, calib_dir + 'domeflat_I.fits', darks=False)
 
     ## Make a mask to use when calling find_stars.
-    calib.make_mask(calib_dir + 'flat.fits', calib_dir + 'mask.fits',
+    calib.make_mask(calib_dir + 'domeflat_I.fits', calib_dir + 'mask.fits',
                        mask_min=0.5, mask_max=1.8,
                        left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
     
@@ -278,29 +281,24 @@ def analyze_stacks():
 ###############################################
 
 """
-Notes on rotation from log:
+Notes on rotation from 07_23 log:
 POS 1
-at frame 61:  I(NW), V(SW), B(SE), R(NE)  (IRBV)
-POS 2
-at frame 82:  V(NW), I(NE), R(SE), B(SW)  (VIRB)
-POS 3
-at frame 106: B(NW), V(NE), I (SE), R(SW) (BVIR)
+at frame 65:  R(NW), I(NE), V(SE), B(SW) (RIVB)
 """
 
-## Splitting the initial dictonary keys above means they don't need to be again split here.
-## Intentionally redundant here
+## Since we weren't able to observe, only flat function used
 
 filters = ['B', 'V', 'R', 'I']
 
 # Open
-rot_1_o = [65, 67, 70, 79, 81]      # key: o_4F_1
-rot_2_o = [83, 85, 87, 89, 91, 93]  # key: o_4F_2
-rot_3_o = [107, 109, 111, 113, 115] # key: o_4F_3
+rot_1_o = []      # key: o_4F_1
+rot_2_o = []  # key: o_4F_2
+rot_3_o = [] # key: o_4F_3
 
 # Closed
-rot_1_c = [61, 64, 66, 69, 78, 80]  # key: c_4F_1
-rot_2_c = [82, 84, 86, 88, 90, 92]  # key: c_4F_2
-rot_3_c = [106, 108, 110, 112, 114] # key: c_4F_3
+rot_1_c = []  # key: c_4F_1
+rot_2_c = []  # key: c_4F_2
+rot_3_c = [] # key: c_4F_3
 
 rot_o_4 = rot_1_o + rot_2_o + rot_3_o
 rot_c_4 = rot_1_c + rot_2_c + rot_3_c
@@ -328,6 +326,49 @@ dict_orders_rot = {'o_4F_1': 'IRBV',
                   'c_4F_1': 'IRBV',
                   'c_4F_2': 'VIRB',
                   'c_4F_3': 'BVIR'}
+
+def make_flat_filter(): 
+    """
+    Makes flat and data mask. 
+    For four filter, dome flat was made with two integration times, 20(2) for BVR 60(45) for I
+    """
+    util.mkdir(calib_dir)
+    
+    ## I quad flat (60)
+    dark_num = np.arange(108, 113+1)
+    flat_num = np.arange(130, 135+1)
+    dark_frames = ['{0:s}dark_{1:03d}.fits'.format(dark_dir, ss) for ss in dark_num]
+    scan_dark_frames = ['{0:s}dark_{1:03d}_scan.fits'.format(dark_dir, ss) for ss in dark_num]
+    flat_frames = ['{0:s}dome_{1:03d}.fits'.format(dome_dir, ss) for ss in flat_num]
+    scan_flat_frames = ['{0:s}dome_{1:03d}_scan.fits'.format(dome_dir, ss) for ss in flat_num]
+    
+    reduce_STA.treat_overscan(dark_frames)
+    reduce_STA.treat_overscan(flat_frames)
+    calib.makeflat(scan_flat_frames, scan_dark_frames, calib_dir + 'domeflat_60.fits', darks=True, fourfilter=True)
+    
+    ## BVR quad flat (20)
+    dark_num = np.arange(118, 123+1)
+    flat_num = np.arange(124, 129+1)
+    dark_frames = ['{0:s}dark_{1:03d}.fits'.format(dark_dir, ss) for ss in dark_num]
+    scan_dark_frames = ['{0:s}dark_{1:03d}_scan.fits'.format(dark_dir, ss) for ss in dark_num]
+    flat_frames = ['{0:s}dome_{1:03d}.fits'.format(dome_dir, ss) for ss in flat_num]
+    scan_flat_frames = ['{0:s}dome_{1:03d}_scan.fits'.format(dome_dir, ss) for ss in flat_num]
+    
+    reduce_STA.treat_overscan(dark_frames)
+    reduce_STA.treat_overscan(flat_frames)
+    calib.makeflat(scan_flat_frames, scan_dark_frames, calib_dir + 'domeflat_20.fits', darks=True, fourfilter=True)
+    
+    # Combining two flats based on filter orientation
+    filt_order = "RIVB"
+    calib.combine_filter_flat(calib_dir + 'domeflat_60.fits', calib_dir + 'domeflat_20.fits', calib_dir + f'flat_{filt_order}.fits', filt_order)
+    
+    
+    ## Make a mask to use when calling find_stars.
+    #calib.make_mask(calib_dir + 'domeflat_60.fits', calib_dir + 'mask_60.fits',
+    #                   mask_min=0.5, mask_max=1.8,
+    #                   left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
+    
+    return
 
 
 def split_filters():
