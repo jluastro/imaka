@@ -1,9 +1,8 @@
 ## reduce_2021_08_27.py
 ##########################
 ## edited by Eden McEwen
-## July 2021
-## NOTE: no science images for this night
-## Primarily flats and darks testing
+## August 2021
+## A four filter run
 
 import numpy as np
 from astropy.io import fits
@@ -39,28 +38,37 @@ stacks_dir = root_dir + 'reduce/stacks/'
 massdimm_dir = root_dir + 'reduce/massdimm/'
 
 ## Junk files -- see logs
+## 22 - spots jumped
 
-dict_suffix = {'open': '_o',
-               'LS': 'LS_c',
-               'docz': 'docz2_c',
-               'doczskycl': 'doczskycl_c'}
+dict_suffix = {'open_IVBR': '_o',
+               'LS_IVBR':   'LS_c',
+               'docz_IVBR': 'docz2_c',
+               'open_RIVB': '_o',
+               'LS_RIVB':   'LS_c',
+               'docz_RIVB': 'docz2_c'}
 
-dict_images = {'open':      [],
-               'LS':        [],
-               'docz':      [],
-               'doczskycl': []
+dict_images = {'open_IVBR':  [15, 18, 21, 24, 27, 30, 33, 43, 46],
+               'LS_IVBR':    [10, 11, 13, 16, 19, 25, 28, 31, 41, 44],
+               'docz_IVBR':  [14, 17, 20, 23, 26, 29, 32, 42, 45],
+               'open_RIVB':  [49, 52, 55, 58, 61, 64, 67],
+               'LS_RIVB':    [47, 50, 53, 56, 59, 62, 65],
+               'docz_RIVB':  [48, 51, 54, 57, 60, 63, 66]
               }
 
-dict_skies = {'open':      'fld2_sky.fits',
-              'LS':        'fld2_sky.fits',
-              'docz':      'fld2_sky.fits',
-              'doczskycl': 'fld2_sky.fits'
+dict_filt = {'open_IVBR': 'IVBR',
+             'LS_IVBR':   'IVBR',
+             'docz_IVBR': 'IVBR',
+             'open_RIVB': 'RIVB',
+             'LS_RIVB':   'RIVB',
+             'docz_RIVB': 'RIVB'
               }
 
-dict_fwhm = {'open': 12,
-             'LS': 5,
-             'docz': 5,
-             'doczskycl': 5
+dict_fwhm = {'open_IVBR': 12,
+             'LS_IVBR': 5,
+             'docz_IVBR': 5,
+             'open_RIVB': 12,
+             'LS_RIVB': 5,
+             'docz_RIVB': 5
             }  
 
 ###############################################
@@ -76,18 +84,22 @@ def make_flat():
     util.mkdir(calib_dir)
     
     ## Copy flat from a previous night
-    shutil.copyfile(root_dir + '../../20210723/sta/reduce/calib/domeflat_I.fits', calib_dir + 'flat_I.fits')
+    shutil.copyfile(root_dir + '../../20210724/sta/reduce/calib/flat_IVBR.fits', calib_dir + 'flat_IVBR.fits')
+    shutil.copyfile(root_dir + '../../20210723/sta/reduce/calib/flat_RIVB.fits', calib_dir + 'flat_RIVB.fits')
     
     ## Creating flat from range, I band only
     #flat_num = np.arange(37, 49+1)
     #flat_frames = ['{0:s}dome_{1:03d}.fits'.format(dome_dir, ss) for ss in flat_num]
     #scan_flat_frames = ['{0:s}dome_{1:03d}_scan.fits'.format(dome_dir, ss) for ss in flat_num]
-    
     #reduce_STA.treat_overscan(flat_frames)
     #calib.makeflat(scan_flat_frames, None, calib_dir + 'domeflat_I.fits', darks=False)
 
     ## Make a mask to use when calling find_stars.
-    calib.make_mask(calib_dir + 'domeflat_I.fits', calib_dir + 'mask.fits',
+    calib.make_mask(calib_dir + 'flat_IVBR.fits', calib_dir + 'mask_IVBR.fits',
+                       mask_min=0.5, mask_max=1.8,
+                       left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
+    
+    calib.make_mask(calib_dir + 'flat_RIVB.fits', calib_dir + 'mask_RIVB.fits',
                        mask_min=0.5, mask_max=1.8,
                        left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
     
@@ -98,12 +110,23 @@ def make_sky():
 
     util.mkdir(sky_dir)
 
-    sky_num = np.arange(97, 101+1)
+    ## COPY A SKY => use a dark
+    # shutil.copyfile(root_dir + '../../20210724/sta/dark/dark_044_scan.fits', sky_dir + 'fld2_sky_tmp.fits')
+    
+    ## CREATING A SKY
+    ## IVBR
+    #sky_num = np.arange(34, 40+1)
+    #sky_frames = ['{0:s}sky_{1:03d}_o.fits'.format(data_dir, ss) for ss in sky_num]
+    #scan_sky_frames =  ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num]
+    #reduce_STA.treat_overscan(sky_frames)
+    #calib.makedark(scan_sky_frames, sky_dir + 'fld2_sky_IVBR.fits')
+    
+    ## RIVB
+    sky_num = np.arange(68, 74+1)
     sky_frames = ['{0:s}sky_{1:03d}_o.fits'.format(data_dir, ss) for ss in sky_num]
     scan_sky_frames =  ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num]
-    
     reduce_STA.treat_overscan(sky_frames)
-    #calib.makedark(scan_sky_frames, sky_dir + 'fld2_sky.fits')
+    calib.makedark(scan_sky_frames, sky_dir + 'fld2_sky_RIVB.fits')
     
     return
 
@@ -113,24 +136,24 @@ def reduce_fld2():
     util.mkdir(out_dir)
 
     ## Loop through all the different data sets and reduce them.
-    #for key in ['set_name']: ## Single key setup
-    for key in dict_suffix.keys():
+    for key in ['open_IVBR', 'LS_IVBR', 'docz_IVBR']: ## Single key setup
+    #for key in dict_suffix.keys():
         
         img = dict_images[key]
         suf = dict_suffix[key]
-        sky = dict_skies[key]
+        filt = dict_filt[key]
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
-        print('      Sky: ', sky)
+        print('   Filter: ', filt)
         
         img_files = [data_dir + 'sta{img:03d}{suf:s}.fits'.format(img=ii, suf=suf) for ii in img]
         scn_files = [data_dir + 'sta{img:03d}{suf:s}_scan.fits'.format(img=ii, suf=suf) for ii in img]
         
         reduce_STA.treat_overscan(img_files)
         redu.clean_images(scn_files, out_dir, rebin=1,
-                                    sky_frame=sky_dir + sky,
-                                    flat_frame=calib_dir + "flat.fits")#,
+                                    sky_frame=sky_dir + f"fld2_sky_{filt}.fits",
+                                    flat_frame=calib_dir + f"flat_{filt}.fits")#,
                                 # fix_bad_pixels=True, worry_about_edges=True)
 
     return
@@ -146,17 +169,17 @@ def find_stars_fld2():
         
         img = dict_images[key]
         suf = dict_suffix[key]
-        sky = dict_skies[key]
+        filt = dict_filt[key]
         fwhm = dict_fwhm[key]
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
-        print('      Sky: ', sky)
+        print('      filt: ', filt)
         
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
 
         redu.find_stars(img_files, fwhm=fwhm, threshold=6, N_passes=2, plot_psf_compare=False,
-                              mask_file=calib_dir+'mask.fits')
+                              mask_file=calib_dir+f'mask_{filt}.fits')
         
     ## DEBUG - single threaded
     # fmt = '{dir}sta{img:03d}{suf:s}_scan_clean.fits'
@@ -210,7 +233,7 @@ def append_massdimm():
             except Exception as e:
                 print(" => ERROR with " + stats)
                 print(" => ", e)
-        else:v
+        else:
             print('Skipping ' + stats)
 
     return
@@ -246,6 +269,7 @@ def analyze_stacks():
         img = dict_images[key]
         suf = dict_suffix[key]
         fwhm = dict_fwhm[key]
+        filt = dict_filt[key]
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
@@ -254,7 +278,7 @@ def analyze_stacks():
         image_file = [stacks_dir + 'fld2_stack_' + suf + '.fits']
         all_images.append(image_file[0])
         
-        redu.find_stars(image_file, fwhm=fwhm, threshold=3, N_passes=2, plot_psf_compare=False, mask_file=calib_dir + 'mask.fits')
+        redu.find_stars(image_file, fwhm=fwhm, threshold=3, N_passes=2, plot_psf_compare=False, mask_file=calib_dir + f'mask_{filt}.fits')
 
     ## Calc stats on all the stacked images
     out_stats_file = stats_dir + 'stats_stacks.fits'
