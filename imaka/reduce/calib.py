@@ -5,6 +5,7 @@ from astropy.stats import sigma_clip, sigma_clipped_stats
 import numpy as np
 import multiprocessing as mp
 import pdb
+import itertools
 
 module_dir = os.path.dirname(__file__)
 
@@ -83,7 +84,7 @@ def makedark(dark_files, output, rescale=None):
     
     return
 
-def makeflat(flat_files, dark_files, output_file, darks=True):
+def makeflat(flat_files, dark_files, output_file, darks=True, fourfilter=False):
     """
     Make a dark-subtracted flat field image from a stack of flats
     and a stack of darks.
@@ -156,7 +157,10 @@ def makeflat(flat_files, dark_files, output_file, darks=True):
 
     # Normalize each of the flats: in parallel
     print(f'  Normalizing each flat in parallel with {cpu_count} cores.')
-    norm_flats = pool.map(normalize_flat, [flat_ds[i] for i in range(len(flat_ds))])
+    if fourfilter:
+        norm_flats = pool.map(normalize_flat_filt, [flat_ds[i] for i in range(len(flat_ds))])
+    else:
+        norm_flats = pool.map(normalize_flat, [flat_ds[i] for i in range(len(flat_ds))])
 
     # Sigma clip  (about the median)
     print('  Sigma clipping (3 sigma, 2 iterations) about the median...')
@@ -222,4 +226,85 @@ def normalize_flat(flat_img):
     mean, median, stdev = sigma_clipped_stats(flat_img, sigma=3, maxiters=2, axis=None)
     norm = flat_img / median
     return norm
+
+def normalize_flat_filt(flat_img):
+    # Normalize by quadrant instead of whole image
+    ## TODO: smaller box for normalization
     
+    med_f = np.zeros_like(flat_img)
+    
+    # Define quadrants with indicies
+    img_half = int(flat_img.shape[0]/ 2)
+    q_edge = 1000 #0 if use all of quad in median
+    
+    # Creating a list of masks for Quadrants 
+    ind_1 = np.zeros_like(flat_img)
+    ind_1[0:img_half, 0:img_half] = 1
+    
+    inds = [(0, img_half), (img_half, img_half*2)]
+    
+    for i in itertools.product(inds, inds):
+        #smaller mask for stats
+        ind_mask = np.zeros_like(flat_img)
+        ind_mask[i[0][0]+q_edge:i[0][1]-q_edge, i[1][0]+q_edge:i[1][1]-q_edge] = 1
+        mask = ~np.array(ind_mask, dtype=bool)
+        mean, median, stdev = sigma_clipped_stats(flat_img, sigma=3, maxiters=2, axis=None, mask=mask)
+        
+        #larger mask for median
+        ind = np.zeros_like(flat_img)
+        ind[i[0][0]:i[0][1], i[1][0]:i[1][1]] = 1
+        med_f += ind*median
+        
+    norm = flat_img / med_f
+    return norm
+
+def combine_filter_flat(flat_long, flat_short, output_file, filt_order):
+    """
+    Combine flat field image for differing filters. Overwrite one quad of short flat with "I" quad from long flat
+
+    Parameters
+    ----------
+    flat_long : str
+        String of full path for make_flat output, longer exposure for I band
+    flat_short : str
+        String of full path for make_flat output, shorter exposure
+    output_file : str
+        Name (including directory) of the output flat field FITS file.
+    filt_order : str
+        BVIR order of filter, used to determine I quadrant
+    """
+    print('\nREDUCE_FLI: combine_filter_flat():')
+    
+    # Output File Names
+    _out = output_file
+    _outlis = output_file.replace('.fits', '.list')
+    util.rmall([_out, _outlis])
+    
+    # Read in the flat images
+    print('  Reading in flat files...')
+    flat_long_data = np.array(fits.getdata(flat_long))
+    flat_short_data = np.array(fits.getdata(flat_short))
+    
+    if flat_long_data.shape != flat_short_data.shape:
+        print("ERROR: flats not the same size")
+    
+    # Define quadrants with indicies
+    img_half = int(flat_short_data.shape[0]/ 2)
+    
+    # Iterate over all filters to add to main flat
+    for i, filt in enumerate(filt_order):
+        if filt == "I":
+            row = (i//2 + 1) % 2
+            col = (i+row+1)%2 
+            r = [img_half*row, img_half*(row+1)]
+            c = [img_half*col, img_half*(col+1)]
+            flat_short_data[r[0]:r[1], c[0]:c[1]] = flat_long_data[r[0]:r[1], c[0]:c[1]]
+        else:
+            continue
+    
+    # Save the output files.
+    # Get the header from the first image.
+    hdr = fits.getheader(flat_long)
+    fits.writeto(_out, flat_short_data, header=hdr, overwrite=True)
+    
+    return
