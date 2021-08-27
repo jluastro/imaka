@@ -139,7 +139,7 @@ def find_stars_fld2():
         print('      Sky: ', sky)
 
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
-        redu.find_stars(img_files, fwhm=fwhm, threshold=6, N_passes=2, plot_psf_compare=False,
+        redu.find_stars(img_files, fwhm=fwhm, threshold=8, N_passes=2, plot_psf_compare=False,
                               mask_file=calib_dir+'mask.fits')
                           
     return

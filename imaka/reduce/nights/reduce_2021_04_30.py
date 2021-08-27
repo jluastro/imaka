@@ -125,8 +125,8 @@ def reduce_fld2():
     
     util.mkdir(out_dir)
 
-    ## Loop through all datasets
-    for key in dict_suffix.keys():   
+    ## Loop through all datasets for key in dict_suffix.keys():   
+    for key in [dict_suffix.keys()]:   
         bin_num = 'bin1' if 'bin1' in key else 'bin2'  # key should contain bin info
         img = dict_images[key]
         suf = dict_suffix[key]
@@ -181,6 +181,7 @@ def calc_star_stats():
         
         img = dict_images[key]
         suf = dict_suffix[key]
+        bin = 'bin1' if 'bin1' in key else 'bin2'  # key should contain bin info 
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Catalog: ', img)

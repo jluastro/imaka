@@ -63,6 +63,7 @@ dict_fwhm = {'open_30': 7,
              'LS': 3,
              'docz': 3}
 
+
 def make_flat(): 
     """
     Make a flat... this will be with dome flats for now. 

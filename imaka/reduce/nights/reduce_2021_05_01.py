@@ -60,11 +60,11 @@ dict_skies = {'open':      'fld2_sky.fits',
               }
 
 dict_fwhm = {'open': 12,
-             'LS': 5,
-             'docz': 5,
-             'doczskycl': 5,
-             'z10glao': 5,
-             'z10scao': 5
+             'LS': 6,
+             'docz': 6,
+             'doczskycl': 6,
+             'z10glao': 6,
+             'z10scao': 6
             }   
 
 def make_flat(): 
@@ -146,7 +146,7 @@ def find_stars_fld2():
         
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
 
-        redu.find_stars(img_files, fwhm=fwhm, threshold=6, N_passes=2, plot_psf_compare=False,
+        redu.find_stars(img_files, fwhm=fwhm, threshold=8, N_passes=2, plot_psf_compare=False,
                               mask_file=calib_dir+'mask.fits')
         
     # DEBUG - single threaded
