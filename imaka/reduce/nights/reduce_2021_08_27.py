@@ -136,8 +136,8 @@ def reduce_fld2():
     util.mkdir(out_dir)
 
     ## Loop through all the different data sets and reduce them.
-    for key in ['open_IVBR', 'LS_IVBR', 'docz_IVBR']: ## Single key setup
-    #for key in dict_suffix.keys():
+    #for key in ['open_RIVB', 'LS_RIVB', 'docz_RIVB']: ## Single key setup
+    for key in dict_suffix.keys():
         
         img = dict_images[key]
         suf = dict_suffix[key]
