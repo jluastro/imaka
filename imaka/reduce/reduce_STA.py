@@ -157,6 +157,176 @@ def treat_overscan_single(filename, remake):
     return
 
 
+def treat_overscan_2020_edit(files):
+    """
+    Performs bias/dark subtraction from overscan images on STA camera
+    Assumes STA 8x2 'cell' structure, each with its own overscan region
+    Works independent of image binning
+    Input: an array of files from STA camera
+    Output: writes new images with '_scan' suffix in name
+    """
+    for file in files:
+
+        # Read in data
+        print('Working on file: ', file)
+        dat, hdr = fits.getdata(file, header=True)
+
+        # Determine binning from image shape
+        binfac = util.get_bin_factor(dat, hdr)
+        #pdb.set_trace()
+
+        # Split the data vertically for the two different read-outs. Take the 
+        # bottom 8 and gang them on the end of the top 8 for easier access.
+        rows = np.vsplit(dat, 2)
+        one_row = np.hstack([rows[0], rows[1]])
+        cells = np.hsplit(one_row, 16)
+
+        # Define the 'image' and 'overscan' region 
+        # Done with fractions, so independent of binning
+        imgs = []
+        scans = []
+        clean_cells = []
+
+        orig_wid = np.shape(dat)[1]        # Width of original image
+        cell_wid = orig_wid / 8            # Width of one cell (1/8 of image)
+        scan_wid = int(120 / binfac)       # Width of overscan region (3/25 of cell)
+        data_wid = int(1440 / binfac)      # Width of data region (22/25 of cell)
+        pix_shift = 5
+        print('orig_wid = ', orig_wid)
+        print('cell_wid = ', cell_wid)
+        print('scan_wid = ', scan_wid)
+        print('data_wid = ', data_wid)
+
+        # For each cell, take the median of each overscan row and 
+        # subtract that from the corresponding row in the data
+        for ii in range(16):
+            ## Take each data column located between ni*dw+ow and (ni+1)*dw and put 
+            ## them next to each other in the new image
+            #img_lo = ii*data_wid + scan_wid - pix_shift
+            img_lo = ii*(data_wid + scan_wid) + pix_shift
+            #img_hi = (ii + 1)*data_wid - pix_shift
+            img_hi = img_lo + data_wid
+            #scn_lo = ii*data_wid - pix_shift
+            scn_lo = img_hi
+            if scn_lo < 0:
+                scn_lo = 0
+            scn_hi = scn_lo + scan_wid
+
+            #img = one_row[img_lo:img_hi, :]
+            #scn = one_row[scn_lo:scn_hi, :]
+            img = one_row[:, img_lo:img_hi]
+            scn = one_row[:, scn_lo:scn_hi]
+
+            med_col = np.median(scn, axis=1)
+            #med_cell = np.array([med_col,]*img.shape[0]).transpose()
+            med_cell = np.array([med_col,]*img.shape[1]).transpose()
+
+            clean_cell = img - med_cell
+            clean_cells.append(clean_cell)
+
+            #pdb.set_trace()
+            # scan, img = np.split(cells[ii], [scan_wid - pix_shift], axis=1)
+            # scans.append(scan)
+            # imgs.append(img)
+            # med_col = np.median(scan, axis=1)
+            # med_cell = np.array([med_col,]*data_wid).transpose()
+            # clean_cell = img - med_cell 
+            # clean_cells.append(clean_cell)
+
+        # Rebuild image with clean cells
+        clean_one_row = np.hstack(clean_cells)
+        pdb.set_trace()
+        clean_rows = np.hsplit(clean_one_row, 2)
+        clean_image = np.vstack(clean_rows)
+
+        # Write new image
+        new_filename = file[:-5] + '_scan.fits'
+        fits.writeto(new_filename, clean_image, hdr, overwrite=True)
+    
+    return
+
+def treat_overscan_working(files):
+    """
+    Performs bias/dark subtraction from overscan images on STA camera.
+    Assumes STA 8x2 'cell' structure, each with its own overscan region.
+    Works independent of image binning and checks image creation date
+    before applying overscan treatment.
+    Input: an array of files from STA camera
+    Output: writes new images with '_scan' suffix in name
+    """
+    
+    sta_date = datetime.strptime('2020-01-21','%Y-%m-%d')  #date of first known sky imgs taken with
+                                                           #the 5280x5760 STA cam settings 
+    for file in files:
+        
+        # Read in data and divide into 'cells'
+        print('Working on file: ', file)
+        dat, hdr = fits.getdata(file, header=True)
+        date = datetime.strptime(hdr['DATE-OBS'],'%Y-%m-%d')
+        
+        rows = np.vsplit(dat, 2)
+        one_row = np.hstack([rows[0], rows[1]])
+        cells = np.hsplit(one_row, 16)
+
+        if date >= sta_date:
+            # Define the 'image' and 'overscan' region 
+            # Done with fractions, so independent of binning
+            # print("Using post-2018 STA overscan protocol...")
+            imgs = []
+            scans = []
+            clean_cells = []
+            corr_term = 24
+
+            orig_wid = np.shape(dat)[1]             # Width of original image
+            cell_wid = int(orig_wid / 8)            # Width of one cell (1/8 of image)
+            scan_wid = int(round(cell_wid * (3/25))) - corr_term # Width of overscan region (3/25 of cell)
+            data_wid = int(round(cell_wid * (22/25))) + corr_term # Width of data region (22/25 of cell)
+            
+
+            # For each cell, split the overscan and data regions 
+            # into separate variables
+            for ii in range(16):
+                cell = cells[ii]
+                scan = cell[:,:scan_wid]
+                scans.append(scan)
+                img = cell[:,scan_wid:data_wid]
+                clean_cells.append(img)
+        else:
+            print("Using pre-2020 STA overscan protocol...")
+            # Define the 'image' and 'overscan' region 
+            # Done with fractions, so independent of binning
+            imgs = []
+            scans = []
+            clean_cells = []
+
+            orig_wid = np.shape(dat)[1]        # Width of original image
+            cell_wid = orig_wid / 8            # Width of one cell (1/8 of image)
+            scan_wid = int(round(cell_wid * (3/25)))  # Width of overscan region (3/25 of cell)
+            data_wid = int(round(cell_wid * (22/25))) # Width of data region (22/25 of cell)
+
+            # For each cell, take the median of each overscan row and 
+            # subtract that from the corresponding row in the data
+            for ii in range(16):
+                scan, img = np.split(cells[ii], [scan_wid], axis=1)
+                scans.append(scan)
+                imgs.append(img)
+                med_col = np.median(scan, axis=1)
+                med_cell = np.array([med_col,]*(data_wid)).transpose()
+                clean_cell = img - med_cell 
+                clean_cells.append(clean_cell)
+            
+        # Rebuild image with clean cells
+        clean_one_row = np.hstack(clean_cells)
+        clean_rows = np.hsplit(clean_one_row,2)
+        clean_image = np.vstack(clean_rows)
+        
+        # Write new image
+        new_filename = file[:-5] + '_scan.fits'
+        fits.writeto(new_filename, clean_image, hdr, overwrite=True)
+    
+    return
+
+
 def clean_image(image_file):
     """
     Cleans a single image.  Cleaning includes:
