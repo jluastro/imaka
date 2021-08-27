@@ -114,13 +114,10 @@ def clean_images(img_files, out_dir, rebin=1, sky_frame=None, flat_frame=None,
     ####
     # Setup for parallel processing.
     ####
-    # Use N_cpu - 2 so we leave 2 for normal operations. 
-    cpu_count = mp.cpu_count()
-    if (cpu_count > 2):
-        cpu_count -= 2
-
+    cpu_count = _cpu_num()
     # Start the pool
-    pool = mp.Pool(cpu_count)
+    #pool = mp.Pool(cpu_count)
+    pool = mp.Pool(1) ## DEBUG
     
     #####
     # Loop through the image stack
@@ -223,14 +220,11 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
     print('\nREDUCE_FLI: find_stars()')
     
     # Prepare for parallel compute.
-    # Use N_cpu - 2 so we leave 2 for normal
-    # operations. 
-    cpu_count = mp.cpu_count()
-    if (cpu_count > 2):
-        cpu_count -= 2
-
+        
+    cpu_count = _cpu_num()
     # Start the pool
     pool = mp.Pool(cpu_count)
+    #pool = mp.Pool(1) ## DEBUG
 
     # Normalize each of the flats: in parallel
     print(f'  Finding stars in parallel with {cpu_count} cores.')
@@ -380,7 +374,7 @@ def find_stars_single(img_file, fwhm, threshold, N_passes, plot_psf_compare, mas
                 cbar.set_label('% Residual')
                 plt.pause(0.05)
                 
-                pdb.set_trace()
+                #pdb.set_trace()
 
             # Save the FWHM and angle.
             x_fwhm[ss] = g2d_params.x_stddev_0.value / gaussian_fwhm_to_sigma / resamp
@@ -582,16 +576,15 @@ def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None, fourf
     ####
     # Setup for parallel processing.
     ####
-    # Use N_cpu - 2 so we leave 2 for normal operations. 
-    cpu_count = mp.cpu_count()
-    if (cpu_count > 2):
-        cpu_count -= 2
-
+    cpu_count = _cpu_num()
+    
     # Start the pool
     pool = mp.Pool(cpu_count)
+    
     results_async = []
     print(f'calc_stats in parallel with {cpu_count} cores.')
     
+    # making file names
     for ii in range(N_files):
         # Select the image file and starlist to work on
         img_file = img_files[ii]
@@ -620,6 +613,7 @@ def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None, fourf
         
 
     for ii in range(N_files):
+        #pdb.set_trace()
         results = results_async[ii].get()
         
         # Save results
@@ -655,10 +649,11 @@ def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None, fourf
                                         'NEA', 'NEA2', 'xFWHM', 'yFWHM', 'theta', 'emp_fwhm', 'emp_fwhm_std',
                                         'quadrant'),
                             meta={'name':'Stats Table', 'scale': plate_scale})
-
-    if fourfilt:
-        quad_col = Column(quadrant, name='quadrant')
-        stats.add_column(quad_col)
+    
+    ## I believe this is already covered in previous command
+    #if fourfilt:
+    #    quad_col = stats.Column(quadrant, name='quadrant')
+    #    stats.add_column(quad_col)
     
     stats['FWHM'].format = '7.3f'
     stats['FWHM_std'].format = '7.3f'
@@ -777,7 +772,7 @@ def calc_star_stats_single(img_file, starlist, is_four_filt):
     for rr in range(len(radii)):
         _ee_out.write('{0:10.2f}  {1:10.4f}\n'.format(radii[rr], enc_energy_final[rr]))
     _ee_out.close()
-
+    
     # Find the 50% and 80% EE values
     ee25_rad = radii[ np.where(enc_energy_final >= 0.25)[0][0]]
     ee50_rad = radii[ np.where(enc_energy_final >= 0.5)[0][0] ]
@@ -935,7 +930,6 @@ def shift_and_add(img_files, starlists, output_root, method='mean', clip_sigma=N
 
         ccddata_arr = []
 
-
     # Now loop through all the images and stack them.
     for ii in range(N_files):
         # Load up the image to work on.
@@ -1045,7 +1039,6 @@ def get_transforms_from_starlists(starlists):
     return trans
 
 
-
 def read_starlist(starlist):
     """
     Read in a starlist and change the column names to be useful
@@ -1059,3 +1052,16 @@ def read_starlist(starlist):
 
     return stars
 
+
+def _cpu_num():
+    # How many cores to use for parallel functions
+    # returns a number
+    # Use N_cpu - 2 so we leave 2 for normal
+    # operations. 
+    cpu_count = mp.cpu_count()
+    if (cpu_count > 2):
+        cpu_count -= 2
+        cpu_count = cpu_count if cpu_count <= 8 else 8
+        
+    # reurn 1 #(DEBUG)
+    return cpu_count
