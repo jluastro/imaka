@@ -3,6 +3,7 @@
 ## edited by Eden McEwen
 ## August 2021
 ## A four filter run
+## Did position 4 (BRIV) and position 1 (RIVB) this night
 
 import numpy as np
 from astropy.io import fits
@@ -55,9 +56,9 @@ dict_images = {'open_IVBR':  [15, 18, 21, 24, 27, 30, 33, 43, 46],
                'docz_RIVB':  [48, 51, 54, 57, 60, 63, 66]
               }
 
-dict_filt = {'open_IVBR': 'IVBR',
-             'LS_IVBR':   'IVBR',
-             'docz_IVBR': 'IVBR',
+dict_filt = {'open_IVBR': 'BRIV',
+             'LS_IVBR':   'BRIV',
+             'docz_IVBR': 'BRIV',
              'open_RIVB': 'RIVB',
              'LS_RIVB':   'RIVB',
              'docz_RIVB': 'RIVB'
@@ -84,7 +85,7 @@ def make_flat():
     util.mkdir(calib_dir)
     
     ## Copy flat from a previous night
-    shutil.copyfile(root_dir + '../../20210724/sta/reduce/calib/flat_IVBR.fits', calib_dir + 'flat_IVBR.fits')
+    shutil.copyfile(root_dir + '../../20210724/sta/reduce/calib/flat_BRIV.fits', calib_dir + 'flat_BRIV.fits')
     shutil.copyfile(root_dir + '../../20210723/sta/reduce/calib/flat_RIVB.fits', calib_dir + 'flat_RIVB.fits')
     
     ## Creating flat from range, I band only
@@ -114,19 +115,19 @@ def make_sky():
     # shutil.copyfile(root_dir + '../../20210724/sta/dark/dark_044_scan.fits', sky_dir + 'fld2_sky_tmp.fits')
     
     ## CREATING A SKY
-    ## IVBR
-    #sky_num = np.arange(34, 40+1)
-    #sky_frames = ['{0:s}sky_{1:03d}_o.fits'.format(data_dir, ss) for ss in sky_num]
-    #scan_sky_frames =  ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num]
-    #reduce_STA.treat_overscan(sky_frames)
-    #calib.makedark(scan_sky_frames, sky_dir + 'fld2_sky_IVBR.fits')
-    
-    ## RIVB
-    sky_num = np.arange(68, 74+1)
+    ## BRIV pos 4
+    sky_num = np.arange(34, 40+1)
     sky_frames = ['{0:s}sky_{1:03d}_o.fits'.format(data_dir, ss) for ss in sky_num]
     scan_sky_frames =  ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num]
     reduce_STA.treat_overscan(sky_frames)
-    calib.makedark(scan_sky_frames, sky_dir + 'fld2_sky_RIVB.fits')
+    calib.makedark(scan_sky_frames, sky_dir + 'fld2_sky_BRIV.fits')
+    
+    ## RIVB pos 1
+    #sky_num = np.arange(68, 74+1)
+    #sky_frames = ['{0:s}sky_{1:03d}_o.fits'.format(data_dir, ss) for ss in sky_num]
+    #scan_sky_frames =  ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num]
+    #reduce_STA.treat_overscan(sky_frames)
+    #calib.makedark(scan_sky_frames, sky_dir + 'fld2_sky_RIVB.fits')
     
     return
 
@@ -194,7 +195,8 @@ def calc_star_stats():
     
     ## Loop through all the different data sets
     #for key in ['set_name']: ## Single key setup
-    for key in dict_suffix.keys():
+    #for key in dict_suffix.keys():
+    for key in ['open_IVBR', 'LS_IVBR', 'docz_IVBR']:
         
         img = dict_images[key]
         suf = dict_suffix[key]
@@ -298,15 +300,10 @@ def analyze_stacks():
 
 """
 Notes on rotation from 07_23 and 07_24 log:
-POS 1
-at frame 65: R(NW), I(NE), V(SE), B(SW). (RIVB)
-POS 2
-at frame 1:  I(NW), V(NE), B(SE), R(SW). (IVBR)
-POS 3
-at frame 45: V(NW), B(NE), R(SE), I(SW). (VBRI)
-POS 4
-at frame 65: B(NW), V(SW), I(SE), R(NE). (BRIV) 
-
+POS 1: RIVB - R(NW), I(NE), V(SE), B(SW). 
+POS 2: IVBR - I(NW), V(NE), B(SE), R(SW). 
+POS 3: VBRI - V(NW), B(NE), R(SE), I(SW). 
+POS 4: BRIV - B(NW), R(NE), I(SE), V(SW). 
 """
 
 ## Splitting the initial dictonary keys above means they don't need to be again split here.

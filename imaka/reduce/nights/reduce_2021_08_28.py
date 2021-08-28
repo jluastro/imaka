@@ -22,7 +22,8 @@ from imaka.reduce import reduce_STA
 import matplotlib
 # matplotlib.use('Agg')
 
-root_dir = '/g/lu/data/imaka/onaga/20210827/sta/'
+root_dir = '/g/lu/data/imaka/onaga/20210828/sta/'
+night = '20210828'
 
 data_dir = root_dir + 'Fld2/'
 twi_dir = root_dir + 'twilights/'
@@ -40,35 +41,44 @@ massdimm_dir = root_dir + 'reduce/massdimm/'
 ## Junk files -- see logs
 ## 22 - spots jumped
 
-dict_suffix = {'open_BRIV': '_o',
-               'LS_BRIV':   'LS_c',
-               'docz_BRIV': 'docz2_c',
-               'open_VBRI': '_o',
+dict_suffix = {'LS_IVBR':   'LS_c',
+               'docz_IVBR': 'docz2_c',
+               'open_IVBR': '_o',
+               'tt_IVBR': 'tt_c', 
                'LS_VBRI':   'LS_c',
-               'docz_VBRI': 'docz2_c'}
-
-dict_images = {'open_BRIV':  [],
-               'LS_BRIV':    [],
-               'docz_BRIV':  [],
-               'open_VBRI':  [],
-               'LS_VBRI':    [],
-               'docz_VBRI':  []
+               'docz_VBRI': 'docz2_c',
+               'open_VBRI': '_o',
+               'tt_VBRI':  'tt_c'
               }
 
-dict_filt = {'open_BRIV': 'BRIV',
-             'LS_BRIV':   'BRIV',
-             'docz_IVBR': 'BRIV',
-             'open_VBRI': 'VBRI',
+dict_images = {'LS_IVBR':    [12, 15, 18, 21, 24, 27, 30, 33, 37],
+               'docz_IVBR':  [13, 16, 19, 22, 25, 28, 31, 34, 38],
+               'open_IVBR':  [14, 17, 20, 23, 26, 29, 32, 35, 39],
+               'tt_BRIV':    [36, 40],
+               'LS_VBRI':    [48, 52, 56, 60],
+               'docz_VBRI':  [49, 53, 57, 61],
+               'open_VBRI':  [50, 54, 58, 62],
+               'tt_VBRI':    [51, 55, 59, 63]
+              }
+
+dict_filt = {'LS_IVBR':   'IVBR',
+             'docz_IVBR': 'IVBR',
+             'open_IVBR': 'IVBR',
+             'tt_IVBR':   'IVBR',
              'LS_VBRI':   'VBRI',
-             'docz_VBRI': 'VBRI'
+             'docz_VBRI': 'VBRI',
+             'open_VBRI': 'VBRI',
+             'tt_VBRI':   'VBRI'
               }
 
-dict_fwhm = {'open_BRIV': 12,
-             'LS_BRIV': 5,
+dict_fwhm = {'LS_IVBR': 5,
              'docz_IVBR': 5,
-             'open_VBRI': 12,
+             'open_IVBR': 12,
+             'tt_IVBR': 5,
              'LS_VBRI': 5,
-             'docz_VBRI': 5
+             'docz_VBRI': 5,
+             'open_VBRI': 12,
+             'tt_VBRI':  5
             }  
 
 ###############################################
@@ -85,7 +95,7 @@ def make_flat():
     
     ## Copy flat from a previous night
     shutil.copyfile(root_dir + '../../20210724/sta/reduce/calib/flat_VBRI.fits', calib_dir + 'flat_VBRI.fits')
-    shutil.copyfile(root_dir + '../../20210723/sta/reduce/calib/flat_BRIV.fits', calib_dir + 'flat_BRIV.fits')
+    shutil.copyfile(root_dir + '../../20210724/sta/reduce/calib/flat_BRIV.fits', calib_dir + 'flat_BRIV.fits')
     
     ## Creating flat from range, I band only
     #flat_num = np.arange(37, 49+1)
@@ -114,19 +124,20 @@ def make_sky():
     # shutil.copyfile(root_dir + '../../20210724/sta/dark/dark_044_scan.fits', sky_dir + 'fld2_sky_tmp.fits')
     
     ## CREATING A SKY
-    ## IVBR
+    
+    ## BRIV
+    sky_num = np.arange(41, 47)
+    sky_frames = ['{0:s}sky_{1:03d}_o.fits'.format(data_dir, ss) for ss in sky_num]
+    scan_sky_frames =  ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num]
+    reduce_STA.treat_overscan(sky_frames)
+    calib.makedark(scan_sky_frames, sky_dir + 'fld2_sky_BRIV.fits')
+    
+    ## VBRI
     #sky_num = np.arange(34, 40+1)
     #sky_frames = ['{0:s}sky_{1:03d}_o.fits'.format(data_dir, ss) for ss in sky_num]
     #scan_sky_frames =  ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num]
     #reduce_STA.treat_overscan(sky_frames)
-    #calib.makedark(scan_sky_frames, sky_dir + 'fld2_sky_IVBR.fits')
-    
-    ## RIVB
-    sky_num = np.arange(68, 74+1)
-    sky_frames = ['{0:s}sky_{1:03d}_o.fits'.format(data_dir, ss) for ss in sky_num]
-    scan_sky_frames =  ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num]
-    reduce_STA.treat_overscan(sky_frames)
-    calib.makedark(scan_sky_frames, sky_dir + 'fld2_sky_RIVB.fits')
+    #calib.makedark(scan_sky_frames, sky_dir + 'fld2_sky_VBRI.fits')
     
     return
 
@@ -298,14 +309,10 @@ def analyze_stacks():
 
 """
 Notes on rotation from 07_23 and 07_24 log:
-POS 1
-at frame 65: R(NW), I(NE), V(SE), B(SW). (RIVB)
-POS 2
-at frame 1:  I(NW), V(NE), B(SE), R(SW). (IVBR)
-POS 3
-at frame 45: V(NW), B(NE), R(SE), I(SW). (VBRI)
-POS 4
-at frame 65: B(NW), V(SW), I(SE), R(NE). (BRIV) 
+POS 1: RIVB - R(NW), I(NE), V(SE), B(SW). 
+POS 2: IVBR - I(NW), V(NE), B(SE), R(SW). 
+POS 3: VBRI - V(NW), B(NE), R(SE), I(SW). 
+POS 4: BRIV - B(NW), R(NE), I(SE), V(SW).  
 
 """
 
