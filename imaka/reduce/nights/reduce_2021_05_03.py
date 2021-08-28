@@ -195,7 +195,7 @@ def stack():
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
         starlists = [out_dir + 'sta{img:03d}{suf:s}_scan_clean_stars.txt'.format(img=ii, suf=suf) for ii in img]
         output_root = stacks_dir + 'fld2_stack_' + suf
-        redu.shift_and_add(img_files, starlists, output_root, method='mean')
+        reduce_fli.shift_and_add(img_files, starlists, output_root, method='mean')
         
     return
 
