@@ -274,14 +274,10 @@ def analyze_stacks():
 
 """
 Notes on rotation from 07_23 and 07_24 log:
-POS 1
-at frame 65: R(NW), I(NE), V(SE), B(SW). (RIVB)
-POS 2
-at frame 1:  I(NW), V(NE), B(SE), R(SW). (IVBR)
-POS 3
-at frame 45: V(NW), B(NE), R(SE), I(SW). (VBRI)
-POS 4
-at frame 65: B(NW), V(SW), I(SE), R(NE). (BRIV) 
+POS 1: RIVB - R(NW), I(NE), V(SE), B(SW). 
+POS 2: IVBR - I(NW), V(NE), B(SE), R(SW). 
+POS 3: VBRI - V(NW), B(NE), R(SE), I(SW). 
+POS 4: BRIV - B(NW), R(NE), I(SE), V(SW). 
 
 """
 

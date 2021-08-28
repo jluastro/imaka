@@ -282,8 +282,7 @@ def analyze_stacks():
 
 """
 Notes on rotation from 07_23 log:
-POS 1
-at frame 65:  R(NW), I(NE), V(SE), B(SW) (RIVB)
+POS 1:  RIVB - R(NW), I(NE), V(SE), B(SW)
 """
 
 ## Since we weren't able to observe, only flat function used
