@@ -458,9 +458,18 @@ def four_filt_split(starlists, filt_order):
     
         # Write new files
         list_root = starlists[ii].split('stars.txt')[0]
-        stars[ind_1].write(list_root + filt_1 + '_' + filt_order + '_stars.txt', format='ascii', overwrite=True)
-        stars[ind_2].write(list_root + filt_2 + '_' + filt_order + '_stars.txt', format='ascii', overwrite=True)
-        stars[ind_3].write(list_root + filt_3 + '_' + filt_order + '_stars.txt', format='ascii', overwrite=True)
-        stars[ind_4].write(list_root + filt_4 + '_' + filt_order + '_stars.txt', format='ascii', overwrite=True)
+        #stars[ind_1].write(list_root + filt_1 + '_' + filt_order + '_stars.txt', format='ascii', overwrite=True)
+        #stars[ind_2].write(list_root + filt_2 + '_' + filt_order + '_stars.txt', format='ascii', overwrite=True)
+        #stars[ind_3].write(list_root + filt_3 + '_' + filt_order + '_stars.txt', format='ascii', overwrite=True)
+        #stars[ind_4].write(list_root + filt_4 + '_' + filt_order + '_stars.txt', format='ascii', overwrite=True)
+        ## Retyring with more aggressive ascii formatting
+        stars[ind_1].write(list_root + filt_1 + '_' + filt_order + '_stars.txt', format='ascii.fixed_width',
+                          delimiter=None, bookend=False,  overwrite=True)
+        stars[ind_2].write(list_root + filt_2 + '_' + filt_order + '_stars.txt', format='ascii.fixed_width',
+                          delimiter=None, bookend=False, overwrite=True)
+        stars[ind_3].write(list_root + filt_3 + '_' + filt_order + '_stars.txt', format='ascii.fixed_width',
+                          delimiter=None, bookend=False,  overwrite=True)
+        stars[ind_4].write(list_root + filt_4 + '_' + filt_order + '_stars.txt', format='ascii.fixed_width',
+                          delimiter=None, bookend=False,  overwrite=True)
     
     return

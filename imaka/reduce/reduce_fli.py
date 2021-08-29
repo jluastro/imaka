@@ -68,7 +68,6 @@ def subtract_dark(image_file, dark_file):
     img_time = i_hdr['EXPTIME']
 
     drk_scale = img_time / drk_time
-
     img_ds = img - (drk * drk_scale)
 
     return img_ds
@@ -1064,7 +1063,7 @@ def read_starlist(starlist):
     Read in a starlist and change the column names to be useful
     with flystar.
     """
-    stars = table.Table.read(starlist, format='ascii')
+    stars = table.Table.read(starlist, format='ascii.fixed_width'')
 
     stars.rename_column('xcentroid', 'x')
     stars.rename_column('ycentroid', 'y')
