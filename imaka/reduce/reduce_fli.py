@@ -74,6 +74,26 @@ def subtract_dark(image_file, dark_file):
     return img_ds
 
 
+def rescale_dark(dark_file, image_file, dark_save):
+    # Rescales a dark to given images exposure time
+    img, i_hdr = fits.getdata(image_file, header=True)
+    drk, d_hdr = fits.getdata(dark_file, header=True)
+
+    # Rescale the dark to match the integration time... this isn't perfect.
+    drk_time = d_hdr['EXPTIME']
+    img_time = i_hdr['EXPTIME']
+
+    drk_scale = img_time / drk_time
+    img_ds = drk * drk_scale
+    
+    d_hdr['EXPTIME'] = img_time
+    
+    fits.writeto(dark_save, img_ds, d_hdr)
+    return
+    
+    
+
+
 def fix_bad_pixels(img):
     crmask, cleanarr = detect_cosmics(img, sigclip=5, sigfrac=0.3, objlim=5.0, gain=1.0,
                                       readnoise=6.5, satlevel=65535.0, pssl=0, niter=4,
