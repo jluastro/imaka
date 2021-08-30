@@ -151,7 +151,7 @@ def fit_moffat_single(img_file, starlist, flux_percent):
     # Load up the image to work on.
     img, hdr = fits.getdata(img_file, header=True)
 
-    stars = Table.read(starlist, format='ascii')
+    stars = Table.read(starlist, format='fits')
     N_stars = len(stars)
 
     # Put the positions into an array 
