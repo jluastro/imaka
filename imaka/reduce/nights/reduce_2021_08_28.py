@@ -257,6 +257,7 @@ def append_massdimm():
 
 
 def stack():
+    ## EDITED FOR 4F DATA
 
     util.mkdir(stacks_dir)
 
@@ -265,13 +266,14 @@ def stack():
     for key in dict_suffix.keys():
         img = dict_images[key]
         suf = dict_suffix[key]
+        filt = dict_filt[key]
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
         
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
         starlists = [out_dir + 'sta{img:03d}{suf:s}_scan_clean_stars.txt'.format(img=ii, suf=suf) for ii in img]
-        output_root = stacks_dir + 'fld2_stack_' + suf
+        output_root = stacks_dir + 'fld2_stack_' + suf + '_' + filt ## EDITED LINE
         
         redu.shift_and_add(img_files, starlists, output_root, method='mean')
         
@@ -279,6 +281,8 @@ def stack():
 
 
 def analyze_stacks():
+    ## EDITED FOR 4F DATA
+    
     ## Loop through all the different data sets
     #for key in ['set_name']: ## Single key setup
     all_images = []
@@ -292,7 +296,7 @@ def analyze_stacks():
         print('   Images: ', img)
         print('     Fwhm: ', str(fwhm))
 
-        image_file = [stacks_dir + 'fld2_stack_' + suf + '.fits']
+        image_file = [stacks_dir + 'fld2_stack_' + suf +  '_' + filt +'.fits'] ## EDITED LINE
         all_images.append(image_file[0])
         
         redu.find_stars(image_file, fwhm=fwhm, threshold=3, N_passes=2, plot_psf_compare=False, mask_file=calib_dir + f'mask_{filt}.fits')

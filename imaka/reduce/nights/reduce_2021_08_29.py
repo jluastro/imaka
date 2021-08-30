@@ -1,9 +1,9 @@
-## reduce_2021_08_27.py
+## reduce_2021_08_29.py
 ##########################
 ## edited by Eden McEwen
 ## August 2021
 ## A four filter run
-## Did position 4 (BRIV) and position 1 (RIVB) this night
+## Did I Band, donuts,  position 3 (VBRI), position 1 (RIVB) this night
 
 import numpy as np
 from astropy.io import fits
@@ -23,7 +23,7 @@ from imaka.reduce import massdimm
 import matplotlib
 # matplotlib.use('Agg')
 
-night = '20210827'
+night = '20210829'
 root_dir = f'/g/lu/data/imaka/onaga/{night}/sta/'
 
 data_dir = root_dir + 'Fld2/'
@@ -31,6 +31,7 @@ twi_dir = root_dir + 'twilights/'
 cal_dir = root_dir + 'calunit/'
 dome_dir = root_dir + 'dome/'
 dark_dir = root_dir + 'dark/'
+screen_dir = root_dir + 'Screen/'
 
 sky_dir = root_dir + 'reduce/sky/' 
 calib_dir = root_dir + 'reduce/calib/'
@@ -39,40 +40,69 @@ stats_dir = root_dir +'reduce/stats/'
 stacks_dir = root_dir + 'reduce/stacks/'
 massdimm_dir = root_dir + 'reduce/massdimm/'
 
+## pulling darks from a different date
+alt_root_dir =f'/g/lu/data/imaka/onaga/20210724/sta/'
+alt_dark_dir = alt_root_dir + 'dark/'
+
 ## Junk files -- see logs
-## 22 - spots jumped
+## 
 
-dict_suffix = {'open_BRIV': '_o',
-               'LS_BRIV':   'LS_c',
-               'docz_BRIV': 'docz2_c',
-               'open_RIVB': '_o',
+dict_suffix = {'LS_I':   'LS_c',
+               'docz_I': 'docz2_c',
+               'open_I': '_o',
+               'tt_I':   'tt_c', 
+               'LS_VBRI':   'LS_c',
+               'docz_VBRI': 'docz2_c',
+               'open_VBRI': '_o',
+               'tt_VBRI':   'tt_c',
                'LS_RIVB':   'LS_c',
-               'docz_RIVB': 'docz2_c'}
-
-dict_images = {'open_BRIV':  [15, 18, 21, 24, 27, 30, 33, 43, 46],
-               'LS_BRIV':    [10, 11, 13, 16, 19, 25, 28, 31, 41, 44],
-               'docz_BRIV':  [14, 17, 20, 23, 26, 29, 32, 42, 45],
-               'open_RIVB':  [49, 52, 55, 58, 61, 64, 67],
-               'LS_RIVB':    [47, 50, 53, 56, 59, 62, 65],
-               'docz_RIVB':  [48, 51, 54, 57, 60, 63, 66]
+               'docz_RIVB': 'docz2_c',
+               'open_RIVB': '_o',
+               'tt_RIVB':   'tt_c'
               }
 
-dict_fwhm = {'open_BRIV': 12,
-             'LS_BRIV': 5,
-             'docz_BRIV': 5,
-             'open_RIVB': 12,
-             'LS_RIVB': 5,
-             'docz_RIVB': 5
-            }  
+dict_images = {'LS_I':    [6, 7, 11, 15, 19, 23],
+               'docz_I':  [8, 12, 16, 20, 24],
+               'open_I':  [9, 13, 17, 21, 25],
+               'tt_I':    [10, 14, 18, 22, 26],
+               'LS_VBRI':    [35, 39, 40, 44],
+               'docz_VBRI':  [36, 41, 45],
+               'open_VBRI':  [37, 42, 46],
+               'tt_VBRI':    [38, 43, 47],
+               'LS_RIVB':   [55, 59, 63, 67],
+               'docz_RIVB': [56, 60, 64, 68],
+               'open_RIVB': [57, 61, 65, 69],
+               'tt_RIVB':   [58, 62, 66, 70]
+              }
 
-# only include filter if key was a 4F file
-dict_filt = {'open_BRIV': 'BRIV',
-             'LS_BRIV':   'BRIV',
-             'docz_BRIV': 'BRIV',
-             'open_RIVB': 'RIVB',
+dict_fwhm = {'LS_I': 6,
+             'docz_I': 6,
+             'open_I': 12,
+             'tt_I': 6,
+             'LS_VBRI': 6,
+             'docz_VBRI': 6,
+             'open_VBRI': 12,
+             'tt_VBRI':  6,
+             'LS_VBRI': 6,
+             'docz_VBRI': 6,
+             'open_VBRI': 12,
+             'tt_VBRI':  6
+            }
+
+dict_filt = {'LS_I':  'I',
+            'docz_I': 'I',
+            'open_I': 'I',
+            'tt_I':   'I', 
+             'LS_VBRI':   'VBRI',
+             'docz_VBRI': 'VBRI',
+             'open_VBRI': 'VBRI',
+             'tt_VBRI':   'VBRI',
              'LS_RIVB':   'RIVB',
-             'docz_RIVB': 'RIVB'
+             'docz_RIVB': 'RIVB',
+             'open_RIVB': 'RIVB',
+             'tt_RIVB':   'RIVB'
               }
+
 
 ###############################################
 ### REDUCTION
@@ -86,23 +116,21 @@ def make_flat():
     """
     util.mkdir(calib_dir)
     
-    ## Copy flat from a previous night
-    shutil.copyfile(root_dir + '../../20210724/sta/reduce/calib/flat_BRIV.fits', calib_dir + 'flat_BRIV.fits')
-    shutil.copyfile(root_dir + '../../20210723/sta/reduce/calib/flat_RIVB.fits', calib_dir + 'flat_RIVB.fits')
+    ## Copy flat taken the a previous night
+    shutil.copyfile(root_dir + '../../20210828/sta/reduce/calib/flat_1p_VBRI.fits', calib_dir + 'flat_VBRI.fits')
     
     ## Creating flat from range, I band only
-    #flat_num = np.arange(37, 49+1)
-    #flat_frames = ['{0:s}dome_{1:03d}.fits'.format(dome_dir, ss) for ss in flat_num]
-    #scan_flat_frames = ['{0:s}dome_{1:03d}_scan.fits'.format(dome_dir, ss) for ss in flat_num]
-    #reduce_STA.treat_overscan(flat_frames)
-    #calib.makeflat(scan_flat_frames, None, calib_dir + 'domeflat_I.fits', darks=False)
+    flat_num = np.arange(1, 5+1)
+    flat_frames = ['{0:s}sta{1:03d}_o.fits'.format(screen_dir, ss) for ss in flat_num]
+    scan_flat_frames = ['{0:s}sta{1:03d}_o_scan.fits'.format(screen_dir, ss) for ss in flat_num]
+    reduce_STA.treat_overscan(flat_frames)
+    calib.makeflat(scan_flat_frames, None, calib_dir + 'flat_I.fits', darks=False)
 
     ## Make a mask to use when calling find_stars.
-    calib.make_mask(calib_dir + 'flat_IVBR.fits', calib_dir + 'mask_IVBR.fits',
-                       mask_min=0.5, mask_max=1.8,
-                       left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
-    
-    calib.make_mask(calib_dir + 'flat_RIVB.fits', calib_dir + 'mask_RIVB.fits',
+    #calib.make_mask(calib_dir + 'flat_I.fits', calib_dir + 'mask_I.fits',
+    #                   mask_min=0.5, mask_max=1.8,
+    #                   left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
+    calib.make_mask(calib_dir + 'flat_VBRI.fits', calib_dir + 'mask_VBRI.fits',
                        mask_min=0.5, mask_max=1.8,
                        left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
     
@@ -112,24 +140,26 @@ def make_flat():
 def make_sky():
 
     util.mkdir(sky_dir)
-
+    
+    ## CREATING A SKY
+    
+    ## I Band
     ## COPY A SKY => use a dark
     # shutil.copyfile(root_dir + '../../20210724/sta/dark/dark_044_scan.fits', sky_dir + 'fld2_sky_tmp.fits')
     
-    ## CREATING A SKY
-    ## BRIV pos 4
-    sky_num = np.arange(34, 40+1)
+    ## VBRI pos 3
+    sky_num = np.arange(48, 54)
     sky_frames = ['{0:s}sky_{1:03d}_o.fits'.format(data_dir, ss) for ss in sky_num]
     scan_sky_frames =  ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num]
     reduce_STA.treat_overscan(sky_frames)
-    calib.makedark(scan_sky_frames, sky_dir + 'fld2_sky_BRIV.fits')
+    calib.makedark(scan_sky_frames, sky_dir + 'fld2_sky_VBRI.fits')
     
     ## RIVB pos 1
-    #sky_num = np.arange(68, 74+1)
-    #sky_frames = ['{0:s}sky_{1:03d}_o.fits'.format(data_dir, ss) for ss in sky_num]
-    #scan_sky_frames =  ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num]
-    #reduce_STA.treat_overscan(sky_frames)
-    #calib.makedark(scan_sky_frames, sky_dir + 'fld2_sky_RIVB.fits')
+    sky_num = np.arange(71, 77+1)
+    sky_frames = ['{0:s}sky_{1:03d}_o.fits'.format(data_dir, ss) for ss in sky_num]
+    scan_sky_frames =  ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num]
+    reduce_STA.treat_overscan(sky_frames)
+    calib.makedark(scan_sky_frames, sky_dir + 'fld2_sky_RIVB.fits')
     
     return
 
@@ -139,7 +169,7 @@ def reduce_fld2():
     util.mkdir(out_dir)
 
     ## Loop through all the different data sets and reduce them.
-    #for key in ['open_RIVB', 'LS_RIVB', 'docz_RIVB']: ## Single key setup
+    #for key in ['tt_IVBR', 'LS_VBRI', 'open_VBRI', 'docz_VBRI', 'tt_VBRI']: ## Single key setup
     for key in dict_suffix.keys():
         
         img = dict_images[key]
@@ -181,7 +211,7 @@ def find_stars_fld2():
         
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
 
-        redu.find_stars(img_files, fwhm=fwhm, threshold=6, N_passes=2, plot_psf_compare=False,
+        redu.find_stars(img_files, fwhm=fwhm, threshold=8, N_passes=2, plot_psf_compare=False,
                               mask_file=calib_dir+f'mask_{filt}.fits')
         
     ## DEBUG - single threaded
@@ -197,7 +227,6 @@ def calc_star_stats():
     
     ## Loop through all the different data sets
     #for key in ['set_name']: ## Single key setup
-    #for key in ['open_IVBR', 'LS_IVBR', 'docz_IVBR']:
     for key in dict_suffix.keys():
         
         img = dict_images[key]
@@ -305,79 +334,89 @@ Notes on rotation from 07_23 and 07_24 log:
 POS 1: RIVB - R(NW), I(NE), V(SE), B(SW). 
 POS 2: IVBR - I(NW), V(NE), B(SE), R(SW). 
 POS 3: VBRI - V(NW), B(NE), R(SE), I(SW). 
-POS 4: BRIV - B(NW), R(NE), I(SE), V(SW). 
+POS 4: BRIV - B(NW), R(NE), I(SE), V(SW).  
+
 """
 
 ## Splitting the initial dictonary keys above means they don't need to be again split here.
 
-filters = ['V', 'R', 'I', 'B']
+filters = [ 'V', 'R', 'I', 'B']
 
 ## Catching any missed name changes
 dict_orders_rot = dict_filt
 dict_images_rot = dict_images
 dict_suffix_rot = dict_suffix
 
-## No 4F flats taken this night, pulled 4F flats in make_flat() from 2021_07
-## This function left as an example
+
 def make_flat_filter(): 
     """
     Makes flat and data mask. 
-    For four filter, dome flat was made with two integration times, 20(2) for BVR 60(45) for I
+     - makeflat(fourfilter=True) normalizes each quadrant independently
+     - combine_filter_flat(filt_order) takes two 4F flats 
+         and gives I-band the logner int quadrant
+    For four filter, dome flat was made with two integration times, 
+        20(2) for BVR 
+        60(45) for I
     """
+    
     util.mkdir(calib_dir)
+    util.mkdir(dark_dir)
     
-    ## Darks are the same all night
+    ## Two exposure length flats taken this night
+    ## Not planning on combining them initially
+    ## scaling old darks because we took none
     
-    #filt_order = "IVBR"
-    #flat_num_60 = np.arange(13, 18+1)
-    #flat_num_20 = np.arange(19, 24+1)
-    
-    
-    filt_order = "BRIV"
-    flat_num_60 = np.arange(73, 78+1)
-    flat_num_20 = np.arange(79, 84+1)
-    
+    filt_order = "VBRI"
     print(filt_order)
     
-    ## I quad flat (60)
-    dark_num = np.arange(29, 34+1)
-    dark_frames = ['{0:s}dark_{1:03d}.fits'.format(dark_dir, ss) for ss in dark_num]
+    print("Scanning Flat Frames... ")
+    flat_num_3p = np.arange(80, 84+1)
+    flat_num_1p = np.append(np.arange(87, 90+1), 85)
+    
+    flat_frames_3p = ['{0:s}sta{1:03d}_o.fits'.format(screen_dir, ss) for ss in flat_num_3p]
+    flat_frames_1p = ['{0:s}sta{1:03d}_o.fits'.format(screen_dir, ss) for ss in flat_num_1p]
+    scan_flat_frames_3p = ['{0:s}sta{1:03d}_o_scan.fits'.format(screen_dir, ss) for ss in flat_num_3p]
+    scan_flat_frames_1p = ['{0:s}sta{1:03d}_o_scan.fits'.format(screen_dir, ss) for ss in flat_num_1p]
+    reduce_STA.treat_overscan(flat_frames_3p)
+    reduce_STA.treat_overscan(flat_frames_1p)
+    
+    print("Scaling Dark Frames... ")
+    dark_num = np.arange(29, 33+1)
+    ## didn't take darks for this date, scaling old ones
+    dark_frames = ['{0:s}dark_{1:03d}.fits'.format(alt_dark_dir, ss) for ss in dark_num]
+    dark_frames_save = ['{0:s}dark_{1:03d}.fits'.format(dark_dir, ss) for ss in dark_num]
+    
+    # Rescaling Dark frames
+    for i in range(len(dark_frames)):
+        if not os.path.isfile(dark_frames_save[i]):
+            redu.rescale_dark(dark_frames[i], flat_frames_3p[0], dark_frames_save[i])
+    
+    print("Scanning Dark Frames... ")
     scan_dark_frames = ['{0:s}dark_{1:03d}_scan.fits'.format(dark_dir, ss) for ss in dark_num]
-    flat_frames = ['{0:s}dome_{1:03d}.fits'.format(dome_dir, ss) for ss in flat_num_60]
-    scan_flat_frames = ['{0:s}dome_{1:03d}_scan.fits'.format(dome_dir, ss) for ss in flat_num_60]
+    reduce_STA.treat_overscan(dark_frames_save)
     
-    reduce_STA.treat_overscan(dark_frames)
-    reduce_STA.treat_overscan(flat_frames)
-    calib.makeflat(scan_flat_frames, scan_dark_frames, 
-                   f'{calib_dir}domeflat_60_{filt_order}.fits', darks=True, fourfilter=True)
-    
-    ## BVR quad flat (20)
-    dark_num = np.arange(39, 44+1)
-    dark_frames = ['{0:s}dark_{1:03d}.fits'.format(dark_dir, ss) for ss in dark_num]
-    scan_dark_frames = ['{0:s}dark_{1:03d}_scan.fits'.format(dark_dir, ss) for ss in dark_num]
-    flat_frames = ['{0:s}dome_{1:03d}.fits'.format(dome_dir, ss) for ss in flat_num_20]
-    scan_flat_frames = ['{0:s}dome_{1:03d}_scan.fits'.format(dome_dir, ss) for ss in flat_num_20]
-    
-    reduce_STA.treat_overscan(dark_frames)
-    reduce_STA.treat_overscan(flat_frames)
-    calib.makeflat(scan_flat_frames, scan_dark_frames, 
-                   f'{calib_dir}domeflat_20_{filt_order}.fits', darks=True, fourfilter=True)
+    print("Making Flats... ")
+    ## Darker flat, 3 piece3 of paper
+    calib.makeflat(scan_flat_frames_3p, scan_dark_frames, 
+                   f'{calib_dir}flat_3p_{filt_order}.fits', darks=True, fourfilter=True)
+    ## Lighter flat, 1 piece of paper
+    calib.makeflat(scan_flat_frames_1p, scan_dark_frames, 
+                   f'{calib_dir}flat_1p_{filt_order}.fits', darks=True, fourfilter=True)
     
     # Combining two flats based on filter orientation
-    calib.combine_filter_flat(f'{calib_dir}domeflat_60_{filt_order}.fits',
-                              f'{calib_dir}domeflat_20_{filt_order}.fits', 
-                              f'{calib_dir}flat_{filt_order}.fits', filt_order)
+    #calib.combine_filter_flat(f'{calib_dir}domeflat_60_{filt_order}.fits',
+    #                          f'{calib_dir}domeflat_20_{filt_order}.fits', 
+    #                          f'{calib_dir}flat_{filt_order}.fits', filt_order)
     
     return
 
 
 def split_filters():
-    ## Split all starlists by filter, given rotation order
-    ## only 4F files should have a dict_filt key entry
-    for key in dict_filt.keys():
-        img = dict_images[key]
-        suf = dict_suffix[key]
-        odr = dict_filt[key]
+    # Split all starlists by filter, given rotation order
+    for key in dict_suffix_rot.keys():
+        img = dict_images_rot[key]
+        suf = dict_suffix_rot[key]
+        odr = dict_orders_rot[key]
         
         starlists = [out_dir + 'sta{img:03d}{suf:s}_scan_clean_stars.txt'.format(img=ii, suf=suf) for ii in img]
         reduce_STA.four_filt_split(starlists, odr)
@@ -385,8 +424,7 @@ def split_filters():
     return
     
 
-def calc_fourfilt_stats():
-    ## BUG: need to figure out how to only use keys with 4F data
+def calc_fourfilt_stats():   
     # Getting unique suffixes (loop states):
     suffixes = list(set(dict_suffix_rot.values()))
     
@@ -408,13 +446,13 @@ def calc_fourfilt_stats():
                 img_files += [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
                 starlists += [out_dir + 'sta{img:03d}{suf:s}_scan_clean_{f:s}_{odr:s}_stars.txt'.format(img=ii, suf=suf, f=f, odr=odr) for ii in img]
             
-            print(f"Calc Star_Stats: {suf} \n Filter: {f}")
-            redu.calc_star_stats(img_files, output_stats=stats_file, starlists=starlists, fourfilt=True)
+            print(f"Calc Star_Stats: {suf} Filter: {f}")
+            reduce_fli.calc_star_stats(img_files, output_stats=stats_file, starlists=starlists, fourfilt=True)
             print("Starting moffat fitting")
-            moffat.fit_moffat(img_files, stats_file, starlists=starlists)
+            #moffat.fit_moffat(img_files, stats_file, starlists=starlists)
             
             ## DEBBUG: SINGLE THREAD
-            # redu.calc_star_stats_single(img_files[0], starlists[0], True)
+            # reduce_fli.calc_star_stats_single(img_files[0], starlists[0], True)
     
     return
 
