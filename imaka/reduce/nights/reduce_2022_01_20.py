@@ -47,7 +47,6 @@ alt_root_dir =f'/g/lu/data/imaka/onaga/20210724/sta/'
 alt_dark_dir = alt_root_dir + 'dark/'
 
 ## Junk files -- see logs
-
 dict_suffix = {'LS_3wfs_r1': 'n3wfs_c',
                'LS_5wfs_r1': 'n5wfs_c',
                'donut_r1':   'n5donut_c',
@@ -61,9 +60,9 @@ dict_images = {'LS_5wfs_r1': [65,69,73,76,79,82],
                'LS_3wfs_r1': [67,70,74,77,80],
                'donut_r1': [66,72],
                'open_r1':  [68,71,75,78,81],
-               'LS_5wfs_r2': [87,90,93,96],
-               'LS_3wfs_r2': [88,91,94],
-               'open_r2':    [89,92,95]
+               'LS_5wfs_r2': [87,90,93,96,104,107,110,113,116,119,122,125,128],
+               'LS_3wfs_r2': [88,91,94,105,108,111,114,117,120,123,126,129],
+               'open_r2':    [89,92,95,106,109,112,115,118,121,124,127,130]
               }
 
 dict_fwhm = {'LS_3wfs_r1': 6,
@@ -183,7 +182,7 @@ def calc_star_stats():
     
     ## Loop through all the different data sets
     #for key in ['set_name']: ## Single key setup
-    for key in dict_suffix.keys():
+    for key in ['LS_3wfs_r2', 'LS_5wfs_r2', 'open_r2']:
         
         img = dict_images[key]
         suf = dict_suffix[key]
