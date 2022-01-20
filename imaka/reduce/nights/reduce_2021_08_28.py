@@ -1,4 +1,4 @@
-## reduce_2021_08_28.py
+ ## reduce_2021_08_28.py
 ##########################
 ## edited by Eden McEwen
 ## August 2021
@@ -101,8 +101,8 @@ def make_flat():
     util.mkdir(calib_dir)
     
     ## Copy flat from a previous night
-    shutil.copyfile(root_dir + '../../20210724/sta/reduce/calib/flat_IVBR.fits', calib_dir + 'flat_IVBR.fits')
-    shutil.copyfile(root_dir + '../../20210724/sta/reduce/calib/flat_VBRI.fits', calib_dir + 'flat_VBRI.fits')
+    #shutil.copyfile(root_dir + '../../20210724/sta/reduce/calib/flat_IVBR.fits', calib_dir + 'flat_IVBR.fits')
+    #shutil.copyfile(root_dir + '../../20210724/sta/reduce/calib/flat_VBRI.fits', calib_dir + 'flat_VBRI.fits')
     
     ## Creating flat from range, I band only
     #flat_num = np.arange(37, 49+1)
@@ -112,11 +112,18 @@ def make_flat():
     #calib.makeflat(scan_flat_frames, None, calib_dir + 'domeflat_I.fits', darks=False)
 
     ## Make a mask to use when calling find_stars.
+    #calib.make_mask(calib_dir + 'flat_IVBR.fits', calib_dir + 'mask_IVBR_old.fits',
+    #                   mask_min=0.5, mask_max=1.8,
+    #                   left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
+    #calib.make_mask(calib_dir + 'flat_VBRI.fits', calib_dir + 'mask_VBRI_old.fits',
+    #                   mask_min=0.5, mask_max=1.8,
+    #                   left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
+    
     calib.make_mask(calib_dir + 'flat_IVBR.fits', calib_dir + 'mask_IVBR.fits',
-                       mask_min=0.5, mask_max=1.8,
+                       mask_min=0.8, mask_max=1.4,
                        left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
     calib.make_mask(calib_dir + 'flat_VBRI.fits', calib_dir + 'mask_VBRI.fits',
-                       mask_min=0.5, mask_max=1.8,
+                       mask_min=0.8, mask_max=1.4,
                        left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
     
     return
@@ -402,12 +409,12 @@ def make_flat_filter():
 def split_filters():
     # Split all starlists by filter, given rotation order
     for key in dict_suffix_rot.keys():
-        img = dict_images_rot[key]
-        suf = dict_suffix_rot[key]
-        odr = dict_orders_rot[key]
-        
-        starlists = [out_dir + 'sta{img:03d}{suf:s}_scan_clean_stars.txt'.format(img=ii, suf=suf) for ii in img]
-        reduce_STA.four_filt_split(starlists, odr)
+        img = dict_images[key]
+        suf = dict_suffix[key]
+        odr = dict_filt[key]
+        if odr != 'I':
+            starlists = [out_dir + 'sta{img:03d}{suf:s}_scan_clean_stars.txt'.format(img=ii, suf=suf) for ii in img]
+            reduce_STA.four_filt_split(starlists, odr)
     
     return
     
@@ -428,16 +435,17 @@ def calc_fourfilt_stats():
             starlists = []
             
             for key in keys:
-                img = dict_images_rot[key]
-                odr = dict_orders_rot[key]
+                img = dict_images[key]
+                odr = dict_filt[key]
                 
-                img_files += [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
-                starlists += [out_dir + 'sta{img:03d}{suf:s}_scan_clean_{f:s}_{odr:s}_stars.txt'.format(img=ii, suf=suf, f=f, odr=odr) for ii in img]
+                if odr != 'I':
+                    img_files += [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
+                    starlists += [out_dir + 'sta{img:03d}{suf:s}_scan_clean_{f:s}_{odr:s}_stars.txt'.format(img=ii, suf=suf, f=f, odr=odr) for ii in img]
             
             print(f"Calc Star_Stats: {suf} Filter: {f}")
-            reduce_fli.calc_star_stats(img_files, output_stats=stats_file, starlists=starlists, fourfilt=True)
+            redu.calc_star_stats(img_files, output_stats=stats_file, starlists=starlists, fourfilt=True)
             print("Starting moffat fitting")
-            #moffat.fit_moffat(img_files, stats_file, starlists=starlists)
+            moffat.fit_moffat(img_files, stats_file, starlists=starlists)
             
             ## DEBBUG: SINGLE THREAD
             # reduce_fli.calc_star_stats_single(img_files[0], starlists[0], True)

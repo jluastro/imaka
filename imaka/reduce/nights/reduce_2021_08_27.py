@@ -87,8 +87,8 @@ def make_flat():
     util.mkdir(calib_dir)
     
     ## Copy flat from a previous night
-    shutil.copyfile(root_dir + '../../20210724/sta/reduce/calib/flat_BRIV.fits', calib_dir + 'flat_BRIV.fits')
-    shutil.copyfile(root_dir + '../../20210723/sta/reduce/calib/flat_RIVB.fits', calib_dir + 'flat_RIVB.fits')
+    #shutil.copyfile(root_dir + '../../20210724/sta/reduce/calib/flat_BRIV.fits', calib_dir + 'flat_BRIV.fits')
+    #shutil.copyfile(root_dir + '../../20210723/sta/reduce/calib/flat_RIVB.fits', calib_dir + 'flat_RIVB.fits')
     
     ## Creating flat from range, I band only
     #flat_num = np.arange(37, 49+1)
@@ -98,12 +98,20 @@ def make_flat():
     #calib.makeflat(scan_flat_frames, None, calib_dir + 'domeflat_I.fits', darks=False)
 
     ## Make a mask to use when calling find_stars.
-    calib.make_mask(calib_dir + 'flat_IVBR.fits', calib_dir + 'mask_IVBR.fits',
-                       mask_min=0.5, mask_max=1.8,
+    #calib.make_mask(calib_dir + 'flat_IVBR.fits', calib_dir + 'mask_IVBR_old.fits',
+    #                   mask_min=0.5, mask_max=1.8,
+    #                   left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
+    
+    calib.make_mask(calib_dir + 'flat_BRIV.fits', calib_dir + 'mask_BRIV.fits',
+                       mask_min=0.8, mask_max=1.4,
                        left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
     
+    #calib.make_mask(calib_dir + 'flat_RIVB.fits', calib_dir + 'mask_RIVB_old.fits',
+    #                   mask_min=0.5, mask_max=1.8,
+    #                   left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
+    
     calib.make_mask(calib_dir + 'flat_RIVB.fits', calib_dir + 'mask_RIVB.fits',
-                       mask_min=0.5, mask_max=1.8,
+                       mask_min=0.8, mask_max=1.4,
                        left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
     
     return
@@ -244,6 +252,7 @@ def append_massdimm():
 
 
 def stack():
+    ## EDITED FOR 4F DATA
 
     util.mkdir(stacks_dir)
 
@@ -252,13 +261,14 @@ def stack():
     for key in dict_suffix.keys():
         img = dict_images[key]
         suf = dict_suffix[key]
+        filt = dict_filt[key]
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
         
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
         starlists = [out_dir + 'sta{img:03d}{suf:s}_scan_clean_stars.txt'.format(img=ii, suf=suf) for ii in img]
-        output_root = stacks_dir + 'fld2_stack_' + suf
+        output_root = stacks_dir + 'fld2_stack_' + suf + '_' + filt ## EDITED LINE
         
         redu.shift_and_add(img_files, starlists, output_root, method='mean')
         
@@ -266,6 +276,8 @@ def stack():
 
 
 def analyze_stacks():
+    ## EDITED FOR 4F DATA
+    
     ## Loop through all the different data sets
     #for key in ['set_name']: ## Single key setup
     all_images = []
@@ -279,10 +291,10 @@ def analyze_stacks():
         print('   Images: ', img)
         print('     Fwhm: ', str(fwhm))
 
-        image_file = [stacks_dir + 'fld2_stack_' + suf + '.fits']
+        image_file = [stacks_dir + 'fld2_stack_' + suf +  '_' + filt +'.fits'] ## EDITED LINE
         all_images.append(image_file[0])
         
-        redu.find_stars(image_file, fwhm=fwhm, threshold=3, N_passes=2, plot_psf_compare=False, mask_file=calib_dir + f'mask_{filt}.fits')
+        redu.find_stars(image_file, fwhm=fwhm, threshold=6, N_passes=2, plot_psf_compare=False, mask_file=calib_dir + f'mask_{filt}.fits')
 
     ## Calc stats on all the stacked images
     out_stats_file = stats_dir + 'stats_stacks.fits'

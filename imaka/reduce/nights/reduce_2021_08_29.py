@@ -117,7 +117,7 @@ def make_flat():
     util.mkdir(calib_dir)
     
     ## Copy flat taken the a previous night
-    shutil.copyfile(root_dir + '../../20210828/sta/reduce/calib/flat_1p_VBRI.fits', calib_dir + 'flat_VBRI.fits')
+    # shutil.copyfile(root_dir + '../../20210828/sta/reduce/calib/flat_1p_VBRI.fits', calib_dir + 'flat_VBRI.fits')
     
     ## Creating flat from range, I band only
     flat_num = np.arange(1, 5+1)
@@ -127,12 +127,13 @@ def make_flat():
     calib.makeflat(scan_flat_frames, None, calib_dir + 'flat_I.fits', darks=False)
 
     ## Make a mask to use when calling find_stars.
-    #calib.make_mask(calib_dir + 'flat_I.fits', calib_dir + 'mask_I.fits',
-    #                   mask_min=0.5, mask_max=1.8,
-    #                   left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
-    calib.make_mask(calib_dir + 'flat_VBRI.fits', calib_dir + 'mask_VBRI.fits',
+    calib.make_mask(calib_dir + 'flat_I.fits', calib_dir + 'mask_I.fits',
                        mask_min=0.5, mask_max=1.8,
                        left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
+    
+    #calib.make_mask(calib_dir + 'flat_VBRI.fits', calib_dir + 'mask_VBRI.fits',
+    #                   mask_min=0.5, mask_max=1.8,
+    #                   left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
     
     return
 
@@ -141,11 +142,13 @@ def make_sky():
 
     util.mkdir(sky_dir)
     
-    ## CREATING A SKY
-    
     ## I Band
-    ## COPY A SKY => use a dark
-    # shutil.copyfile(root_dir + '../../20210724/sta/dark/dark_044_scan.fits', sky_dir + 'fld2_sky_tmp.fits')
+    ## NO SKY TAKEN => use a 180 dark
+    dark_num = np.arange(103, 111+1)
+    dark_frames = ['{0:s}dark_{1:03d}.fits'.format(dark_dir, ss) for ss in dark_num]
+    scan_dark_frames =  ['{0:s}dark_{1:03d}_scan.fits'.format(dark_dir, ss) for ss in dark_num]
+    reduce_STA.treat_overscan(dark_frames)
+    calib.makedark(scan_dark_frames, sky_dir + 'fld2_sky_I.fits')
     
     ## VBRI pos 3
     sky_num = np.arange(48, 54)
@@ -198,26 +201,27 @@ def reduce_fld2():
 def find_stars_fld2():
     ## Loop through all the different data sets
     #for key in ['set_name']: ## Single key setup
-    for key in dict_suffix.keys():
+    #for key in ['set_name']:
+    #for key in dict_suffix.keys():
         
-        img = dict_images[key]
-        suf = dict_suffix[key]
-        filt = dict_filt[key]
-        fwhm = dict_fwhm[key]
+    #    img = dict_images[key]
+    #    suf = dict_suffix[key]
+    #    filt = dict_filt[key]
+    #    fwhm = dict_fwhm[key]
 
-        print('Working on: {1:s}  {0:s}'.format(key, suf))
-        print('   Images: ', img)
-        print('      filt: ', filt)
+    #    print('Working on: {1:s}  {0:s}'.format(key, suf))
+    #    print('   Images: ', img)
+    #    print('      filt: ', filt)
         
-        img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
+    #    img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
 
-        redu.find_stars(img_files, fwhm=fwhm, threshold=8, N_passes=2, plot_psf_compare=False,
-                              mask_file=calib_dir+f'mask_{filt}.fits')
+     #   redu.find_stars(img_files, fwhm=fwhm, threshold=8, N_passes=2, plot_psf_compare=False, mask_file=calib_dir+f'mask_{filt}.fits')
         
     ## DEBUG - single threaded
-    # fmt = '{dir}sta{img:03d}{suf:s}_scan_clean.fits'
-    # image_file = fmt.format(dir=out_dir, img=dict_images['LS_c'][0], suf=dict_suffix['LS_c'][0]) 
-    # redu.find_stars_single(image_file, dict_fwhm['LS_c'], 3, 2, False, calib_dir + 'mask.fits')
+    key_test = 'LS_I'
+    fmt = '{dir}sta{img:03d}{suf:s}_scan_clean.fits'
+    image_file = fmt.format(dir=out_dir, img=dict_images[key_test][0], suf=dict_suffix[key_test]) 
+    redu.find_stars_single(image_file, dict_fwhm[key_test], 3, 2, False, calib_dir + 'mask_I.fits')
                           
     return
 
@@ -362,51 +366,29 @@ def make_flat_filter():
     util.mkdir(calib_dir)
     util.mkdir(dark_dir)
     
-    ## Two exposure length flats taken this night
-    ## Not planning on combining them initially
-    ## scaling old darks because we took none
+    filt_order = "RIVB" # position 1
+    flat_num = np.arange(88, 92+1)
     
-    filt_order = "VBRI"
-    print(filt_order)
+    print("Filter: ", filt_order)
     
     print("Scanning Flat Frames... ")
-    flat_num_3p = np.arange(80, 84+1)
-    flat_num_1p = np.append(np.arange(87, 90+1), 85)
-    
-    flat_frames_3p = ['{0:s}sta{1:03d}_o.fits'.format(screen_dir, ss) for ss in flat_num_3p]
-    flat_frames_1p = ['{0:s}sta{1:03d}_o.fits'.format(screen_dir, ss) for ss in flat_num_1p]
-    scan_flat_frames_3p = ['{0:s}sta{1:03d}_o_scan.fits'.format(screen_dir, ss) for ss in flat_num_3p]
-    scan_flat_frames_1p = ['{0:s}sta{1:03d}_o_scan.fits'.format(screen_dir, ss) for ss in flat_num_1p]
-    reduce_STA.treat_overscan(flat_frames_3p)
-    reduce_STA.treat_overscan(flat_frames_1p)
-    
-    print("Scaling Dark Frames... ")
-    dark_num = np.arange(29, 33+1)
-    ## didn't take darks for this date, scaling old ones
-    dark_frames = ['{0:s}dark_{1:03d}.fits'.format(alt_dark_dir, ss) for ss in dark_num]
-    dark_frames_save = ['{0:s}dark_{1:03d}.fits'.format(dark_dir, ss) for ss in dark_num]
-    
-    # Rescaling Dark frames
-    for i in range(len(dark_frames)):
-        if not os.path.isfile(dark_frames_save[i]):
-            redu.rescale_dark(dark_frames[i], flat_frames_3p[0], dark_frames_save[i])
+    flat_frames = ['{0:s}sta{1:03d}_o.fits'.format(screen_dir, ss) for ss in flat_num]
+    scan_flat_frames = ['{0:s}sta{1:03d}_o_scan.fits'.format(screen_dir, ss) for ss in flat_num]
+    reduce_STA.treat_overscan(flat_frames)
     
     print("Scanning Dark Frames... ")
+    dark_num = np.arange(94, 102+1)
+    dark_frames = ['{0:s}dark_{1:03d}.fits'.format(dark_dir, ss) for ss in dark_num]
     scan_dark_frames = ['{0:s}dark_{1:03d}_scan.fits'.format(dark_dir, ss) for ss in dark_num]
-    reduce_STA.treat_overscan(dark_frames_save)
+    reduce_STA.treat_overscan(dark_frames)
     
     print("Making Flats... ")
-    ## Darker flat, 3 piece3 of paper
-    calib.makeflat(scan_flat_frames_3p, scan_dark_frames, 
-                   f'{calib_dir}flat_3p_{filt_order}.fits', darks=True, fourfilter=True)
-    ## Lighter flat, 1 piece of paper
-    calib.makeflat(scan_flat_frames_1p, scan_dark_frames, 
-                   f'{calib_dir}flat_1p_{filt_order}.fits', darks=True, fourfilter=True)
-    
-    # Combining two flats based on filter orientation
-    #calib.combine_filter_flat(f'{calib_dir}domeflat_60_{filt_order}.fits',
-    #                          f'{calib_dir}domeflat_20_{filt_order}.fits', 
-    #                          f'{calib_dir}flat_{filt_order}.fits', filt_order)
+    calib.makeflat(scan_flat_frames, scan_dark_frames[:len(scan_flat_frames)], 
+                   f'{calib_dir}flat_{filt_order}.fits', darks=True, fourfilter=True)
+    print("Making mask... ")
+    calib.make_mask(f'{calib_dir}flat_{filt_order}.fits', f'{calib_dir}mask_{filt_order}.fits',
+                       mask_min=0.5, mask_max=1.8,
+                       left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
     
     return
 
