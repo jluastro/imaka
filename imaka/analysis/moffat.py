@@ -149,7 +149,7 @@ def fit_moffat_single(img_file, starlist, flux_percent):
     print(f"p{pid} - Fitting moffat for {img_file} and {starlist}")
     
     # Load up the image to work on.
-    img, hdr = fits.getdata(img_file, header=True)
+    img, hdr = fits.getdata(img_file, ignore_missing_end=True)
 
     stars = Table.read(starlist, format='fits')
     N_stars = len(stars)
