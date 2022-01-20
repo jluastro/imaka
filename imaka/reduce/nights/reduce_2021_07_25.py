@@ -1,4 +1,4 @@
-## reduce_2021_07_24.py
+## reduce_2021_07_25.py
 ##########################
 ## edited by Eden McEwen
 ## July 2021
@@ -23,7 +23,7 @@ from imaka.reduce import reduce_STA
 import matplotlib
 # matplotlib.use('Agg')
 
-root_dir = '/g/lu/data/imaka/onaga/20210724/sta/'
+root_dir = '/g/lu/data/imaka/onaga/20210725/sta/'
 
 data_dir = root_dir + 'Fld2/'
 twi_dir = root_dir + 'twilights/'

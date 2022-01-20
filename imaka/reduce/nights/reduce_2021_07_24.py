@@ -278,7 +278,6 @@ POS 1: RIVB - R(NW), I(NE), V(SE), B(SW).
 POS 2: IVBR - I(NW), V(NE), B(SE), R(SW). 
 POS 3: VBRI - V(NW), B(NE), R(SE), I(SW). 
 POS 4: BRIV - B(NW), R(NE), I(SE), V(SW). 
-
 """
 
 ## Splitting the initial dictonary keys above means they don't need to be again split here.
