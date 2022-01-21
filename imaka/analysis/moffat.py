@@ -98,6 +98,7 @@ def fit_moffat(img_files, stats_file, x_guess=5, y_guess=5, flux_percent=0.9, st
     pool.join()
 
     for ii in range(N_files):
+        print(results_async[ii]) #REMOVE
         results = results_async[ii].get()
         
         N_sky[ii]     = results['N_sky']
@@ -149,7 +150,7 @@ def fit_moffat_single(img_file, starlist, flux_percent):
     print(f"p{pid} - Fitting moffat for {img_file} and {starlist}")
     
     # Load up the image to work on.
-    img, hdr = fits.getdata(img_file, ignore_missing_end=True)
+    img, hdr = fits.getdata(img_file, header=True, ignore_missing_end=True)
 
     stars = Table.read(starlist, format='fits')
     N_stars = len(stars)
