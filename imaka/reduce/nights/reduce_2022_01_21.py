@@ -45,27 +45,17 @@ massdimm_dir = root_dir + 'reduce/massdimm/'
 
 ## Junk files -- see logs
 dict_suffix = {'LS_3wfs_s': 'n3wfs_c',
-               'LS_3wfs_w': 'n3wfs_c',
+               'LS_3wfs_w': 'n3wide_c',
                'LS_5wfs': 'n5wfs_c',
-               'donut':   'n5donut_c',
                'open':    '_o',
-              }
+              } #                'donut':   'n5donut_c',
 
 dict_images = {'LS_5wfs':  [20,23,26,29,32,46,50,54,64,68,72],
                'LS_3wfs_s': [21,24,27,30,33,47,51,55,65,69,73],
                'LS_3wfs_w': [48,52,56,66,70,74],
                'open':    [22,25,28,31,34,49,53,57,67,71,75],
-               'donut':   [58,59,60,61,62,63]
-              }
+              } # 'donut':   [58,59,60,61,62,63]
 
-dict_fwhm = {'LS_3wfs_r1': 6,
-             'LS_5wfs_r1': 6,
-             'donut_r1': 6,
-             'open_r1': 12,
-             'LS_3wfs_r2': 6,
-             'LS_5wfs_r2': 6,
-             'open_r2':    12
-            }  
 
 ###############################################
 ### REDUCTION
@@ -105,8 +95,9 @@ def make_sky():
 
     util.mkdir(sky_dir)
 
-    sky_num = np.arange(39, 45+1) #sky set 1
-    #sky_num = np.arange(141, 146+1) #sky set 2
+    #sky_num = np.arange(39, 45+1) #sky set 1 middle of the night
+    #sky_num = np.arange(77, 83+1) #sky set 2 end of the night
+    sky_num = [39,40,41,42,43,44,45,77,78,79,80,81,82,83]
     sky_frames = ['{0:s}sky_{1:03d}_o.fits'.format(data_dir, ss) for ss in sky_num]
     reduce_STA.treat_overscan(sky_frames)
 
@@ -121,8 +112,8 @@ def reduce_beehive():
     util.mkdir(out_dir)
 
     ## Loop through all the different data sets and reduce them.
-    for key in dict_suffix.keys():
-    #for key in ['LS_3wfs_r2', 'LS_5wfs_r2', 'open_r2']:
+    #for key in dict_suffix.keys():
+    for key in ['open']:
         img = dict_images[key]
         suf = dict_suffix[key]
         sky = 'beehive_sky.fits'
@@ -136,7 +127,7 @@ def reduce_beehive():
         
         reduce_STA.treat_overscan(img_files)
         #reduce_STA.treat_overscan_working(img_files)  #BUG
-        redu.clean_images(scn_files, out_dir, rebin=1, sky_frame=sky_dir + sky, flat_frame=calib_dir + "flat_ones.fits")
+        redu.clean_images(scn_files, out_dir, rebin=1, sky_frame=sky_dir + sky, flat_frame=calib_dir + "flat.fits")
     return
 
 ###############################################
@@ -147,7 +138,7 @@ def find_stars_beehive():
     ## Loop through all the different data sets
     #for key in ['set_name']: ## Single key setup
     for key in dict_suffix.keys():
-    #for key in ['LS_3wfs_r2', 'LS_5wfs_r2', 'open_r2']:
+    #for key in ['open']:
 
         img = dict_images[key]
         suf = dict_suffix[key]
@@ -155,7 +146,7 @@ def find_stars_beehive():
         
         # o/c loop distinction
         fwhm = 8 if re.search('open', key) else 5
-        thrsh = 6 if re.search('open', key) else 12
+        thrsh = 6 if re.search('open', key) else 10
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
@@ -163,7 +154,7 @@ def find_stars_beehive():
 
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
         # Taken from working branch version args
-        redu.find_stars(img_files, fwhm=fwhm,  threshold = thrsh, plot_psf_compare=False, mask_file=calib_dir+'mask_ones.fits')
+        redu.find_stars(img_files, fwhm=fwhm,  threshold = thrsh, plot_psf_compare=False, mask_file=calib_dir+'mask.fits')
         
     ## DEBUG - single threaded
     # fmt = '{dir}sta{img:03d}{suf:s}_scan_clean.fits'
@@ -177,7 +168,7 @@ def calc_star_stats():
     util.mkdir(stats_dir)
     
     ## Loop through all the different data sets
-    for key in ['set_name']: ## Single key setup
+    for key in dict_suffix.keys(): ## Single key setup
     #for key in ['LS_3wfs_r2', 'LS_5wfs_r2', 'open_r2']:
         
         img = dict_images[key]
@@ -238,7 +229,7 @@ def stack_beehive():
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
         starlists = [out_dir + 'sta{img:03d}{suf:s}_scan_clean_stars.txt'.format(img=ii, suf=suf) for ii in img]
         output_root = stacks_dir + 'beehive_stack_' + suf
-        reduce_fli.shift_and_add(img_files, starlists, output_root, method='mean')
+        redu.shift_and_add(img_files, starlists, output_root, method='mean')
         
     return
 
