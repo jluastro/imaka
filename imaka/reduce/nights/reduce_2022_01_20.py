@@ -254,10 +254,13 @@ def analyze_stacks():
     ## Loop through all the different data sets
     #for key in ['set_name']: ## Single key setup
     all_images = []
-    for key in dict_suffix.keys():
+    #for key in dict_suffix.keys():
+    for key in ['LS_3wfs_r2', 'LS_5wfs_r2', 'open_r2']:
         img = dict_images[key]
         suf = dict_suffix[key]
-        fwhm = dict_fwhm[key]
+        # o/c loop distinction
+        fwhm = 8 if re.search('open', key) else 5
+        thrsh = 8 if re.search('open', key) else 10
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
@@ -266,7 +269,7 @@ def analyze_stacks():
         image_file = [stacks_dir + 'beehive_stack_' + suf + '.fits']
         all_images.append(image_file[0])
         
-        redu.find_stars(image_file, fwhm=fwhm, threshold=3, N_passes=2, plot_psf_compare=False,
+        redu.find_stars(image_file, fwhm=fwhm, threshold=thrsh, N_passes=2, plot_psf_compare=False,
                               mask_file=calib_dir + 'mask.fits')
 
     ## Calc stats on all the stacked images
