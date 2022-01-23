@@ -1,10 +1,9 @@
- ## reduce_2022_01_21.py
+ ## reduce_2022_01_23.py
 ##########################
 ## edited by Eden McEwen
 ## January 2022
 ## Single filter winter cluster
 ## pulled reduction code from 08_2021
-
 
 import numpy as np
 from astropy.io import fits
@@ -25,7 +24,7 @@ from imaka.reduce import massdimm
 import matplotlib
 # matplotlib.use('Agg')
 
-night = '20220121'
+night = '20220123'
 root_dir = f'/g/lu/data/imaka/onaga/{night}/sta/'
 
 data_dir = root_dir + 'Beehive-W/'
@@ -43,18 +42,18 @@ stacks_dir = root_dir + 'reduce/stacks/'
 massdimm_dir = root_dir + 'reduce/massdimm/'
 
 
-## Junk files -- see logs
-dict_suffix = {'open':    '_o',
-               'LS_3wfs_s': 'n3wfs_c',
+## Junk files - see logs
+dict_suffix = {'LS_3wfs_s': 'n3wfs_c',
                'LS_3wfs_w': 'n3wide_c',
                'LS_5wfs': 'n5wfs_c',
-              } #                'donut':   'n5donut_c',
+               'open':    '_o',
+              }
 
-dict_images = {'LS_5wfs':  [20,23,26,29,32,46,50,54,64,68,72],
-               'LS_3wfs_s': [21,24,27,30,33,47,51,55,65,69,73],
-               'LS_3wfs_w': [48,52,56,66,70,74],
-               'open':    [22,25,28,31,34,49,53,57,67,71,75],
-              } # 'donut':   [58,59,60,61,62,63]
+dict_images = {'LS_5wfs':   [0,4,8,12,16,20,24,28,32,36,40,44,58,62,66,70,74,78,82,86,90,94,98],
+               'LS_3wfs_s': [1,5,9,13,17,21,25,29,33,37,41,45,59,63,67,71,75,79,83,87,91,95,99],
+               'LS_3wfs_w': [2,6,10,14,18,22,26,30,34,38,42,46,60,64,68,72,76,80,84,88,92,94,100],
+               'open':      [3,7,11,15,19,23,27,31,35,39,43,47,61,65,69,73,77,81,85,89,93,97,101],
+              }
 
 
 ###############################################
@@ -66,27 +65,16 @@ def make_flat():
     """
     Makes flat and data mask. 
     Just for single filter I band
-    CHANGES: flats and darks are called calls for the cal unit
+    CHANGES: took domeflats 01_22
     """
     util.mkdir(calib_dir)
     
-    # Flats: at 20 seconds
-    flat_num = [0,2,3,4,5]
-    flat_frames = ['{0:s}sta{1:03d}_o.fits'.format(cal_dir, ss) for ss in flat_num]
-    scan_flat_frames = ['{0:s}sta{1:03d}_o_scan.fits'.format(cal_dir, ss) for ss in flat_num]
-    reduce_STA.treat_overscan(flat_frames)
-    
-    # Darks: at 20 seconds
-    dark_num = [1,6,7,8,9]
-    dark_frames = ['{0:s}sta{1:03d}_o.fits'.format(cal_dir, ss) for ss in dark_num]
-    scan_dark_frames = ['{0:s}sta{1:03d}_o_scan.fits'.format(cal_dir, ss) for ss in dark_num]
-    reduce_STA.treat_overscan(dark_frames)
-    
-    # Make flat
-    calib.makeflat(scan_flat_frames, scan_dark_frames, calib_dir + 'flat.fits', darks=True)
+    ## Copy flat from previous night because twilight exposures, did not bring flat lamp
+    # opted to not do this, no other flat had wfs in the right position
+    shutil.copyfile(root_dir + '../../20220122/sta/reduce/calib/domeflat.fits', calib_dir + 'domeflat.fits')
     
     # Mask for masking find_stars areas
-    calib.make_mask(calib_dir + 'flat.fits', calib_dir + 'mask.fits',
+    calib.make_mask(calib_dir + 'domeflat.fits', calib_dir + 'domemask.fits',
                        mask_min=0.8, mask_max=1.4,
                        left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
 
@@ -95,12 +83,15 @@ def make_sky():
 
     util.mkdir(sky_dir)
 
-    #sky_num = np.arange(39, 45+1) #sky set 1 middle of the night
-    #sky_num = np.arange(77, 83+1) #sky set 2 end of the night
-    sky_num = [39,40,41,42,43,44,45,77,78,79,80,81,82,83]
+    #sky_num = np.arange(48, 57+1) #sky set 1 middle of the night
+    #sky_num = np.arange(102, 116+1) #sky set 2 end of the night
     sky_frames = ['{0:s}sky_{1:03d}_o.fits'.format(data_dir, ss) for ss in sky_num]
     reduce_STA.treat_overscan(sky_frames)
-
+    scan_sky_frames =  ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num]
+    calib.makedark(scan_sky_frames, sky_dir + 'beehive_sky2.fits')
+    
+    # ALl skies
+    sky_num = np.append(np.arange(48, 57+1), np.arange(102, 116+1)) # fill skyset
     scan_sky_frames =  ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num]
     calib.makedark(scan_sky_frames, sky_dir + 'beehive_sky.fits')
     
@@ -112,8 +103,8 @@ def reduce_beehive():
     util.mkdir(out_dir)
 
     ## Loop through all the different data sets and reduce them.
-    #for key in dict_suffix.keys():
-    for key in ['open']:
+    for key in dict_suffix.keys():
+    #for key in ['open']:
         img = dict_images[key]
         suf = dict_suffix[key]
         sky = 'beehive_sky.fits'
@@ -127,7 +118,7 @@ def reduce_beehive():
         
         reduce_STA.treat_overscan(img_files)
         #reduce_STA.treat_overscan_working(img_files)  #BUG
-        redu.clean_images(scn_files, out_dir, rebin=1, sky_frame=sky_dir + sky, flat_frame=calib_dir + "flat.fits")
+        redu.clean_images(scn_files, out_dir, rebin=1, sky_frame=sky_dir + sky, flat_frame=calib_dir + "domeflat.fits")
     return
 
 ###############################################
@@ -137,16 +128,16 @@ def reduce_beehive():
 def find_stars_beehive():
     ## Loop through all the different data sets
     #for key in ['set_name']: ## Single key setup
-    #for key in dict_suffix.keys():
-    for key in ['open']:
+    for key in dict_suffix.keys():
+    #for key in ['open']:
 
         img = dict_images[key]
         suf = dict_suffix[key]
         sky = sky_dir + 'beehive_sky.fits'
         
         # o/c loop distinction
-        fwhm = 10 if re.search('open', key) else 5
-        thrsh = 5 if re.search('open', key) else 10
+        fwhm = 8 if re.search('open', key) else 5
+        thrsh = 8 if re.search('open', key) else 12
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
@@ -154,7 +145,7 @@ def find_stars_beehive():
 
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
         # Taken from working branch version args
-        redu.find_stars(img_files, fwhm=fwhm,  threshold = thrsh, plot_psf_compare=False, mask_file=calib_dir+'mask.fits')
+        redu.find_stars(img_files, fwhm=fwhm,  threshold = thrsh, plot_psf_compare=False, mask_file=calib_dir+'domemask.fits')
         
     ## DEBUG - single threaded
     # fmt = '{dir}sta{img:03d}{suf:s}_scan_clean.fits'
@@ -168,8 +159,8 @@ def calc_star_stats():
     util.mkdir(stats_dir)
     
     ## Loop through all the different data sets
-    #for key in dict_suffix.keys(): ## Single key setup
-    for key in ['open']:
+    for key in ['set_name']: ## Single key setup
+    #for key in ['LS_3wfs_r2', 'LS_5wfs_r2', 'open_r2']:
         
         img = dict_images[key]
         suf = dict_suffix[key]

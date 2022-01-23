@@ -160,12 +160,14 @@ def find_stars_beehive():
         sky = sky_dir + 'beehive_sky.fits'
         
         # o/c loop distinction
-        fwhm = 8 if re.search('open', key) else 5
-        thrsh = 7 if re.search('open', key) else 10
+        fwhm = 12 if re.search('open', key) else 5
+        thrsh = 6 if re.search('open', key) else 6
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
         print('      Sky: ', sky)
+        print('     Fwhm: ', str(fwhm))
+        print('   Thresh: ', str(thrsh))
 
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
         # Taken from working branch version args
@@ -265,6 +267,7 @@ def analyze_stacks():
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
         print('     Fwhm: ', str(fwhm))
+        print('   Thresh: ', str(thrsh))
 
         image_file = [stacks_dir + 'beehive_stack_' + suf + '.fits']
         all_images.append(image_file[0])
