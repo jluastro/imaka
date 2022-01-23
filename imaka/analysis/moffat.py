@@ -98,7 +98,6 @@ def fit_moffat(img_files, stats_file, x_guess=5, y_guess=5, flux_percent=0.9, st
     pool.join()
 
     for ii in range(N_files):
-        print(results_async[ii]) #REMOVE
         results = results_async[ii].get()
         
         N_sky[ii]     = results['N_sky']
