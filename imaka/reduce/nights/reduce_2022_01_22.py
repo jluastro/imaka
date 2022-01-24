@@ -43,16 +43,34 @@ massdimm_dir = root_dir + 'reduce/massdimm/'
 
 
 ## Junk files - 15 - see logs
-dict_suffix = {'LS_3wfs_s': 'n3wfs_c',
-               'LS_3wfs_w': 'n3wide_c',
-               'LS_5wfs': 'n5wfs_c',
-               'open':    '_o',
+dict_suffix = {'LS_3wfs_s_1': 'n3wfs_c',
+               'LS_3wfs_w_1': 'n3wide_c',
+               'LS_5wfs_1': 'n5wfs_c',
+               'open_1':    '_o',
+               'LS_3wfs_s_2': 'n3wfs_c',
+               'LS_3wfs_w_2': 'n3wide_c',
+               'LS_5wfs_2': 'n5wfs_c',
+               'open_2':    '_o',
               }
 
-dict_images = {'LS_5wfs':  [11,19,23,27,31,35,39,43,47,51,55,59,70,74,78,82,86,90,94,98,102,106],
-               'LS_3wfs_s': [12,16,20,24,28,32,36,40,44,48,52,56,60,71,75,79,83,87,91,95,99,103,107],
-               'LS_3wfs_w': [13,17,21,25,29,33,37,41,45,49,53,57,61,72,76,80,84,88,92,96,100,104,108],
-               'open':    [14,18,22,26,30,34,38,42,46,50,54,58,62,73,77,81,85,89,93,97,101,105,109],
+dict_images = {'LS_5wfs_1':   [11,19,23,27,31,35,39,43,47,51,55,59],
+               'LS_3wfs_s_1': [12,16,20,24,28,32,36,40,44,48,52,56,60],
+               'LS_3wfs_w_1': [13,17,21,25,29,33,37,41,45,49,53,57,61],
+               'open_1':      [14,18,22,26,30,34,38,42,46,50,54,58,62],
+               'LS_5wfs_2':   [70,74,78,82,86,90,94,98,102,106],
+               'LS_3wfs_s_2': [71,75,79,83,87,91,95,99,103,107],
+               'LS_3wfs_w_2': [72,76,80,84,88,92,96,100,104,108],
+               'open_2':      [73,77,81,85,89,93,97,101,105,109],
+              }
+
+dict_sky = {'LS_3wfs_s_1':    'beehive_sky1.fits',
+               'LS_3wfs_w_1': 'beehive_sky1.fits',
+               'LS_5wfs_1':   'beehive_sky1.fits',
+               'open_1':      'beehive_sky1.fits',
+               'LS_3wfs_s_2': 'beehive_sky2.fits',
+               'LS_3wfs_w_2': 'beehive_sky2.fits',
+               'LS_5wfs_2':   'beehive_sky2.fits',
+               'open_2':      'beehive_sky2.fits',
               }
 
 
@@ -118,7 +136,7 @@ def reduce_beehive():
     #for key in ['open']:
         img = dict_images[key]
         suf = dict_suffix[key]
-        sky = 'beehive_sky.fits'
+        sky = dict_sky[key]
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
@@ -144,7 +162,7 @@ def find_stars_beehive():
 
         img = dict_images[key]
         suf = dict_suffix[key]
-        sky = sky_dir + 'beehive_sky.fits'
+        sky = dict_sky[key]
         
         # o/c loop distinction
         fwhm = 8 if re.search('open', key) else 5

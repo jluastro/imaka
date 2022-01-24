@@ -1,10 +1,9 @@
- ## reduce_2022_01_21.py
+ ## reduce_2022_01_24.py
 ##########################
 ## edited by Eden McEwen
 ## January 2022
 ## Single filter winter cluster
 ## pulled reduction code from 08_2021
-
 
 import numpy as np
 from astropy.io import fits
@@ -25,7 +24,7 @@ from imaka.reduce import massdimm
 import matplotlib
 # matplotlib.use('Agg')
 
-night = '20220121'
+night = '20220124'
 root_dir = f'/g/lu/data/imaka/onaga/{night}/sta/'
 
 data_dir = root_dir + 'Beehive-W/'
@@ -43,18 +42,18 @@ stacks_dir = root_dir + 'reduce/stacks/'
 massdimm_dir = root_dir + 'reduce/massdimm/'
 
 
-## Junk files -- see logs
-dict_suffix = {'open':    '_o',
-               'LS_3wfs_s': 'n3wfs_c',
+## Junk files - see logs
+dict_suffix = {'LS_3wfs_s': 'n3wfs_c',
                'LS_3wfs_w': 'n3wide_c',
                'LS_5wfs': 'n5wfs_c',
-              } #                'donut':   'n5donut_c',
+               'open':    '_o',
+              }
 
-dict_images = {'LS_5wfs':  [20,23,26,29,32,46,50,54,64,68,72],
-               'LS_3wfs_s': [21,24,27,30,33,47,51,55,65,69,73],
-               'LS_3wfs_w': [48,52,56,66,74],
-               'open':    [22,25,28,31,34,49,53,57,67,75],
-              } # 'donut':   [58,59,60,61,62,63]
+dict_images = {'LS_5wfs':   [121,125,129,133,137,141,145,149,153,157,161],
+               'LS_3wfs_s': [122,126,130,134,138,142,146,150,154,158,162],
+               'LS_3wfs_w': [123,127,131,135,139,143,147,151,155,159,163],
+               'open':      [124,128,132,136,140,144,148,152,156,160,164],
+              }
 
 
 ###############################################
@@ -66,31 +65,12 @@ def make_flat():
     """
     Makes flat and data mask. 
     Just for single filter I band
-    CHANGES: flats and darks are called calls for the cal unit
+    CHANGES: took domeflats 01_22
     """
     util.mkdir(calib_dir)
     
-    # Flats: at 20 seconds
-    #flat_num = [0,2,3,4,5]
-    #flat_frames = ['{0:s}sta{1:03d}_o.fits'.format(cal_dir, ss) for ss in flat_num]
-    #scan_flat_frames = ['{0:s}sta{1:03d}_o_scan.fits'.format(cal_dir, ss) for ss in flat_num]
-    #reduce_STA.treat_overscan(flat_frames)
-    
-    # Darks: at 20 seconds
-    #dark_num = [1,6,7,8,9]
-    #dark_frames = ['{0:s}sta{1:03d}_o.fits'.format(cal_dir, ss) for ss in dark_num]
-    #scan_dark_frames = ['{0:s}sta{1:03d}_o_scan.fits'.format(cal_dir, ss) for ss in dark_num]
-    #reduce_STA.treat_overscan(dark_frames)
-    
-    # Make flat
-    #calib.makeflat(scan_flat_frames, scan_dark_frames, calib_dir + 'flat.fits', darks=True)
-    
-    # Mask for masking find_stars areas
-    #calib.make_mask(calib_dir + 'flat.fits', calib_dir + 'mask.fits',
-    #                   mask_min=0.8, mask_max=1.4,
-    #                   left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
-    
-    ## found the flat from domes better, using that:
+    ## Copy flat from previous night because twilight exposures, did not bring flat lamp
+    # opted to not do this, no other flat had wfs in the right position
     shutil.copyfile(root_dir + '../../20220122/sta/reduce/calib/domeflat.fits', calib_dir + 'domeflat.fits')
     
     # Mask for masking find_stars areas
@@ -103,14 +83,17 @@ def make_sky():
 
     util.mkdir(sky_dir)
 
-    #sky_num = np.arange(39, 45+1) #sky set 1 middle of the night
-    #sky_num = np.arange(77, 83+1) #sky set 2 end of the night
-    sky_num = [39,40,41,42,43,44,45,77,78,79,80,81,82,83]
+    sky_num = np.arange(173, 179+1) #sky set 1 middle of the night
+    #sky_num = np.arange(102, 108+1) #sky set 2 end of the night
     sky_frames = ['{0:s}sky_{1:03d}_o.fits'.format(data_dir, ss) for ss in sky_num]
     reduce_STA.treat_overscan(sky_frames)
-
     scan_sky_frames =  ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num]
-    calib.makedark(scan_sky_frames, sky_dir + 'beehive_sky.fits')
+    calib.makedark(scan_sky_frames, sky_dir + 'beehive_sky1.fits')
+    
+    # ALl skies
+    #sky_num = np.append(np.arange(48, 57+1), np.arange(102, 108+1)) # fill skyset
+    #scan_sky_frames =  ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num]
+    #calib.makedark(scan_sky_frames, sky_dir + 'beehive_sky.fits')
     
     return
 
@@ -124,7 +107,7 @@ def reduce_beehive():
     #for key in ['open']:
         img = dict_images[key]
         suf = dict_suffix[key]
-        sky = 'beehive_sky.fits'
+        sky = 'beehive_sky1.fits'
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
@@ -145,16 +128,16 @@ def reduce_beehive():
 def find_stars_beehive():
     ## Loop through all the different data sets
     #for key in ['set_name']: ## Single key setup
-    #for key in dict_suffix.keys():
-    for key in ['open']:
+    for key in dict_suffix.keys():
+    #for key in ['open']:
 
         img = dict_images[key]
         suf = dict_suffix[key]
-        sky = sky_dir + 'beehive_sky.fits'
+        sky = sky_dir + 'beehive_sky1.fits'
         
         # o/c loop distinction
-        fwhm = 10 if re.search('open', key) else 7
-        thrsh = 5 if re.search('open', key) else 10
+        fwhm = 10 if re.search('open', key) else 8
+        thrsh = 10 if re.search('open', key) else 12
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
@@ -162,7 +145,7 @@ def find_stars_beehive():
 
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
         # Taken from working branch version args
-        redu.find_stars(img_files, fwhm=fwhm,  threshold = thrsh, plot_psf_compare=False, mask_file=calib_dir+'mask.fits')
+        redu.find_stars(img_files, fwhm=fwhm,  threshold = thrsh, plot_psf_compare=False, mask_file=calib_dir+'domemask.fits')
         
     ## DEBUG - single threaded
     # fmt = '{dir}sta{img:03d}{suf:s}_scan_clean.fits'
@@ -176,8 +159,8 @@ def calc_star_stats():
     util.mkdir(stats_dir)
     
     ## Loop through all the different data sets
-    #for key in dict_suffix.keys(): ## Single key setup
-    for key in ['open']:
+    for key in dict_suffix.keys():
+    #for key in ['open']:
         
         img = dict_images[key]
         suf = dict_suffix[key]

@@ -102,7 +102,7 @@ def make_flat():
     ## This mask tells us where not to search for stars.
     ## UPDATE: mask_min and mask_max were hand calculated 6/14/2021
     calib.make_mask(calib_dir + 'flat.fits', calib_dir + 'mask.fits',
-                       mask_min=0.5, mask_max=1.8,
+                       mask_min=0.8, mask_max=1.4,
                        left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
     return
 
