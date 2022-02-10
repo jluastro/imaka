@@ -1,4 +1,4 @@
- ## reduce_2022_01_23.py
+ ## reduce_2022_01_25.py
 ##########################
 ## edited by Eden McEwen
 ## January 2022
@@ -24,7 +24,7 @@ from imaka.reduce import massdimm
 import matplotlib
 # matplotlib.use('Agg')
 
-night = '20220123'
+night = '20220125'
 root_dir = f'/g/lu/data/imaka/onaga/{night}/sta/'
 
 data_dir = root_dir + 'Beehive-W/'
@@ -43,34 +43,16 @@ massdimm_dir = root_dir + 'reduce/massdimm/'
 
 
 ## Junk files - see logs
-dict_suffix = {'LS_3wfs_s_1': 'n3wfs_c',
-               'LS_3wfs_w_1': 'n3wide_c',
-               'LS_5wfs_1': 'n5wfs_c',
-               'open_1':    '_o',
-               'LS_3wfs_s_2': 'n3wfs_c',
-               'LS_3wfs_w_2': 'n3wide_c',
-               'LS_5wfs_2': 'n5wfs_c',
-               'open_2':    '_o',
+dict_suffix = {'LS_3wfs_s': 'n3wfs_c',
+               'LS_3wfs_w': 'n3wide_c',
+               'LS_5wfs': 'n5wfs_c',
+               'open':    '_o',
               }
 
-dict_images = {'LS_5wfs_1':   [0,4,8,12,16,20,24,28,32,36,40,44],
-               'LS_3wfs_s_1': [1,5,9,13,17,21,25,29,33,37,41,45],
-               'LS_3wfs_w_1': [2,6,10,14,18,22,26,30,34,38,42,46],
-               'open_1':      [3,7,11,15,19,23,27,31,35,39,43,47],
-               'LS_5wfs_2':   [58,62,66,70,74,78,82,86,90,94,98],
-               'LS_3wfs_s_2': [59,63,67,71,75,79,83,87,91,95,99],
-               'LS_3wfs_w_2': [60,64,68,72,76,80,84,88,92,96,100],
-               'open_2':      [61,65,69,73,77,81,85,89,93,97,101],
-              }
-
-dict_sky = {'LS_3wfs_s_1':    'beehive_sky1.fits',
-               'LS_3wfs_w_1': 'beehive_sky1.fits',
-               'LS_5wfs_1':   'beehive_sky1.fits',
-               'open_1':      'beehive_sky1.fits',
-               'LS_3wfs_s_2': 'beehive_sky2.fits',
-               'LS_3wfs_w_2': 'beehive_sky2.fits',
-               'LS_5wfs_2':   'beehive_sky2.fits',
-               'open_2':      'beehive_sky2.fits',
+dict_images = {'LS_5wfs':   [0,4,8,10,14,18,22,26,30,34],
+               'LS_3wfs_s': [1,5,11,15,19,23,27,31,35],
+               'LS_3wfs_w': [2,6,12,16,20,24,28,32,36],
+               'open':      [3,7,13,17,21,25,29,33,37],
               }
 
 
@@ -101,15 +83,9 @@ def make_sky():
 
     util.mkdir(sky_dir)
 
-    #sky_num = np.arange(48, 57+1) #sky set 1 middle of the night
-    sky_num = np.arange(102, 108+1) #sky set 2 end of the night
+    sky_num = np.arange(38, 44+1) #sky set 1 middle of the night
     sky_frames = ['{0:s}sky_{1:03d}_o.fits'.format(data_dir, ss) for ss in sky_num]
     reduce_STA.treat_overscan(sky_frames)
-    scan_sky_frames =  ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num]
-    calib.makedark(scan_sky_frames, sky_dir + 'beehive_sky2.fits')
-    
-    # ALl skies
-    sky_num = np.append(np.arange(48, 57+1), np.arange(102, 108+1)) # fill skyset
     scan_sky_frames =  ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num]
     calib.makedark(scan_sky_frames, sky_dir + 'beehive_sky.fits')
     
@@ -125,7 +101,7 @@ def reduce_beehive():
     #for key in ['open']:
         img = dict_images[key]
         suf = dict_suffix[key]
-        sky = dict_sky[key]
+        sky = 'beehive_sky.fits'
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
@@ -151,9 +127,9 @@ def find_stars_beehive():
 
         img = dict_images[key]
         suf = dict_suffix[key]
-        sky = dict_sky[key]
+        sky = sky_dir + 'beehive_sky.fits'
         
-        # o/c loop distinction        
+        # o/c loop distinction
         fwhm = 15 if re.search('open', key) else 8
         thrsh = 6 if re.search('open', key) else 7
 
@@ -228,8 +204,7 @@ def stack_beehive():
     util.mkdir(stacks_dir)
 
     # Loop through all the different data sets and reduce them.
-    #for key in dict_suffix.keys():
-    for key in ['open_2', 'LS_3wfs_s_2', 'LS_3wfs_w_2', 'LS_5wfs_2']:
+    for key in dict_suffix.keys():
         img = dict_images[key]
         suf = dict_suffix[key]
 
@@ -248,17 +223,18 @@ def analyze_stacks():
     ## Loop through all the different data sets
     #for key in ['set_name']: ## Single key setup
     all_images = []
-    #for key in dict_suffix.keys():
-    for key in ['open_2', 'LS_3wfs_s_2', 'LS_3wfs_w_2', 'LS_5wfs_2']:
+    for key in dict_suffix.keys():
         img = dict_images[key]
         suf = dict_suffix[key]
         
+        # o/c loop distinction
         fwhm = 15 if re.search('open', key) else 8
         thrsh = 6 if re.search('open', key) else 7
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
         print('     Fwhm: ', str(fwhm))
+        print('    thrsh: ', str(thrsh))
 
         image_file = [stacks_dir + 'beehive_stack_' + suf + '.fits']
         all_images.append(image_file[0])

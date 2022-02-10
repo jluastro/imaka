@@ -49,10 +49,10 @@ dict_suffix = {'LS_3wfs_s': 'n3wfs_c',
                'open':    '_o',
               }
 
-dict_images = {'LS_5wfs':   [121,125,129,133,137,141,145,149,153,157,161],
-               'LS_3wfs_s': [122,126,130,134,138,142,146,150,154,158,162],
-               'LS_3wfs_w': [123,127,131,135,139,143,147,151,155,159,163],
-               'open':      [124,128,132,136,140,144,148,152,156,160,164],
+dict_images = {'LS_5wfs':   [121,125,129,133,137,141,145,149,153,157,161,169,180,184,188,192,196,200,204,208,212,213],
+               'LS_3wfs_s': [122,126,130,134,138,142,146,150,154,158,162,166,170,181,185,189,193,197,201,205,209,214],
+               'LS_3wfs_w': [123,127,131,135,139,143,147,151,155,159,163,167,171,182,186,190,194,198,202,206,210,215],
+               'open':      [124,128,132,136,140,144,148,152,156,160,168,172,183,168,172,187,191,195,199,203,207,211,216],
               }
 
 
@@ -83,17 +83,17 @@ def make_sky():
 
     util.mkdir(sky_dir)
 
-    sky_num = np.arange(173, 179+1) #sky set 1 middle of the night
-    #sky_num = np.arange(102, 108+1) #sky set 2 end of the night
+    #sky_num = np.arange(173, 179+1) #sky set 1 middle of the night
+    sky_num = np.arange(217, 223+1) #sky set 2 end of the night
     sky_frames = ['{0:s}sky_{1:03d}_o.fits'.format(data_dir, ss) for ss in sky_num]
     reduce_STA.treat_overscan(sky_frames)
     scan_sky_frames =  ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num]
-    calib.makedark(scan_sky_frames, sky_dir + 'beehive_sky1.fits')
+    calib.makedark(scan_sky_frames, sky_dir + 'beehive_sky2.fits')
     
     # ALl skies
-    #sky_num = np.append(np.arange(48, 57+1), np.arange(102, 108+1)) # fill skyset
-    #scan_sky_frames =  ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num]
-    #calib.makedark(scan_sky_frames, sky_dir + 'beehive_sky.fits')
+    sky_num = np.append(np.arange(173, 179+1), np.arange(217, 223+1)) # fill skyset
+    scan_sky_frames =  ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num]
+    calib.makedark(scan_sky_frames, sky_dir + 'beehive_sky.fits')
     
     return
 
@@ -107,7 +107,7 @@ def reduce_beehive():
     #for key in ['open']:
         img = dict_images[key]
         suf = dict_suffix[key]
-        sky = 'beehive_sky1.fits'
+        sky = 'beehive_sky.fits'
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
@@ -136,8 +136,8 @@ def find_stars_beehive():
         sky = sky_dir + 'beehive_sky1.fits'
         
         # o/c loop distinction
-        fwhm = 10 if re.search('open', key) else 8
-        thrsh = 10 if re.search('open', key) else 12
+        fwhm = 15 if re.search('open', key) else 8
+        thrsh = 6 if re.search('open', key) else 7
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
@@ -232,17 +232,21 @@ def analyze_stacks():
     for key in dict_suffix.keys():
         img = dict_images[key]
         suf = dict_suffix[key]
-        fwhm = dict_fwhm[key]
+        
+        # o/c loop distinction
+        fwhm = 15 if re.search('open', key) else 8
+        thrsh = 5 if re.search('open', key) else 6
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
         print('     Fwhm: ', str(fwhm))
+        print('    thrsh: ', str(thrsh))
 
         image_file = [stacks_dir + 'beehive_stack_' + suf + '.fits']
         all_images.append(image_file[0])
         
-        redu.find_stars(image_file, fwhm=fwhm, threshold=3, N_passes=2, plot_psf_compare=False,
-                              mask_file=calib_dir + 'mask.fits')
+        redu.find_stars(image_file, fwhm=fwhm, threshold=thrsh, N_passes=2, plot_psf_compare=False,
+                              mask_file=calib_dir + 'domemask.fits')
 
     ## Calc stats on all the stacked images
     out_stats_file = stats_dir + 'stats_stacks.fits'

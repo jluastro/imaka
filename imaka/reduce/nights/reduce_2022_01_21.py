@@ -145,16 +145,16 @@ def reduce_beehive():
 def find_stars_beehive():
     ## Loop through all the different data sets
     #for key in ['set_name']: ## Single key setup
-    #for key in dict_suffix.keys():
-    for key in ['open']:
+    for key in dict_suffix.keys():
+    #for key in ['open']:
 
         img = dict_images[key]
         suf = dict_suffix[key]
         sky = sky_dir + 'beehive_sky.fits'
         
         # o/c loop distinction
-        fwhm = 10 if re.search('open', key) else 7
-        thrsh = 5 if re.search('open', key) else 10
+        fwhm = 15 if re.search('open', key) else 7
+        thrsh = 7
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
@@ -162,7 +162,7 @@ def find_stars_beehive():
 
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
         # Taken from working branch version args
-        redu.find_stars(img_files, fwhm=fwhm,  threshold = thrsh, plot_psf_compare=False, mask_file=calib_dir+'mask.fits')
+        redu.find_stars(img_files, fwhm=fwhm,  threshold = thrsh, plot_psf_compare=False, mask_file=calib_dir+'domemask.fits')
         
     ## DEBUG - single threaded
     # fmt = '{dir}sta{img:03d}{suf:s}_scan_clean.fits'
@@ -176,8 +176,8 @@ def calc_star_stats():
     util.mkdir(stats_dir)
     
     ## Loop through all the different data sets
-    #for key in dict_suffix.keys(): ## Single key setup
-    for key in ['open']:
+    for key in dict_suffix.keys(): ## Single key setup
+    #for key in ['open']:
         
         img = dict_images[key]
         suf = dict_suffix[key]
@@ -227,7 +227,9 @@ def stack_beehive():
     util.mkdir(stacks_dir)
 
     # Loop through all the different data sets and reduce them.
-    for key in dict_suffix.keys():
+    #for key in dict_suffix.keys():
+    #for key in ['LS_5wfs', 'LS_3wfs_s', 'LS_3wfs_w']: #excluding open
+    for key in ['open']:
         img = dict_images[key]
         suf = dict_suffix[key]
 
@@ -249,7 +251,9 @@ def analyze_stacks():
     for key in dict_suffix.keys():
         img = dict_images[key]
         suf = dict_suffix[key]
-        fwhm = dict_fwhm[key]
+        
+        fwhm = 15 if re.search('open', key) else 7
+        thrsh = 7
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
@@ -258,8 +262,8 @@ def analyze_stacks():
         image_file = [stacks_dir + 'beehive_stack_' + suf + '.fits']
         all_images.append(image_file[0])
         
-        redu.find_stars(image_file, fwhm=fwhm, threshold=3, N_passes=2, plot_psf_compare=False,
-                              mask_file=calib_dir + 'mask.fits')
+        redu.find_stars(image_file, fwhm=fwhm, threshold=thrsh, N_passes=2, plot_psf_compare=False,
+                              mask_file=calib_dir + 'domemask.fits')
 
     ## Calc stats on all the stacked images
     out_stats_file = stats_dir + 'stats_stacks.fits'

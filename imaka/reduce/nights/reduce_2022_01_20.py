@@ -69,9 +69,9 @@ dict_fwhm = {'LS_3wfs_r1': 6,
              'LS_5wfs_r1': 6,
              'donut_r1': 6,
              'open_r1': 12,
-             'LS_3wfs_r2': 6,
-             'LS_5wfs_r2': 6,
-             'open_r2':    12
+             'LS_3wfs_r2': 10,
+             'LS_5wfs_r2': 10,
+             'open_r2':    15
             }  
 
 ###############################################
@@ -154,14 +154,15 @@ def find_stars_beehive():
     #for key in ['set_name']: ## Single key setup
     #for key in dict_suffix.keys():
     for key in ['LS_3wfs_r2', 'LS_5wfs_r2', 'open_r2']:
+    #for key in []:
 
         img = dict_images[key]
         suf = dict_suffix[key]
         sky = sky_dir + 'beehive_sky.fits'
         
         # o/c loop distinction
-        fwhm = 12 if re.search('open', key) else 5
-        thrsh = 6 if re.search('open', key) else 6
+        fwhm = 15 if re.search('open', key) else 10
+        thrsh = 6
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
@@ -174,9 +175,10 @@ def find_stars_beehive():
         redu.find_stars(img_files, fwhm=fwhm,  threshold = thrsh, plot_psf_compare=False, mask_file=calib_dir+'mask.fits')
         
     ## DEBUG - single threaded
-    # fmt = '{dir}sta{img:03d}{suf:s}_scan_clean.fits'
-    # image_file = fmt.format(dir=out_dir, img=dict_images['LS_c'][0], suf=dict_suffix['LS_c'][0]) 
-    # redu.find_stars_single(image_file, dict_fwhm['LS_c'], 3, 2, False, calib_dir + 'mask.fits')
+    #key_i = 'open_r2'
+    #fmt = '{dir}sta{img:03d}{suf:s}_scan_clean.fits'
+    #image_file = fmt.format(dir=out_dir, img=dict_images[key_i][0], suf=dict_suffix[key_i]) 
+    #redu.find_stars_single(image_file, dict_fwhm[key_i], 7, 2, False, calib_dir + 'mask.fits')
                           
     return
 
@@ -186,7 +188,8 @@ def calc_star_stats():
     
     ## Loop through all the different data sets
     #for key in ['set_name']: ## Single key setup
-    for key in ['LS_3wfs_r2', 'LS_5wfs_r2', 'open_r2']:   
+    for key in ['LS_3wfs_r2', 'LS_5wfs_r2', 'open_r2']:
+    #for key in []:
         img = dict_images[key]
         suf = dict_suffix[key]
 
@@ -200,9 +203,10 @@ def calc_star_stats():
         moffat.fit_moffat(img_files, stats_file, flux_percent=0.2)
 
     ## DEBUG - single threaded
+    #key_i = 'open_r2'
     #fmt = '{dir}sta{img:03d}{suf:s}_scan_clean.fits'
-    #image_file = fmt.format(dir=out_dir, img=dict_images['LS_3wfs_r2'][0], suf=dict_suffix['LS_3wfs_r2'])
-    #stats_file = stats_dir + 'stats_LS_3wfs_r2.fits'
+    #image_file = fmt.format(dir=out_dir, img=dict_images[key_i][0], suf=dict_suffix[key_i]) 
+    #stats_file = f'{stats_dir}stats_{key_i}.fits'
     #redu.calc_star_stats([image_file], output_stats=stats_file)
     #moffat.fit_moffat_single(image_file,image_file.replace('.fits', '_stars_stats.fits'), 0.2)
         
@@ -260,9 +264,10 @@ def analyze_stacks():
     for key in ['LS_3wfs_r2', 'LS_5wfs_r2', 'open_r2']:
         img = dict_images[key]
         suf = dict_suffix[key]
-        # o/c loop distinction
-        fwhm = 8 if re.search('open', key) else 5
-        thrsh = 8 if re.search('open', key) else 10
+        
+        # o/c loop distinction - copied from the find stars function
+        fwhm = 15 if re.search('open', key) else 10
+        thrsh = 8
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
@@ -273,7 +278,7 @@ def analyze_stacks():
         all_images.append(image_file[0])
         
         redu.find_stars(image_file, fwhm=fwhm, threshold=thrsh, N_passes=2, plot_psf_compare=False,
-                              mask_file=calib_dir + 'mask.fits')
+                              mask_file=calib_dir + 'domemask.fits')
 
     ## Calc stats on all the stacked images
     out_stats_file = stats_dir + 'stats_stacks.fits'
