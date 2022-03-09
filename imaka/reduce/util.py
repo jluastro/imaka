@@ -222,6 +222,14 @@ def get_four_filter_quadrant(starlist_name):
         quad = 'SW'
 
     return quad
+
+def get_four_filter_name(starlist_name):
+    # Get filter position in case of four filter data
+    name_strings = starlist_name.split("_")
+    filt_name    = name_strings[-3]
+    filt_order   = name_strings[-2]
+
+    return filt_name, filt_order
     
 def get_filter(hdr):
     if 'FILT' in hdr:

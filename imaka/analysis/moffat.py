@@ -42,6 +42,7 @@ def Elliptical_Moffat2D(x, y, \
 def fit_moffat(img_files, stats_file, x_guess=5, y_guess=5, flux_percent=0.9, starlists=None):
     """
     Conduct Moffat fit on data and add outputs to stats tables
+    starlists - fits files output by the
     """
 
     # Create arrays for all the final statistics.
@@ -139,7 +140,9 @@ def fit_moffat(img_files, stats_file, x_guess=5, y_guess=5, flux_percent=0.9, st
     stats['Major Alpha std'] = width_y_std
 
     stats_file_root, stats_file_ext = os.path.splitext(stats_file)
-    stats.write(stats_file_root.split("_mdp")[0] + stats_file_ext, overwrite=True)
+    output_stats = stats_file_root.split("_mdp")[0] + stats_file_ext
+    print(f' => fit_moffat finished, saving to {output_stats}')
+    stats.write(output_stats, overwrite=True)
     
     return
 
@@ -150,8 +153,12 @@ def fit_moffat_single(img_file, starlist, flux_percent):
     
     # Load up the image to work on.
     img, hdr = fits.getdata(img_file, header=True, ignore_missing_end=True)
-
-    stars = Table.read(starlist, format='fits')
+    
+    print("File exists: ", os.path.exists(starlist))
+    if not os.path.exists(starlist):
+        return {}
+    stars = Table.read(starlist, format='fits') #, format='ascii.fixed_width')
+    
     N_stars = len(stars)
 
     # Put the positions into an array 
@@ -250,8 +257,9 @@ def fit_moffat_single(img_file, starlist, flux_percent):
     # Save the average PSF (flux-weighted). Note we are making a slight 
     # mistake here since each PSF has a different sub-pixel position
     final_psf_mof /= N_good_stars
-    fits.writeto(img_file.replace('.fits', '_psf_mof_oversamp{0:d}.fits'.format(over_samp)),
+    fits.writeto(starlist.replace('_stars_stats.fits', '_psf_mof_oversamp{0:d}.fits'.format(over_samp)),
                  final_psf_mof, hdr, overwrite=True)
+    #TODO: four filter specific, base on starlist
 
     # Save and updated list of stars with all their moffat fits.
     stars['N Sky'] = N_sky_list
@@ -262,8 +270,8 @@ def fit_moffat_single(img_file, starlist, flux_percent):
     stars['Major Alpha'] = width_y_list
 
     stars_file_root, stars_file_ext = os.path.splitext(starlist)
-    stars.write(starlist.replace('.fits', '_mdp.fits'), overwrite=True)
-
+    stars.write(starlist.replace('.fits', '_mdp.fits'), overwrite=True) #, format='ascii.fixed_wi
+    #TODO: Changing the format back until I get an error
     
     # Take median values of parameters and put in intial lists
     results = {}

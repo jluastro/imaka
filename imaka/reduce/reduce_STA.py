@@ -444,17 +444,18 @@ def four_filt_split(starlists, filt_order):
         print("\t", starlists[ii])
 
         # Read in image and starlists
-        stars = table.Table.read(starlists[ii], format='ascii')
+        stars = Table.read(starlists[ii], format='ascii')
         x = stars['xcentroid']
         y = stars['ycentroid']
 
         # Define quadrants with indicies
-        img_half = 5280 / 2
+        img_half = 5280 / 2 # FOR BIN2!!!!
+        img_half = 5280 #BIN1
 
-        ind_1 = np.where((x>img_half) & (y<img_half))
-        ind_2 = np.where((x<img_half) & (y<img_half))
-        ind_3 = np.where((x<img_half) & (y>img_half))
-        ind_4 = np.where((x>img_half) & (y>img_half))
+        ind_1 = np.where((x<img_half) & (y>img_half))
+        ind_2 = np.where((x>img_half) & (y>img_half))
+        ind_3 = np.where((x>img_half) & (y<img_half))
+        ind_4 = np.where((x<img_half) & (y<img_half))
     
         # Write new files
         list_root = starlists[ii].split('stars.txt')[0]
@@ -475,5 +476,9 @@ def four_filt_split(starlists, filt_order):
                           delimiter=None, bookend=False,  formats=formats, overwrite=True)
         stars[ind_4].write(list_root + filt_4 + '_' + filt_order + '_stars.txt', format='ascii.fixed_width',
                           delimiter=None, bookend=False,  formats=formats, overwrite=True)
+        
+        #from the original star function 
+        #sources.write(img_file.replace('.fits', '_stars.txt'), format='ascii.fixed_width',
+        #                  delimiter=None, bookend=False, formats=formats, overwrite=True)
     
     return

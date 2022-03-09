@@ -90,8 +90,6 @@ def rescale_dark(dark_file, image_file, dark_save):
     fits.writeto(dark_save, img_ds, d_hdr)
     return
     
-    
-
 
 def fix_bad_pixels(img):
     crmask, cleanarr = detect_cosmics(img, sigclip=5, sigfrac=0.3, objlim=5.0, gain=1.0,
@@ -169,7 +167,11 @@ def clean_and_save_single_image(img_file, sky, flat, out_dir, rebin, fix_bad_pix
                                                 fix_bad_pixels=fix_bad_pixels,
                                                 worry_about_edges=worry_about_edges)
     
-
+    if rebin != 1:
+        orig_binfac = hdr['BINFAC']
+        new_binfac = orig_binfac * rebin
+        hdr['BINFAC'] = new_binfac
+    
     # Write it out
     print(f'  p{pid} - Writing image')
     file_dir, file_name = os.path.split(img_file)
@@ -229,7 +231,7 @@ def clean_single_image(img, sky=None, flat=None, rebin=1,
     return img, bad_pixels
 
 
-def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=False, mask_file=None):
+def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=False, mask_file=None, sharp_lim=1.0, peak_max=50000):
     """
     img_files - a list of image files.
     fwhm - First guess at the FWHM of the PSF for the first pass on the first image.
@@ -247,7 +249,7 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
 
     # Normalize each of the flats: in parallel
     print(f'  Finding stars in parallel with {cpu_count} cores.')
-    args = zip(img_files, repeat(fwhm), repeat(threshold), repeat(N_passes), repeat(plot_psf_compare), repeat(mask_file))
+    args = zip(img_files, repeat(fwhm), repeat(threshold), repeat(N_passes), repeat(plot_psf_compare), repeat(mask_file), repeat(sharp_lim), repeat(peak_max))
     results = pool.starmap(find_stars_single, args)
 
     pool.close()
@@ -255,7 +257,7 @@ def find_stars(img_files, fwhm=5, threshold=4, N_passes=2, plot_psf_compare=Fals
 
     return
 
-def find_stars_single(img_file, fwhm, threshold, N_passes, plot_psf_compare, mask_file):
+def find_stars_single(img_file, fwhm, threshold, N_passes, plot_psf_compare, mask_file, sharp_lim, peak_max):
     pid = mp.current_process().pid
     
     print(f'  p{pid} - Working on image: {img_file}')
@@ -295,7 +297,7 @@ def find_stars_single(img_file, fwhm, threshold, N_passes, plot_psf_compare, mas
     # Each pass will have an updated fwhm for the PSF.
     for nn in range(N_passes):
         print(f'    p{pid} - Pass {nn:d} assuming FWHM = {fwhm_curr:.1f}')
-        daofind = DAOStarFinder(fwhm=fwhm_curr, threshold = img_threshold, exclude_border=True)
+        daofind = DAOStarFinder(fwhm=fwhm_curr, threshold = img_threshold, exclude_border=True, sharplo=-sharp_lim, sharphi=sharp_lim, peakmax=peak_max)
         sources = daofind(img - bkg_mean, mask=mask)
         print(f'    p{pid} - {len(sources)} sources found, now fitting for FWHM.')
 
@@ -437,6 +439,7 @@ def find_stars_single(img_file, fwhm, threshold, N_passes, plot_psf_compare, mas
         final_psf_mod /= final_psf_mod.sum()
         fits.writeto(img_file.replace('.fits', '_psf_obs.fits'), final_psf_obs, hdr, overwrite=True)
         fits.writeto(img_file.replace('.fits', '_psf_mod.fits'), final_psf_mod, hdr, overwrite=True)
+        #TODO: make starlist specific
 
         # Drop sources with flux (signifiance) that isn't good enough.
         # Empirically this is <1.2
@@ -688,7 +691,7 @@ def calc_star_stats(img_files, output_stats='image_stats.fits', filt=None, fourf
     stats['emp_fwhm_std'].format = '7.3f'
 
     add_frame_number_column(stats)
-
+    print(f' => calc_stats finished, saving to {output_stats}')
     stats.write(output_stats, overwrite=True)
                         
     return
@@ -714,12 +717,14 @@ def calc_star_stats_single(img_file, starlist, is_four_filt):
     # Read in the appropriate starlist for this image. 
     stars = table.Table.read(starlist, format='ascii')
     N_stars = len(stars)
+    print("File exists: ", os.path.exists(starlist), " Stars: ", N_stars)
 
     # Figure out quadrant information (relevant of four-filter only)
     if is_four_filt:
         quad = util.get_four_filter_quadrant(starlist)
+        f, odr = util.get_four_filter_name(starlist)
     else:
-        quad = ''
+        quad, f, odr  = '','',''
 
         
     # Put the positions into an array for photutils work.
@@ -785,7 +790,10 @@ def calc_star_stats_single(img_file, starlist, is_four_filt):
     img_dir_name, img_file_name = os.path.split(img_file)
     ee_dir = img_dir_name + '/ee/'
     util.mkdir(ee_dir)
-    _ee_out = open(ee_dir + img_file_name.replace('.fits', '_ee.txt'), 'w')
+    ee_name = ee_dir + img_file_name.replace('.fits', '_ee.txt')
+    if is_four_filt:
+        ee_name = ee_dir + img_file_name.replace('.fits', f'_{f}_{odr}_ee.txt')
+    _ee_out = open(ee_name, 'w')
     _ee_out.write('{0:10s}  {1:10s}\n'.format('#Radius', 'EE'))
     _ee_out.write('{0:10s}  {1:10s}\n'.format('#(arcsec)', '()'))
     for rr in range(len(radii)):
@@ -872,6 +880,9 @@ def calc_star_stats_single(img_file, starlist, is_four_filt):
     # Save the individual star stats. (and plate scale info)
     stars.meta['scale'] = plate_scale
     new_starlist = img_file.replace('.fits', '_stars_stats.fits')
+    if is_four_filt:
+        new_starlist = img_file.replace('.fits', f'_{f}_{odr}_stars_stats.fits')
+    
     stars.write(new_starlist, overwrite=True)
 
     results = {}
@@ -1023,6 +1034,7 @@ def get_transforms_from_starlists(starlists):
 
         for ii in range(len(starlists)):
             # Load up the corresponding starlist.
+            print("Starlist: " + starlists[ii])
             stars = read_starlist(starlists[ii])
 
             t = align.initial_align(stars, stars_ref, briteN=N_brite, transformModel=transforms.Shift, req_match=3)
