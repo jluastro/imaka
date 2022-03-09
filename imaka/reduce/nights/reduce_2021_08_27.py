@@ -41,6 +41,7 @@ massdimm_dir = root_dir + 'reduce/massdimm/'
 
 ## Junk files -- see logs
 ## 22 - spots jumped
+## Junk from post processing: 11, 15, 30
 
 dict_suffix = {'open_BRIV': '_o',
                'LS_BRIV':   'LS_c',
@@ -49,8 +50,8 @@ dict_suffix = {'open_BRIV': '_o',
                'LS_RIVB':   'LS_c',
                'docz_RIVB': 'docz2_c'}
 
-dict_images = {'open_BRIV':  [15, 18, 21, 24, 27, 30, 33, 43, 46],
-               'LS_BRIV':    [10, 11, 13, 16, 19, 25, 28, 31, 41, 44],
+dict_images = {'open_BRIV':  [ 18, 21, 24, 27, 33, 43, 46], # 15, 30
+               'LS_BRIV':    [10, 11, 13, 16, 19, 25, 28, 31, 41, 44], #11
                'docz_BRIV':  [14, 17, 20, 23, 26, 29, 32, 42, 45],
                'open_RIVB':  [49, 52, 55, 58, 61, 64, 67],
                'LS_RIVB':    [47, 50, 53, 56, 59, 62, 65],
@@ -199,6 +200,40 @@ def find_stars_fld2():
                           
     return
 
+def filter_stars():
+    ## Loop through all the different data sets
+    #for key in ['set_name']: ## Single key setup
+    for key in dict_suffix.keys():
+        
+        img = dict_images[key]
+        suf = dict_suffix[key]
+        filt = dict_filt[key]
+        fwhm = dict_fwhm[key]
+
+        print('Filtering: {1:s}  {0:s}'.format(key, suf))
+        print('   Images: ', img)
+        print('      filt: ', filt)
+        
+        star_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean_stars.txt'.format(img=ii, suf=suf) for ii in img]
+        # TODO: move this into a faster system, in the reduce file
+        for sf in star_files:
+            stars = table.Table.read(sf, format='ascii')
+            
+            formats = {'xcentroid': '%8.3f', 'ycentroid': '%8.3f', 'sharpness': '%.2f',
+                   'roundness1': '%.2f', 'roundness2': '%.2f', 'peak': '%10.1f',
+                   'flux': '%10.6f', 'mag': '%6.2f', 'x_fwhm': '%5.2f', 'y_fwhm': '%5.2f',
+                   'theta': '%6.3f'}
+            
+            stars.write(sf.split(".txt")[0]+"_orig.txt", format='ascii.fixed_width', delimiter=None, bookend=False, formats=formats, overwrite=True)
+            
+            stars = stars[stars['peak'] > 100]
+            stars = stars[stars['peak'] < 30000]
+            stars = stars[stars['sharpness'] < 0.7]
+
+            stars.write(sf, format='ascii.fixed_width', delimiter=None, bookend=False, formats=formats, overwrite=True)
+                          
+    return
+
 
 def calc_star_stats():
     util.mkdir(stats_dir)
@@ -206,6 +241,7 @@ def calc_star_stats():
     ## Loop through all the different data sets
     #for key in ['set_name']: ## Single key setup
     #for key in ['open_IVBR', 'LS_IVBR', 'docz_IVBR']:
+    #for key in []:
     for key in dict_suffix.keys():
         
         img = dict_images[key]
@@ -216,15 +252,18 @@ def calc_star_stats():
         
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
         stats_file = stats_dir + 'stats_' + key + '.fits'
-        
+
         redu.calc_star_stats(img_files, output_stats=stats_file)
         moffat.fit_moffat(img_files, stats_file, flux_percent=0.2)
 
     ## DEBUG - single threaded
-    # fmt = '{dir}sta{img:03d}{suf:s}_scan_clean.fits'
-    # image_file = fmt.format(dir=out_dir, img=dict_images['LS_c'][0], suf=dict_suffix['LS_c'][0])
-    # stats_file = stats_dir + 'stats_LS_c.fits'
-    # redu.calc_star_stats(image_file, stats_file, flux_percent=0.2)
+    #key_i = 'open_BRIV'
+    #fmt = '{dir}sta{img:03d}{suf:s}_scan_clean.fits'
+    #image_file = fmt.format(dir=out_dir, img=dict_images[key_i][0], suf=dict_suffix[key_i]) 
+    #stats_file = f'{stats_dir}stats_{key_i}.fits'
+    #redu.calc_star_stats([image_file], output_stats=stats_file)
+    #moffat.fit_moffat_single(image_file,image_file.replace('.fits', '_stars_stats.fits'), 0.2)
+
         
     return
 
@@ -419,15 +458,20 @@ def calc_fourfilt_stats():
                 
                 img_files += [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
                 starlists += [out_dir + 'sta{img:03d}{suf:s}_scan_clean_{f:s}_{odr:s}_stars.txt'.format(img=ii, suf=suf, f=f, odr=odr) for ii in img]
-            
+            starlist_stats = [strlst.replace('_stars.txt', '_stars_stats.fits') for strlst in starlists]
             print(f"Calc Star_Stats: {suf} \n Filter: {f}")
-            redu.calc_star_stats(img_files, output_stats=stats_file, starlists=starlists, fourfilt=True)
+            #redu.calc_star_stats(img_files, output_stats=stats_file, starlists=starlists, fourfilt=True)
             print("Starting moffat fitting")
-            moffat.fit_moffat(img_files, stats_file, starlists=starlists)
+            moffat.fit_moffat(img_files, stats_file, starlists=starlist_stats)
             
             ## DEBBUG: SINGLE THREAD
-            # redu.calc_star_stats_single(img_files[0], starlists[0], True)
-    
+            #print("stars: ", starlists[0])
+            #print("stats: ", stats_file)
+            #redu.calc_star_stats_single(img_files[0], starlists[0], True)
+            #moffat.fit_moffat_single(img_files[0], starlist_stats[0], 0.2)
+            #break
+        #break
+        
     return
 
 

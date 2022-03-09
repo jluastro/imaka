@@ -83,10 +83,10 @@ dict_fwhm = {'LS_I': 6,
              'docz_VBRI': 6,
              'open_VBRI': 12,
              'tt_VBRI':  6,
-             'LS_VBRI': 6,
-             'docz_VBRI': 6,
-             'open_VBRI': 12,
-             'tt_VBRI':  6
+             'LS_RIVB': 6,
+             'docz_RIVB': 6,
+             'open_RIVB': 12,
+             'tt_RIVB':  6
             }
 
 dict_filt = {'LS_I':  'I',
@@ -203,25 +203,29 @@ def find_stars_fld2():
     #for key in ['set_name']: ## Single key setup
     #for key in ['set_name']:
     #for key in dict_suffix.keys():
+    for key in ['LS_RIVB', 'docz_RIVB', 'open_RIVB', 'tt_RIVB']:
         
-    #    img = dict_images[key]
-    #    suf = dict_suffix[key]
-    #    filt = dict_filt[key]
-    #    fwhm = dict_fwhm[key]
+        img = dict_images[key]
+        suf = dict_suffix[key]
+        filt = dict_filt[key]
+        fwhm = dict_fwhm[key]
+        thrsh = 10
+        peak_max = 30000
+        sharp_lim = 0.9
 
-    #    print('Working on: {1:s}  {0:s}'.format(key, suf))
-    #    print('   Images: ', img)
-    #    print('      filt: ', filt)
+        print('Working on: {1:s}  {0:s}'.format(key, suf))
+        print('   Images: ', img)
+        print('      filt: ', filt)
         
-    #    img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
+        img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
 
-     #   redu.find_stars(img_files, fwhm=fwhm, threshold=8, N_passes=2, plot_psf_compare=False, mask_file=calib_dir+f'mask_{filt}.fits')
+        redu.find_stars(img_files, fwhm=fwhm, threshold =thrsh, N_passes=2, plot_psf_compare=False, mask_file=calib_dir+f'mask_{filt}.fits', peak_max=peak_max, sharp_lim=sharp_lim)
         
     ## DEBUG - single threaded
-    key_test = 'LS_I'
-    fmt = '{dir}sta{img:03d}{suf:s}_scan_clean.fits'
-    image_file = fmt.format(dir=out_dir, img=dict_images[key_test][0], suf=dict_suffix[key_test]) 
-    redu.find_stars_single(image_file, dict_fwhm[key_test], 3, 2, False, calib_dir + 'mask_I.fits')
+    #key_test = 'LS_I'
+    #fmt = '{dir}sta{img:03d}{suf:s}_scan_clean.fits'
+    #image_file = fmt.format(dir=out_dir, img=dict_images[key_test][0], suf=dict_suffix[key_test]) 
+    #redu.find_stars_single(image_file, dict_fwhm[key_test], 3, 2, False, calib_dir + 'mask_I.fits')
                           
     return
 
@@ -241,7 +245,7 @@ def calc_star_stats():
         
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
         stats_file = stats_dir + 'stats_' + key + '.fits'
-        
+
         redu.calc_star_stats(img_files, output_stats=stats_file)
         moffat.fit_moffat(img_files, stats_file, flux_percent=0.2)
 
@@ -252,6 +256,7 @@ def calc_star_stats():
     # redu.calc_star_stats(image_file, stats_file, flux_percent=0.2)
         
     return
+
 
 
 def append_massdimm():
@@ -307,6 +312,9 @@ def analyze_stacks():
         suf = dict_suffix[key]
         fwhm = dict_fwhm[key]
         filt = dict_filt[key]
+        thrsh = 10
+        peak_max = 30000
+        sharp_lim = 0.9
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
@@ -315,7 +323,7 @@ def analyze_stacks():
         image_file = [stacks_dir + 'fld2_stack_' + suf + '.fits']
         all_images.append(image_file[0])
         
-        redu.find_stars(image_file, fwhm=fwhm, threshold=3, N_passes=2, plot_psf_compare=False, mask_file=calib_dir + f'mask_{filt}.fits')
+        redu.find_stars(image_file, fwhm=fwhm, threshold=thrsh, N_passes=2, plot_psf_compare=False, mask_file=calib_dir + f'mask_{filt}.fits')
 
     ## Calc stats on all the stacked images
     out_stats_file = stats_dir + 'stats_stacks.fits'
@@ -361,6 +369,7 @@ def make_flat_filter():
     For four filter, dome flat was made with two integration times, 
         20(2) for BVR 
         60(45) for I
+    *Note, no VBRI filter taken forr this date
     """
     
     util.mkdir(calib_dir)
@@ -395,14 +404,14 @@ def make_flat_filter():
 
 def split_filters():
     # Split all starlists by filter, given rotation order
-    for key in dict_suffix_rot.keys():
+    for key in dict_images_rot.keys():
         img = dict_images_rot[key]
         suf = dict_suffix_rot[key]
         odr = dict_orders_rot[key]
         
-        starlists = [out_dir + 'sta{img:03d}{suf:s}_scan_clean_stars.txt'.format(img=ii, suf=suf) for ii in img]
-        reduce_STA.four_filt_split(starlists, odr)
-    
+        if odr != 'I':
+            starlists = [out_dir + 'sta{img:03d}{suf:s}_scan_clean_stars.txt'.format(img=ii, suf=suf) for ii in img]
+            reduce_STA.four_filt_split(starlists, odr)
     return
     
 
@@ -422,20 +431,60 @@ def calc_fourfilt_stats():
             starlists = []
             
             for key in keys:
-                img = dict_images_rot[key]
-                odr = dict_orders_rot[key]
+                img = dict_images[key]
+                odr = dict_filt[key]
                 
-                img_files += [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
-                starlists += [out_dir + 'sta{img:03d}{suf:s}_scan_clean_{f:s}_{odr:s}_stars.txt'.format(img=ii, suf=suf, f=f, odr=odr) for ii in img]
+                if odr != 'I':
+                    img_files += [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
+                    starlists += [out_dir + 'sta{img:03d}{suf:s}_scan_clean_{f:s}_{odr:s}_stars.txt'.format(img=ii, suf=suf, f=f, odr=odr) for ii in img]
             
             print(f"Calc Star_Stats: {suf} Filter: {f}")
-            reduce_fli.calc_star_stats(img_files, output_stats=stats_file, starlists=starlists, fourfilt=True)
+            redu.calc_star_stats(img_files, output_stats=stats_file, starlists=starlists, fourfilt=True)
             print("Starting moffat fitting")
-            #moffat.fit_moffat(img_files, stats_file, starlists=starlists)
+            moffat.fit_moffat(img_files, stats_file, starlists=starlists)
             
             ## DEBBUG: SINGLE THREAD
             # reduce_fli.calc_star_stats_single(img_files[0], starlists[0], True)
     
+    return
+
+def calc_fourfilt_stats():
+    ## BUG: need to figure out how to only use keys with 4F data
+    # Getting unique suffixes (loop states):
+    suffixes = list(set(dict_suffix_rot.values()))
+    
+    # Grouping by suffixes 
+    for suf in suffixes:
+        # keys with given suffix
+        keys = [key for key in dict_suffix_rot.keys() if dict_suffix_rot[key] == suf]
+        
+        # Iterating through filters
+        for f in filters:
+            stats_file = stats_dir + f'stats_{suf}_{f}.fits'
+            img_files = []
+            starlists = []
+            
+            for key in keys:
+                img = dict_images_rot[key]
+                odr = dict_orders_rot[key]
+                
+                if odr != 'I':
+                    img_files += [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
+                    starlists += [out_dir + 'sta{img:03d}{suf:s}_scan_clean_{f:s}_{odr:s}_stars.txt'.format(img=ii, suf=suf, f=f, odr=odr) for ii in img]
+            starlist_stats = [strlst.replace('_stars.txt', '_stars_stats.fits') for strlst in starlists]
+            print(f"Calc Star_Stats: {suf} \n Filter: {f}")
+            redu.calc_star_stats(img_files, output_stats=stats_file, starlists=starlists, fourfilt=True)
+            print("Starting moffat fitting")
+            moffat.fit_moffat(img_files, stats_file, starlists=starlist_stats)
+            
+            ## DEBBUG: SINGLE THREAD
+            #print("stars: ", starlists[0])
+            #print("stats: ", stats_file)
+            #redu.calc_star_stats_single(img_files[0], starlists[0], True)
+            #moffat.fit_moffat_single(img_files[0], starlist_stats[0], 0.2)
+            #break
+        #break
+        
     return
 
 
