@@ -132,3 +132,594 @@ def plot_ee_50(test_img_base, root_dir, fld, night):
 
     print(f'50% EE radius = {fwhm:.3f}"')
     return
+
+def plot_moffat_fit_4F(fil_band, root_dir, c_key, fld, night):
+    stats_c = Table.read(f'{root_dir}reduce/stats/stats_{c_key}_{fil_band}_mdp.fits')
+    stats_o = Table.read(f'{root_dir}reduce/stats/stats__o_{fil_band}_mdp.fits')
+    
+    plt.figure(figsize=(10,5))
+    plt.clf()
+    plt.subplot(121)
+    plt.errorbar(stats_c['Minor Alpha'], stats_c['Beta'], xerr=stats_c['Minor Alpha std'], yerr=stats_c['Beta std'], fmt='r.', label='Closed (LS)')
+    plt.errorbar(stats_o['Minor Alpha'], stats_o['Beta'], xerr=stats_o['Minor Alpha std'], yerr=stats_o['Beta std'], fmt='k.', label='Open')
+    plt.xlabel(r'Minor $\alpha$')
+    plt.ylabel(r'$\beta$')
+    plt.legend()
+
+    plt.subplot(122)
+    plt.errorbar(stats_c['Phi'], stats_c['Beta'], xerr=stats_c['Phi std'], yerr=stats_c['Beta std'], fmt='r.', label='Closed (LS)')
+    plt.errorbar(stats_o['Phi'], stats_o['Beta'], xerr=stats_o['Phi std'], yerr=stats_o['Beta std'], fmt='k.', label='Open')
+    plt.xlabel(r'$\phi$')
+    plt.ylabel(r'$\beta$')
+    plt.legend()
+
+    plt.suptitle(f"Moffat Fit Open vs. {c_key} Closed, \n filter {fil_band} summary {night}")
+    return
+
+
+def plot_stack_stats_4F(date, suffixes=['open', 'ttf', 'closed'], root_dir='/Users/jlu/work/imaka/pleiades/', reduce_dir='fli/reduce/'):
+    """
+        Make a suite of standard plots for the stats on a given night.
+        Parameters
+        ----------
+        date : str
+        The date string for which to plot up the stats (i.e. '20170113').
+        Optional Parameters
+        -------------------
+        suffix : str
+        stats files have the name stats_open<suffix>.fits, stats_ttf<suffix>.fits, and
+        stats_closed<suffix>.fits.
+        root_dir : str
+        The root directory for the <date> observing run directories. The
+        stats files will be searched for in:
+        <root_dir>/<date>/fli/reduce/stats/
+        """
+    stats_dir = root_dir + date + '/' + reduce_dir + 'stats/'
+    plots_dir = root_dir + date + '/' + reduce_dir + 'plots/'
+    
+    labels = ['B', 'V', 'R', 'I']
+    
+    util.mkdir(plots_dir)
+    
+    stats = []
+    for suffix in suffixes:
+        for f in labels:
+            stats.append(Table.read(f'{stats_dir}stats_{suffix}_{f}.fits'))
+    
+    scale = stats[0].meta['SCALE']
+    colors = get_color_list()
+    
+    #
+    # Plots for ratio of improvements. First we need to find a matching
+    # closed loop image to go with each open (and TTF) image.
+    #
+    tree_indices = []
+    tree_so = scipy.spatial.KDTree(np.array([stats[0]['Index']]).T)
+    for ss in range(len(stats)):
+        dist_ss, idx_ss = tree_so.query(np.array([stats[ss]['Index']]).T, 1)
+        tree_indices.append(idx_ss)
+    
+    #####
+    # FWHM vs. Frame
+    #####
+    plt.figure(1, figsize=(12, 6))
+    plt.subplots_adjust(left=0.1, bottom=0.15)
+    plt.clf()
+    plt.subplot(121)
+    for ss in range(len(suffixes)):
+        plt.plot(stats[ss]['Index'], stats[ss]['FWHM']*scale, marker='o', linestyle='none', label=suffixes[ss])
+    plt.xlabel('Frame Number')
+    plt.ylabel('Gaussian-Fit FWHM (")')
+    plt.legend(numpoints=1)
+    plt.ylim(0, 1.5)
+    plt.title(date)
+
+    plt.subplot(122)
+    for ss in range(1, len(suffixes)):
+        idx = tree_indices[ss]
+        label = suffixes[ss] + " / " + suffixes[0]
+        plt.plot(stats[0]['Index'][idx], stats[ss]['FWHM'] / stats[0]['FWHM'][idx], marker='o', linestyle='none', label=label)
+    plt.xlabel('Frame Number')
+    plt.ylabel('Ratio of Gaussian-Fit FWHM')
+    plt.legend(numpoints=1)
+    plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
+    plt.ylim(0, 1.3)
+    plt.savefig(plots_dir + 'fwhm_vs_frame' + suffix + '.png')
+    
+    #####
+    # Empirical FWHM
+    #####
+    plt.figure(2, figsize=(12, 6))
+    plt.subplots_adjust(left=0.1, bottom=0.15)
+    plt.clf()
+    plt.subplot(121)
+    for ss in range(len(suffixes)):
+        plt.plot(stats[ss]['Index'], stats[ss]['emp_fwhm']*scale, marker='o', linestyle='none', label=suffixes[ss])
+    plt.xlabel('Frame Number')
+    plt.ylabel('Empirical FWHM (")')
+    plt.legend(numpoints=1)
+    plt.ylim(0, 1.5)
+
+    plt.subplot(122)
+    for ss in range(1, len(suffixes)):
+        idx = tree_indices[ss]
+        label = suffixes[ss] + " / " + suffixes[0]
+        plt.plot(stats[0]['Index'][idx], stats[ss]['emp_fwhm'] / stats[0]['emp_fwhm'][idx], marker='o', linestyle='none', label=label)
+    plt.xlabel('Frame Number')
+    plt.ylabel('Ratio of Empircal FWHM')
+    plt.legend(numpoints=1)
+    plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
+    plt.ylim(0, 1.3)
+    plt.savefig(plots_dir + 'efwhm_vs_frame' + suffix + '.png')
+    
+    
+    #####
+    # EE 50
+    #####
+    plt.figure(3, figsize=(12, 6))
+    plt.subplots_adjust(left=0.1, bottom=0.15)
+    plt.clf()
+    plt.subplot(121)
+    for ss in range(len(suffixes)):
+        plt.plot(stats[ss]['Index'], stats[ss]['EE50'], marker='o', linestyle='none', label=suffixes[ss])
+    plt.xlabel('Frame Number')
+    plt.ylabel('Radius of 50% Encircled Energy (")')
+    plt.legend(numpoints=1)
+    plt.ylim(0, 1.5)
+    plt.title(date)
+    
+    plt.subplot(122)
+    for ss in range(1, len(suffixes)):
+        idx = tree_indices[ss]
+        label = suffixes[ss] + " / " + suffixes[0]
+        plt.plot(stats[0]['Index'][idx], stats[ss]['EE50'] / stats[0]['EE50'][idx], marker='o', linestyle='none', label=label)
+    plt.xlabel('Frame Number')
+    plt.ylabel('Ratio of 50% EE Radius')
+    plt.legend(numpoints=1)
+    plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
+    plt.ylim(0, 1.3)
+    plt.savefig(plots_dir + 'ee50_vs_frame' + suffix + '.png')
+
+#####
+# EE 80
+#####
+    plt.figure(4, figsize=(12, 6))
+    plt.subplots_adjust(left=0.1, bottom=0.15)
+    plt.clf()
+    plt.subplot(121)
+    for ss in range(len(suffixes)):
+        plt.plot(stats[ss]['Index'], stats[ss]['EE80'], marker='o', linestyle='none', label=suffixes[ss])
+    plt.xlabel('Frame Number')
+    plt.ylabel('Radius of 80% Encircled Energy (")')
+    plt.legend(numpoints=1)
+    plt.ylim(0, 1.5)
+    plt.title(date)
+    
+    plt.subplot(122)
+    for ss in range(1, len(suffixes)):
+        idx = tree_indices[ss]
+        label = suffixes[ss] + " / " + suffixes[0]
+        plt.plot(stats[0]['Index'][idx], stats[ss]['EE80'] / stats[0]['EE80'][idx], marker='o', linestyle='none', label=label)
+    plt.xlabel('Frame Number')
+    plt.ylabel('Ratio of 80% EE Radius')
+    plt.legend(numpoints=1)
+    plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
+    plt.ylim(0, 1.3)
+    plt.savefig(plots_dir + 'ee80_vs_frame' + suffix + '.png')
+    
+    #####
+    # NEA
+    #####
+    plt.figure(5, figsize=(12, 6))
+    plt.subplots_adjust(left=0.1, bottom=0.15)
+    plt.clf()
+    plt.subplot(121)
+    for ss in range(len(suffixes)):
+        plt.plot(stats[ss]['Index'], stats[ss]['NEA'] * scale**2, marker='o', linestyle='none', label=suffixes[ss])
+    plt.xlabel('Frame Number')
+    plt.ylabel('NEA (Sq. Arcsec)')
+    plt.legend(numpoints=1)
+    plt.ylim(0, 5)
+    plt.title(date)
+    
+    plt.subplot(122)
+    for ss in range(1, len(suffixes)):
+        idx = tree_indices[ss]
+        label = suffixes[ss] + " / " + suffixes[0]
+        plt.plot(stats[0]['Index'][idx], stats[ss]['NEA'] / stats[0]['NEA'][idx], marker='o', linestyle='none', label=label)
+    plt.xlabel('Frame Number')
+    plt.ylabel('Ratio of NEA')
+    plt.legend(numpoints=1)
+    plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
+    plt.ylim(0, 1.5)
+    plt.savefig(plots_dir + 'nea_vs_frame' + suffix + '.png')
+    
+    #####
+    # NEA2
+    #####
+    plt.figure(6, figsize=(12, 6))
+    plt.subplots_adjust(left=0.1, bottom=0.15)
+    plt.clf()
+    plt.subplot(121)
+    for ss in range(len(suffixes)):
+        plt.plot(stats[ss]['Index'], stats[ss]['NEA2']*scale**2, marker='o', linestyle='none', label=suffixes[ss])
+    plt.xlabel('Frame Number')
+    plt.ylabel('NEA2 (Sq. Arcsec)')
+    plt.legend(numpoints=1)
+    plt.ylim(0, 5)
+    plt.title(date)
+    
+    plt.subplot(122)
+    for ss in range(1, len(suffixes)):
+        idx = tree_indices[ss]
+        label = suffixes[ss] + " / " + suffixes[0]
+        plt.plot(stats[0]['Index'][idx], stats[ss]['NEA2'] / stats[0]['NEA2'][idx], marker='o', linestyle='none', label=label)
+    plt.xlabel('Frame Number')
+    plt.ylabel('Ratio of NEA2')
+    plt.legend(numpoints=1)
+    plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
+    plt.ylim(0, 1.5)
+    plt.savefig(plots_dir + 'nea2_vs_frame' + suffix + '.png')
+
+#####
+# FWHM for each direction
+#####
+    plt.figure(7, figsize=(12, 6))
+    plt.subplots_adjust(left=0.1, bottom=0.15)
+    plt.clf()
+    plt.subplot(121)
+    for ss in range(len(suffixes)):
+        c = np.take(colors, ss, mode='wrap')
+        plt.plot(stats[ss]['Index'], stats[ss]['xFWHM']*scale, marker='o', color=c, linestyle='none', label='X ' + suffixes[ss])
+        plt.plot(stats[ss]['Index'], stats[ss]['yFWHM']*scale, marker='^', color=c, linestyle='none', label='Y ' + suffixes[ss])
+    plt.xlabel('Frame Number')
+    plt.ylabel('Gaussian-Fit FWHM (")')
+    plt.legend(numpoints=1, fontsize=10)
+    plt.ylim(0, 1.5)
+    plt.title(date)
+    
+    plt.subplot(122)
+    for ss in range(1, len(suffixes)):
+        idx = tree_indices[ss]
+        label = suffixes[ss] + " / " + suffixes[0]
+        plt.plot(stats[0]['Index'][idx], stats[ss]['xFWHM'] / stats[0]['xFWHM'][idx], marker='o', color=c, linestyle='none', label=label)
+        plt.plot(stats[0]['Index'][idx], stats[ss]['yFWHM'] / stats[0]['yFWHM'][idx], marker='^', color=c, linestyle='none', label=label)
+    plt.xlabel('Frame Number')
+    plt.ylabel('Ratio of Gaussian-Fit FWHM')
+    plt.legend(numpoints=1, fontsize=10)
+    plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
+    plt.ylim(0, 1.3)
+    plt.savefig(plots_dir + 'xyfwhm_vs_frame' + suffix + '.png')
+
+
+##########
+# All plots vs. time.
+##########
+
+    utcs = []
+    for ss in range(len(suffixes)):
+        utc_dt = [datetime.strptime(stats[ss]['TIME_UTC'][ii], '%H:%M:%S') for ii in range(len(stats[ss]))]
+        utcs.append(utc_dt)
+
+    time_fmt = mp_dates.DateFormatter('%H:%M')
+    
+    
+    #####
+    # FWHM
+    #####
+    plt.figure(8, figsize=(12, 6))
+    plt.subplots_adjust(left=0.1, bottom=0.15)
+    plt.clf()
+    plt.subplot(121)
+    for ss in range(len(suffixes)):
+        plt.plot(utcs[ss], stats[ss]['FWHM']*scale, marker='o', linestyle='none', label=suffixes[ss])
+    plt.gca().xaxis.set_major_formatter(time_fmt)
+    plt.xticks(rotation=35)
+    plt.xlabel('UTC Time (hr)')
+    plt.ylabel('Gaussian-Fit FWHM (")')
+    plt.legend(numpoints=1)
+    plt.ylim(0, 1.5)
+    plt.title(date)
+    
+    plt.subplot(122)
+    for ss in range(1, len(suffixes)):
+        idx = tree_indices[ss]
+        label = suffixes[ss] + " / " + suffixes[0]
+        utc = [utcs[0][ii] for ii in idx]
+        plt.plot(utc, stats[ss]['FWHM'] / stats[0]['FWHM'][idx], marker='o', linestyle='none', label=label)
+    plt.gca().xaxis.set_major_formatter(time_fmt)
+    plt.xticks(rotation=35)
+    plt.xlabel('UTC Time (hr)')
+    plt.ylabel('Ratio of Gaussian-Fit FWHM')
+    plt.legend(numpoints=1)
+    plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
+    plt.ylim(0, 1.3)
+    plt.savefig(plots_dir + 'fwhm_vs_time' + suffix + '.png')
+
+#####
+# Empirical FWHM
+#####
+    plt.figure(9, figsize=(12, 6))
+    plt.subplots_adjust(left=0.1, bottom=0.15)
+    plt.clf()
+    plt.subplot(121)
+    for ss in range(len(suffixes)):
+        plt.plot(utcs[ss], stats[ss]['emp_fwhm']*scale, marker='o', linestyle='none', label=suffixes[ss])
+    plt.gca().xaxis.set_major_formatter(time_fmt)
+    plt.xticks(rotation=35)
+    plt.xlabel('UTC Time (hr)')
+    plt.ylabel('Empirical FWHM (")')
+    plt.legend(numpoints=1)
+    plt.ylim(0, 1.5)
+    plt.title(date)
+    
+    plt.subplot(122)
+    for ss in range(1, len(suffixes)):
+        idx = tree_indices[ss]
+        label = suffixes[ss] + " / " + suffixes[0]
+        utc = [utcs[0][ii] for ii in idx]
+        plt.plot(utc, stats[ss]['emp_fwhm'] / stats[0]['emp_fwhm'][idx], marker='o', linestyle='none', label=suffixes[ss])
+    plt.gca().xaxis.set_major_formatter(time_fmt)
+    plt.xticks(rotation=35)
+    plt.xlabel('UTC Time (hr)')
+    plt.ylabel('Ratio of Empircal FWHM')
+    plt.legend(numpoints=1)
+    plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
+    plt.ylim(0, 1.3)
+    plt.savefig(plots_dir + 'efwhm_vs_time' + suffix + '.png')
+    
+    #####
+    # EE 50
+    #####
+    plt.figure(10, figsize=(12, 6))
+    plt.subplots_adjust(left=0.1, bottom=0.15)
+    plt.clf()
+    plt.subplot(121)
+    for ss in range(len(suffixes)):
+        plt.plot(utcs[ss], stats[ss]['EE50'], marker='o', linestyle='none', label=suffixes[ss])
+    plt.gca().xaxis.set_major_formatter(time_fmt)
+    plt.xticks(rotation=35)
+    plt.xlabel('UTC Time (hr)')
+    plt.ylabel('Radius of 50% Encircled Energy (")')
+    plt.legend(numpoints=1)
+    plt.ylim(0, 1.5)
+    plt.title(date)
+    
+    plt.subplot(122)
+    for ss in range(1, len(suffixes)):
+        idx = tree_indices[ss]
+        label = suffixes[ss] + " / " + suffixes[0]
+        utc = [utcs[0][ii] for ii in idx]
+        plt.plot(utc, stats[ss]['EE50'] / stats[0]['EE50'][idx], marker='o', linestyle='none', label=label)
+    plt.gca().xaxis.set_major_formatter(time_fmt)
+    plt.xticks(rotation=35)
+    plt.xlabel('UTC Time (hr)')
+    plt.ylabel('Ratio of 50% EE Radius')
+    plt.legend(numpoints=1)
+    plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
+    plt.ylim(0, 1.3)
+    plt.savefig(plots_dir + 'ee50_vs_time' + suffix + '.png')
+
+#####
+# EE 80
+#####
+    plt.figure(11, figsize=(12, 6))
+    plt.subplots_adjust(left=0.1, bottom=0.15)
+    plt.clf()
+    plt.subplot(121)
+    for ss in range(len(suffixes)):
+        plt.plot(utcs[ss], stats[ss]['EE80'], marker='o', linestyle='none', label=suffixes[ss])
+    plt.gca().xaxis.set_major_formatter(time_fmt)
+    plt.xticks(rotation=35)
+    plt.xlabel('UTC Time (hr)')
+    plt.ylabel('Radius of 80% Encircled Energy (")')
+    plt.legend(numpoints=1)
+    plt.ylim(0, 1.5)
+    plt.title(date)
+    
+    plt.subplot(122)
+    for ss in range(1, len(suffixes)):
+        idx = tree_indices[ss]
+        label = suffixes[ss] + " / " + suffixes[0]
+        utc = [utcs[0][ii] for ii in idx]
+        plt.plot(utc, stats[ss]['EE80'] / stats[0]['EE80'][idx], marker='o', linestyle='none', label=label)
+    plt.gca().xaxis.set_major_formatter(time_fmt)
+    plt.xticks(rotation=35)
+    plt.xlabel('UTC Time (hr)')
+    plt.ylabel('Ratio of 80% EE Radius')
+    plt.legend(numpoints=1)
+    plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
+    plt.ylim(0, 1.3)
+    plt.savefig(plots_dir + 'ee80_vs_time' + suffix + '.png')
+
+#####
+# NEA
+#####
+    plt.figure(12, figsize=(12, 6))
+    plt.subplots_adjust(left=0.1, bottom=0.15)
+    plt.clf()
+    plt.subplot(121)
+    for ss in range(len(suffixes)):
+        plt.plot(utcs[ss], stats[ss]['NEA']*scale**2, marker='o', linestyle='none', label=suffixes[ss])
+    plt.gca().xaxis.set_major_formatter(time_fmt)
+    plt.xticks(rotation=35)
+    plt.xlabel('UTC Time (hr)')
+    plt.ylabel('NEA (Sq. Arcsec)')
+    plt.legend(numpoints=1)
+    plt.ylim(0, 5)
+    plt.title(date)
+    
+    plt.subplot(122)
+    for ss in range(1, len(suffixes)):
+        idx = tree_indices[ss]
+        label = suffixes[ss] + " / " + suffixes[0]
+        utc = [utcs[0][ii] for ii in idx]
+        plt.plot(utc, stats[ss]['NEA'] / stats[0]['NEA'][idx], marker='o', linestyle='none', label=label)
+    plt.gca().xaxis.set_major_formatter(time_fmt)
+    plt.xticks(rotation=35)
+    plt.xlabel('UTC Time (hr)')
+    plt.ylabel('Ratio of NEA')
+    plt.legend(numpoints=1)
+    plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
+    plt.ylim(0, 1.5)
+    plt.savefig(plots_dir + 'nea_vs_time' + suffix + '.png')
+
+#####
+# NEA2
+#####
+    plt.figure(13, figsize=(12, 6))
+    plt.subplots_adjust(left=0.1, bottom=0.15)
+    plt.clf()
+    plt.subplot(121)
+    for ss in range(len(suffixes)):
+        plt.plot(utcs[ss], stats[ss]['NEA2']*scale**2, marker='o', linestyle='none', label=suffixes[ss])
+    plt.gca().xaxis.set_major_formatter(time_fmt)
+    plt.xticks(rotation=35)
+    plt.xlabel('UTC Time (hr)')
+    plt.ylabel('NEA2 (Sq. Arcsec)')
+    plt.legend(numpoints=1)
+    plt.ylim(0, 5)
+    plt.title(date)
+    
+    plt.subplot(122)
+    for ss in range(1, len(suffixes)):
+        idx = tree_indices[ss]
+        label = suffixes[ss] + " / " + suffixes[0]
+        utc = [utcs[0][ii] for ii in idx]
+        plt.plot(utc, stats[ss]['NEA2'] / stats[0]['NEA2'][idx], marker='o', linestyle='none', label=label)
+    plt.gca().xaxis.set_major_formatter(time_fmt)
+    plt.xticks(rotation=35)
+    plt.xlabel('UTC Time (hr)')
+    plt.ylabel('Ratio of NEA2')
+    plt.legend(numpoints=1)
+    plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
+    plt.ylim(0, 1.5)
+    plt.savefig(plots_dir + 'nea2_vs_time' + suffix + '.png')
+    
+    #####
+    # FWHM for each direction
+    #####
+    plt.figure(14, figsize=(12, 6))
+    plt.subplots_adjust(left=0.1, bottom=0.15)
+    plt.subplot(121)
+    for ss in range(len(suffixes)):
+        c = np.take(colors, ss, mode='wrap')
+        plt.plot(utcs[ss], stats[ss]['xFWHM']*scale, marker='o', color=c, linestyle='none', label='X ' + suffixes[ss])
+        plt.plot(utcs[ss], stats[ss]['yFWHM']*scale, marker='^', color=c, linestyle='none', label='Y ' + suffixes[ss])
+    plt.gca().xaxis.set_major_formatter(time_fmt)
+    plt.xticks(rotation=35)
+    plt.xlabel('UTC Time (hr)')
+    plt.ylabel('Gaussian-Fit FWHM (")')
+    plt.legend(numpoints=1, fontsize=10)
+    plt.ylim(0, 1.5)
+    plt.title(date)
+    
+    plt.subplot(122)
+    for ss in range(1, len(suffixes)):
+        c = np.take(colors, ss, mode='wrap')
+        idx = tree_indices[ss]
+        label = suffixes[ss] + " / " + suffixes[0]
+        utc = [utcs[0][ii] for ii in idx]
+        plt.plot(utc, stats[ss]['xFWHM'] / stats[0]['xFWHM'][idx], marker='o', color=c, linestyle='none', label=label)
+        plt.plot(utc, stats[ss]['yFWHM'] / stats[0]['yFWHM'][idx], marker='^', color=c, linestyle='none', label=label)
+    plt.gca().xaxis.set_major_formatter(time_fmt)
+    plt.xticks(rotation=35)
+    plt.xlabel('UTC Time (hr)')
+    plt.ylabel('Ratio of Gaussian-Fit FWHM')
+    plt.legend(numpoints=1, fontsize=10)
+    plt.axhline(1.0, color='k', linestyle='--', linewidth=2)
+    plt.ylim(0, 1.3)
+    plt.savefig(plots_dir + 'xyfwhm_vs_time' + suffix + '.png')
+    
+    return
+
+
+
+
+def plot_fwhmvt_nomatch_filt(open_file, closed_file, comp_col, title, plots_dir, wav_given):
+    """
+    Plot FWHM vs. time for both open, closed, MASS, and DIMM
+    
+    Inputs
+    ----------
+    open_file and closed_file: str
+        The fits table stats files
+        
+    comp_col: str
+        what column of data to compare (e.g. 'emp_fwhm')
+
+    title: str
+        title for generated plot
+        
+    plots_dir: str
+        directory to put generated plot in
+    """
+    
+    #Read in data
+    stats1 = Table.read(open_file)
+    stats2 = Table.read(closed_file)
+    
+    time1, date1, data1, data2, err1, err2 = add_data.match_cols(open_file, open_file, comp_col)
+    time2, date2, data1, data2, err1, err2 = add_data.match_cols(closed_file, closed_file, comp_col)
+    
+    calib1 = []
+    calib2 = []
+    
+    # Get mass/dimm data
+    mass = stats2['MASS']
+    dimm = stats1['DIMM']
+    wvln = wav_given
+
+    # Shift to match wavelengths
+    for i in range(len(stats1)):
+       # wvln = filter2wv(stats1['FILTER'][i])
+        scale = stats1.meta['SCALE']
+        factor = ((500/wvln)**0.2) * scale
+        calib1.append(factor)
+    
+    for i in range(len(stats2)):
+        #wvln = filter2wv(stats2['FILTER'][i])
+        scale = stats2.meta['SCALE']
+        factor = ((500/wvln)**0.2) * scale
+        calib2.append(factor)
+
+    calib1 = np.array(calib1)
+    calib2 = np.array(calib2)
+
+    comp_col_err = comp_col + '_std'
+    if comp_col_err in stats1.colnames:
+        open_err = stats1[comp_col_err] * calib1
+        closed_err = stats2[comp_col_err] * calib2
+    else:
+        open_err = np.zeros(len(stats1))
+        closed_err = np.zeros(len(stats2))
+
+    # Plot fwhm and seeing vs time
+    times1 = []
+    for i in range(len(time1)):
+        string = str(date1[i])+str(time1[i])
+        dt_obj = datetime.strptime(string, "b'%Y-%m-%d'b'%H:%M:%S'")
+        times1.append(dt_obj)
+
+    times2 = []
+    for i in range(len(time2)):
+        string = str(date2[i])+str(time2[i])
+        dt_obj = datetime.strptime(string, "b'%Y-%m-%d'b'%H:%M:%S'")
+        times2.append(dt_obj)
+
+    plt.figure(1, figsize=(12, 4))
+    plt.errorbar(times1, stats1[comp_col]*calib1, yerr=open_err, fmt='o', label="Open")
+    plt.errorbar(times2, stats2[comp_col]*calib2, yerr=closed_err, fmt='ro', label="Closed")
+    plt.plot(times1, dimm, 'b-')
+    plt.plot(times2, mass, 'r-')
+    plt.ylabel(comp_col)
+    plt.xlabel("UTC Time")
+    plt.xticks(rotation=35)
+    plt.ylim(0, 2)
+    plt.title(title)
+    plt.gca().xaxis.set_major_formatter(mp_dates.DateFormatter('%H:%M'))
+    plt.legend()
+    
+    plt.savefig(plots_dir + 'fwhm_v_time' + '.png')
+    return
+

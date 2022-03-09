@@ -21,7 +21,7 @@ from astropy.modeling import fitting
 from astropy.stats import sigma_clip
 import scipy.linalg
 from matplotlib import cm
-
+from astropy.stats import sigma_clipped_stats
 
 
 def fetch_stats_from_onaga(dates, output_root):

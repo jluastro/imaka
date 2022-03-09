@@ -294,7 +294,7 @@ def minmaj_FWHM(files_o, files_c):
 
 def plot_gain(files_o, files_c):
 
-    plt.figure(1, figsize=(10,4))
+    plt.figure(1, figsize=(14,6))
     waves = [445, 551, 658, 806]
     ps=0.12
 
@@ -381,11 +381,15 @@ def power_model(files_o, files_c):
     α_o = p_o.alpha.value
     α_c = p_c.alpha.value
 
-    plt.text(450, 0.61, 'χ$^2$='+str(np.round(χ2_o,2)), color='b', fontsize=14)
-    plt.text(450, 0.5, 'χ$^2$='+str(np.round(χ2_c,2)), color='r', fontsize=14)
-    plt.text(450, 0.63, 'α='+str(np.round(α_o,2)), color='b', fontsize=14)
-    plt.text(450, 0.52, 'α='+str(np.round(α_c,2)), color='r', fontsize=14)
-
+    #plt.text(450, 0.61, 'χ$^2$='+str(np.round(χ2_o,2)), color='b', fontsize=14)
+    #plt.text(450, 0.5, 'χ$^2$='+str(np.round(χ2_c,2)), color='r', fontsize=14)
+    #plt.text(450, 0.63, 'α='+str(np.round(α_o,2)), color='b', fontsize=14)
+    #plt.text(450, 0.52, 'α='+str(np.round(α_c,2)), color='r', fontsize=14)
+    print('χ$^2$='+str(np.round(χ2_o,2)))
+    print('χ$^2$='+str(np.round(χ2_c,2)))
+    print('α='+str(np.round(α_o,2)))
+    print('α='+str(np.round(α_c,2)))
+    
     plt.xlabel('Observation Wavelength (nm)', fontsize=16)
     plt.ylabel('Minor FWHM (arcsec)', fontsize=16)
     plt.title('Wavelength Dependence Model', fontsize=18)
