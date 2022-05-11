@@ -190,7 +190,7 @@ def make_mask(flat_file, out_filename, mask_min=None, mask_max=None,
                     left_slice=left_slice, right_slice=right_slice,
                     top_slice=top_slice, bottom_slice=bottom_slice)
 
-    fits.writeto(out_filename, mask.astype(np.uint8), header=hdr)
+    fits.writeto(out_filename, mask.astype(np.uint8), header=hdr, overwrite=True)
 
     return
 
