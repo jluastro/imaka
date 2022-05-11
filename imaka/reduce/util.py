@@ -241,7 +241,30 @@ def get_filter(hdr):
         return 'I'
     
     return
-    
+
+def get_wavelength(filter_str):
+    wave = 0
+    if filter_str == 'B':
+        wave = 445
+    elif filter_str == 'V':
+        wave = 551
+    elif filter_str == 'R':
+        wave = 658
+    elif filter_str == 'I':
+        wave = 806
+    return wave
+
+def get_quad(filt, filt_order):
+    quad = ''
+    if filt == filt_order[0]:
+        quad = 'NW'
+    elif filt == filt_order[1]:
+        quad = 'NE'
+    elif filt == filt_order[2]:
+        quad = 'SE'
+    elif filt == filt_order[3]:
+        quad = 'SW'
+    return quad
     
 def get_bin_factor(image, header):
 
