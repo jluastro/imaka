@@ -30,7 +30,6 @@ def stack_all(table_list, open_close_list, filter_list):
             wave = 806
             
         table_list[ii].add_column(Column(np.repeat(wave, N_frames), name='wavelength'))
-
     
     all_stats = table.vstack(table_list)
 
@@ -292,11 +291,10 @@ def minmaj_FWHM(files_o, files_c):
     return
 
 
-def plot_gain(files_o, files_c):
+def plot_gain(files_o, files_c, ps=0.12):
 
     plt.figure(1, figsize=(14,6))
     waves = [445, 551, 658, 806]
-    ps=0.12
 
     for i in range(4):
         plt.subplot(121)
@@ -346,18 +344,17 @@ def plot_gain(files_o, files_c):
     return
 
 
-def power_model(files_o, files_c):
+def power_model(files_o, files_c, ps = 0.12):
 
     waves = [445, 551, 658, 806]
-    ps = 0.12
 
     fwhm_o = []
     fwhm_c = []
     fwhm_o_err = []
     fwhm_c_err = []
     for i in range(4):
-        FWHM_min_o, sig_FWHM_min_o, FWHM_maj_o, sig_FWHM_maj_o = moffat.calc_mof_fwhm(files_o[i], filt=False)
-        FWHM_min_c, sig_FWHM_min_c, FWHM_maj_c, sig_FWHM_maj_c = moffat.calc_mof_fwhm(files_c[i], filt=False)   
+        FWHM_min_o, sig_FWHM_min_o, FWHM_maj_o, sig_FWHM_maj_o = moffat.calc_mof_fwhm(files_o[i], filt=False, plate_scale = ps)
+        FWHM_min_c, sig_FWHM_min_c, FWHM_maj_c, sig_FWHM_maj_c = moffat.calc_mof_fwhm(files_c[i], filt=False, plate_scale = ps)   
         fwhm_o.append(np.median(FWHM_min_o)*ps)
         fwhm_o_err.append(np.std(FWHM_min_o)*ps/np.sqrt(len(FWHM_min_o)))
         fwhm_c.append(np.median(FWHM_min_c)*ps)
