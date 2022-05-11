@@ -55,6 +55,11 @@ dict_images = {'LS_5wfs':   [0,4,8,10,14,18,22,26,30,34],
                'open':      [3,7,13,17,21,25,29,33,37],
               }
 
+dict_fwhm = {'LS_5wfs':    8,
+               'LS_3wfs_s':  8,
+               'LS_3wfs_w':   8,
+               'open':      15
+            }
 
 ###############################################
 ### REDUCTION
@@ -113,6 +118,36 @@ def reduce_beehive():
         reduce_STA.treat_overscan(img_files)
         #reduce_STA.treat_overscan_working(img_files)  #BUG
         redu.clean_images(scn_files, out_dir, rebin=1, sky_frame=sky_dir + sky, flat_frame=calib_dir + "domeflat.fits")
+    return
+
+def rebin_mask():
+    # rebin flat
+    redu.write_rebin_single(calib_dir+'domeflat.fits', 2, calib_dir+'domeflat_bin2.fits')
+    # Mask from rebinned flat
+    calib.make_mask(calib_dir + 'domeflat_bin2.fits', calib_dir + 'domemask_bin2.fits',
+                       mask_min=0.8*4, mask_max=1.4*4,
+                       left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
+    return
+
+def rebin_data():
+    """
+    Takes the reduced files, and rebins them
+    this changes the sape of the file and the header. 
+    """
+    util.mkdir(out_dir + "bin2/")
+    binfac = 2
+    for key in dict_suffix.keys():
+    #for key in ["LS_3wfs_s_1"]:
+        img = dict_images[key]
+        suf = dict_suffix[key]
+
+        print('Rebinning: {1:s}  {0:s}'.format(key, suf))
+        print('   Images: ', img)
+        
+        img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
+        rebin_files = [out_dir + 'bin2/sta{img:03d}{suf:s}_scan_clean_bin2.fits'.format(img=ii, suf=suf) for ii in img]
+        
+        redu.write_rebin(img_files, rebin_files, binfac)
     return
 
 ###############################################
@@ -195,7 +230,6 @@ def append_massdimm():
                 print(" => ", e)
         else:
             print('Skipping ' + stats)
-
     return
 
 

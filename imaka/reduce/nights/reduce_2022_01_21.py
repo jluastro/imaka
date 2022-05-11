@@ -42,7 +42,6 @@ stats_dir = root_dir +'reduce/stats/'
 stacks_dir = root_dir + 'reduce/stacks/'
 massdimm_dir = root_dir + 'reduce/massdimm/'
 
-
 ## Junk files -- see logs
 dict_suffix = {'open':    '_o',
                'LS_3wfs_s': 'n3wfs_c',
@@ -53,8 +52,22 @@ dict_suffix = {'open':    '_o',
 dict_images = {'LS_5wfs':  [20,23,26,29,32,46,50,54,64,68,72],
                'LS_3wfs_s': [21,24,27,30,33,47,51,55,65,69,73],
                'LS_3wfs_w': [48,52,56,66,74],
-               'open':    [22,25,28,31,34,49,53,57,67,75],
+               'open':    [22,28,31,49,53,57,67,75], # 25, 34 => windshake
               } # 'donut':   [58,59,60,61,62,63]
+
+thresh = 10
+dict_fwhm = {'open':    12,
+               'LS_3wfs_s': 7,
+               'LS_3wfs_w': 7,
+               'LS_5wfs': 7,
+              }
+
+dict_sharp= {'open': 0.9,
+             'LS_3wfs_s': 0.8,
+             'LS_3wfs_w': 0.8,
+             'LS_5wfs': 0.8,
+            }  
+
 
 
 ###############################################
@@ -150,19 +163,23 @@ def find_stars_beehive():
 
         img = dict_images[key]
         suf = dict_suffix[key]
+        fwhm = dict_fwhm[key]
         sky = sky_dir + 'beehive_sky.fits'
-        
-        # o/c loop distinction
-        fwhm = 15 if re.search('open', key) else 7
-        thrsh = 7
+
+        fwhm = dict_fwhm[key]
+        thrsh = 10
+        peak_max = 30000
+        sharp_lim = dict_sharp[key]
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
         print('      Sky: ', sky)
+        print('     Fwhm: ', str(fwhm))
+        print('   Thresh: ', str(thrsh))
 
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
         # Taken from working branch version args
-        redu.find_stars(img_files, fwhm=fwhm,  threshold = thrsh, plot_psf_compare=False, mask_file=calib_dir+'domemask.fits')
+        redu.find_stars(img_files, fwhm=fwhm,  threshold = thrsh, plot_psf_compare=False, mask_file=calib_dir+'domemask.fits', peak_max=peak_max, sharp_lim=sharp_lim)
         
     ## DEBUG - single threaded
     # fmt = '{dir}sta{img:03d}{suf:s}_scan_clean.fits'
@@ -171,6 +188,43 @@ def find_stars_beehive():
                           
     return
 
+def filter_stars():
+    ## Loop through all the different data sets
+    #for key in ['set_name']: ## Single key setup
+    for key in dict_suffix.keys():
+        
+        img = dict_images[key]
+        suf = dict_suffix[key]
+        fwhm = dict_fwhm[key]
+
+        print('Filtering: {1:s}  {0:s}'.format(key, suf))
+        print('   Images: ', img)
+        
+        star_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean_stars.txt'.format(img=ii, suf=suf) for ii in img]
+        
+        formats = {'xcentroid': '%8.3f', 'ycentroid': '%8.3f', 'sharpness': '%.2f',
+                   'roundness1': '%.2f', 'roundness2': '%.2f', 'peak': '%10.1f',
+                   'flux': '%10.6f', 'mag': '%6.2f', 'x_fwhm': '%5.2f', 'y_fwhm': '%5.2f',
+                   'theta': '%6.3f'}
+        
+        # TODO: move this into a faster system, in the reduce file
+        
+        for sf in star_files:
+            stars = table.Table.read(sf, format='ascii')
+            
+            stars.write(sf.split(".txt")[0]+"_orig.txt", format='ascii.fixed_width', delimiter=None, bookend=False, formats=formats, overwrite=True)
+            
+            stars = stars[stars['peak'] > 100]
+            stars = stars[stars['peak'] < 30000]
+            
+            stars = stars[stars['x_fwhm'] > 2.3]
+            stars = stars[stars['y_fwhm'] > 2.3]
+            #stars = stars[stars['x_fwhm'] < 23.55]
+            #stars = stars[stars['y_fwhm'] < 23.55]
+
+            stars.write(sf, format='ascii.fixed_width', delimiter=None, bookend=False, formats=formats, overwrite=True)
+                          
+    return
 
 def calc_star_stats():
     util.mkdir(stats_dir)
@@ -228,8 +282,8 @@ def stack_beehive():
 
     # Loop through all the different data sets and reduce them.
     #for key in dict_suffix.keys():
-    #for key in ['LS_5wfs', 'LS_3wfs_s', 'LS_3wfs_w']: #excluding open
-    for key in ['open']:
+    for key in ['LS_5wfs', 'LS_3wfs_s', 'LS_3wfs_w']: #excluding open
+    #for key in ['open']:
         img = dict_images[key]
         suf = dict_suffix[key]
 
@@ -250,20 +304,23 @@ def analyze_stacks():
     all_images = []
     for key in dict_suffix.keys():
         img = dict_images[key]
-        suf = dict_suffix[key]
+        suf = dict_suffix[key] 
         
-        fwhm = 15 if re.search('open', key) else 7
-        thrsh = 7
+        fwhm = dict_fwhm[key]
+        thrsh = 10
+        peak_max = 30000
+        sharp_lim = dict_sharp[key]
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
         print('     Fwhm: ', str(fwhm))
+        print('   Thresh: ', str(thrsh))
 
         image_file = [stacks_dir + 'beehive_stack_' + suf + '.fits']
         all_images.append(image_file[0])
         
-        redu.find_stars(image_file, fwhm=fwhm, threshold=thrsh, N_passes=2, plot_psf_compare=False,
-                              mask_file=calib_dir + 'domemask.fits')
+        redu.find_stars(image_file, fwhm=fwhm,  threshold = thrsh, plot_psf_compare=False, 
+                        mask_file=calib_dir+'domemask.fits', peak_max=peak_max, sharp_lim=sharp_lim)
 
     ## Calc stats on all the stacked images
     out_stats_file = stats_dir + 'stats_stacks.fits'
