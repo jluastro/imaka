@@ -205,7 +205,7 @@ def calc_star_stats():
 
 def append_massdimm():
 
-    massdimm.fetch_data(night, massdimm_dir)
+    massdimm.fetch_data('20200121', massdimm_dir) ## not working, http doesn't exist
     stats_tables = glob.glob(root_dir + 'reduce/stats/stats*.fits')
 
     for stats in stats_tables:
