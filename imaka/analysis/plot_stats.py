@@ -1484,10 +1484,15 @@ def filter2wv(filter_label):
     #converts filter label from fits header into wavelength in nanometers
     
     if type(filter_label)==str:
+        print(filter_label)
         if filter_label == "I":
             return 806
         elif filter_label == "R":
             return 658
+        elif filter_label == "V":
+            return 551
+        elif filter_label == "B":
+            return 445
         elif filter_label == "1_micronlp":
             return 1000
         else:
@@ -1500,7 +1505,11 @@ def filter2wv(filter_label):
                 new_array[i] = 806
             elif filter_label[i] == "R":
                 new_array[i] = 658
-            elif filter_label == "1_micronlp":
+            elif filter_label[i] == "V":
+                new_array[i] = 551
+            elif filter_label[i] == "B":
+                new_array[i] = 445
+            elif filter_label[i] == "1_micronlp":
                 rew_array[i] = 1000
             else:
                 print("Filter not found: defaulting to 500 nm")
@@ -1861,10 +1870,10 @@ def plot_nea(data_root='/Users/jlu/data/imaka/'):
     return
 
 
-def comp_cdf(files, labels, colors):
+def comp_cdf(files, labels, colors, scale=0.063):
     plt.figure(figsize=(15,4))
     for ii in range(len(files)):
-        FWHM_min, sig_FWHM_min, FWHM_maj, sig_FWHM_maj = moffat.calc_mof_fwhm(files[ii], filt=False);
+        FWHM_min, sig_FWHM_min, FWHM_maj, sig_FWHM_maj = moffat.calc_mof_fwhm(files[ii], filt=False, plate_scale = scale);
 
         plt.subplot(131)
         plt.hist(FWHM_min, color=colors[ii], linewidth=2, bins = np.arange(0, 1.3, 0.01), cumulative=True, histtype='step', density=True, label=labels[ii]);
@@ -1886,8 +1895,6 @@ def comp_cdf(files, labels, colors):
         plt.legend(loc=4)
         if ii == 0:
             plt.xlim(1, np.max(elon)+0.1)
-
-
         
     return
 
@@ -1945,7 +1952,7 @@ def plot_var(img_file, starlist, title):
     plt.figure(1, figsize=(15,6))
 
     plt.subplot(121)
-    bins = np.arange(0,1, .01)
+    bins = np.arange(0,2, .02)
     plt.hist(FWHMs, bins=bins, alpha=0.5, label='All Data')
     plt.hist(FWHMs_clip, bins=bins, alpha=0.5, label='Clipped Data')
     plt.xticks(fontsize=14); plt.yticks(fontsize=14)
@@ -1969,6 +1976,95 @@ def plot_var(img_file, starlist, title):
     plt.xlabel('x offset (arcsec)', fontsize=16) 
     plt.ylabel('y offset (arcsec)', fontsize=16)
     plt.title("Field Variability", fontsize=20)
+    plt.colorbar(label='FWHM (as)')
+    plt.xticks(fontsize=14); plt.yticks(fontsize=14)
+    plt.gca().set_aspect('equal', adjustable='box')
+    
+    plt.suptitle(title, fontsize=22)
+
+    plt.tight_layout()
+
+    
+def plot_var_small(img_file, starlist, title):
+
+    # Read in stack and starlist
+    img, hdr = fits.getdata(img_file, header=True)
+
+    if starlist.endswith('txt'):
+        stars = Table.read(starlist, format='ascii')
+    else:
+        stars = Table.read(starlist)
+
+    # Check to see if we have already calculated Moffat parameters. 
+    if 'mdp' in starlist:
+        # Trim out negative beta values.
+        idx = np.where((stars['Beta'] > 0) & (stars['Minor Alpha'] > 0))[0]
+        stars = stars[idx]
+
+        stars['Moffat FWHM'] = 2.0 * stars['Minor Alpha'] * np.sqrt((2.0**(1. / stars['Beta'])) - 1)
+        idx = np.where((stars['Moffat FWHM'] > 0.25) )[0]
+        stars = stars[idx]
+        
+        # # Get the brightest YY% stars
+        # flux_percent = 0.2
+        # flux_sorted = np.sort(stars['flux'])
+        # flux_cut = flux_sorted[int(len(stars) * flux_percent)]
+
+        # idx = np.where(stars['flux'] > flux_cut)[0]
+        # stars = stars[idx]
+        
+        x_cents = stars['xcentroid'].data
+        y_cents = stars['ycentroid'].data
+        FWHMs = stars['Moffat FWHM'].data
+        mags = stars['mag'].data
+
+        # FWHMs = stars['fwhm_emp']
+    else:
+        raise RuntimeError('Table must include pre-calculate Moffat fits')
+
+    # Fetch the plate scale for plotting
+    img, hdr = fits.getdata(img_file, header=True)
+    scale = util.get_plate_scale(img, hdr)
+
+    # Convert everything into arcsec.
+    x_cents *= scale
+    y_cents *= scale
+    FWHMs *= scale
+    
+    # Sigma clip data
+    filt = sigma_clip(FWHMs, sigma=3, maxiters=5, copy=False)
+    FWHMs_clip = FWHMs[~filt.mask]
+    x_cents_clip = x_cents[~filt.mask]
+    y_cents_clip = y_cents[~filt.mask]
+
+    #plt.figure(1, figsize=(15,6))
+    plt.figure(1, figsize=(7,6))
+
+    #plt.subplot(121)
+    #bins = np.arange(0,2, .02)
+    #plt.hist(FWHMs, bins=bins, alpha=0.5, label='All Data')
+    #plt.hist(FWHMs_clip, bins=bins, alpha=0.5, label='Clipped Data')
+    #plt.xticks(fontsize=14); plt.yticks(fontsize=14)
+    #plt.xlabel('Minor FWHM (arcsec)', fontsize=16)
+    #plt.ylabel('N Sources', fontsize=16)
+    #plt.title('FWHM Distribution', fontsize=20)
+    #plt.legend()
+
+    print('Median FWHM           = {0:.3f}"'.format(np.median(FWHMs)))
+    print('Median FWHM (clipped) = {0:.3f}"'.format(np.median(FWHMs_clip)))
+    print('Mean FWHM             = {0:.3f}"'.format(np.mean(FWHMs)))
+    print('Mean FWHM (clipped)   = {0:.3f}"'.format(np.mean(FWHMs_clip)))
+    print('Stddev FWHM           = {0:.3f}"'.format(np.std(FWHMs)))
+    print('Stddev FWHM (clipped) = {0:.3f}"'.format(np.std(FWHMs_clip)))
+
+    # Plot the FWHM over the field. First, determine the min/max on the colorscale.
+    #plt.subplot(122)
+    plt.scatter(x_cents_clip, y_cents_clip, c=FWHMs_clip,
+                    vmin=0.25, vmax=FWHMs_clip.max(),
+                    cmap = plt.cm.viridis, s=10)
+    plt.xlabel('x offset (arcsec)', fontsize=16) 
+    plt.ylabel('y offset (arcsec)', fontsize=16)
+    #plt.title("Field Variability", fontsize=20)
     plt.colorbar(label='FWHM (as)')
     plt.xticks(fontsize=14); plt.yticks(fontsize=14)
     plt.gca().set_aspect('equal', adjustable='box')
