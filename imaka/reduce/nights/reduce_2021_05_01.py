@@ -129,6 +129,9 @@ def reduce_fld2():
 
     return
 
+###############################################
+### ANALYSIS
+###############################################
 
 def find_stars_fld2():
     # Loop through all the different data sets and reduce them.
@@ -139,6 +142,10 @@ def find_stars_fld2():
         suf = dict_suffix[key]
         sky = dict_skies[key]
         fwhm = dict_fwhm[key]
+        
+        thrsh = 10
+        peak_max = 30000
+        sharp_lim = 0.9
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
@@ -146,8 +153,8 @@ def find_stars_fld2():
         
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
 
-        redu.find_stars(img_files, fwhm=fwhm, threshold=8, N_passes=2, plot_psf_compare=False,
-                              mask_file=calib_dir+'mask.fits')
+        redu.find_stars(img_files, fwhm=fwhm, threshold=thrsh, N_passes=2, plot_psf_compare=False,
+                        mask_file=calib_dir+'mask.fits', peak_max=peak_max, sharp_lim=sharp_lim)
         
     # DEBUG - single threaded
     # fmt = '{dir}sta{img:03d}{suf:s}_scan_clean.fits'
@@ -155,6 +162,7 @@ def find_stars_fld2():
     # redu.find_stars_single(image_file, dict_fwhm['LS_c'], 3, 2, False, calib_dir + 'mask.fits')
                           
     return
+
 
 
 def calc_star_stats():

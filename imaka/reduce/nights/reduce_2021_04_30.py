@@ -64,9 +64,9 @@ dict_skies = {'open_bin1':    'fld2_sky_180_bin1.fits',
               'LS_bin2':      'fld2_sky_180_bin2.fits',
               'docz_bin2':    'fld2_sky_180_bin2.fits'}
 
-dict_fwhm = {'open_bin1': 7,
-               'LS_bin1':     3,
-               'docz_bin1':   3,
+dict_fwhm = {'open_bin1': 10,
+               'LS_bin1':     6,
+               'docz_bin1':   6,
                'open_bin2':   7,
                'LS_bin2':     3,
                'docz_bin2':   3}
@@ -122,15 +122,18 @@ def make_sky():
 
 
 def reduce_fld2():
-    
+
     util.mkdir(out_dir)
 
-    ## Loop through all datasets for key in dict_suffix.keys():   
-    for key in [dict_suffix.keys()]:   
-        bin_num = 'bin1' if 'bin1' in key else 'bin2'  # key should contain bin info
+    ## Loop through all the different data sets and reduce them.
+    #for key in ['set_name']: ## Single key setup
+    for key in dict_suffix.keys():
+        
         img = dict_images[key]
         suf = dict_suffix[key]
         sky = dict_skies[key]
+        
+        bin_num = 'bin1' if 'bin1' in key else 'bin2'  # key should contain bin info
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
@@ -145,6 +148,9 @@ def reduce_fld2():
 
     return
 
+###############################################
+### ANALYSIS
+###############################################
 
 def find_stars_fld2():
     
@@ -155,6 +161,10 @@ def find_stars_fld2():
         suf = dict_suffix[key]
         sky = dict_skies[key]
         fwhm = dict_fwhm[key]
+        
+        thrsh = 10
+        peak_max = 30000
+        sharp_lim = 0.9
 
         bin = 'bin1' if 'bin1' in key else 'bin2'  # key should contain bin info 
 
@@ -163,8 +173,10 @@ def find_stars_fld2():
         print('      Sky: ', sky)
         
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
-        redu.find_stars(img_files, fwhm=fwhm, threshold=3, N_passes=2, plot_psf_compare=False,
-                              mask_file=calib_dir+'mask_'+bin+'.fits')
+        redu.find_stars(img_files, fwhm=fwhm, threshold=thrsh, N_passes=2, plot_psf_compare=False,
+                        mask_file=calib_dir+f'mask_{bin}.fits', peak_max=peak_max, sharp_lim=sharp_lim)
+        #redu.find_stars(img_files, fwhm=fwhm, threshold=3, N_passes=2, plot_psf_compare=False,
+        #                      mask_file=calib_dir+'mask_'+bin+'.fits')
         #reduce_fli.find_stars(img_files, fwhm=fwhm, threshold=3, N_passes=2, plot_psf_compare=False,
         #                      mask_flat=flat_dir+"flat"+bin+".fits", mask_min=0.8, mask_max=1.4,
         #                      left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
