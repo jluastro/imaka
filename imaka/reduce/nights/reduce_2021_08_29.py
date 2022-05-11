@@ -19,6 +19,7 @@ from imaka.analysis import moffat
 from astropy.stats import sigma_clipped_stats
 import os, shutil
 import pdb
+import re
 from imaka.reduce import massdimm
 import matplotlib
 # matplotlib.use('Agg')
@@ -282,21 +283,23 @@ def append_massdimm():
 
 
 def stack():
+     ## EDITED FOR 4F DATA
 
     util.mkdir(stacks_dir)
 
     ## Loop through all the different data sets
-    #for key in ['set_name']: ## Single key setup
+    #for key in ['tt_RIVB']: ## Single key setup
     for key in dict_suffix.keys():
         img = dict_images[key]
         suf = dict_suffix[key]
+        filt = dict_filt[key]
 
         print('Working on: {1:s}  {0:s}'.format(key, suf))
         print('   Images: ', img)
         
         img_files = [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
         starlists = [out_dir + 'sta{img:03d}{suf:s}_scan_clean_stars.txt'.format(img=ii, suf=suf) for ii in img]
-        output_root = stacks_dir + 'fld2_stack_' + suf
+        output_root = stacks_dir + 'fld2_stack_' + suf + '_' + filt ## EDITED LINE
         
         redu.shift_and_add(img_files, starlists, output_root, method='mean')
         
@@ -304,6 +307,8 @@ def stack():
 
 
 def analyze_stacks():
+    ## EDITED FOR 4F DATA
+    
     ## Loop through all the different data sets
     #for key in ['set_name']: ## Single key setup
     all_images = []
@@ -320,7 +325,7 @@ def analyze_stacks():
         print('   Images: ', img)
         print('     Fwhm: ', str(fwhm))
 
-        image_file = [stacks_dir + 'fld2_stack_' + suf + '.fits']
+        image_file = [stacks_dir + 'fld2_stack_' + suf +  '_' + filt +'.fits'] ## EDITED LINE
         all_images.append(image_file[0])
         
         redu.find_stars(image_file, fwhm=fwhm, threshold=thrsh, N_passes=2, plot_psf_compare=False, mask_file=calib_dir + f'mask_{filt}.fits')
@@ -402,7 +407,7 @@ def make_flat_filter():
     return
 
 
-def split_filters():
+def split_4F_starlists():
     # Split all starlists by filter, given rotation order
     for key in dict_images_rot.keys():
         img = dict_images_rot[key]
@@ -410,10 +415,9 @@ def split_filters():
         odr = dict_orders_rot[key]
         
         if odr != 'I':
-            starlists = [out_dir + 'sta{img:03d}{suf:s}_scan_clean_stars.txt'.format(img=ii, suf=suf) for ii in img]
+            starlists = [out_dir + '4F/sta{img:03d}{suf:s}_scan_clean_stars.txt'.format(img=ii, suf=suf) for ii in img]
             reduce_STA.four_filt_split(starlists, odr)
     return
-    
 
 def calc_fourfilt_stats():   
     # Getting unique suffixes (loop states):
@@ -436,7 +440,7 @@ def calc_fourfilt_stats():
                 
                 if odr != 'I':
                     img_files += [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
-                    starlists += [out_dir + 'sta{img:03d}{suf:s}_scan_clean_{f:s}_{odr:s}_stars.txt'.format(img=ii, suf=suf, f=f, odr=odr) for ii in img]
+                    starlists += [out_dir + '4F/sta{img:03d}{suf:s}_scan_clean_{f:s}_{odr:s}_stars.txt'.format(img=ii, suf=suf, f=f, odr=odr) for ii in img]
             
             print(f"Calc Star_Stats: {suf} Filter: {f}")
             redu.calc_star_stats(img_files, output_stats=stats_file, starlists=starlists, fourfilt=True)
@@ -448,44 +452,68 @@ def calc_fourfilt_stats():
     
     return
 
-def calc_fourfilt_stats():
-    ## BUG: need to figure out how to only use keys with 4F data
-    # Getting unique suffixes (loop states):
+def update_4F_stats():
+    # this function updates the "FILTER" column on the 4F stats summaries
     suffixes = list(set(dict_suffix_rot.values()))
-    
-    # Grouping by suffixes 
     for suf in suffixes:
-        # keys with given suffix
-        keys = [key for key in dict_suffix_rot.keys() if dict_suffix_rot[key] == suf]
-        
         # Iterating through filters
         for f in filters:
-            stats_file = stats_dir + f'stats_{suf}_{f}.fits'
-            img_files = []
-            starlists = []
-            
-            for key in keys:
-                img = dict_images_rot[key]
-                odr = dict_orders_rot[key]
-                
-                if odr != 'I':
-                    img_files += [out_dir + 'sta{img:03d}{suf:s}_scan_clean.fits'.format(img=ii, suf=suf) for ii in img]
-                    starlists += [out_dir + 'sta{img:03d}{suf:s}_scan_clean_{f:s}_{odr:s}_stars.txt'.format(img=ii, suf=suf, f=f, odr=odr) for ii in img]
-            starlist_stats = [strlst.replace('_stars.txt', '_stars_stats.fits') for strlst in starlists]
-            print(f"Calc Star_Stats: {suf} \n Filter: {f}")
-            redu.calc_star_stats(img_files, output_stats=stats_file, starlists=starlists, fourfilt=True)
-            print("Starting moffat fitting")
-            moffat.fit_moffat(img_files, stats_file, starlists=starlist_stats)
-            
-            ## DEBBUG: SINGLE THREAD
-            #print("stars: ", starlists[0])
-            #print("stats: ", stats_file)
-            #redu.calc_star_stats_single(img_files[0], starlists[0], True)
-            #moffat.fit_moffat_single(img_files[0], starlist_stats[0], 0.2)
-            #break
-        #break
-        
+            s_f = stats_dir + f'stats_{suf}_{f}.fits'
+            print("Updating: ", s_f)
+            stats = table.Table.read(s_f)
+            # from the number of the file we can add in a column for order. this could have been easier at a different step?
+            # list of all the image numbers used in this file
+            images = [re.search(f"Fld2/sta(.*){suf}", filt).group(1) for filt in stats["Image"]]
+            # want to find the key corresponding to these
+            f_ord = [next(key for key, value in dict_images.items() if (int(i) in value)).split("_")[1] for i in images]
+            # then get the filter order depending on that key
+            stats.replace_column('FILTER', table.Column(np.repeat(f, len(stats))))
+            if not 'F_ORD'in stats.colnames:
+                stats.add_column(table.Column(f_ord, name='F_ORD'))
+            if not 'wavelength' in stats.colnames:
+                stats.add_column(table.Column(np.repeat(util.get_wavelength(f), len(stats)), name='wavelength'))
+            if not 'quad' in stats.colnames:
+                stats.add_column(table.Column([util.get_quad(f, odr) for odr in f_ord], name='quad'))
+            stats.write(s_f, overwrite=True)
+                             
     return
 
+# must stack and find stars for stacks previously.
+def split_4F_stacks():
+    all_images = []
+    for key in dict_suffix.keys():
+        img = dict_images[key]
+        suf = dict_suffix[key]
+        odr = dict_filt[key]
+        
+        if odr != 'I':
+            starlists = [stacks_dir + '4F/fld2_stack_' + suf +  '_' + odr +'_stars.txt'] # unfortunate naming error for stacks
+            reduce_STA.four_filt_split(starlists, odr)
+    return
+    
+
+def analyze_4F_stacks():
+    ## Loop through all the different data sets
+    #for key in ['set_name']: ## Single key setup
+    all_images = []
+    all_starlists = []
+    
+    for key in dict_suffix.keys():
+        img = dict_images[key]
+        suf = dict_suffix[key]
+        odr = dict_filt[key]
+        
+        if odr != 'I':
+            all_images += [stacks_dir + f'fld2_stack_{suf}_{odr}.fits' for f in filters]
+            all_starlists += [stacks_dir + f'4F/fld2_stack_{suf}_{odr}_{f}_{odr}_stars.txt' for f in filters] # unfortunate naming error
+    
+    stats_file = stats_dir + 'stats_stacks.fits'
+    starlist_stats = [strlst.replace('_stars.txt', '_stars_stats.fits') for strlst in all_starlists]
+    ## Calc stats on all the stacked images
+    #redu.calc_star_stats(all_images, output_stats=stats_file, starlists=all_starlists, fourfilt=True)
+    print("Starting moffat fitting")
+    moffat.fit_moffat(all_images, stats_file, starlists=starlist_stats, flux_percent=0.2)
+
+    return
 
 
