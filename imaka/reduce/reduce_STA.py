@@ -447,6 +447,7 @@ def four_filt_split(starlists, filt_order):
         stars = Table.read(starlists[ii], format='ascii')
         x = stars['xcentroid']
         y = stars['ycentroid']
+        stars.add_column(Column(np.repeat('4', len(stars)), name='FILTER'))
 
         # Define quadrants with indicies
         img_half = 5280 / 2 # FOR BIN2!!!!
@@ -456,6 +457,11 @@ def four_filt_split(starlists, filt_order):
         ind_2 = np.where((x>img_half) & (y>img_half))
         ind_3 = np.where((x>img_half) & (y<img_half))
         ind_4 = np.where((x<img_half) & (y<img_half))
+        
+        stars['filter'][ind_1] = filt_1
+        stars['filter'][ind_2] = filt_2
+        stars['filter'][ind_3] = filt_3
+        stars['filter'][ind_4] = filt_4
     
         # Write new files
         list_root = starlists[ii].split('stars.txt')[0]
