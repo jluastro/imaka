@@ -1,6 +1,7 @@
 ### moffat.py - Takes reduced images and existing stats files and conducts moffat fitting, adds data to stats tables and makes model PSFs
 
 import os
+import pdb
 import numpy as np
 from astropy.io import fits
 from astropy.table import Table, Column
@@ -146,19 +147,16 @@ def fit_moffat(img_files, stats_file, x_guess=5, y_guess=5, flux_percent=0.9, st
     
     return
 
-def fit_moffat_single(img_file, starlist, flux_percent):
+def fit_moffat_single(img_file, starlist, flux_percent, plot_psf_compare=False):
     pid = mp.current_process().pid
-    
     print(f"p{pid} - Fitting moffat for {img_file} and {starlist}")
     
     # Load up the image to work on.
     img, hdr = fits.getdata(img_file, header=True, ignore_missing_end=True)
-    
     print("File exists: ", os.path.exists(starlist))
     if not os.path.exists(starlist):
         return {}
     stars = Table.read(starlist, format='fits') #, format='ascii.fixed_width')
-    
     N_stars = len(stars)
 
     # Put the positions into an array 
@@ -211,9 +209,12 @@ def fit_moffat_single(img_file, starlist, flux_percent):
     y_0_list       = np.zeros(N_good_stars, dtype=float)
     width_x_list   = np.zeros(N_good_stars, dtype=float)
     width_y_list   = np.zeros(N_good_stars, dtype=float)
+    lss_list   = np.zeros(N_good_stars, dtype=float)
+    fvu_list   = np.zeros(N_good_stars, dtype=float)
+    mfr_list   = np.zeros(N_good_stars, dtype=float)
 
     # We will fit on oversampled images.  This is the over-sampling factor.
-    over_samp = 2
+    over_samp = 1 # BUG switched for the bin1 images
     
     final_psf_mof = np.zeros(((cut_size + 1) * over_samp,
                               (cut_size + 1) * over_samp), dtype=float)
@@ -225,42 +226,103 @@ def fit_moffat_single(img_file, starlist, flux_percent):
         image_cut = img[ylo[jj]:yhi[jj], xlo[jj]:xhi[jj]]
 
         over_samp_cut = scipy.ndimage.zoom(image_cut, over_samp, order=1)
+        over_samp_cut /= over_samp_cut.max() #normed peak to 1 # BUG: what if bright outlier?
 
-        # Conduct moffat fit
+        # Setup moffat fit
         y, x = np.mgrid[:over_samp_cut.shape[0], :over_samp_cut.shape[1]]
         z = over_samp_cut
-        m_init = Elliptical_Moffat2D(N_sky = 0,
+        m2d_model = Elliptical_Moffat2D(N_sky = 0,
                                          amplitude = np.amax(z),
                                          x_0 = over_samp_cut.shape[0] / 2,
                                          y_0 = over_samp_cut.shape[1] / 2,
                                          width_x = 4.55 * over_samp,
                                          width_y = 4.17 * over_samp)
-        fit_m = fitting.LevMarLSQFitter()
-        m = fit_m(m_init, x, y, z)
-             
-        N_sky_list[jj]     = m.N_sky.value
-        amplitude_list[jj] = m.amplitude.value
-        power_list[jj]     = m.power.value
-        x_0_list[jj]       = m.x_0.value / over_samp
-        y_0_list[jj]       = m.y_0.value / over_samp
-        if m.width_x.value < m.width_y.value:
-            width_x_list[jj]    = m.width_x.value / over_samp
-            width_y_list[jj]    = m.width_y.value / over_samp
-            phi_list[jj]       = m.phi.value 
+        #c2d_model = models.Const2D(0.0)
+        #the_model = m2d_model + c2d_model
+        the_model = m2d_model
+        fit_m = fitting.LevMarLSQFitter() #the_fitter
+        
+        # Conduct moffat fit
+        m2d_params = fit_m(the_model, x, y, z,
+                           epsilon=1e-12, acc=1e-12, maxiter=300, weights=None) #added values for better fit
+        m2d_image = m2d_params(x, y)
+        
+        # Add to our average observed/model PSFs
+        final_psf_mof += m2d_image
+        
+        # Saving relevant parameters
+        N_sky_list[jj]     = m2d_params.N_sky.value
+        amplitude_list[jj] = m2d_params.amplitude.value
+        power_list[jj]     = m2d_params.power.value
+        x_0_list[jj]       = m2d_params.x_0.value / over_samp
+        y_0_list[jj]       = m2d_params.y_0.value / over_samp
+        
+        # Add based on major or minor axis
+        if m2d_params.width_x.value < m2d_params.width_y.value:
+            width_x_list[jj]    = m2d_params.width_x.value / over_samp
+            width_y_list[jj]    = m2d_params.width_y.value / over_samp
+            phi_list[jj]       = m2d_params.phi.value 
         else:
-            width_x_list[jj]    = m.width_y.value / over_samp
-            width_y_list[jj]    = m.width_x.value / over_samp
-            phi_list[jj]       = m.phi.value + (np.pi/2)
-
-        final_psf_mof += m(x, y)
+            width_x_list[jj]    = m2d_params.width_y.value / over_samp
+            width_y_list[jj]    = m2d_params.width_x.value / over_samp
+            phi_list[jj]       = m2d_params.phi.value + (np.pi/2)
+        
+        # fit metrics
+        diff_img_ss = over_samp_cut - m2d_image
+        PSF_mean_ss = np.mean(over_samp_cut)
+        residual_ss = np.sum(diff_img_ss**2) # Least Squares Sum (LSS)
+        med_fr_ss = np.median(np.abs(diff_img_ss / over_samp_cut)) # Median Fractional Residual (MFR)
+        fvu_ss = residual_ss / np.sum((over_samp_cut - PSF_mean_ss)**2)  # Fraction of Variance Unexplained (FVU)
+        
+        # Save the fit
+        lss_list[jj] = residual_ss
+        fvu_list[jj] = fvu_ss
+        mfr_list[jj] = med_fr_ss
+        
+        # plot checking
+        if (plot_psf_compare == True) and (x_cent > 200) and (y_cent > 200):
+            vmin = over_samp_cut.min()
+            vmax = over_samp_cut.max()
+            # Plotting
+            plt.figure(4, figsize=(12,3))
+            plt.clf()
+            # 1. Cut out Source
+            plt.subplot(1,4,1)
+            plt.imshow(over_samp_cut, origin='lower', vmin=vmin, vmax=vmax)
+            plt.colorbar(fraction=0.046, pad=0.05)
+            plt.title(f'Image (resamp={over_samp:d})')
+            # 2. Model of source
+            plt.subplot(1,4,2)
+            plt.imshow(m2d_image, origin='lower', vmin=vmin, vmax=vmax)
+            plt.colorbar(fraction=0.046, pad=0.05)
+            plt.title(f'Model (resamp={over_samp:d})')
+            # 3. Residual - Subtraction
+            plt.subplot(1,4,3)
+            plt.imshow(over_samp_cut - m2d_image, origin='lower', vmin=-vmax/6, vmax=vmax/6)
+            plt.colorbar(fraction=0.046, pad=0.04)
+            plt.title(f"Data-Model (resamp={over_samp:d})")
+            # 4. Residual - Fraction
+            plt.subplot(1,4,4)
+            plt.subplots_adjust(left=0.08)
+            plt.imshow((over_samp_cut - m2d_image) / over_samp_cut, vmin=-1, vmax=1) # take out outliers?
+            plt.colorbar(fraction=0.046, pad=0.05)
+            plt.title('Residual fraction')
+            plt.suptitle(f"Source {jj} fit, alpha major: {width_x_list[jj]:.2f} minor: {width_y_list[jj]:.2f} | LSS {residual_ss:.2e} | FVU {fvu_ss:.2e} | MFR {med_fr_ss:.2e}")
+            plt.tight_layout()
+            plt.pause(0.05)
+                
+            pdb.set_trace()
 
     # Save the average PSF (flux-weighted). Note we are making a slight 
     # mistake here since each PSF has a different sub-pixel position
     final_psf_mof /= N_good_stars
-    fits.writeto(starlist.replace('_stars_stats.fits', '_psf_mof_oversamp{0:d}.fits'.format(over_samp)),
+    sl_dir_name, sl_file_name = os.path.split(starlist)
+    psf_dir = sl_dir_name + '/psf/'
+    util.mkdir(psf_dir)
+    fits.writeto(psf_dir+sl_file_name.replace('_stars_stats.fits', '_psf_mof_oversamp{0:d}.fits'.format(over_samp)),
                  final_psf_mof, hdr, overwrite=True)
     #TODO: four filter specific, base on starlist
-
+    
     # Save and updated list of stars with all their moffat fits.
     stars['N Sky'] = N_sky_list
     stars['Amplitude'] = amplitude_list
@@ -268,6 +330,11 @@ def fit_moffat_single(img_file, starlist, flux_percent):
     stars['Beta'] = power_list
     stars['Minor Alpha'] = width_x_list
     stars['Major Alpha'] = width_y_list
+    stars['Moffat MIN FWHM'] = 2.0 * stars['Minor Alpha'] * np.sqrt((2.0**(1. / stars['Beta'])) - 1)
+    stars['Moffat MAJ FWHM'] = 2.0 * stars['Major Alpha'] * np.sqrt((2.0**(1. / stars['Beta'])) - 1)
+    stars['Moff LSS'] = lss_list
+    stars['Moff FVU'] = fvu_list
+    stars['Moff MFR'] = mfr_list
 
     stars_file_root, stars_file_ext = os.path.splitext(starlist)
     stars.write(starlist.replace('.fits', '_mdp.fits'), overwrite=True) #, format='ascii.fixed_wi
@@ -292,6 +359,10 @@ def fit_moffat_single(img_file, starlist, flux_percent):
     results['y_0_std']       = np.std(y_0_list)
     results['width_x_std']   = np.std(abs(width_x_list))
     results['width_y_std']   = np.std(abs(width_y_list))
+    
+    results['moff_lss']      = np.median(lss_list)
+    results['moff_fvu']      = np.median(fvu_list)
+    results['moff_mfr']      = np.median(mfr_list)
 
     results['mof_stars'] = int(N_good_stars)
 
@@ -325,7 +396,10 @@ def calc_mof_fwhm(stats_file, filt=False, plate_scale=0.016):
         the stats table. 
     """
     data = Table.read(stats_file)
+    return calc_mof_fwhm_data(data, filt, plate_scale)
 
+    
+def calc_mof_fwhm_data(data, filt=False, plate_scale=0.016):
     filters = np.array(data['FILTER'])
     bin_fac = np.array(data['BINFAC'])
     N_stars = np.array(data['N Stars'])
@@ -363,6 +437,12 @@ def calc_mof_fwhm(stats_file, filt=False, plate_scale=0.016):
     
     return FWHM_min, sig_FWHM_min, FWHM_maj, sig_FWHM_maj
 
+def calc_mof_fwhm_single(alpha_min,alpha_maj,beta,  filt=False, plate_scale=0.016, bin_fac=1):
+    # Calculate calibration factors
+    calib = plate_scale * bin_fac
+    FWHM_min = 2 * alpha_min * np.sqrt((2**(1/beta))-1) * calib
+    FWHM_maj = 2 * alpha_maj * np.sqrt((2**(1/beta))-1) * calib
+    return  FWHM_min, FWHM_maj
 
 def rm_mof(stats_files):
     """
