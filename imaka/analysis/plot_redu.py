@@ -29,7 +29,7 @@ from matplotlib import cm
 from astropy.stats import sigma_clipped_stats
 import matplotlib.lines as mlines
 import matplotlib.patches as mpatches
-
+import seaborn as sns
 
 # for plotting and checking one files starlist
 def plot_starlist_stats(test_img_base, root_dir, fld, night, rebinned=False):
@@ -214,7 +214,9 @@ def plot_stack_stats_4F_frame(date, suffixes=['open', 'ttf', 'closed'], root_dir
     plots_dir = root_dir + date + '/' + reduce_dir + 'plots/'
     
     labels = ['B', 'V', 'R', 'I']
-    dict_filt = {"B":"b", "V":"c", "R":"r", "I":"m"}
+    filt_colors = sns.color_palette("Spectral", 5)
+    dict_filt = {"B":filt_colors[4], "V":filt_colors[3], "R":filt_colors[1], "I":filt_colors[0]}
+    #dict_filt = {"B":"b", "V":"c", "R":"r", "I":"m"}
     f_fmt = {'LS_c':'x', 'docz2_c':'+', 'tt_c':'^', "_o":'o'}
     f_name = {"_o":'Open', 'LS_c':'Closed (LS)', 'docz2_c':'Closed (DOC)', 'tt_c':'Closed (tt)'}
         
@@ -879,3 +881,188 @@ def get_color_list():
     
     colors = [item['color'] for item in prop_cycler]
     return colors
+
+### Beta vs. min FWHM, median over all frames
+def plot_fwhm_beta_4F_frames(redu, c_keys = ["LS_c", "tt_c", "_o"], xlim=[0,1.5], ylim = [1,7]):
+    filters = ["B", "V", "R", "I"]
+    
+    fig, ax = plt.subplots(ncols=2, nrows=1, figsize=(10,4))
+    filt_colors = sns.color_palette("Spectral", 5)
+    fdict_color = {"B":filt_colors[4], "V":filt_colors[3], "R":filt_colors[1], "I":filt_colors[0]}
+    kdict_fmt = {'LS_c':'x', 'docz_c': '+', 'tt_c':'^', '_o':'o'}
+    kdict_name = {'_o':'Open (AO Off)', 'docz_c':'Closed LS (AO On)', 'LS_c':'Closed LS (AO On)', 'tt_c':'Closed TT (AO Partial)'}
+
+    # iterate through filters
+    for fil_band in filters:
+        for key in c_keys:
+            stat_f = f'{redu.root_dir}reduce/stats/stats_{key}_{fil_band}_mdp.fits'
+            stats = Table.read(stat_f)
+
+            # TODO: outlier rejection
+
+            FWHM_min, sig_FWHM_min, FWHM_maj, sig_FWHM_maj = moffat.calc_mof_fwhm(stat_f, filt=False, plate_scale=stats.meta['SCALE'])
+            ax[0].errorbar(np.median(FWHM_min), np.median(stats['Beta']), xerr=np.median(sig_FWHM_min), yerr=np.median(stats['Beta std']), fmt=kdict_fmt[key],  ecolor='lightgray', mec=fdict_color[fil_band], mfc=fdict_color[fil_band])
+            ax[1].errorbar(np.median(FWHM_maj), np.median(stats['Beta']), xerr=np.median(sig_FWHM_maj), yerr=np.median(stats['Beta std']), fmt=kdict_fmt[key],  ecolor='lightgray', mec=fdict_color[fil_band], mfc=fdict_color[fil_band])
+
+    ax[0].set_xlabel(r'FWHM Moffat MIN (as)')
+    ax[1].set_xlabel(r'FWHM Moffat MAJ (as)')
+    ax[0].set_ylabel(r'$\beta$')
+
+    ax[1].set_ylim(ylim[0], ylim[1])    
+    ax[0].set_ylim(ylim[0], ylim[1])
+
+    ax[1].set_xlim(xlim[0], xlim[1])    
+    ax[0].set_xlim(xlim[0], xlim[1]) 
+
+    ax[0].legend(handles=[mlines.Line2D([0], [0], marker=kdict_fmt[key], label=kdict_name[key], color='grey',  lw=0) for key in c_keys])
+    ax[1].legend(handles=[mpatches.Patch(color=value, label=key) for key, value in fdict_color.items()], loc=2)
+
+    plt.suptitle(f"Moffat Summary for {redu.night}, combined filter rotations")
+    return
+
+
+### Beta vs. min FWHM, median over all frames
+def plot_fwhm_beta_4F_stack_sum(redu, c_keys = ["LS_c", "tt_c", "_o"], xlim=[0,1.5], ylim = [1,7]):
+    filters = ["B", "V", "R", "I"]
+
+    fig, ax = plt.subplots(ncols=2, nrows=1, figsize=(10,4))
+    fcolors = sns.color_palette("Spectral", 5)
+    fdict_color = {"B":fcolors[4], "V":fcolors[3], "R":fcolors[1], "I":fcolors[0]}
+    kdict_fmt = {'LS_c':'x', 'docz2_c': '+', 'tt_c':'^', '_o':'o'}
+    kdict_name = {'_o':'Open (AO Off)', 'docz2_c':'Closed LS (AO On)', 'LS_c':'Closed LS (AO On)', 'tt_c':'Closed TT (AO Partial)'}
+
+    stats_stacked = Table.read(redu.stats_dir + 'stats_stacks.fits')
+    status = ["_".join(img.split("_")[-3:-1]) for img in stats_stacked["Image"]]
+    labels = [stats_stacked["FILTER"][i]+status[i] for i in range(len(status))]
+
+    FWHM_min, sig_FWHM_min, FWHM_maj, sig_FWHM_maj = redu.moffat.calc_mof_fwhm_data(stats_stacked, filt=False, plate_scale=stats_stacked.meta['SCALE'])
+
+    for i in range(len(status)):
+        fil_band = stats_stacked["FILTER"][i]
+        key = status[i]
+        ax[0].errorbar(FWHM_min[i], stats_stacked['Beta'][i], xerr=sig_FWHM_min[i], yerr=stats_stacked['Beta std'][i], fmt=kdict_fmt[key], ecolor='lightgray', mec=fdict_color[fil_band], mfc=fdict_color[fil_band])
+        ax[1].errorbar(FWHM_maj[i], stats_stacked['Beta'][i], xerr=sig_FWHM_maj[i], yerr=stats_stacked['Beta std'][i], fmt=kdict_fmt[key], ecolor='lightgray', mec=fdict_color[fil_band], mfc=fdict_color[fil_band])
+
+    ax[0].legend(handles=[mlines.Line2D([0], [0], marker=kdict_fmt[key], label=kdict_name[key], color='grey',  lw=0) for key in c_keys], prop={'size':8})
+    ax[1].legend(handles=[mpatches.Patch(color=value, label=key) for key, value in fdict_color.items()], loc=2)
+
+    ax[0].set_xlabel(r'FWHM Moffat MIN (as)')
+    ax[1].set_xlabel(r'FWHM Moffat MAJ (as)')
+    ax[0].set_ylabel(r'$\beta$')
+
+    ax[1].set_ylim(ylim[0], ylim[1])    
+    ax[0].set_ylim(ylim[0], ylim[1])
+    ax[1].set_xlim(xlim[0], xlim[1])    
+    ax[0].set_xlim(xlim[0], xlim[1]) 
+
+    plt.suptitle(f"Moffat Fit Min and Maj Moffat FWHM, \n STACKS for {redu.night}, Multiple orientations plotted")
+    plt.plot()
+    return
+
+def plot_jitter_4F_stack_sum(redu, c_keys = ["LS_c", "tt_c", "_o"], xlim=[0,1.5], ylim = [1,5]):
+    filters = ["B", "V", "R", "I"]
+
+    fig, ax = plt.subplots(ncols=2, nrows=1, figsize=(10,4))
+    fcolors = sns.color_palette("Spectral", 5)
+    fdict_color = {"B":fcolors[4], "V":fcolors[3], "R":fcolors[1], "I":fcolors[0]}
+    kdict_fmt = {'LS_c':'x', 'docz2_c': '+', 'tt_c':'^', '_o':'o'}
+    kdict_name = {'_o':'Open (AO Off)', 'docz2_c':'Closed LS (AO On)', 'LS_c':'Closed LS (AO On)', 'tt_c':'Closed TT (AO Partial)'}
+
+    stats_stacked = Table.read(redu.stats_dir + 'stats_stacks.fits')
+    f_ord = [img.split("_")[-1].split(".")[0] for img in stats_stacked['Image']]
+    orders = np.unique(f_ord).tolist()
+
+    status = ["_".join(img.split("_")[-3:-1]) for img in stats_stacked["Image"]]
+    labels = [stats_stacked["FILTER"][i]+status[i] for i in range(len(status))]
+    #fmts_use = [dict_filt[stats_stacked["FILTER"][i]]+f_fmt[status[i]] for i in range(len(status))]
+
+    FWHM_min, sig_FWHM_min, FWHM_maj, sig_FWHM_maj = moffat.calc_mof_fwhm_data(stats_stacked, filt=False, plate_scale=stats_stacked.meta['SCALE'])
+
+    for i in range(len(status)):
+        fil_band = stats_stacked["FILTER"][i]
+        key = status[i]
+        index = orders.index(f_ord[i])
+        im = ax[index].errorbar(np.sqrt(FWHM_maj[i]**2 - FWHM_min[i]**2), stats_stacked['Beta'][i], xerr=sig_FWHM_min[i], fmt=kdict_fmt[key], ecolor='lightgray', mec=fdict_color[fil_band], mfc=fdict_color[fil_band])
+
+    ax[0].set_xlabel(f'{orders[0]}  $sqrt(MAJ^2 - MIN^2)$ Moffat FWHM(as)')
+    ax[1].set_xlabel(f'{orders[1]}  $sqrt(MAJ^2 - MIN^2)$ Moffat FWHM(as)')
+    ax[0].set_ylabel(r'$\beta$')
+
+    ax[0].legend(handles=[mlines.Line2D([0], [0], marker=kdict_fmt[key], label=kdict_name[key], color='grey',  lw=0) for key in c_keys], prop={'size':8})
+    ax[1].legend(handles=[mpatches.Patch(color=value, label=key) for key, value in fdict_color.items()], loc=2)
+
+    ax[1].set_ylim(ylim[0], ylim[1])    
+    ax[0].set_ylim(ylim[0], ylim[1])
+    ax[1].set_xlim(xlim[0], xlim[1])    
+    ax[0].set_xlim(xlim[0], xlim[1])    
+
+
+    plt.suptitle(f"JITTER: Moffat Fit Min and Maj FWHM, \n STACKS for {redu.night}")
+    plt.plot()
+    
+# FWHM vs. seperation, for stacked image
+def plot_fwhm_sep_4F_stacks(redu, c_key = 'LS_c', o_key = '_o', odr ='IVBR'):
+    width = 10560
+    dict_filt = {"B":"b", "V":"c", "R":"r", "I":"m"}
+    fcolors = sns.color_palette("Spectral", 5)
+    fdict_color = {"B":fcolors[4], "V":fcolors[3], "R":fcolors[1], "I":fcolors[0]}
+
+    fig, ax = plt.subplots(ncols=2, nrows=1, figsize=(12,5))
+
+    for filt in dict_filt.keys():
+        stats_stacked_c_mdp = f'{redu.stacks_dir}fld2_stack_{c_key}_{odr}_{filt}_{odr}_stars_stats_mdp.fits'
+        stats_stacked_o_mdp = f'{redu.stacks_dir}fld2_stack_{o_key}_{odr}_{filt}_{odr}_stars_stats_mdp.fits'
+        stats_c = Table.read(stats_stacked_c_mdp)
+        stats_o = Table.read(stats_stacked_o_mdp)
+        
+        stats_c['Moffat FWHM'] = 2.0 * stats_c['Minor Alpha'] * np.sqrt((2.0**(1. / stats_c['Beta'])) - 1)
+        stats_o['Moffat FWHM'] = 2.0 * stats_o['Minor Alpha'] * np.sqrt((2.0**(1. / stats_o['Beta'])) - 1)
+
+        stats_c['FA'] = np.sqrt( (stats_c['xcentroid']-width/2)**2 + (stats_c['ycentroid']-width/2)**2 )*stats_c.meta['SCALE']
+        stats_o['FA'] = np.sqrt( (stats_o['xcentroid']-width/2)**2 + (stats_o['ycentroid']-width/2)**2 )*stats_o.meta['SCALE']
+
+        ax[0].scatter(stats_c['FA'], stats_c['Moffat FWHM']*stats_c.meta['SCALE'], color=fdict_color[filt], label = f'{filt} {c_key}', alpha = 0.9, s = 1)
+        ax[1].scatter(stats_o['FA'], stats_o['Moffat FWHM']*stats_c.meta['SCALE'], color=fdict_color[filt], label = f'{filt} {o_key}', alpha = 0.9, s = 1)
+
+    ax[0].legend()
+    ax[1].legend()
+    ax[1].set_ylim(0, 1.4)    
+    ax[0].set_ylim(0, 1.4)
+
+    ax[0].set_xlabel(r'Separation from Center (as)')
+    ax[1].set_xlabel(r'Separation from Center (as)')
+
+    ax[0].set_ylabel(r'fwhm_emp (as)')
+    ax[1].set_ylabel(r'fwhm_emp (as)')
+
+    ax[0].set_title('CLOSED loop')
+    ax[1].set_title('OPEN loop')
+
+    plt.suptitle(f'Radial performance vs. FWHM {redu.night} {odr} STACK')
+    return
+
+def plot_beta_mag_4F_stacks(redu, c_key = "LS_c", filt_key = "RIVB"):
+    stats_c = Table.read(f'{redu.root_dir}reduce/stacks/fld2_stack_{c_key}_{filt_key}_stars_stats_mdp.fits')
+    stats_o = Table.read(f'{redu.root_dir}reduce/stacks/fld2_stack__o_{filt_key}_stars_stats_mdp.fits')
+
+    plt.figure(figsize=(10,5))
+    plt.clf()
+    plt.subplot(121)
+    plt.errorbar(stats_o['mag'], stats_o['Beta'],  fmt='k.', label='Open', alpha=0.5)
+    plt.errorbar(stats_c['mag'], stats_c['Beta'],  fmt='r.', label='Closed (LS)', alpha=0.5)
+    plt.xlabel(r'mag')
+    plt.ylabel(r'$\beta$')
+    plt.ylim(0,20)
+    plt.legend()
+
+    plt.subplot(122)
+    plt.errorbar(stats_o['fwhm_emp'], stats_o['Beta'], fmt='k.', label='Open', alpha=0.5)
+    plt.errorbar(stats_c['fwhm_emp'], stats_c['Beta'],  fmt='r.', label='Closed (LS)', alpha=0.5)
+
+    plt.xlabel(r'fwhm_emp')
+    plt.ylabel(r'$\beta$')
+    plt.legend()
+    plt.ylim(0,20)
+
+    plt.suptitle(f"Moffat Fit Open vs.Closed, \n {redu.night} STACK for {c_key} filter order {filt_key}")
+    return
