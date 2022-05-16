@@ -148,9 +148,7 @@ def makeflat(flat_files, dark_files, output_file, darks=True, fourfilter=False):
     # Prepare for parallel compute.
     # Use N_cpu - 2 so we leave 2 for normal
     # operations. 
-    cpu_count = mp.cpu_count()
-    if (cpu_count > 2):
-        cpu_count -= 2
+    cpu_count = _cpu_num()
 
     # Start the pool
     pool = mp.Pool(cpu_count)
@@ -258,7 +256,7 @@ def normalize_flat_filt(flat_img):
     norm = flat_img / med_f
     return norm
 
-def combine_filter_flat(flat_long, flat_short, output_file, filt_order):
+def combine_filter_flat(flat_long, flat_short, output_file, filt_order, flip_180=True):
     """
     Combine flat field image for differing filters. Overwrite one quad of short flat with "I" quad from long flat
 
@@ -295,7 +293,10 @@ def combine_filter_flat(flat_long, flat_short, output_file, filt_order):
     for i, filt in enumerate(filt_order):
         if filt == "I":
             row = (i//2 + 1) % 2
-            col = (i+row+1)%2 
+            col = (i+row + 1) % 2 
+            if flip_180:
+                row = (row+1)%2
+                col = (col+1)%2
             r = [img_half*row, img_half*(row+1)]
             c = [img_half*col, img_half*(col+1)]
             flat_short_data[r[0]:r[1], c[0]:c[1]] = flat_long_data[r[0]:r[1], c[0]:c[1]]
@@ -308,3 +309,16 @@ def combine_filter_flat(flat_long, flat_short, output_file, filt_order):
     fits.writeto(_out, flat_short_data, header=hdr, overwrite=True)
     
     return
+
+def _cpu_num():
+    # How many cores to use for parallel functions
+    # returns a number
+    # Use N_cpu - 2 so we leave 2 for normal
+    # operations. 
+    cpu_count = mp.cpu_count()
+    if (cpu_count > 2):
+        cpu_count -= 2
+        cpu_count = cpu_count if cpu_count <= 8 else 8
+        
+    # reurn 1 #(DEBUG)
+    return cpu_count

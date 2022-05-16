@@ -51,12 +51,9 @@ def treat_overscan(files, remake=False):
     """
     # Parallael process the images.
 
-    # Use N_cpu - 2 so we leave 2 for normal
+    # Use N_cpu - 2, but no more than 8
     # operations. 
-    cpu_count = mp.cpu_count()
-    if (cpu_count > 2):
-        cpu_count -= 2
-
+    cpu_count = _cpu_num()
     # Start the pool
     pool = mp.Pool(cpu_count)
 
@@ -417,7 +414,7 @@ def add_focus(stats_files):
     return 
 
 
-def four_filt_split(starlists, filt_order):
+def four_filt_split(starlists, filt_order, bin_fac=1, flip_180=False):
     
     """
     For STA camera with four filters.
@@ -450,22 +447,27 @@ def four_filt_split(starlists, filt_order):
         stars.add_column(Column(np.repeat('4', len(stars)), name='FILTER'))
 
         # Define quadrants with indicies
-        img_half = 5280 / 2 # FOR BIN2!!!!
-        img_half = 5280 #BIN1
-
+        img_half = 5280/bin_fac #BIN1
+        
         ind_1 = np.where((x<img_half) & (y>img_half))
         ind_2 = np.where((x>img_half) & (y>img_half))
         ind_3 = np.where((x>img_half) & (y<img_half))
         ind_4 = np.where((x<img_half) & (y<img_half))
         
-        stars['filter'][ind_1] = filt_1
-        stars['filter'][ind_2] = filt_2
-        stars['filter'][ind_3] = filt_3
-        stars['filter'][ind_4] = filt_4
+        if flip_180: # added for the 2022_5 run, STA upsidedown
+            ind_1, ind_3 = ind_3, ind_1
+            ind_2, ind_4 = ind_4, ind_2
+        
+        stars['FILTER'][ind_1] = filt_1
+        stars['FILTER'][ind_2] = filt_2
+        stars['FILTER'][ind_3] = filt_3
+        stars['FILTER'][ind_4] = filt_4
     
         # Write new files
-        list_root = starlists[ii].split('stars.txt')[0]
-        #stars[ind_1].write(list_root + filt_1 + '_' + filt_order + '_stars.txt', format='ascii', overwrite=True)
+        list_dir = '/'.join(starlists[ii].split('/')[:-1])
+        list_root = starlists[ii].split('/')[-1].split('stars.txt')[0]
+        list_start = list_dir + '/4F/' + list_root
+        #stars[ind_1].write(list_root + filt_1 + '_' + filt_oer + '_stars.txt', format='ascii', overwrite=True)
         #stars[ind_2].write(list_root + filt_2 + '_' + filt_order + '_stars.txt', format='ascii', overwrite=True)
         #stars[ind_3].write(list_root + filt_3 + '_' + filt_order + '_stars.txt', format='ascii', overwrite=True)
         #stars[ind_4].write(list_root + filt_4 + '_' + filt_order + '_stars.txt', format='ascii', overwrite=True)
@@ -474,13 +476,13 @@ def four_filt_split(starlists, filt_order):
                    'roundness1': '%.2f', 'roundness2': '%.2f', 'peak': '%10.1f',
                    'flux': '%10.6f', 'mag': '%6.2f', 'x_fwhm': '%5.2f', 'y_fwhm': '%5.2f',
                    'theta': '%6.3f'}
-        stars[ind_1].write(list_root + filt_1 + '_' + filt_order + '_stars.txt', format='ascii.fixed_width',
+        stars[ind_1].write(list_start + filt_1 + '_' + filt_order + '_stars.txt', format='ascii.fixed_width',
                           delimiter=None, bookend=False, formats=formats, overwrite=True)
-        stars[ind_2].write(list_root + filt_2 + '_' + filt_order + '_stars.txt', format='ascii.fixed_width',
+        stars[ind_2].write(list_start + filt_2 + '_' + filt_order + '_stars.txt', format='ascii.fixed_width',
                           delimiter=None, bookend=False, formats=formats, overwrite=True)
-        stars[ind_3].write(list_root + filt_3 + '_' + filt_order + '_stars.txt', format='ascii.fixed_width',
+        stars[ind_3].write(list_start + filt_3 + '_' + filt_order + '_stars.txt', format='ascii.fixed_width',
                           delimiter=None, bookend=False,  formats=formats, overwrite=True)
-        stars[ind_4].write(list_root + filt_4 + '_' + filt_order + '_stars.txt', format='ascii.fixed_width',
+        stars[ind_4].write(list_start + filt_4 + '_' + filt_order + '_stars.txt', format='ascii.fixed_width',
                           delimiter=None, bookend=False,  formats=formats, overwrite=True)
         
         #from the original star function 
@@ -488,3 +490,17 @@ def four_filt_split(starlists, filt_order):
         #                  delimiter=None, bookend=False, formats=formats, overwrite=True)
     
     return
+
+
+def _cpu_num():
+    # How many cores to use for parallel functions
+    # returns a number
+    # Use N_cpu - 2 so we leave 2 for normal
+    # operations. 
+    cpu_count = mp.cpu_count()
+    if (cpu_count > 2):
+        cpu_count -= 2
+        cpu_count = cpu_count if cpu_count <= 8 else 8
+        
+    # reurn 1 #(DEBUG)
+    return cpu_count
