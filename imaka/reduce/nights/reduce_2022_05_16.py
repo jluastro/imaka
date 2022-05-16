@@ -1,9 +1,9 @@
-## reduce_2022_05_12.py
+## reduce_2022_05_14.py
 ##########################
 ## edited by Eden McEwen
 ## May 2022
 ## A four filter run
-## Did position 3 (VBRI) this night, not planning on rotating
+## Did position 1 (RIVB) this night
 
 import numpy as np
 from astropy.io import fits
@@ -24,7 +24,7 @@ from imaka.reduce import massdimm
 import matplotlib
 # matplotlib.use('Agg')
 
-night = '20220512'
+night = '20220516'
 root_dir = f'/g/lu/data/imaka/onaga/{night}/sta/'
 
 data_dir = root_dir + 'Fld2/'
@@ -45,19 +45,23 @@ massdimm_dir = root_dir + 'reduce/massdimm/'
 
 dict_suffix = {'open': '_o',
                'LS':   'LS_c',
+               'TT':   'TT_c',
               }
 
-dict_images = {'open':  [124, 126, 128, 130, 132, 134, 136, 138, 140, 147, 149, 151, 153, 155, 157, 159],
-               'LS':    [123, 125, 127, 129, 131, 133, 135, 137, 139, 146, 148, 150, 152, 154, 156, 158], 
+dict_images = {'open':  [],
+               'LS':    [], 
+               'TT':    [], 
               }
 
 dict_fwhm = {'open': 12,
              'LS': 8,
+             'TT': 10,
             }  
 
 # only include filter if key was a 4F file
-dict_filt = {'open': 'VBRI',
-             'LS':   'VBRI',
+dict_filt = {'open': 'RIVB',
+             'LS':   'RIVB',
+             'LS':   'RIVB',
               }
 
 ###############################################
@@ -83,7 +87,7 @@ def make_flat():
     #reduce_STA.treat_overscan(flat_frames)
     #calib.makeflat(scan_flat_frames, None, calib_dir + 'domeflat_I.fits', darks=False)
     
-    calib.make_mask(calib_dir + 'flat_VBRI.fits', calib_dir + 'mask_VBRI.fits',
+    calib.make_mask(calib_dir + 'flat_RIVB.fits', calib_dir + 'mask_RIVB.fits',
                        mask_min=0.8, mask_max=1.4,
                        left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
     return
@@ -101,7 +105,7 @@ def make_sky():
     sky_frames = ['{0:s}sky_{1:03d}_o.fits'.format(data_dir, ss) for ss in sky_num]
     scan_sky_frames =  ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num]
     reduce_STA.treat_overscan(sky_frames)
-    calib.makedark(scan_sky_frames, sky_dir + 'fld2_sky_VBRI.fits')
+    calib.makedark(scan_sky_frames, sky_dir + 'fld2_sky_RIVB.fits')
 
     return
 
@@ -119,7 +123,7 @@ def make_dark():
     scan_dark_frames = ['{0:s}dark_{1:03d}_scan.fits'.format(dark_dir, ss) for ss in dark_num]
     
     reduce_STA.treat_overscan(dark_frames)
-    calib.makedark(scan_dark_frames, calib_dir + 'fld2_dark120_VBRI.fits')
+    calib.makedark(scan_dark_frames, calib_dir + 'fld2_dark120_RIVB.fits')
     
     print("BVR quad flat (20)")
     dark_num = np.arange(116,118+1)
@@ -127,7 +131,7 @@ def make_dark():
     scan_dark_frames = ['{0:s}dark_{1:03d}_scan.fits'.format(dark_dir, ss) for ss in dark_num]
     
     reduce_STA.treat_overscan(dark_frames)
-    calib.makedark(scan_dark_frames, calib_dir + 'fld2_dark20_VBRI.fits')
+    calib.makedark(scan_dark_frames, calib_dir + 'fld2_dark20_RIVB.fits')
     
     return
 
@@ -375,41 +379,41 @@ def make_flat_4F():
     util.mkdir(calib_dir)
     
     ## Darks are the same all night
-    filt_order = "VBRI"
-    flat_num_120 = np.arange(108, 110+1)
-    flat_num_020 = np.arange(103, 107+1)
+    filt_order = "RIVB"
+    flat_num_60 = np.arange(65, 69+1)
+    flat_num_20 = np.arange(71, 75+1)
     
     print(filt_order)
     
-    print("I quad flat (120)")
-    dark_num = np.arange(116, 118+1)
+    print("I quad flat (60)")
+    dark_num = np.arange(76, 80+1)
     dark_frames = ['{0:s}dark_{1:03d}.fits'.format(dark_dir, ss) for ss in dark_num]
     scan_dark_frames = ['{0:s}dark_{1:03d}_scan.fits'.format(dark_dir, ss) for ss in dark_num]
-    flat_frames = ['{0:s}sta{1:03d}_o.fits'.format(dome_dir, ss) for ss in flat_num_120]
-    scan_flat_frames = ['{0:s}sta{1:03d}_o_scan.fits'.format(dome_dir, ss) for ss in flat_num_120]
+    flat_frames = ['{0:s}sta{1:03d}_o.fits'.format(dome_dir, ss) for ss in flat_num_60]
+    scan_flat_frames = ['{0:s}sta{1:03d}_o_scan.fits'.format(dome_dir, ss) for ss in flat_num_60]
     
     reduce_STA.treat_overscan(dark_frames)
     reduce_STA.treat_overscan(flat_frames)
     calib.makeflat(scan_flat_frames, scan_dark_frames, 
-                   f'{calib_dir}domeflat_120_{filt_order}.fits', darks=True, fourfilter=True)
+                   f'{calib_dir}domeflat_60_{filt_order}.fits', darks=True, fourfilter=True)
     
     print("BVR quad flat (20)")
-    dark_num = np.arange(111, 115+1)
+    dark_num = np.arange(81,85+1)
     dark_frames = ['{0:s}dark_{1:03d}.fits'.format(dark_dir, ss) for ss in dark_num]
     scan_dark_frames = ['{0:s}dark_{1:03d}_scan.fits'.format(dark_dir, ss) for ss in dark_num]
-    flat_frames = ['{0:s}sta{1:03d}_o.fits'.format(dome_dir, ss) for ss in flat_num_020]
-    scan_flat_frames = ['{0:s}sta{1:03d}_o_scan.fits'.format(dome_dir, ss) for ss in flat_num_020]
+    flat_frames = ['{0:s}sta{1:03d}_o.fits'.format(dome_dir, ss) for ss in flat_num_20]
+    scan_flat_frames = ['{0:s}sta{1:03d}_o_scan.fits'.format(dome_dir, ss) for ss in flat_num_20]
     
     reduce_STA.treat_overscan(dark_frames)
     reduce_STA.treat_overscan(flat_frames)
     calib.makeflat(scan_flat_frames, scan_dark_frames, 
-                   f'{calib_dir}domeflat_020_{filt_order}.fits', darks=True, fourfilter=True)
+                   f'{calib_dir}domeflat_20_{filt_order}.fits', darks=True, fourfilter=True)
     
     # Combining two flats based on filter orientation
-    calib.combine_filter_flat(f'{calib_dir}domeflat_120_{filt_order}.fits',
-                              f'{calib_dir}domeflat_020_{filt_order}.fits', 
+    print("Combining: I quad flat (60) & BVR quad flat (20)")
+    calib.combine_filter_flat(f'{calib_dir}domeflat_60_{filt_order}.fits',
+                              f'{calib_dir}domeflat_20_{filt_order}.fits', 
                               f'{calib_dir}flat_{filt_order}.fits', filt_order, flip_180=True)
-    
     calib.make_mask(f'{calib_dir}flat_{filt_order}.fits', f'{calib_dir}mask_{filt_order}.fits',
                        mask_min=0.8, mask_max=1.4,
                        left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)

@@ -1,4 +1,4 @@
-## reduce_2022_05_12.py
+## reduce_2022_05_13.py
 ##########################
 ## edited by Eden McEwen
 ## May 2022
@@ -24,7 +24,7 @@ from imaka.reduce import massdimm
 import matplotlib
 # matplotlib.use('Agg')
 
-night = '20220512'
+night = '20220513'
 root_dir = f'/g/lu/data/imaka/onaga/{night}/sta/'
 
 data_dir = root_dir + 'Fld2/'
@@ -47,8 +47,8 @@ dict_suffix = {'open': '_o',
                'LS':   'LS_c',
               }
 
-dict_images = {'open':  [124, 126, 128, 130, 132, 134, 136, 138, 140, 147, 149, 151, 153, 155, 157, 159],
-               'LS':    [123, 125, 127, 129, 131, 133, 135, 137, 139, 146, 148, 150, 152, 154, 156, 158], 
+dict_images = {'LS':   [86,88,90,92,94,96,103,115,107,109,111,113,115,122,124,126,128,130,132,134,136,138,142], 
+               'open': [87,89,91,93,95,97,104,106,108,110,112,114,116,123,125,127,129,131,133,135,137,139,143], 
               }
 
 dict_fwhm = {'open': 12,
@@ -97,7 +97,7 @@ def make_sky():
     # shutil.copyfile(root_dir + '../../20210724/sta/dark/dark_044_scan.fits', sky_dir + 'fld2_sky_tmp.fits')
     
     ## CREATING A SKY
-    sky_num = np.arange(141, 145+1)
+    sky_num = np.arange(117, 121+1)
     sky_frames = ['{0:s}sky_{1:03d}_o.fits'.format(data_dir, ss) for ss in sky_num]
     scan_sky_frames =  ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num]
     reduce_STA.treat_overscan(sky_frames)
@@ -113,16 +113,16 @@ def make_dark():
     # shutil.copyfile(root_dir + '../../20210724/sta/dark/dark_044_scan.fits', sky_dir + 'fld2_sky_tmp.fits')
     
     ## CREATING A SKY
-    print("I quad flat (120)")
-    dark_num = np.arange(111, 115+1)
+    print("I quad flat (60)")
+    dark_num = np.arange(81, 85+1)
     dark_frames = ['{0:s}dark_{1:03d}.fits'.format(dark_dir, ss) for ss in dark_num]
     scan_dark_frames = ['{0:s}dark_{1:03d}_scan.fits'.format(dark_dir, ss) for ss in dark_num]
     
     reduce_STA.treat_overscan(dark_frames)
-    calib.makedark(scan_dark_frames, calib_dir + 'fld2_dark120_VBRI.fits')
+    calib.makedark(scan_dark_frames, calib_dir + 'fld2_dark60_VBRI.fits')
     
     print("BVR quad flat (20)")
-    dark_num = np.arange(116,118+1)
+    dark_num = np.arange(76,80+1)
     dark_frames = ['{0:s}dark_{1:03d}.fits'.format(dark_dir, ss) for ss in dark_num]
     scan_dark_frames = ['{0:s}dark_{1:03d}_scan.fits'.format(dark_dir, ss) for ss in dark_num]
     
@@ -360,12 +360,13 @@ POS 4: BRIV - B(NW), R(NE), I(SE), V(SW).
 
 ## Splitting the initial dictonary keys above means they don't need to be again split here.
 
-filters = ['B', 'I', 'R', 'V']
+filters = ['V', 'R', 'I', 'B']
 
 ## Catching any missed name changes
 dict_orders_rot = dict_filt
 dict_images_rot = dict_images
 dict_suffix_rot = dict_suffix
+
 
 def make_flat_4F(): 
     """
@@ -376,43 +377,45 @@ def make_flat_4F():
     
     ## Darks are the same all night
     filt_order = "VBRI"
-    flat_num_120 = np.arange(108, 110+1)
-    flat_num_020 = np.arange(103, 107+1)
+    flat_num_60 = np.arange(63, 67+1)
+    flat_num_20 = np.array([73, 74, 75, 73, 74])
     
     print(filt_order)
     
-    print("I quad flat (120)")
-    dark_num = np.arange(116, 118+1)
+    print("I quad flat (60)")
+    dark_num = np.arange(81, 85+1)
     dark_frames = ['{0:s}dark_{1:03d}.fits'.format(dark_dir, ss) for ss in dark_num]
     scan_dark_frames = ['{0:s}dark_{1:03d}_scan.fits'.format(dark_dir, ss) for ss in dark_num]
-    flat_frames = ['{0:s}sta{1:03d}_o.fits'.format(dome_dir, ss) for ss in flat_num_120]
-    scan_flat_frames = ['{0:s}sta{1:03d}_o_scan.fits'.format(dome_dir, ss) for ss in flat_num_120]
+    flat_frames = ['{0:s}sta{1:03d}_o.fits'.format(dome_dir, ss) for ss in flat_num_60]
+    scan_flat_frames = ['{0:s}sta{1:03d}_o_scan.fits'.format(dome_dir, ss) for ss in flat_num_60]
     
     reduce_STA.treat_overscan(dark_frames)
     reduce_STA.treat_overscan(flat_frames)
     calib.makeflat(scan_flat_frames, scan_dark_frames, 
-                   f'{calib_dir}domeflat_120_{filt_order}.fits', darks=True, fourfilter=True)
+                   f'{calib_dir}domeflat_60_{filt_order}.fits', darks=True, fourfilter=True)
     
     print("BVR quad flat (20)")
-    dark_num = np.arange(111, 115+1)
+    dark_num = np.arange(76,80+1)
     dark_frames = ['{0:s}dark_{1:03d}.fits'.format(dark_dir, ss) for ss in dark_num]
     scan_dark_frames = ['{0:s}dark_{1:03d}_scan.fits'.format(dark_dir, ss) for ss in dark_num]
-    flat_frames = ['{0:s}sta{1:03d}_o.fits'.format(dome_dir, ss) for ss in flat_num_020]
-    scan_flat_frames = ['{0:s}sta{1:03d}_o_scan.fits'.format(dome_dir, ss) for ss in flat_num_020]
+    flat_frames = ['{0:s}sta{1:03d}_o.fits'.format(dome_dir, ss) for ss in flat_num_20]
+    scan_flat_frames = ['{0:s}sta{1:03d}_o_scan.fits'.format(dome_dir, ss) for ss in flat_num_20]
     
     reduce_STA.treat_overscan(dark_frames)
     reduce_STA.treat_overscan(flat_frames)
     calib.makeflat(scan_flat_frames, scan_dark_frames, 
-                   f'{calib_dir}domeflat_020_{filt_order}.fits', darks=True, fourfilter=True)
+                   f'{calib_dir}domeflat_20_{filt_order}.fits', darks=True, fourfilter=True)
     
     # Combining two flats based on filter orientation
-    calib.combine_filter_flat(f'{calib_dir}domeflat_120_{filt_order}.fits',
-                              f'{calib_dir}domeflat_020_{filt_order}.fits', 
+    print("Combining: I quad flat (60) & BVR quad flat (20)")
+    calib.combine_filter_flat(f'{calib_dir}domeflat_60_{filt_order}.fits',
+                              f'{calib_dir}domeflat_20_{filt_order}.fits', 
                               f'{calib_dir}flat_{filt_order}.fits', filt_order, flip_180=True)
     
     calib.make_mask(f'{calib_dir}flat_{filt_order}.fits', f'{calib_dir}mask_{filt_order}.fits',
                        mask_min=0.8, mask_max=1.4,
                        left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
+    
     return
 
 
@@ -425,7 +428,7 @@ def split_4F_starlists():
         suf = dict_suffix[key]
         odr = dict_filt[key]
         starlists = [out_dir + 'sta{img:03d}{suf:s}_scan_clean_stars.txt'.format(img=ii, suf=suf) for ii in img]
-        reduce_STA.four_filt_split(starlists, odr, flip_180=True)
+        reduce_STA.four_filt_split(starlists, odr)
     return
     
 
@@ -493,15 +496,14 @@ def update_4F_stats():
 
 # must stack and find stars for stacks previously.
 def split_4F_stacks():
-    util.mkdir(stacks_dir+'4F/')
     all_images = []
     for key in dict_suffix.keys():
         img = dict_images[key]
         suf = dict_suffix[key]
         odr = dict_filt[key]
 
-        starlists = [stacks_dir + 'fld2_stack_' + suf +  '_' + odr +'_stars.txt'] # unfortunate naming error for stacks
-        reduce_STA.four_filt_split(starlists, odr, flip_180=True)
+        starlists = [stacks_dir + '4f/fld2_stack_' + suf +  '_' + odr +'_stars.txt'] # unfortunate naming error for stacks
+        reduce_STA.four_filt_split(starlists, odr)
     return
     
 
@@ -522,7 +524,7 @@ def analyze_4F_stacks():
     stats_file = stats_dir + 'stats_stacks.fits'
     starlist_stats = [strlst.replace('_stars.txt', '_stars_stats.fits') for strlst in all_starlists]
     ## Calc stats on all the stacked images
-    redu.calc_star_stats(all_images, output_stats=stats_file, starlists=all_starlists, fourfilt=True)
+    #redu.calc_star_stats(all_images, output_stats=stats_file, starlists=all_starlists, fourfilt=True)
     print("Starting moffat fitting")
     moffat.fit_moffat(all_images, stats_file, starlists=starlist_stats, flux_percent=0.2)
 

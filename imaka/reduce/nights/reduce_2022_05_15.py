@@ -1,9 +1,10 @@
-## reduce_2022_05_12.py
+## reduce_2022_05_15.py
 ##########################
 ## edited by Eden McEwen
 ## May 2022
 ## A four filter run
-## Did position 3 (VBRI) this night, not planning on rotating
+## Did position 2 (IVBR) this night, not planning on rotating
+## Seeing changed significantly during this run, so we split img lists
 
 import numpy as np
 from astropy.io import fits
@@ -24,7 +25,7 @@ from imaka.reduce import massdimm
 import matplotlib
 # matplotlib.use('Agg')
 
-night = '20220512'
+night = '20220515'
 root_dir = f'/g/lu/data/imaka/onaga/{night}/sta/'
 
 data_dir = root_dir + 'Fld2/'
@@ -41,27 +42,30 @@ stacks_dir = root_dir + 'reduce/stacks/'
 massdimm_dir = root_dir + 'reduce/massdimm/'
 
 ## Junk files -- see logs
-## 130 - oversaturated DM voltages
 
 dict_suffix = {'open': '_o',
                'LS':   'LS_c',
+               'TT':   'TT_c',
               }
 
-dict_images = {'open':  [124, 126, 128, 130, 132, 134, 136, 138, 140, 147, 149, 151, 153, 155, 157, 159],
-               'LS':    [123, 125, 127, 129, 131, 133, 135, 137, 139, 146, 148, 150, 152, 154, 156, 158], 
+dict_images = {'open':  [3,6,9,12,15,18,29,32,35,38,46,49,52,55,58,61,64],
+               'LS':    [0,1,4,5,8,11,14,17,28,31,34,37,45,48,51,54,57,60,63], 
+               'TT':    [2,7,10,13,16,19,30,33,36,39,47,50,53,56,59,62,65],
               }
 
-dict_fwhm = {'open': 12,
-             'LS': 8,
+dict_fwhm = {'open':  12,
+             'LS':     8,
+             'TT':    10,
             }  
 
 # only include filter if key was a 4F file
-dict_filt = {'open': 'VBRI',
-             'LS':   'VBRI',
+dict_filt = {'open': 'IVBR',
+             'LS':   'IVBR',
+             'TT':   'IVBR',
               }
 
 ###############################################
-### REDUCTION
+### REDUCTION #################################
 ###############################################
 
 
@@ -71,10 +75,10 @@ def make_flat():
     Just for single filter I band
     """
     util.mkdir(calib_dir)
+    filt_order = 'IVBR'
     
     ## Copy flat from a previous night
-    #shutil.copyfile(root_dir + '../../20210724/sta/reduce/calib/flat_BRIV.fits', calib_dir + 'flat_BRIV.fits')
-    #shutil.copyfile(root_dir + '../../20210723/sta/reduce/calib/flat_RIVB.fits', calib_dir + 'flat_RIVB.fits')
+    shutil.copyfile(root_dir + '../../20220514/sta/reduce/calib/flat_IVBR.fits', calib_dir + 'flat_IVBR.fits')
     
     ## Creating flat from range, I band only
     #flat_num = np.arange(37, 49+1)
@@ -83,7 +87,7 @@ def make_flat():
     #reduce_STA.treat_overscan(flat_frames)
     #calib.makeflat(scan_flat_frames, None, calib_dir + 'domeflat_I.fits', darks=False)
     
-    calib.make_mask(calib_dir + 'flat_VBRI.fits', calib_dir + 'mask_VBRI.fits',
+    calib.make_mask(f'{calib_dir}flat_{filt_order}.fits', f'{calib_dir}mask_{filt_order}.fits',
                        mask_min=0.8, mask_max=1.4,
                        left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
     return
@@ -97,11 +101,11 @@ def make_sky():
     # shutil.copyfile(root_dir + '../../20210724/sta/dark/dark_044_scan.fits', sky_dir + 'fld2_sky_tmp.fits')
     
     ## CREATING A SKY
-    sky_num = np.arange(141, 145+1)
+    sky_num = np.arange(40, 44+1)
     sky_frames = ['{0:s}sky_{1:03d}_o.fits'.format(data_dir, ss) for ss in sky_num]
     scan_sky_frames =  ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num]
     reduce_STA.treat_overscan(sky_frames)
-    calib.makedark(scan_sky_frames, sky_dir + 'fld2_sky_VBRI.fits')
+    calib.makedark(scan_sky_frames, sky_dir + 'fld2_sky_IVBR.fits')
 
     return
 
@@ -113,30 +117,31 @@ def make_dark():
     # shutil.copyfile(root_dir + '../../20210724/sta/dark/dark_044_scan.fits', sky_dir + 'fld2_sky_tmp.fits')
     
     ## CREATING A SKY
-    print("I quad flat (120)")
-    dark_num = np.arange(111, 115+1)
+    print("I quad flat (60)")
+    dark_num = np.arange(51, 55+1)
     dark_frames = ['{0:s}dark_{1:03d}.fits'.format(dark_dir, ss) for ss in dark_num]
     scan_dark_frames = ['{0:s}dark_{1:03d}_scan.fits'.format(dark_dir, ss) for ss in dark_num]
     
     reduce_STA.treat_overscan(dark_frames)
-    calib.makedark(scan_dark_frames, calib_dir + 'fld2_dark120_VBRI.fits')
+    calib.makedark(scan_dark_frames, calib_dir + 'fld2_dark60_IVBR.fits')
     
     print("BVR quad flat (20)")
-    dark_num = np.arange(116,118+1)
+    dark_num = np.arange(46,50+1)
     dark_frames = ['{0:s}dark_{1:03d}.fits'.format(dark_dir, ss) for ss in dark_num]
     scan_dark_frames = ['{0:s}dark_{1:03d}_scan.fits'.format(dark_dir, ss) for ss in dark_num]
     
     reduce_STA.treat_overscan(dark_frames)
-    calib.makedark(scan_dark_frames, calib_dir + 'fld2_dark20_VBRI.fits')
-    
+    calib.makedark(scan_dark_frames, calib_dir + 'fld2_dark20_IVBR.fits')
+
     return
+
 
 def reduce_fld2():
 
     util.mkdir(out_dir)
 
     ## Loop through all the different data sets and reduce them.
-    #for key in ['open_RIVB', 'LS_RIVB', 'docz_RIVB']: ## Single key setup
+    #for key in ['LS_3new','open_3' ]: ## Single key setup
     for key in dict_suffix.keys():
         
         img = dict_images[key]
@@ -159,7 +164,7 @@ def reduce_fld2():
     return
 
 ###############################################
-### ANALYSIS
+### ANALYSIS ##################################
 ###############################################
 
 def find_stars_fld2():
@@ -375,44 +380,45 @@ def make_flat_4F():
     util.mkdir(calib_dir)
     
     ## Darks are the same all night
-    filt_order = "VBRI"
-    flat_num_120 = np.arange(108, 110+1)
-    flat_num_020 = np.arange(103, 107+1)
+    filt_order = "IVBR"
+    flat_num_60 = np.arange(62, 66+1)
+    flat_num_20 = np.arange(57, 61+1)
     
     print(filt_order)
     
-    print("I quad flat (120)")
-    dark_num = np.arange(116, 118+1)
+    print("I quad flat (60)")
+    dark_num = np.arange(51, 55+1)
     dark_frames = ['{0:s}dark_{1:03d}.fits'.format(dark_dir, ss) for ss in dark_num]
     scan_dark_frames = ['{0:s}dark_{1:03d}_scan.fits'.format(dark_dir, ss) for ss in dark_num]
-    flat_frames = ['{0:s}sta{1:03d}_o.fits'.format(dome_dir, ss) for ss in flat_num_120]
-    scan_flat_frames = ['{0:s}sta{1:03d}_o_scan.fits'.format(dome_dir, ss) for ss in flat_num_120]
+    flat_frames = ['{0:s}sta{1:03d}_o.fits'.format(dome_dir, ss) for ss in flat_num_60]
+    scan_flat_frames = ['{0:s}sta{1:03d}_o_scan.fits'.format(dome_dir, ss) for ss in flat_num_60]
     
     reduce_STA.treat_overscan(dark_frames)
     reduce_STA.treat_overscan(flat_frames)
     calib.makeflat(scan_flat_frames, scan_dark_frames, 
-                   f'{calib_dir}domeflat_120_{filt_order}.fits', darks=True, fourfilter=True)
+                   f'{calib_dir}domeflat_60_{filt_order}.fits', darks=True, fourfilter=True)
     
     print("BVR quad flat (20)")
-    dark_num = np.arange(111, 115+1)
+    dark_num = np.arange(46,50+1)
     dark_frames = ['{0:s}dark_{1:03d}.fits'.format(dark_dir, ss) for ss in dark_num]
     scan_dark_frames = ['{0:s}dark_{1:03d}_scan.fits'.format(dark_dir, ss) for ss in dark_num]
-    flat_frames = ['{0:s}sta{1:03d}_o.fits'.format(dome_dir, ss) for ss in flat_num_020]
-    scan_flat_frames = ['{0:s}sta{1:03d}_o_scan.fits'.format(dome_dir, ss) for ss in flat_num_020]
+    flat_frames = ['{0:s}sta{1:03d}_o.fits'.format(dome_dir, ss) for ss in flat_num_20]
+    scan_flat_frames = ['{0:s}sta{1:03d}_o_scan.fits'.format(dome_dir, ss) for ss in flat_num_20]
     
     reduce_STA.treat_overscan(dark_frames)
     reduce_STA.treat_overscan(flat_frames)
     calib.makeflat(scan_flat_frames, scan_dark_frames, 
-                   f'{calib_dir}domeflat_020_{filt_order}.fits', darks=True, fourfilter=True)
+                   f'{calib_dir}domeflat_20_{filt_order}.fits', darks=True, fourfilter=True)
     
     # Combining two flats based on filter orientation
-    calib.combine_filter_flat(f'{calib_dir}domeflat_120_{filt_order}.fits',
-                              f'{calib_dir}domeflat_020_{filt_order}.fits', 
+    print("Combining: I quad flat (60) & BVR quad flat (20)")
+    calib.combine_filter_flat(f'{calib_dir}domeflat_60_{filt_order}.fits',
+                              f'{calib_dir}domeflat_20_{filt_order}.fits', 
                               f'{calib_dir}flat_{filt_order}.fits', filt_order, flip_180=True)
-    
     calib.make_mask(f'{calib_dir}flat_{filt_order}.fits', f'{calib_dir}mask_{filt_order}.fits',
                        mask_min=0.8, mask_max=1.4,
                        left_slice=20, right_slice=20, top_slice=25, bottom_slice=25)
+    
     return
 
 
