@@ -428,7 +428,7 @@ def split_4F_starlists():
         suf = dict_suffix[key]
         odr = dict_filt[key]
         starlists = [out_dir + 'sta{img:03d}{suf:s}_scan_clean_stars.txt'.format(img=ii, suf=suf) for ii in img]
-        reduce_STA.four_filt_split(starlists, odr)
+        reduce_STA.four_filt_split(starlists, odr, flip_180=True)
     return
     
 
@@ -496,14 +496,15 @@ def update_4F_stats():
 
 # must stack and find stars for stacks previously.
 def split_4F_stacks():
+    util.mkdir(stacks_dir+'4F/')
     all_images = []
     for key in dict_suffix.keys():
         img = dict_images[key]
         suf = dict_suffix[key]
         odr = dict_filt[key]
 
-        starlists = [stacks_dir + '4f/fld2_stack_' + suf +  '_' + odr +'_stars.txt'] # unfortunate naming error for stacks
-        reduce_STA.four_filt_split(starlists, odr)
+        starlists = [stacks_dir + 'fld2_stack_' + suf +  '_' + odr +'_stars.txt'] # unfortunate naming error for stacks
+        reduce_STA.four_filt_split(starlists, odr, flip_180=True)
     return
     
 
@@ -524,7 +525,7 @@ def analyze_4F_stacks():
     stats_file = stats_dir + 'stats_stacks.fits'
     starlist_stats = [strlst.replace('_stars.txt', '_stars_stats.fits') for strlst in all_starlists]
     ## Calc stats on all the stacked images
-    #redu.calc_star_stats(all_images, output_stats=stats_file, starlists=all_starlists, fourfilt=True)
+    redu.calc_star_stats(all_images, output_stats=stats_file, starlists=all_starlists, fourfilt=True)
     print("Starting moffat fitting")
     moffat.fit_moffat(all_images, stats_file, starlists=starlist_stats, flux_percent=0.2)
 

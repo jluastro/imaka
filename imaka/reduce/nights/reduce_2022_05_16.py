@@ -1,4 +1,4 @@
-## reduce_2022_05_14.py
+## reduce_2022_05_16.py
 ##########################
 ## edited by Eden McEwen
 ## May 2022
@@ -45,23 +45,27 @@ massdimm_dir = root_dir + 'reduce/massdimm/'
 
 dict_suffix = {'open': '_o',
                'LS':   'LS_c',
+               'LS_new': 'LS_c2',
                'TT':   'TT_c',
               }
 
-dict_images = {'open':  [],
-               'LS':    [], 
-               'TT':    [], 
+dict_images = {'open':   [87,90,94,98,102,106,110,120,124,128,137,141,145,149,153],
+               'LS':     [86,89,92,93,96,97,100,104,108,118,122,126,135,139,143,147,151], 
+               'LS_new': [101,105,109,119,123,127,136,140,144,148,152],
+               'TT':     [88,91,95,99,103,107,111,121,125,129,138,142,146,150,154]
               }
 
 dict_fwhm = {'open': 12,
              'LS': 8,
+             'LS_new': 8,
              'TT': 10,
             }  
 
 # only include filter if key was a 4F file
 dict_filt = {'open': 'RIVB',
              'LS':   'RIVB',
-             'LS':   'RIVB',
+             'LS_new': 'RIVB',
+             'TT':   'RIVB',
               }
 
 ###############################################
@@ -101,7 +105,7 @@ def make_sky():
     # shutil.copyfile(root_dir + '../../20210724/sta/dark/dark_044_scan.fits', sky_dir + 'fld2_sky_tmp.fits')
     
     ## CREATING A SKY
-    sky_num = np.arange(141, 145+1)
+    sky_num = np.arange(130, 134+1)
     sky_frames = ['{0:s}sky_{1:03d}_o.fits'.format(data_dir, ss) for ss in sky_num]
     scan_sky_frames =  ['{0:s}sky_{1:03d}_o_scan.fits'.format(data_dir, ss) for ss in sky_num]
     reduce_STA.treat_overscan(sky_frames)
@@ -117,16 +121,16 @@ def make_dark():
     # shutil.copyfile(root_dir + '../../20210724/sta/dark/dark_044_scan.fits', sky_dir + 'fld2_sky_tmp.fits')
     
     ## CREATING A SKY
-    print("I quad flat (120)")
-    dark_num = np.arange(111, 115+1)
+    print("I quad dark (60)")
+    dark_num = np.arange(76, 80+1)
     dark_frames = ['{0:s}dark_{1:03d}.fits'.format(dark_dir, ss) for ss in dark_num]
     scan_dark_frames = ['{0:s}dark_{1:03d}_scan.fits'.format(dark_dir, ss) for ss in dark_num]
     
     reduce_STA.treat_overscan(dark_frames)
     calib.makedark(scan_dark_frames, calib_dir + 'fld2_dark120_RIVB.fits')
     
-    print("BVR quad flat (20)")
-    dark_num = np.arange(116,118+1)
+    print("BVR quad dark (20)")
+    dark_num = np.arange(81,85+1)
     dark_frames = ['{0:s}dark_{1:03d}.fits'.format(dark_dir, ss) for ss in dark_num]
     scan_dark_frames = ['{0:s}dark_{1:03d}_scan.fits'.format(dark_dir, ss) for ss in dark_num]
     
@@ -140,8 +144,8 @@ def reduce_fld2():
     util.mkdir(out_dir)
 
     ## Loop through all the different data sets and reduce them.
-    #for key in ['open_RIVB', 'LS_RIVB', 'docz_RIVB']: ## Single key setup
-    for key in dict_suffix.keys():
+    for key in ['LS','LS_new', 'TT']: ## Single key setup
+    #for key in dict_suffix.keys():
         
         img = dict_images[key]
         suf = dict_suffix[key]

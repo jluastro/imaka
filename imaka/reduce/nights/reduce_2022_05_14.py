@@ -57,7 +57,7 @@ dict_images = {'open_1':  [68,70,72,74,76,78,82],
                'LS_1':    [67,69,71,73,75,77,81], 
                'open_2':  [89,91,93,95,97,99,101,103],
                'LS_2':    [88,90,92,94,96,98,100,102],
-               'open_3':  [112, 115, 118, 124, 127],
+               'open_3':  [ 115, 118, 124, 127], #112
                'LS_3':    [110, 113, 116, 122, 125, 128],
                'LS_3new': [111, 114, 117, 123, 126, 129],
               }
@@ -533,6 +533,7 @@ def split_4F_stacks():
 def analyze_4F_stacks():
     ## Loop through all the different data sets
     #for key in ['set_name']: ## Single key setup
+    util.mkdir(stacks_dir+'4F/')
     all_images = []
     all_starlists = []
     
